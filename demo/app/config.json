@@ -1,0 +1,14 @@
+{
+        "Uart":{
+                "Baud":115200,
+                "DataBits":8,
+                "StopBits":1,
+                "Parity":"n"
+        },
+        "Socket":{
+                "ipaddr":"192.168.1.251",
+                "net_port":8000
+        },
+        "Led0":1,
+        "Beep0":0
+}

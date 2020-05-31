@@ -1,0 +1,25 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "F:/arm-gcc/include",
+                "F:/arm-gcc/arm-linux-gnueabihf/libc/usr/include",
+                "F:/arm-gcc/arm-linux-gnueabihf/libc/usr/include/linux"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "__ARM_PCS_VFP"
+            ],
+            "windowsSdkVersion": "8.1",
+            "compilerPath": "D:/Software/Visual Studio 2015/VC/bin/cl.exe",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "msvc-x64"
+        }
+    ],
+    "version": 4
+}

@@ -1,0 +1,12 @@
+
+
+#mod insert
+insmod /usr/driver/kernal_beep.ko
+insmod /usr/driver/kernal_led.ko
+
+#sshd func
+/usr/local/bin/sshd
+
+#app
+/usr/app/shutdown
+/usr/app/app_demo /usr/app/config.json
