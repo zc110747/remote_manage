@@ -1,4 +1,4 @@
-/*
+﻿/*
  * File      : typedef.h
  * system define
  * COPYRIGHT (C) 2020, zc

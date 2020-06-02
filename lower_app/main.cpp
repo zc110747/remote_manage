@@ -15,7 +15,8 @@
 /*@{*/
 #include "include/UartThread.h"
 #include "include/ApplicationThread.h"
-#include "include/SocketThread.h"
+#include "include/SocketTcpThread.h"
+#include "include/SocketUdpThread.h"
 #include "include/SystemConfig.h"
 
 /**************************************************************************
@@ -57,6 +58,7 @@ int main(int argc, char* argv[])
     int result = 0;
 	std::string sConfigFile;
 
+	//守护进程初始化
     result = daemon(1, 1);
 	if(result < 0)
 	{
@@ -71,7 +73,7 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
-		sConfigFile = std::string("config.js");
+		sConfigFile = std::string("config.json");
 	}
 	USR_DEBUG("config file:%s\n", sConfigFile.c_str());
 
@@ -84,7 +86,8 @@ int main(int argc, char* argv[])
 #if __SYSTEM_DEBUG == 0
 	UartThreadInit();
 	ApplicationThreadInit();
-	SocketThreadInit();
+	SocketTcpThreadInit();
+	SocketUdpThreadInit();
 	for(;;){
 		sleep(10);
 	}
@@ -116,31 +119,29 @@ void SystemLogArray(uint8_t *pArrayBuffer, uint16_t nArraySize)
 }
 
 #if __SYSTEM_DEBUG == 1
-static uint8_t 	rx_buffer[BUFFER_SIZE];
-static uint8_t  tx_buffer[BUFFER_SIZE];
+#define TEST_BUFFER_SZIE	1200
+static uint8_t 	rx_buffer[TEST_BUFFER_SZIE];
+static uint8_t  tx_buffer[TEST_BUFFER_SZIE];
 const uint8_t test_command[] = {
 	0x5a, 0x01, 0x32, 0x23, 0x00, 0x08, 0x02, 0x00, 
 	0x00, 0x00, 0x03, 0x07, 0x00, 0x01, 0xFF, 0xFF
 };
-class CTestProtocolInfo:public CProtocolInfo
+
+template<class T>
+class CTestProtocolInfo:public CProtocolInfo<T>
 {
 private: 
-	uint16_t read_num;
-	uint16_t total_num;
+	uint16_t read_num{0};
+	uint16_t total_num{sizeof(test_command)};
 
 public:
-	CTestProtocolInfo(uint8_t *p_rx, uint8_t *p_tx, uint8_t *p_rxd, uint16_t max_bs):
-		CProtocolInfo(p_rx, p_tx, p_rxd, max_bs){
-			total_num = sizeof(test_command);
-			read_num = 0;
-	}
-	~CTestProtocolInfo(){}
+	using CProtocolInfo<T>::CProtocolInfo;
 
 	void clear(void){
 		read_num = 0;
 	}
 
-	int DeviceRead(int nFd, uint8_t *pDataStart, uint16_t nDataSize)
+	int DeviceRead(int nFd, uint8_t *pDataStart, uint16_t nDataSize, T ExtraInfo)
 	{
 		uint16_t left_num, min_num;
 
@@ -149,14 +150,16 @@ public:
 		memcpy(pDataStart, &test_command[read_num], min_num);
 		read_num += min_num;
 
-		return min_num;
+		*ExtraInfo = min_num;
+		return *ExtraInfo;
 	}
 	
-	int DeviceWrite(int nFd, uint8_t *pDataStart, uint16_t nDataSize)
+	int DeviceWrite(int nFd, uint8_t *pDataStart, uint16_t nDataSize, T ExtraInfo)
 	{
 		printf("send array:");
 		SystemLogArray(pDataStart, nDataSize);
-		return nDataSize;
+		*ExtraInfo = nDataSize;
+		return *ExtraInfo;
 	}
 };
 
@@ -170,20 +173,22 @@ public:
 static void SystemTest(void)
 {
 	int nFd = 0, nFlag;
+	int size;
 	CApplicationReg *pApplicationReg;
-	CTestProtocolInfo *pTesetProtocolInfo;
+	CTestProtocolInfo<int *> *pTesetProtocolInfo;
 
 	pApplicationReg = new CApplicationReg();
-	pTesetProtocolInfo = new CTestProtocolInfo(rx_buffer, tx_buffer, 
-								&rx_buffer[FRAME_HEAD_SIZE], BUFFER_SIZE);
+	pTesetProtocolInfo = new CTestProtocolInfo<int *>(rx_buffer, tx_buffer, 
+								&rx_buffer[FRAME_HEAD_SIZE], TEST_BUFFER_SZIE);
 	/*更新设备处理指针*/
 	SetApplicationReg(pApplicationReg);
 
 	/*执行接收数据的处理指令*/
-	nFlag = pTesetProtocolInfo->CheckRxBuffer(nFd);
+	nFlag = pTesetProtocolInfo->CheckRxBuffer(nFd, &size);
 	if(nFlag == RT_OK){
 		pTesetProtocolInfo->ExecuteCommand(nFd);
 		pApplicationReg->RefreshAllDevice();
+		pTesetProtocolInfo->SendTxBuffer(nFd, &size);
 	}
 
 	delete pApplicationReg;

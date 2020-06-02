@@ -5,7 +5,7 @@ CFLAGS  := -O3 -std=c++11 -lpthread
 #头文件路径
 LOWERAPP_INC_ROOT = lib/jsoncpp/include
 
-OBJS = main.o source/ApplicationThread.o source/SocketThread.o source/UartThread.o source/UsrProtocol.o source/SystemConfig.o driver/Beep.o driver/Led.o 
+OBJS = main.o source/ApplicationThread.o source/SocketTcpThread.o source/SocketUdpThread.o source/UartThread.o source/SystemConfig.o driver/Beep.o driver/Led.o 
 LIB = lib/libjsoncpp.a #链接的库
 APP = app_demo
 

@@ -210,10 +210,12 @@ int CApplicationReg::RefreshAllDevice(void)
                             BeepStatusConvert((pRegVal[2]>>1)&0x01);
                         break;
                         case DEVICE_REBOOT:
-                            system("reboot");
-                            while(1){
-                                USR_DEBUG("wait for reboot\r\n");
-                                sleep(1);
+                            if(system("reboot") != -1)
+                            {
+                                USR_DEBUG("Wait For System Reboot\r\n");
+                                while(1){
+                                    sleep(1);
+                                }
                             }
                         break;
                         default:
@@ -236,7 +238,7 @@ int CApplicationReg::RefreshAllDevice(void)
             {
                 free(pRegVal);
                 free(pRegCacheVal);
-                USR_DEBUG("modify by other interface\n");
+                USR_DEBUG("Modify By Other Interface\n");
                 return RT_FAIL;
             }
         }
@@ -244,8 +246,9 @@ int CApplicationReg::RefreshAllDevice(void)
         free(pRegVal);
         free(pRegCacheVal);
     }
-    else{
-        USR_DEBUG("malloc error\n");
+    else
+    {
+        USR_DEBUG("Malloc Error\n");
     }
 
     return RT_OK;
@@ -290,7 +293,7 @@ void ApplicationThreadInit(void)
 
     nErr = pthread_create(&tid1, NULL, ApplicationLoopTask, NULL);	
     if(nErr != 0){
-        USR_DEBUG("app task thread create nErr, %d\n", nErr);
+        USR_DEBUG("App Task Thread Create Err:%d\n", nErr);
     }
 }
 
@@ -303,7 +306,7 @@ void ApplicationThreadInit(void)
  */
 void *ApplicationLoopTask(void *arg)
 {
-    USR_DEBUG("app Task Start\n");
+    USR_DEBUG("App Thread Start\n");
     for(;;){
         if(pApplicationReg->RefreshAllDevice() == RT_OK){
             usleep(800);      //指令处理完休眠，非RT_OK表示仍有指令需要处理

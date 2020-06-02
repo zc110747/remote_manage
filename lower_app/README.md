@@ -11,4 +11,10 @@ driver/ 硬件驱动的实现
 include/ 头文件路径
 lib/ 应用编写需要的外部支持库
 source/ 应用代码实现
-template/ 代码结构模板
+template/ 代码结构模板  
+
+编译指令:
+cd lib/jsoncpp
+make
+cd ../../
+make

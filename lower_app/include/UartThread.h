@@ -20,8 +20,8 @@
 * Include Header Files
 ***************************************************************************/
 #include "UsrTypeDef.h"
-#include "UsrProtocol.h"
 #include "ApplicationThread.h"
+#include "UsrProtocol.hpp"
 
 /**************************************************************************
 * Global Macro Definition
@@ -31,20 +31,21 @@
 /**************************************************************************
 * Global Type Definition
 ***************************************************************************/
-class CUartProtocolInfo:public CProtocolInfo
+template<class T>
+class CUartProtocolInfo:public CProtocolInfo<T>
 {
 public:
-	CUartProtocolInfo(uint8_t *pRxCachebuf, uint8_t *pTxCacheBuf, uint8_t *pRxData, uint16_t nMaxSize):
-		CProtocolInfo(pRxCachebuf, pTxCacheBuf, pRxData, nMaxSize){}
-	~CUartProtocolInfo(){}
+	using CProtocolInfo<T>::CProtocolInfo;
 
-	int DeviceRead(int nFd, uint8_t *pDataStart, uint16_t nDataSize)
+	int DeviceRead(int nFd, uint8_t *pDataStart, uint16_t nDataSize, T ExtraInfo)
 	{
-		return read(nFd, pDataStart, nDataSize);
+		*ExtraInfo = read(nFd, pDataStart, nDataSize);
+		return *ExtraInfo;
 	}
-	int DeviceWrite(int nFd, uint8_t *pDataStart, uint16_t nDataSize)
+	int DeviceWrite(int nFd, uint8_t *pDataStart, uint16_t nDataSize, T ExtraInfo)
 	{
-		return write(nFd, pDataStart, nDataSize);
+		*ExtraInfo = write(nFd, pDataStart, nDataSize);
+		return *ExtraInfo;
 	}
 };
 

@@ -32,9 +32,13 @@ struct SSystemConfig
     int m_stop_bits;
     std::string m_parity;
 
-    //网络配置
-    std::string m_ipaddr;
-    int m_net_port;
+    //网络配置TCP
+    std::string m_tcp_ipaddr;
+    int m_tcp_net_port;
+
+    // //网络配置UDP
+    std::string m_udp_ipaddr;
+    int m_udp_net_port;
 
     //硬件状态
     int m_led0_status;
@@ -52,6 +56,6 @@ struct SSystemConfig
 /**************************************************************************
 * Global Functon Declaration
 ***************************************************************************/
-int system_config_init(std::string sConfigfile);
+int system_config_init(std::string &sConfigfile);
 SSystemConfig *GetSSytemConfigInfo(void);
 #endif

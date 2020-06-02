@@ -37,9 +37,13 @@ static SSystemConfig SSysConifg = {
     1,
     std::string("n"),
 
-    //网络设置
+    //TCP网络设置
     std::string("127.0.0.1"),
     8000,
+
+    //UDP网络设置
+    std::string("127.0.0.1"),
+    8001,
 
     //硬件状态
     0,
@@ -68,7 +72,7 @@ static SSystemConfig SSysConifg = {
  *  
  * @return 硬件配置处理的结果
  */
-int system_config_init(std::string sConfigfile)
+int system_config_init(std::string &sConfigfile)
 {
     Json::Value root;
     std::ifstream ifs;
@@ -89,9 +93,13 @@ int system_config_init(std::string sConfigfile)
     SSysConifg.m_stop_bits = root["Uart"]["StopBits"].asInt();
     SSysConifg.m_parity = std::string(root["Uart"]["Parity"].asString());
 
-    //sokcet状态
-    SSysConifg.m_ipaddr = std::string(root["Socket"]["ipaddr"].asString());
-    SSysConifg.m_net_port = root["Socket"]["net_port"].asInt();
+    //sokcet TCP状态
+    SSysConifg.m_tcp_ipaddr = std::string(root["SocketTcp"]["ipaddr"].asString());
+    SSysConifg.m_tcp_net_port = root["SocketTcp"]["net_port"].asInt();
+
+    //sokcet UDP状态
+    SSysConifg.m_udp_ipaddr = std::string(root["SocketUdp"]["ipaddr"].asString());
+    SSysConifg.m_udp_net_port = root["SocketUdp"]["net_port"].asInt();
 
     //硬件状态
     SSysConifg.m_led0_status = root["Led0"].asInt();

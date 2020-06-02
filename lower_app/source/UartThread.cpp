@@ -28,7 +28,7 @@
 /**************************************************************************
 * Local static Variable Declaration
 ***************************************************************************/
-static CUartProtocolInfo *pUartProtocolInfo; //uart模块管理信息指针
+static CUartProtocolInfo<int *> *pUartProtocolInfo; //uart模块管理信息指针
 
 static uint8_t 	nRxCacheBuffer[UART_BUFFER_SIZE];
 static uint8_t  nTxCacheBuffer[UART_BUFFER_SIZE];
@@ -64,7 +64,7 @@ void UartThreadInit(void)
 
 	if((nComFd = open(TTY_DEVICE, O_RDWR|O_NOCTTY|O_NDELAY))<0)
 	{	
-		USR_DEBUG("Open %s failed\n", TTY_DEVICE);
+		USR_DEBUG("Open %s Failed\n", TTY_DEVICE);
 		return;
 	}
 	else
@@ -74,13 +74,13 @@ void UartThreadInit(void)
 	}
 
 	//创建UART协议管理对象
-	pUartProtocolInfo = new CUartProtocolInfo(nRxCacheBuffer, nTxCacheBuffer, 
+	pUartProtocolInfo = new CUartProtocolInfo<int *>(nRxCacheBuffer, nTxCacheBuffer, 
 						&nRxCacheBuffer[FRAME_HEAD_SIZE], UART_BUFFER_SIZE);
 
 	nErr = pthread_create(&tid1, NULL, UartLoopThread, NULL);
 	if(nErr != 0)
 	{
-		USR_DEBUG("Uart Task Thread Create Err=%d\n", nErr);
+		USR_DEBUG("Uart Task Thread Create Err:%d\n", nErr);
 	}
 }
 
@@ -94,17 +94,18 @@ void UartThreadInit(void)
 static void *UartLoopThread(void *arg)
 {
 	int nFlag;
+	int size;
 
 	USR_DEBUG("Uart Main Task Start\n");
 	write(nComFd, "Uart Start OK!\n", strlen("Uart Start OK!\n"));
 
 	for(;;)
 	{	   
-		nFlag = pUartProtocolInfo->CheckRxBuffer(nComFd);
+		nFlag = pUartProtocolInfo->CheckRxBuffer(nComFd, &size);
 		if(nFlag == RT_OK)
 		{
 			pUartProtocolInfo->ExecuteCommand(nComFd);
-			pUartProtocolInfo->SendTxBuffer(nComFd);
+			pUartProtocolInfo->SendTxBuffer(nComFd, &size);
 		}
 		else
 		{
@@ -132,7 +133,7 @@ static int set_opt(int nFd, int nBaud, int nDataBits, std::string cParity, int n
 
 	if(tcgetattr(nFd, &oldtio)  !=  0) 
 	{ 
-		USR_DEBUG("SetupSerial 1");
+		USR_DEBUG("Get Serial Attribute Failed\n");
 		return -1;
 	}
 	bzero(&newtio, sizeof(newtio));
@@ -217,11 +218,11 @@ static int set_opt(int nFd, int nBaud, int nDataBits, std::string cParity, int n
 	tcflush(nFd, TCIFLUSH);
 	if((tcsetattr(nFd, TCSANOW,&newtio))!=0)
 	{
-		USR_DEBUG("serial config error\n");
+		USR_DEBUG("Serial Config Error\n");
 		return -1;
 	}
 
-	USR_DEBUG("serial config done!\n\r");
+	USR_DEBUG("Serial Config Done Success!\n\r");
 	return 0;
 }
 
