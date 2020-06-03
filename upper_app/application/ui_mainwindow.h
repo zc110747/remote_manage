@@ -239,7 +239,7 @@ public:
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName(QString::fromUtf8("menubar"));
-        menubar->setGeometry(QRect(0, 0, 710, 23));
+        menubar->setGeometry(QRect(0, 0, 710, 26));
         MainWindow->setMenuBar(menubar);
         statusbar = new QStatusBar(MainWindow);
         statusbar->setObjectName(QString::fromUtf8("statusbar"));
@@ -279,7 +279,7 @@ public:
         label_test->setText(QApplication::translate("MainWindow", "\350\260\203\350\257\225\347\252\227\345\217\243", nullptr));
         btn_clear->setText(QApplication::translate("MainWindow", "\346\270\205\347\251\272\346\225\260\346\215\256", nullptr));
         label_ipaddr->setText(QApplication::translate("MainWindow", "Ipaddr", nullptr));
-        line_edit_ipaddr->setText(QApplication::translate("MainWindow", "192.168.1.251", nullptr));
+        line_edit_ipaddr->setText(QApplication::translate("MainWindow", "127.0.0.1", nullptr));
         label_port->setText(QApplication::translate("MainWindow", "Port", nullptr));
         line_edit_port->setText(QApplication::translate("MainWindow", "8000", nullptr));
         btn_socket_open->setText(QApplication::translate("MainWindow", "\350\277\236\346\216\245\347\275\221\347\273\234", nullptr));

@@ -26,12 +26,12 @@
 * Global Macro Definition
 ***************************************************************************/
 /*协议数据长度*/
-#define FRAME_HEAD_SIZE			6   //协议头数据的宽度
+#define FRAME_HEAD_SIZE			3   //协议头数据的宽度
+#define EXTRA_HEAD_SIZE			3
 #define CRC_SIZE				2   //CRC数据的长度 
 
 /*协议数据格式*/
 #define PROTOCOL_REQ_HEAD  		0x5A	/*协议数据头*/
-#define PROTOCOL_DEVICE_ID      0x01	/*设备ID*/
 #define PROTOCOL_ACK_HEAD		0x5B	/*应答数据头*/
 
 /*设备操作指令*/
@@ -60,8 +60,6 @@
 struct req_frame
 {
 	uint8_t head;
-	uint8_t id;
-	uint16_t packet_id;
 	uint16_t length;
 };
 #pragma pack(pop)
@@ -81,10 +79,10 @@ public:
 	 *  
 	 * @return NULL
 	 */
-	CProtocolInfo(uint8_t *pRxCachebuf, uint8_t *pTxCacheBuf, uint8_t *pRxData, uint16_t nMaxSize){
+	CProtocolInfo(uint8_t *pRxCachebuf, uint8_t *pTxCacheBuf, uint16_t nMaxSize){
 		m_RxCachePtr = pRxCachebuf;
 		m_TxCachePtr = pTxCacheBuf;
-		m_RxCacheDataPtr = pRxData;
+		m_RxCacheDataPtr = &pRxCachebuf[FRAME_HEAD_SIZE+EXTRA_HEAD_SIZE];
 		m_RxBufSize = 0;
 		m_TxBufSize = 0;
 		m_PacketNum = 0;
@@ -182,17 +180,9 @@ public:
 				m_RxBufSize += nread;
 
 				/*已经接收到长度数据*/
-				if(m_RxBufSize > 5)
+				if(m_RxBufSize >= FRAME_HEAD_SIZE)
 				{
 					int nLen;
-
-					/*设备ID检测*/
-					if(frame_ptr->id != PROTOCOL_DEVICE_ID)
-					{
-						m_RxBufSize = 0;
-						USR_DEBUG("Devoce ID Invalid\n");
-						return RT_INVALID;
-					}
 
 					/*获取接收数据的总长度*/
 					m_RxDataSize = LENGTH_CONVERT(frame_ptr->length);
@@ -205,7 +195,12 @@ public:
 						CrcRecv = (m_RxCachePtr[nLen-2]<<8) + m_RxCachePtr[nLen-1];
 						CrcCacl = CrcCalculate(&m_RxCachePtr[1], nLen-CRC_SIZE-1);
 						if(CrcRecv == CrcCacl){
-							m_PacketNum = LENGTH_CONVERT(frame_ptr->packet_id);
+							if(m_RxCachePtr[3] != DEVICE_ID)
+							{
+								USR_DEBUG("Device ID Error:%d\n", m_RxCachePtr[3]);
+								return RT_INVALID;
+							}
+							m_PacketNum = m_RxCachePtr[4]<<8 | m_RxCachePtr[5];
 							return RT_OK;
 						}
 						else{
@@ -258,15 +253,17 @@ public:
 	{
 		uint8_t nOutSize, nIndex;
 		uint16_t nCrcCalc;
+		uint16_t nBufSize;
 
+		nBufSize = nDataSize+4;
 		nOutSize = 0;
 		m_TxCachePtr[nOutSize++] = PROTOCOL_ACK_HEAD;
-		m_TxCachePtr[nOutSize++] = PROTOCOL_DEVICE_ID;
+		m_TxCachePtr[nOutSize++] = (uint8_t)(nBufSize>>8);
+		m_TxCachePtr[nOutSize++] = (uint8_t)(nBufSize&0xff);	
+		m_TxCachePtr[nOutSize++] = DEVICE_ID;
 		m_TxCachePtr[nOutSize++] = (uint8_t)(m_PacketNum>>8);
 		m_TxCachePtr[nOutSize++] = (uint8_t)(m_PacketNum&0xff);
 		m_TxCachePtr[nOutSize++] = nAck;
-		m_TxCachePtr[nOutSize++] = (uint8_t)(nDataSize>>8);
-		m_TxCachePtr[nOutSize++] = (uint8_t)(nDataSize&0xff);	
 
 		if(nDataSize != 0 && pData != NULL)
 		{

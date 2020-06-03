@@ -43,8 +43,8 @@ class CUartProtocolInfo:public CProtocolInfo
 {
 public:
     CUartProtocolInfo(uint8_t *pRxBuffer, uint8_t *pTxBuffer, CComInfo *pComInfo,
-                     CProtocolQueue *pUartQueue, CUartThread *pUartThread):
-        CProtocolInfo(pRxBuffer, pTxBuffer){
+                     CProtocolQueue *pUartQueue, CUartThread *pUartThread, int nMaxBufSize):
+        CProtocolInfo(pRxBuffer, pTxBuffer, nMaxBufSize){
         m_pComInfo = pComInfo;
         m_pUartQueue = pUartQueue;
         m_pThread = pUartThread;

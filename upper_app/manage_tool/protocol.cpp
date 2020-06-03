@@ -5,11 +5,6 @@
 #include <QThread>
 #include <QDebug>
 
-CProtocolInfo::CProtocolInfo(uint8_t *pRxBuffer, uint8_t *pTxBuffer)
-{
-    m_pRxBuffer = pRxBuffer;
-    m_pTxBuffer = pTxBuffer;
-}
 
 //生成发送数据报文
 int CProtocolInfo::CreateSendBuffer(uint8_t nId, uint16_t nSize, uint8_t *pStart, bool bWriteThrough)
@@ -21,19 +16,22 @@ int CProtocolInfo::CreateSendBuffer(uint8_t nId, uint16_t nSize, uint8_t *pStart
             uint8_t nTotalSize, nIndex;
             uint16_t nCrcVal;
             uint16_t random;
+            uint16_t nSendSize;
 
             //生成随机数
             qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));
             random = qrand()%65536;
             m_nPacketId = random;
 
+            nSendSize = nSize+3;
+
             nTotalSize = 0;
             m_pTxBuffer[nTotalSize++] = PROTOCOL_SEND_HEAD;
+            m_pTxBuffer[nTotalSize++] = (uint8_t)(nSendSize>>8);
+            m_pTxBuffer[nTotalSize++] = (uint8_t)(nSendSize&0xff);
             m_pTxBuffer[nTotalSize++] = nId;
             m_pTxBuffer[nTotalSize++] = (uint8_t)(random>>8);
             m_pTxBuffer[nTotalSize++] = (uint8_t)(random&0xff);
-            m_pTxBuffer[nTotalSize++] = (uint8_t)(nSize>>8);
-            m_pTxBuffer[nTotalSize++] = (uint8_t)(nSize&0xff);
 
             if(nSize != 0 && pStart != NULL)
             {
@@ -67,6 +65,54 @@ uint16_t CProtocolInfo::CaclcuCrcVal(uint8_t *pStart, int nSize)
         return 0;
     }
     return 0xffff;
+}
+
+//读取接收数据
+int CProtocolInfo::CheckReceiveData(void)
+{
+    int nRead;
+    //int CrcRecv, CrcCacl;
+
+    do
+    {
+        if(m_RxBufSize == 0)
+        {
+            nRead = DeviceRead(&m_pRxBuffer[m_RxBufSize], 1);
+            if(nRead != 0 && m_pRxBuffer[0] == PROTOCOL_RECV_HEAD)
+            {
+                m_RxBufSize++;
+                m_RxTimout = 0;
+            }
+            else
+            {
+                m_RxBufSize = 0;
+                m_RxTimout++;
+            }
+        }
+
+        if(m_RxBufSize > 0)
+        {
+            nRead = DeviceRead(&m_pRxBuffer[m_RxBufSize], m_MaxBufSize-m_RxBufSize);
+            if(nRead > 0)
+            {
+                m_RxTimout = 0;
+                m_RxBufSize += nRead;
+
+            }
+            else
+            {
+                m_RxTimout++;
+                QThread::msleep(10);
+            }
+        }
+
+        if(m_RxTimout > 4000)
+        {
+           return RT_TIMEOUT;
+        }
+    }while(1);
+
+    return RT_OK;
 }
 
 int CProtocolQueue::QueuePost(SSendBuffer *pSendBuffer)

@@ -67,8 +67,7 @@ void SocketTcpThreadInit(void)
 	int nErr;
 	pthread_t tid1;
 
-    pTcpProtocolInfo = new CTcpProtocolInfo<int *>(nRxCacheBuffer, nTxCacheBuffer, 
-                        &nRxCacheBuffer[FRAME_HEAD_SIZE], SOCKET_BUFFER_SIZE);
+    pTcpProtocolInfo = new CTcpProtocolInfo<int *>(nRxCacheBuffer, nTxCacheBuffer, SOCKET_BUFFER_SIZE);
     nErr = pthread_create(&tid1, NULL, SocketTcpLoopThread, NULL);
 	if(nErr != 0)
     {

@@ -123,7 +123,7 @@ void SystemLogArray(uint8_t *pArrayBuffer, uint16_t nArraySize)
 static uint8_t 	rx_buffer[TEST_BUFFER_SZIE];
 static uint8_t  tx_buffer[TEST_BUFFER_SZIE];
 const uint8_t test_command[] = {
-	0x5a, 0x01, 0x32, 0x23, 0x00, 0x08, 0x02, 0x00, 
+	0x5a, 0x00, 0x0B, 0x01, 0x32, 0x23, 0x02, 0x00, 
 	0x00, 0x00, 0x03, 0x07, 0x00, 0x01, 0xFF, 0xFF
 };
 
@@ -178,8 +178,7 @@ static void SystemTest(void)
 	CTestProtocolInfo<int *> *pTesetProtocolInfo;
 
 	pApplicationReg = new CApplicationReg();
-	pTesetProtocolInfo = new CTestProtocolInfo<int *>(rx_buffer, tx_buffer, 
-								&rx_buffer[FRAME_HEAD_SIZE], TEST_BUFFER_SZIE);
+	pTesetProtocolInfo = new CTestProtocolInfo<int *>(rx_buffer, tx_buffer, TEST_BUFFER_SZIE);
 	/*更新设备处理指针*/
 	SetApplicationReg(pApplicationReg);
 

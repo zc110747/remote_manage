@@ -74,8 +74,7 @@ void UartThreadInit(void)
 	}
 
 	//创建UART协议管理对象
-	pUartProtocolInfo = new CUartProtocolInfo<int *>(nRxCacheBuffer, nTxCacheBuffer, 
-						&nRxCacheBuffer[FRAME_HEAD_SIZE], UART_BUFFER_SIZE);
+	pUartProtocolInfo = new CUartProtocolInfo<int *>(nRxCacheBuffer, nTxCacheBuffer, UART_BUFFER_SIZE);
 
 	nErr = pthread_create(&tid1, NULL, UartLoopThread, NULL);
 	if(nErr != 0)

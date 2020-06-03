@@ -1,5 +1,5 @@
 #编译工具和编译选项
-CC = arm-linux-gnueabihf-g++
+CC = g++
 CFLAGS  := -O3 -std=c++11 -lpthread
 
 #头文件路径

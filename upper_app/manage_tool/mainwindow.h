@@ -43,5 +43,5 @@ private:
     Ui::MainWindow *ui;
 };
 
-QString byteArrayToHexString(QString head, uint8_t* str, uint16_t size, QString tail);
+QString byteArrayToHexString(QString head, const uint8_t* str, uint16_t size, QString tail);
 #endif // MAINWINDOW_H

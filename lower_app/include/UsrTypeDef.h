@@ -69,6 +69,8 @@ typedef unsigned int uint32_t;
 #define PARITY      'N'
 #define STOPBITS    1
 
+#define DEVICE_ID   0x01/*设备ID*/
+
 /**************************************************************************
 * Global Functon Declaration
 ***************************************************************************/

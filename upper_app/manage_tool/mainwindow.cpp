@@ -289,7 +289,7 @@ void MainWindow::on_btn_clear_clicked()
 }
 
 //数组转换成指针发送
-QString byteArrayToHexString(QString head, uint8_t* str, uint16_t size, QString tail)
+QString byteArrayToHexString(QString head, const uint8_t* str, uint16_t size, QString tail)
 {
     QString result = head;
     QString s;

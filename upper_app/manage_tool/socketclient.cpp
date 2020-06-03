@@ -6,7 +6,8 @@ static uint8_t rx_buffer[BUFF_CACHE_SIZE];
 static uint8_t tx_buffer[BUFF_CACHE_SIZE];
 static CTcpClientSocketInfo *pCTcpClientSocketInfo;
 
-CTcpClientSocketInfo::CTcpClientSocketInfo(QObject *parent, uint8_t *pRxBuffer, uint8_t *pTxBuffer):QObject(parent), CProtocolInfo(pRxBuffer, pTxBuffer)
+CTcpClientSocketInfo::CTcpClientSocketInfo(QObject *parent, uint8_t *pRxBuffer, uint8_t *pTxBuffer, int nMaxBufSize):
+    QObject(parent), CProtocolInfo(pRxBuffer, pTxBuffer, nMaxBufSize)
 {
     status = false;
 
@@ -125,7 +126,7 @@ int TcpClientPostQueue(SSendBuffer *pSendBuffer)
 
 void TcpClientSocketInit(void)
 {
-    pCTcpClientSocketInfo = new CTcpClientSocketInfo((QObject *)0, rx_buffer, tx_buffer);
+    pCTcpClientSocketInfo = new CTcpClientSocketInfo((QObject *)0, rx_buffer, tx_buffer, BUFF_CACHE_SIZE);
 }
 
 CTcpClientSocketInfo *GetTcpClientSocket()

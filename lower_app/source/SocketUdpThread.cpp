@@ -59,8 +59,7 @@ void SocketUdpThreadInit(void)
     int nErr;
 	pthread_t tid1;
 
-    pUdpProtocolInfo = new CUdpProtocolInfo<UdpInfo *>(nRxCacheBuffer, nTxCacheBuffer, 
-                        &nRxCacheBuffer[FRAME_HEAD_SIZE], UDP_BUFFER_SIZE);
+    pUdpProtocolInfo = new CUdpProtocolInfo<UdpInfo *>(nRxCacheBuffer, nTxCacheBuffer, UDP_BUFFER_SIZE);
     nErr = pthread_create(&tid1, NULL, SocketUdpLoopThread, NULL);
 	if(nErr != 0)
     {

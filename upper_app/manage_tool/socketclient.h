@@ -35,7 +35,7 @@ class CTcpClientSocketInfo:public QObject, public CProtocolInfo
     Q_OBJECT
 
 public:
-    CTcpClientSocketInfo(QObject *parent=0, uint8_t *pRxBuffer=nullptr, uint8_t *pTxBuffer=nullptr);
+    CTcpClientSocketInfo(QObject *parent=0, uint8_t *pRxBuffer=nullptr, uint8_t *pTxBuffer=nullptr, int nMaxBufSize = 0);
     ~CTcpClientSocketInfo();
     int DeviceRead(uint8_t *pStart, uint16_t nMaxSize){
         return tcpSocket->read((char *)pStart, nMaxSize);

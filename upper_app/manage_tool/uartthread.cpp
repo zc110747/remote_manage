@@ -45,6 +45,7 @@ void CUartThread::run()
                 emit send_edit_test(Sendbuf);
                 Sendbuf.clear();
 
+
                 while(1)
                 {
                     nLen = pUartProtocolInfo->DeviceRead(rx_buffer, BUFF_CACHE_SIZE);
@@ -93,7 +94,8 @@ void UartThreadInit(void)
     pComInfo = new CComInfo();
     pUartThread = new CUartThread();
     pUartQueue = new CProtocolQueue();
-    pUartProtocolInfo = new CUartProtocolInfo(rx_buffer, tx_buffer, pComInfo, pUartQueue, pUartThread);
+    pUartProtocolInfo = new CUartProtocolInfo(rx_buffer, tx_buffer, pComInfo, pUartQueue,
+                                              pUartThread, BUFF_CACHE_SIZE);
 }
 
 CUartProtocolInfo *GetUartProtocolInfo(void)
