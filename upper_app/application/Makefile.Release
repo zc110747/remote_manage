@@ -53,21 +53,21 @@ SOURCES       = ..\manage_tool\qextserialport\qextserialport.cpp \
 		..\manage_tool\main.cpp \
 		..\manage_tool\mainwindow.cpp \
 		..\manage_tool\protocol.cpp \
-		..\manage_tool\socketclient.cpp \
-		..\manage_tool\uartthread.cpp release\moc_mainwindow.cpp \
-		release\moc_socketclient.cpp \
-		release\moc_uartthread.cpp
+		..\manage_tool\tcpclient.cpp \
+		..\manage_tool\uartclient.cpp release\moc_mainwindow.cpp \
+		release\moc_tcpclient.cpp \
+		release\moc_uartclient.cpp
 OBJECTS       = release\qextserialport.obj \
 		release\qextserialport_win.obj \
 		release\commandinfo.obj \
 		release\main.obj \
 		release\mainwindow.obj \
 		release\protocol.obj \
-		release\socketclient.obj \
-		release\uartthread.obj \
+		release\tcpclient.obj \
+		release\uartclient.obj \
 		release\moc_mainwindow.obj \
-		release\moc_socketclient.obj \
-		release\moc_uartthread.obj
+		release\moc_tcpclient.obj \
+		release\moc_uartclient.obj
 
 DIST          = icon.rc ..\manage_tool\qextserialport\qextserialport.h \
 		..\manage_tool\qextserialport\qextserialport_global.h \
@@ -75,16 +75,16 @@ DIST          = icon.rc ..\manage_tool\qextserialport\qextserialport.h \
 		..\manage_tool\commandinfo.h \
 		..\manage_tool\mainwindow.h \
 		..\manage_tool\protocol.h \
-		..\manage_tool\socketclient.h \
+		..\manage_tool\tcpclient.h \
 		..\manage_tool\typedef.h \
-		..\manage_tool\uartthread.h ..\manage_tool\qextserialport\qextserialport.cpp \
+		..\manage_tool\uartclient.h ..\manage_tool\qextserialport\qextserialport.cpp \
 		..\manage_tool\qextserialport\qextserialport_win.cpp \
 		..\manage_tool\commandinfo.cpp \
 		..\manage_tool\main.cpp \
 		..\manage_tool\mainwindow.cpp \
 		..\manage_tool\protocol.cpp \
-		..\manage_tool\socketclient.cpp \
-		..\manage_tool\uartthread.cpp
+		..\manage_tool\tcpclient.cpp \
+		..\manage_tool\uartclient.cpp
 QMAKE_TARGET  = manage_tool
 DESTDIR        = release\ #avoid trailing-slash linebreak
 TARGET         = manage_tool.exe
@@ -181,7 +181,7 @@ all: Makefile.Release  release\manage_tool.exe
 
 release\manage_tool.exe: D:\Software\Qt5\5.12.8\msvc2015_64\lib\Qt5Widgets.lib D:\Software\Qt5\5.12.8\msvc2015_64\lib\Qt5Gui.lib D:\Software\Qt5\5.12.8\msvc2015_64\lib\Qt5Network.lib D:\Software\Qt5\5.12.8\msvc2015_64\lib\Qt5Core.lib D:\Software\Qt5\5.12.8\msvc2015_64\lib\qtmain.lib ui_mainwindow.h $(OBJECTS) release\icon.res
 	$(LINKER) $(LFLAGS) /MANIFEST:embed /OUT:$(DESTDIR_TARGET) @<<
-release\qextserialport.obj release\qextserialport_win.obj release\commandinfo.obj release\main.obj release\mainwindow.obj release\protocol.obj release\socketclient.obj release\uartthread.obj release\moc_mainwindow.obj release\moc_socketclient.obj release\moc_uartthread.obj
+release\qextserialport.obj release\qextserialport_win.obj release\commandinfo.obj release\main.obj release\mainwindow.obj release\protocol.obj release\tcpclient.obj release\uartclient.obj release\moc_mainwindow.obj release\moc_tcpclient.obj release\moc_uartclient.obj
 $(LIBS)
 <<
 
@@ -194,10 +194,10 @@ qmake: FORCE
 qmake_all: FORCE
 
 dist:
-	$(ZIP) manage_tool.zip $(SOURCES) $(DIST) ..\manage_tool\manage_tool.pro D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\spec_pre.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\common\angle.conf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\win32\windows_vulkan_sdk.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\common\windows-vulkan.conf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\common\msvc-desktop.conf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\qconfig.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3danimation.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3danimation_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dcore.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dcore_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dextras.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dextras_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dinput.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dinput_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dlogic.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dlogic_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dquick.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dquick_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dquickanimation.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dquickanimation_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dquickextras.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dquickextras_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dquickinput.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dquickinput_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dquickrender.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dquickrender_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dquickscene2d.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dquickscene2d_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3drender.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3drender_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_accessibility_support_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_axbase.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_axbase_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_axcontainer.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_axcontainer_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_axserver.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_axserver_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_bluetooth.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_bluetooth_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_bootstrap_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_charts.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_charts_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_concurrent.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_concurrent_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_core.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_core_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_datavisualization.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_datavisualization_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_dbus.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_dbus_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_designer.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_designer_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_designercomponents_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_devicediscovery_support_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_edid_support_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_egl_support_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_eventdispatcher_support_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_fb_support_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_fontdatabase_support_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_gamepad.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_gamepad_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_gui.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_gui_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_help.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_help_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_location.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_location_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_multimedia.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_multimedia_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_multimediawidgets.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_multimediawidgets_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_network.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_network_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_networkauth.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_networkauth_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_nfc.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_nfc_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_opengl.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_opengl_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_openglextensions.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_openglextensions_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_packetprotocol_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_platformcompositor_support_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_positioning.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_positioning_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_positioningquick.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_positioningquick_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_printsupport.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_printsupport_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_purchasing.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_purchasing_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_qml.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_qml_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_qmldebug_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_qmldevtools_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_qmltest.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_qmltest_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_qtmultimediaquicktools_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_quick.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_quick_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_quickcontrols2.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_quickcontrols2_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_quickparticles_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_quickshapes_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_quicktemplates2.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_quicktemplates2_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_quickwidgets.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_quickwidgets_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_remoteobjects.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_remoteobjects_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_repparser.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_repparser_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_script.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_script_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_scripttools.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_scripttools_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_scxml.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_scxml_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_sensors.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_sensors_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_serialbus.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_serialbus_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_serialport.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_serialport_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_sql.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_sql_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_svg.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_svg_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_testlib.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_testlib_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_texttospeech.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_texttospeech_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_theme_support_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_uiplugin.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_uitools.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_uitools_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_virtualkeyboard.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_virtualkeyboard_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_vulkan_support_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_webchannel.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_webchannel_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_websockets.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_websockets_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_webview.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_webview_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_widgets.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_widgets_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_windowsuiautomation_support_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_winextras.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_winextras_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_xml.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_xml_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_xmlpatterns.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_xmlpatterns_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_zlib_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\qt_functions.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\qt_config.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\win32-msvc\qmake.conf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\spec_post.prf .qmake.stash D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\exclusive_builds.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\common\msvc-version.conf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\toolchain.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\default_pre.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\win32\default_pre.prf ..\manage_tool\qextserialport\qextserialport.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\resolve_config.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\exclusive_builds_post.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\default_post.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\build_pass.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\qml_debug.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\precompile_header.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\warn_on.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\qt.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\resources.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\moc.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\win32\opengl.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\uic.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\qmake_use.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\file_copies.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\win32\windows.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\testcase_targets.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\exceptions.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\yacc.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\lex.prf ..\manage_tool\manage_tool.pro D:\Software\Qt5\5.12.8\msvc2015_64\lib\Qt5Widgets.prl D:\Software\Qt5\5.12.8\msvc2015_64\lib\Qt5Gui.prl D:\Software\Qt5\5.12.8\msvc2015_64\lib\Qt5Network.prl D:\Software\Qt5\5.12.8\msvc2015_64\lib\Qt5Core.prl D:\Software\Qt5\5.12.8\msvc2015_64\lib\qtmain.prl    D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\data\dummy.cpp ..\manage_tool\qextserialport\qextserialport.h ..\manage_tool\qextserialport\qextserialport_global.h ..\manage_tool\qextserialport\qextserialport_p.h ..\manage_tool\commandinfo.h ..\manage_tool\mainwindow.h ..\manage_tool\protocol.h ..\manage_tool\socketclient.h ..\manage_tool\typedef.h ..\manage_tool\uartthread.h  ..\manage_tool\qextserialport\qextserialport.cpp ..\manage_tool\qextserialport\qextserialport_win.cpp ..\manage_tool\commandinfo.cpp ..\manage_tool\main.cpp ..\manage_tool\mainwindow.cpp ..\manage_tool\protocol.cpp ..\manage_tool\socketclient.cpp ..\manage_tool\uartthread.cpp ..\manage_tool\mainwindow.ui    
+	$(ZIP) manage_tool.zip $(SOURCES) $(DIST) ..\manage_tool\manage_tool.pro D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\spec_pre.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\common\angle.conf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\win32\windows_vulkan_sdk.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\common\windows-vulkan.conf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\common\msvc-desktop.conf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\qconfig.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3danimation.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3danimation_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dcore.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dcore_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dextras.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dextras_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dinput.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dinput_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dlogic.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dlogic_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dquick.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dquick_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dquickanimation.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dquickanimation_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dquickextras.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dquickextras_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dquickinput.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dquickinput_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dquickrender.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dquickrender_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dquickscene2d.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3dquickscene2d_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3drender.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_3drender_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_accessibility_support_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_axbase.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_axbase_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_axcontainer.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_axcontainer_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_axserver.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_axserver_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_bluetooth.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_bluetooth_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_bootstrap_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_charts.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_charts_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_concurrent.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_concurrent_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_core.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_core_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_datavisualization.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_datavisualization_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_dbus.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_dbus_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_designer.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_designer_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_designercomponents_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_devicediscovery_support_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_edid_support_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_egl_support_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_eventdispatcher_support_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_fb_support_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_fontdatabase_support_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_gamepad.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_gamepad_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_gui.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_gui_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_help.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_help_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_location.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_location_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_multimedia.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_multimedia_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_multimediawidgets.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_multimediawidgets_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_network.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_network_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_networkauth.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_networkauth_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_nfc.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_nfc_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_opengl.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_opengl_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_openglextensions.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_openglextensions_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_packetprotocol_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_platformcompositor_support_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_positioning.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_positioning_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_positioningquick.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_positioningquick_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_printsupport.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_printsupport_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_purchasing.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_purchasing_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_qml.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_qml_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_qmldebug_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_qmldevtools_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_qmltest.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_qmltest_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_qtmultimediaquicktools_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_quick.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_quick_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_quickcontrols2.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_quickcontrols2_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_quickparticles_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_quickshapes_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_quicktemplates2.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_quicktemplates2_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_quickwidgets.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_quickwidgets_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_remoteobjects.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_remoteobjects_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_repparser.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_repparser_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_script.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_script_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_scripttools.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_scripttools_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_scxml.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_scxml_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_sensors.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_sensors_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_serialbus.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_serialbus_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_serialport.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_serialport_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_sql.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_sql_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_svg.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_svg_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_testlib.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_testlib_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_texttospeech.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_texttospeech_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_theme_support_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_uiplugin.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_uitools.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_uitools_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_virtualkeyboard.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_virtualkeyboard_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_vulkan_support_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_webchannel.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_webchannel_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_websockets.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_websockets_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_webview.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_webview_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_widgets.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_widgets_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_windowsuiautomation_support_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_winextras.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_winextras_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_xml.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_xml_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_xmlpatterns.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_xmlpatterns_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\modules\qt_lib_zlib_private.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\qt_functions.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\qt_config.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\win32-msvc\qmake.conf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\spec_post.prf .qmake.stash D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\exclusive_builds.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\common\msvc-version.conf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\toolchain.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\default_pre.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\win32\default_pre.prf ..\manage_tool\qextserialport\qextserialport.pri D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\resolve_config.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\exclusive_builds_post.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\default_post.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\build_pass.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\qml_debug.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\precompile_header.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\warn_on.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\qt.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\resources.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\moc.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\win32\opengl.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\uic.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\qmake_use.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\file_copies.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\win32\windows.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\testcase_targets.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\exceptions.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\yacc.prf D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\lex.prf ..\manage_tool\manage_tool.pro D:\Software\Qt5\5.12.8\msvc2015_64\lib\Qt5Widgets.prl D:\Software\Qt5\5.12.8\msvc2015_64\lib\Qt5Gui.prl D:\Software\Qt5\5.12.8\msvc2015_64\lib\Qt5Network.prl D:\Software\Qt5\5.12.8\msvc2015_64\lib\Qt5Core.prl D:\Software\Qt5\5.12.8\msvc2015_64\lib\qtmain.prl    D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\data\dummy.cpp ..\manage_tool\qextserialport\qextserialport.h ..\manage_tool\qextserialport\qextserialport_global.h ..\manage_tool\qextserialport\qextserialport_p.h ..\manage_tool\commandinfo.h ..\manage_tool\mainwindow.h ..\manage_tool\protocol.h ..\manage_tool\tcpclient.h ..\manage_tool\typedef.h ..\manage_tool\uartclient.h  ..\manage_tool\qextserialport\qextserialport.cpp ..\manage_tool\qextserialport\qextserialport_win.cpp ..\manage_tool\commandinfo.cpp ..\manage_tool\main.cpp ..\manage_tool\mainwindow.cpp ..\manage_tool\protocol.cpp ..\manage_tool\tcpclient.cpp ..\manage_tool\uartclient.cpp ..\manage_tool\mainwindow.ui    
 
 clean: compiler_clean 
-	-$(DEL_FILE) release\qextserialport.obj release\qextserialport_win.obj release\commandinfo.obj release\main.obj release\mainwindow.obj release\protocol.obj release\socketclient.obj release\uartthread.obj release\moc_mainwindow.obj release\moc_socketclient.obj release\moc_uartthread.obj
+	-$(DEL_FILE) release\qextserialport.obj release\qextserialport_win.obj release\commandinfo.obj release\main.obj release\mainwindow.obj release\protocol.obj release\tcpclient.obj release\uartclient.obj release\moc_mainwindow.obj release\moc_tcpclient.obj release\moc_uartclient.obj
 	-$(DEL_FILE) release\icon.res
 
 distclean: clean 
@@ -223,9 +223,9 @@ compiler_moc_predefs_clean:
 release\moc_predefs.h: D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\data\dummy.cpp
 	cl -BxD:\Software\Qt5\5.12.8\msvc2015_64\bin\qmake.exe -nologo -Zc:wchar_t -FS -Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -O2 -MD -W3 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 -wd4577 -wd4467 -E D:\Software\Qt5\5.12.8\msvc2015_64\mkspecs\features\data\dummy.cpp 2>NUL >release\moc_predefs.h
 
-compiler_moc_header_make_all: release\moc_qextserialport.cpp release\moc_mainwindow.cpp release\moc_socketclient.cpp release\moc_uartthread.cpp
+compiler_moc_header_make_all: release\moc_qextserialport.cpp release\moc_mainwindow.cpp release\moc_tcpclient.cpp release\moc_uartclient.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) release\moc_qextserialport.cpp release\moc_mainwindow.cpp release\moc_socketclient.cpp release\moc_uartthread.cpp
+	-$(DEL_FILE) release\moc_qextserialport.cpp release\moc_mainwindow.cpp release\moc_tcpclient.cpp release\moc_uartclient.cpp
 release\moc_qextserialport.cpp: ..\manage_tool\qextserialport\qextserialport.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QIODevice \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qiodevice.h \
@@ -396,7 +396,7 @@ release\moc_mainwindow.cpp: ..\manage_tool\mainwindow.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\bin\moc.exe
 	D:\Software\Qt5\5.12.8\msvc2015_64\bin\moc.exe $(DEFINES) --compiler-flavor=msvc --include F:/git-storge/remote_manage/upper_app/application/release/moc_predefs.h -ID:/Software/Qt5/5.12.8/msvc2015_64/mkspecs/win32-msvc -IF:/git-storge/remote_manage/upper_app/manage_tool -ID:/Software/Qt5/5.12.8/msvc2015_64/include -ID:/Software/Qt5/5.12.8/msvc2015_64/include/QtWidgets -ID:/Software/Qt5/5.12.8/msvc2015_64/include/QtGui -ID:/Software/Qt5/5.12.8/msvc2015_64/include/QtANGLE -ID:/Software/Qt5/5.12.8/msvc2015_64/include/QtNetwork -ID:/Software/Qt5/5.12.8/msvc2015_64/include/QtCore -I. -I"D:\Software\Visual Studio 2015\VC\INCLUDE" -I"D:\Software\Visual Studio 2015\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10150.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\winrt" ..\manage_tool\mainwindow.h -o release\moc_mainwindow.cpp
 
-release\moc_socketclient.cpp: ..\manage_tool\socketclient.h \
+release\moc_tcpclient.cpp: ..\manage_tool\tcpclient.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QDebug \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qdebug.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qalgorithms.h \
@@ -569,9 +569,9 @@ release\moc_socketclient.cpp: ..\manage_tool\socketclient.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QMutex \
 		release\moc_predefs.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\bin\moc.exe
-	D:\Software\Qt5\5.12.8\msvc2015_64\bin\moc.exe $(DEFINES) --compiler-flavor=msvc --include F:/git-storge/remote_manage/upper_app/application/release/moc_predefs.h -ID:/Software/Qt5/5.12.8/msvc2015_64/mkspecs/win32-msvc -IF:/git-storge/remote_manage/upper_app/manage_tool -ID:/Software/Qt5/5.12.8/msvc2015_64/include -ID:/Software/Qt5/5.12.8/msvc2015_64/include/QtWidgets -ID:/Software/Qt5/5.12.8/msvc2015_64/include/QtGui -ID:/Software/Qt5/5.12.8/msvc2015_64/include/QtANGLE -ID:/Software/Qt5/5.12.8/msvc2015_64/include/QtNetwork -ID:/Software/Qt5/5.12.8/msvc2015_64/include/QtCore -I. -I"D:\Software\Visual Studio 2015\VC\INCLUDE" -I"D:\Software\Visual Studio 2015\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10150.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\winrt" ..\manage_tool\socketclient.h -o release\moc_socketclient.cpp
+	D:\Software\Qt5\5.12.8\msvc2015_64\bin\moc.exe $(DEFINES) --compiler-flavor=msvc --include F:/git-storge/remote_manage/upper_app/application/release/moc_predefs.h -ID:/Software/Qt5/5.12.8/msvc2015_64/mkspecs/win32-msvc -IF:/git-storge/remote_manage/upper_app/manage_tool -ID:/Software/Qt5/5.12.8/msvc2015_64/include -ID:/Software/Qt5/5.12.8/msvc2015_64/include/QtWidgets -ID:/Software/Qt5/5.12.8/msvc2015_64/include/QtGui -ID:/Software/Qt5/5.12.8/msvc2015_64/include/QtANGLE -ID:/Software/Qt5/5.12.8/msvc2015_64/include/QtNetwork -ID:/Software/Qt5/5.12.8/msvc2015_64/include/QtCore -I. -I"D:\Software\Visual Studio 2015\VC\INCLUDE" -I"D:\Software\Visual Studio 2015\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10150.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\winrt" ..\manage_tool\tcpclient.h -o release\moc_tcpclient.cpp
 
-release\moc_uartthread.cpp: ..\manage_tool\uartthread.h \
+release\moc_uartclient.cpp: ..\manage_tool\uartclient.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QThread \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qthread.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qobject.h \
@@ -740,7 +740,7 @@ release\moc_uartthread.cpp: ..\manage_tool\uartthread.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QtGlobal \
 		release\moc_predefs.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\bin\moc.exe
-	D:\Software\Qt5\5.12.8\msvc2015_64\bin\moc.exe $(DEFINES) --compiler-flavor=msvc --include F:/git-storge/remote_manage/upper_app/application/release/moc_predefs.h -ID:/Software/Qt5/5.12.8/msvc2015_64/mkspecs/win32-msvc -IF:/git-storge/remote_manage/upper_app/manage_tool -ID:/Software/Qt5/5.12.8/msvc2015_64/include -ID:/Software/Qt5/5.12.8/msvc2015_64/include/QtWidgets -ID:/Software/Qt5/5.12.8/msvc2015_64/include/QtGui -ID:/Software/Qt5/5.12.8/msvc2015_64/include/QtANGLE -ID:/Software/Qt5/5.12.8/msvc2015_64/include/QtNetwork -ID:/Software/Qt5/5.12.8/msvc2015_64/include/QtCore -I. -I"D:\Software\Visual Studio 2015\VC\INCLUDE" -I"D:\Software\Visual Studio 2015\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10150.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\winrt" ..\manage_tool\uartthread.h -o release\moc_uartthread.cpp
+	D:\Software\Qt5\5.12.8\msvc2015_64\bin\moc.exe $(DEFINES) --compiler-flavor=msvc --include F:/git-storge/remote_manage/upper_app/application/release/moc_predefs.h -ID:/Software/Qt5/5.12.8/msvc2015_64/mkspecs/win32-msvc -IF:/git-storge/remote_manage/upper_app/manage_tool -ID:/Software/Qt5/5.12.8/msvc2015_64/include -ID:/Software/Qt5/5.12.8/msvc2015_64/include/QtWidgets -ID:/Software/Qt5/5.12.8/msvc2015_64/include/QtGui -ID:/Software/Qt5/5.12.8/msvc2015_64/include/QtANGLE -ID:/Software/Qt5/5.12.8/msvc2015_64/include/QtNetwork -ID:/Software/Qt5/5.12.8/msvc2015_64/include/QtCore -I. -I"D:\Software\Visual Studio 2015\VC\INCLUDE" -I"D:\Software\Visual Studio 2015\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10150.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\winrt" ..\manage_tool\uartclient.h -o release\moc_uartclient.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
@@ -1200,7 +1200,7 @@ release\mainwindow.obj: ..\manage_tool\mainwindow.cpp ..\manage_tool\mainwindow.
 		..\manage_tool\protocol.h \
 		..\manage_tool\typedef.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QMutex \
-		..\manage_tool\uartthread.h \
+		..\manage_tool\uartclient.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QThread \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qthread.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QDebug \
@@ -1208,7 +1208,7 @@ release\mainwindow.obj: ..\manage_tool\mainwindow.cpp ..\manage_tool\mainwindow.
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QIODevice \
 		..\manage_tool\qextserialport\qextserialport_global.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QtGlobal \
-		..\manage_tool\socketclient.h \
+		..\manage_tool\tcpclient.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QObject \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtNetwork\QTcpSocket \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtNetwork\qtcpsocket.h \
@@ -1293,7 +1293,7 @@ release\protocol.obj: ..\manage_tool\protocol.cpp ..\manage_tool\protocol.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qsharedpointer.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qsharedpointer_impl.h
 
-release\socketclient.obj: ..\manage_tool\socketclient.cpp ..\manage_tool\socketclient.h \
+release\tcpclient.obj: ..\manage_tool\tcpclient.cpp ..\manage_tool\tcpclient.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QDebug \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qdebug.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qalgorithms.h \
@@ -1465,12 +1465,11 @@ release\socketclient.obj: ..\manage_tool\socketclient.cpp ..\manage_tool\socketc
 		..\manage_tool\typedef.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QMutex
 
-release\uartthread.obj: ..\manage_tool\uartthread.cpp ..\manage_tool\uartthread.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QThread \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qthread.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qobject.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qobjectdefs.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qnamespace.h \
+release\uartclient.obj: ..\manage_tool\uartclient.cpp ..\manage_tool\mainwindow.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QMainWindow \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qmainwindow.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qtwidgetsglobal.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtguiglobal.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qglobal.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qconfig-bootstrapped.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qconfig.h \
@@ -1492,7 +1491,15 @@ release\uartthread.obj: ..\manage_tool\uartthread.cpp ..\manage_tool\uartthread.
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qmutex.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qnumeric.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qversiontagging.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtgui-config.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qtwidgets-config.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qwidget.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qwindowdefs.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qobjectdefs.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qnamespace.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qobjectdefs_impl.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qwindowdefs_win.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qobject.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qstring.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qchar.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qbytearray.h \
@@ -1517,50 +1524,32 @@ release\uartthread.obj: ..\manage_tool\uartthread.cpp ..\manage_tool\uartthread.
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qvarlengtharray.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qcontainerfwd.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qobject_impl.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QDebug \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qdebug.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qhash.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qmap.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qtextstream.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qiodevice.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qlocale.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qvariant.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qshareddata.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qvector.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qpoint.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qset.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qcontiguouscache.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qsharedpointer.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qsharedpointer_impl.h \
-		..\manage_tool\mainwindow.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QMainWindow \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qmainwindow.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qtwidgetsglobal.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtguiglobal.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtgui-config.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qtwidgets-config.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qwidget.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qwindowdefs.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qwindowdefs_win.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qmargins.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qpaintdevice.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qrect.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qsize.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qpoint.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qpalette.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qcolor.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qrgb.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qrgba64.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qbrush.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qvector.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qmatrix.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qpolygon.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qregion.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qdatastream.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qiodevice.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qline.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtransform.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qpainterpath.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qimage.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qpixelformat.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qpixmap.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qsharedpointer.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qshareddata.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qhash.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qsharedpointer_impl.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qfont.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qfontmetrics.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qfontinfo.h \
@@ -1568,6 +1557,13 @@ release\uartthread.obj: ..\manage_tool\uartthread.cpp ..\manage_tool\uartthread.
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qcursor.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qkeysequence.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qevent.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qvariant.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qmap.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qdebug.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qtextstream.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qlocale.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qset.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qcontiguouscache.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qurl.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qurlquery.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qfile.h \
@@ -1576,68 +1572,13 @@ release\uartthread.obj: ..\manage_tool\uartthread.cpp ..\manage_tool\uartthread.
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtouchdevice.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qtabwidget.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qicon.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QWidget \
-		ui_mainwindow.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QVariant \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QApplication \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qapplication.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qcoreapplication.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qeventloop.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qdesktopwidget.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qguiapplication.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qinputmethod.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QCheckBox \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qcheckbox.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractbutton.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QComboBox \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qcombobox.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractitemdelegate.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qstyleoption.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractspinbox.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qvalidator.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qregularexpression.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qslider.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractslider.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qstyle.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qtabbar.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qrubberband.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qframe.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qabstractitemmodel.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QFrame \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QLabel \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qlabel.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QLineEdit \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qlineedit.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextcursor.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextformat.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qpen.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextoption.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QMenuBar \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qmenubar.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qmenu.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qaction.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qactiongroup.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QPushButton \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qpushbutton.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QStatusBar \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qstatusbar.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QTextEdit \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qtextedit.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractscrollarea.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextdocument.h \
-		..\manage_tool\protocol.h \
-		..\manage_tool\typedef.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QMutex \
-		..\manage_tool\qextserialport\qextserialport.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QIODevice \
-		..\manage_tool\qextserialport\qextserialport_global.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QtGlobal
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QWidget
 
 release\moc_mainwindow.obj: release\moc_mainwindow.cpp 
 
-release\moc_socketclient.obj: release\moc_socketclient.cpp 
+release\moc_tcpclient.obj: release\moc_tcpclient.cpp 
 
-release\moc_uartthread.obj: release\moc_uartthread.cpp 
+release\moc_uartclient.obj: release\moc_uartclient.cpp 
 
 ####### Install
 

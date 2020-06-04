@@ -74,6 +74,8 @@ public:
     QLineEdit *line_edit_port;
     QPushButton *btn_socket_open;
     QPushButton *btn_socket_close;
+    QLabel *label_socket_type;
+    QComboBox *combo_box_socket_type;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -215,27 +217,33 @@ public:
         btn_clear->setGeometry(QRect(10, 350, 92, 28));
         frame_socket = new QFrame(centralwidget);
         frame_socket->setObjectName(QString::fromUtf8("frame_socket"));
-        frame_socket->setGeometry(QRect(500, 280, 201, 141));
+        frame_socket->setGeometry(QRect(500, 280, 201, 191));
         frame_socket->setFrameShape(QFrame::StyledPanel);
         frame_socket->setFrameShadow(QFrame::Raised);
         label_ipaddr = new QLabel(frame_socket);
         label_ipaddr->setObjectName(QString::fromUtf8("label_ipaddr"));
-        label_ipaddr->setGeometry(QRect(10, 20, 41, 20));
+        label_ipaddr->setGeometry(QRect(10, 70, 41, 20));
         line_edit_ipaddr = new QLineEdit(frame_socket);
         line_edit_ipaddr->setObjectName(QString::fromUtf8("line_edit_ipaddr"));
-        line_edit_ipaddr->setGeometry(QRect(70, 20, 121, 20));
+        line_edit_ipaddr->setGeometry(QRect(60, 70, 121, 20));
         label_port = new QLabel(frame_socket);
         label_port->setObjectName(QString::fromUtf8("label_port"));
-        label_port->setGeometry(QRect(10, 60, 41, 20));
+        label_port->setGeometry(QRect(10, 110, 41, 20));
         line_edit_port = new QLineEdit(frame_socket);
         line_edit_port->setObjectName(QString::fromUtf8("line_edit_port"));
-        line_edit_port->setGeometry(QRect(70, 60, 121, 21));
+        line_edit_port->setGeometry(QRect(60, 110, 121, 21));
         btn_socket_open = new QPushButton(frame_socket);
         btn_socket_open->setObjectName(QString::fromUtf8("btn_socket_open"));
-        btn_socket_open->setGeometry(QRect(10, 100, 71, 23));
+        btn_socket_open->setGeometry(QRect(10, 150, 71, 23));
         btn_socket_close = new QPushButton(frame_socket);
         btn_socket_close->setObjectName(QString::fromUtf8("btn_socket_close"));
-        btn_socket_close->setGeometry(QRect(110, 100, 71, 23));
+        btn_socket_close->setGeometry(QRect(110, 150, 71, 23));
+        label_socket_type = new QLabel(frame_socket);
+        label_socket_type->setObjectName(QString::fromUtf8("label_socket_type"));
+        label_socket_type->setGeometry(QRect(10, 30, 51, 20));
+        combo_box_socket_type = new QComboBox(frame_socket);
+        combo_box_socket_type->setObjectName(QString::fromUtf8("combo_box_socket_type"));
+        combo_box_socket_type->setGeometry(QRect(60, 30, 121, 21));
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName(QString::fromUtf8("menubar"));
@@ -284,6 +292,7 @@ public:
         line_edit_port->setText(QApplication::translate("MainWindow", "8000", nullptr));
         btn_socket_open->setText(QApplication::translate("MainWindow", "\350\277\236\346\216\245\347\275\221\347\273\234", nullptr));
         btn_socket_close->setText(QApplication::translate("MainWindow", "\346\226\255\345\274\200\347\275\221\347\273\234", nullptr));
+        label_socket_type->setText(QApplication::translate("MainWindow", "\345\215\217\350\256\256", nullptr));
     } // retranslateUi
 
 };

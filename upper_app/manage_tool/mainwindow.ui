@@ -529,7 +529,7 @@
       <x>500</x>
       <y>280</y>
       <width>201</width>
-      <height>141</height>
+      <height>191</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -542,7 +542,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>20</y>
+       <y>70</y>
        <width>41</width>
        <height>20</height>
       </rect>
@@ -554,8 +554,8 @@
     <widget class="QLineEdit" name="line_edit_ipaddr">
      <property name="geometry">
       <rect>
-       <x>70</x>
-       <y>20</y>
+       <x>60</x>
+       <y>70</y>
        <width>121</width>
        <height>20</height>
       </rect>
@@ -568,7 +568,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>60</y>
+       <y>110</y>
        <width>41</width>
        <height>20</height>
       </rect>
@@ -580,8 +580,8 @@
     <widget class="QLineEdit" name="line_edit_port">
      <property name="geometry">
       <rect>
-       <x>70</x>
-       <y>60</y>
+       <x>60</x>
+       <y>110</y>
        <width>121</width>
        <height>21</height>
       </rect>
@@ -594,7 +594,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>100</y>
+       <y>150</y>
        <width>71</width>
        <height>23</height>
       </rect>
@@ -607,13 +607,36 @@
      <property name="geometry">
       <rect>
        <x>110</x>
-       <y>100</y>
+       <y>150</y>
        <width>71</width>
        <height>23</height>
       </rect>
      </property>
      <property name="text">
       <string>断开网络</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_socket_type">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>51</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>协议</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="combo_box_socket_type">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>30</y>
+       <width>121</width>
+       <height>21</height>
+      </rect>
      </property>
     </widget>
    </widget>

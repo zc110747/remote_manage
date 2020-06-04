@@ -23,16 +23,16 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     protocol.cpp \
-    socketclient.cpp \
-    uartthread.cpp
+    tcpclient.cpp \
+    uartclient.cpp
 
 HEADERS += \
     commandinfo.h \
     mainwindow.h \
     protocol.h \
-    socketclient.h \
+    tcpclient.h \
     typedef.h \
-    uartthread.h
+    uartclient.h
 
 FORMS += \
     mainwindow.ui

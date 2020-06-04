@@ -2,9 +2,6 @@
 #include "protocol.h"
 #include <QTime>
 #include <QEventLoop>
-#include <QThread>
-#include <QDebug>
-
 
 //生成发送数据报文
 int CProtocolInfo::CreateSendBuffer(uint8_t nId, uint16_t nSize, uint8_t *pStart, bool bWriteThrough)
@@ -144,63 +141,4 @@ int CProtocolInfo::CheckReceiveData(void)
     }while(1);
 
     return RT_OK;
-}
-
-int CProtocolQueue::QueuePost(SSendBuffer *pSendBuffer)
-{
-    if(m_nFreeList == 0)
-    {
-        return QUEUE_INFO_FULL;
-    }
-
-    m_qLockMutex->lock();
-    qinfo_ptr[m_nWriteIndex] = pSendBuffer;
-    m_nWriteIndex++;
-
-    //队列循环
-    if(m_nWriteIndex == MAX_QUEUE){
-        m_nWriteIndex = 0;
-    }
-    m_nFreeList--;
-    m_qLockMutex->unlock();
-
-    return QUEUE_INFO_OK;
-}
-
-int CProtocolQueue::QueuePend(SSendBuffer *pSendbuffer)
-{
-    if(m_nFreeList < MAX_QUEUE)
-    {
-        m_qLockMutex->lock();
-        pSendbuffer->m_pBuffer = qinfo_ptr[m_nReadIndex]->m_pBuffer;
-        pSendbuffer->m_nSize  = qinfo_ptr[m_nReadIndex]->m_nSize;
-        pSendbuffer->m_IsWriteThrough =  qinfo_ptr[m_nReadIndex]->m_IsWriteThrough;
-
-        delete qinfo_ptr[m_nReadIndex];
-        qinfo_ptr[m_nReadIndex] = nullptr;
-        m_nReadIndex++;
-
-        //队列循环
-        if(m_nReadIndex == MAX_QUEUE){
-            m_nReadIndex = 0;
-        }
-        m_nFreeList++;
-        m_qLockMutex->unlock();
-        qDebug()<<"queue receive";
-        return  QUEUE_INFO_OK;
-    }
-    else{
-        QThread::msleep(100);
-        return QUEUE_INFO_EMPTY;
-    }
-}
-
-//清空队列
-void CProtocolQueue::clear()
-{
-    m_qLockMutex->lock();
-    m_nFreeList = MAX_QUEUE;
-    m_nWriteIndex = 0;
-    m_nReadIndex = 0;
-    m_qLockMutex->unlock();
 }

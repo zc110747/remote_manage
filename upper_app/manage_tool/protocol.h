@@ -3,6 +3,8 @@
 
 #include "typedef.h"
 #include <QMutex>
+#include <QThread>
+#include <QDebug>
 
 //协议相关的指令
 #define PROTOCOL_SEND_HEAD          0x5A
@@ -30,7 +32,8 @@ enum PROTOCOL_STATUS
 {
     PROTOCOL_NULL = 0,
     PROTOCOL_UART,
-    PROTOCOL_SOCKET
+    PROTOCOL_TCP,
+    PROTOCOL_UDP
 };
 
 class SSendBuffer
@@ -46,9 +49,9 @@ public:
     }
 
     int m_nSize;
+    uint8_t *m_pBuffer;
     int m_nCommand;
     uint8_t m_IsWriteThrough;
-    uint8_t *m_pBuffer;
 };
 
 class CProtocolQueue
@@ -75,9 +78,59 @@ public:
         return false;
     }
 
-    void clear();
-    int QueuePost(SSendBuffer *pSendBuffer);
-    int QueuePend(SSendBuffer *pSendbuffer);
+    void clear(){
+        m_qLockMutex->lock();
+        m_nFreeList = MAX_QUEUE;
+        m_nWriteIndex = 0;
+        m_nReadIndex = 0;
+        m_qLockMutex->unlock();
+    }
+    int QueuePost(SSendBuffer *pSendBuffer)
+    {
+        if(m_nFreeList == 0)
+        {
+            return QUEUE_INFO_FULL;
+        }
+
+        m_qLockMutex->lock();
+        qinfo_ptr[m_nWriteIndex] = pSendBuffer;
+        m_nWriteIndex++;
+
+        //队列循环
+        if(m_nWriteIndex == MAX_QUEUE){
+            m_nWriteIndex = 0;
+        }
+        m_nFreeList--;
+        m_qLockMutex->unlock();
+
+        return QUEUE_INFO_OK;
+    }
+    int QueuePend(SSendBuffer *pSendbuffer){
+        if(m_nFreeList < MAX_QUEUE)
+        {
+            m_qLockMutex->lock();
+            pSendbuffer->m_pBuffer = qinfo_ptr[m_nReadIndex]->m_pBuffer;
+            pSendbuffer->m_nSize  = qinfo_ptr[m_nReadIndex]->m_nSize;
+            pSendbuffer->m_IsWriteThrough =  qinfo_ptr[m_nReadIndex]->m_IsWriteThrough;
+
+            delete qinfo_ptr[m_nReadIndex];
+            qinfo_ptr[m_nReadIndex] = nullptr;
+            m_nReadIndex++;
+
+            //队列循环
+            if(m_nReadIndex == MAX_QUEUE){
+                m_nReadIndex = 0;
+            }
+            m_nFreeList++;
+            m_qLockMutex->unlock();
+            qDebug()<<"queue receive";
+            return  QUEUE_INFO_OK;
+        }
+        else{
+            QThread::msleep(100);
+            return QUEUE_INFO_EMPTY;
+        }
+    };
 private:
     volatile int m_nFreeList;
     volatile int m_nWriteIndex;
@@ -93,8 +146,12 @@ public:
         m_pRxBuffer = pRxBuffer;
         m_pTxBuffer = pTxBuffer;
         m_MaxBufSize = nMaxBufSize;
+        m_pQueue = new CProtocolQueue();
     };
-    ~CProtocolInfo(){};
+    ~CProtocolInfo(){
+        delete  m_pQueue;
+        m_pQueue = nullptr;
+    };
 
     int CreateSendBuffer(uint8_t nId, uint16_t nSize, uint8_t *pStart, bool bWriteThrough);
     uint16_t CrcCalculate(uint8_t *pStart, int nSize);
@@ -110,10 +167,21 @@ public:
     virtual int DeviceRead(uint8_t *pStart, uint16_t nMaxSize) = 0;
     virtual int DeviceWrite(uint8_t *pStart, uint16_t nSize) = 0;
 
+    //socket处理的应用
+    int PostQueue(SSendBuffer *pSendBuffer)
+    {
+        if(m_pQueue != nullptr)
+        {
+            return m_pQueue->QueuePost(pSendBuffer);
+        }
+        return QUEUE_INFO_INVALID;
+    }
+
     uint8_t *m_pRxBuffer;
     uint8_t *m_pTxBuffer;
     int m_RxBufSize{0};  //接收到缓存区总长度
     int m_RxDataSize{0}; //接收到数据区长度
+    CProtocolQueue *m_pQueue;
 
 private:
     uint16_t m_nPacketId{0};

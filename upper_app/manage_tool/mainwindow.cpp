@@ -1,12 +1,12 @@
 ﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "protocol.h"
-#include "uartthread.h"
-#include "socketclient.h"
+#include "uartclient.h"
+#include "tcpclient.h"
 #include "commandinfo.h"
 
-static CUartProtocolInfo *pMainUartProtocolInfo;
-static CTcpClientSocketInfo *pCTcpClientSocketInfo;
+static CUartProtocolThreadInfo *pMainUartProtocolThreadInfo;
+static CTcpSocketThreadInfo *pMainTcpSocketThreadInfo;
 static PROTOCOL_STATUS protocol_flag;
 
 #define FRAM_STYLE  "QFrame{border-radius:10px}"
@@ -77,6 +77,12 @@ void MainWindow::init()
     ui->combo_box_parity->addItems(ParityList);
     ui->combo_box_parity->setCurrentIndex(0);
 
+    //设置协议类型
+    QStringList SocketTypeList;
+    SocketTypeList<<"TCP"<<"UDP";
+    ui->combo_box_socket_type->addItems(SocketTypeList);
+    ui->combo_box_parity->setCurrentIndex(0);
+
     //正则限制部分输入需要为数据
     QRegExp regx("[0-9]+$");
     QValidator *validator_time = new QRegExpValidator(regx,  ui->line_edit_time);
@@ -91,17 +97,17 @@ void MainWindow::init()
 
     //Uart应用相关线程和数据初始化
     UartThreadInit();
-    pMainUartProtocolInfo = GetUartProtocolInfo();
-    connect(pMainUartProtocolInfo->m_pThread, SIGNAL(send_edit_recv(QString)), this, SLOT(append_text_edit_recv(QString)));
-    connect(pMainUartProtocolInfo->m_pThread, SIGNAL(send_edit_test(QString)), this, SLOT(append_text_edit_test(QString)));
-    pMainUartProtocolInfo->m_pThread->start();
+    pMainUartProtocolThreadInfo = GetUartProtocolInfo();
+    connect(pMainUartProtocolThreadInfo, SIGNAL(send_edit_recv(QString)), this, SLOT(append_text_edit_recv(QString)));
+    connect(pMainUartProtocolThreadInfo, SIGNAL(send_edit_test(QString)), this, SLOT(append_text_edit_test(QString)));
+    pMainUartProtocolThreadInfo->start();
 
     //Socket应用相关线程和数据初始化
     TcpClientSocketInit();
-    pCTcpClientSocketInfo = GetTcpClientSocket();
-    connect(pCTcpClientSocketInfo->m_pThread, SIGNAL(send_edit_recv(QString)), this, SLOT(append_text_edit_recv(QString)));
-    connect(pCTcpClientSocketInfo->m_pThread, SIGNAL(send_edit_test(QString)), this, SLOT(append_text_edit_test(QString)));
-    pCTcpClientSocketInfo->m_pThread->start();
+    pMainTcpSocketThreadInfo = GetTcpClientSocket();
+    connect(pMainTcpSocketThreadInfo, SIGNAL(send_edit_recv(QString)), this, SLOT(append_text_edit_recv(QString)));
+    connect(pMainTcpSocketThreadInfo, SIGNAL(send_edit_test(QString)), this, SLOT(append_text_edit_test(QString)));
+    pMainTcpSocketThreadInfo->start();
 }
 
 //接收窗口的显示执行
@@ -148,11 +154,11 @@ void CmdSendBuffer(uint8_t *pStart, uint16_t nSize, int nCommand, bool isThrough
     SSendBuffer *pSendbuf = new SSendBuffer(pStart, nSize, nCommand, isThrough);
     if(protocol_flag == PROTOCOL_UART)
     {
-        UartPostQueue(pSendbuf);
+        pMainUartProtocolThreadInfo->PostQueue(pSendbuf);
     }
-    else if(protocol_flag == PROTOCOL_SOCKET)
+    else if(protocol_flag == PROTOCOL_TCP)
     {
-        TcpClientPostQueue(pSendbuf);
+        pMainTcpSocketThreadInfo->PostQueue(pSendbuf);
     }
     else
     {
@@ -220,10 +226,10 @@ void MainWindow::on_btn_send_cmd_clicked()
 void MainWindow::on_btn_uart_close_clicked()
 {
     init_btn_disable(ui);
-    pMainUartProtocolInfo->m_pUartQueue->clear();      //清空队列
-    pMainUartProtocolInfo->m_pComInfo->com_status = false;
-    pMainUartProtocolInfo->m_pComInfo->com->close();
-    pMainUartProtocolInfo->m_pComInfo->com->deleteLater();
+    pMainUartProtocolThreadInfo->m_pQueue->clear();      //清空队列
+    pMainUartProtocolThreadInfo->m_bComStatus = false;
+    pMainUartProtocolThreadInfo->m_pSerialPortCom->close();
+    pMainUartProtocolThreadInfo->m_pSerialPortCom->deleteLater();
     ui->btn_uart_close->setDisabled(true);
     ui->btn_uart_open->setEnabled(true);
     ui->btn_socket_open->setEnabled(true);
@@ -239,28 +245,25 @@ void MainWindow::on_btn_uart_close_clicked()
 //开启串口
 void MainWindow::on_btn_uart_open_clicked()
 {
-    CComInfo *pComInfo;
+    pMainUartProtocolThreadInfo->m_pSerialPortCom = new QextSerialPort(ui->combo_box_com->currentText(), QextSerialPort::Polling);
+    pMainUartProtocolThreadInfo->m_bComStatus = pMainUartProtocolThreadInfo->m_pSerialPortCom->open(QIODevice::ReadWrite);
 
-    pComInfo = pMainUartProtocolInfo->m_pComInfo;
-    pComInfo->com = new QextSerialPort(ui->combo_box_com->currentText(), QextSerialPort::Polling);
-    pComInfo->com_status = pComInfo->com->open(QIODevice::ReadWrite);
-
-    if(pComInfo->com_status)
+    if(pMainUartProtocolThreadInfo->m_bComStatus)
     {
         //清除缓存区
-        pComInfo->com->flush();
+        pMainUartProtocolThreadInfo->m_pSerialPortCom ->flush();
         //设置波特率
-        pComInfo->com->setBaudRate((BaudRateType)ui->combo_box_baud->currentText().toInt());
+        pMainUartProtocolThreadInfo->m_pSerialPortCom ->setBaudRate((BaudRateType)ui->combo_box_baud->currentText().toInt());
         //设置数据位
-        pComInfo->com->setDataBits((DataBitsType)ui->combo_box_data->currentText().toInt());
+        pMainUartProtocolThreadInfo->m_pSerialPortCom->setDataBits((DataBitsType)ui->combo_box_data->currentText().toInt());
         //设置校验位
-        pComInfo->com->setParity((ParityType)ui->combo_box_parity->currentText().toInt());
+        pMainUartProtocolThreadInfo->m_pSerialPortCom->setParity((ParityType)ui->combo_box_parity->currentText().toInt());
         //设置停止位
-        pComInfo->com->setStopBits((StopBitsType)ui->combo_box_stop->currentText().toInt());
-        pComInfo->com->setFlowControl(FLOW_OFF);
-        pComInfo->com->setTimeout(10);
+        pMainUartProtocolThreadInfo->m_pSerialPortCom->setStopBits((StopBitsType)ui->combo_box_stop->currentText().toInt());
+        pMainUartProtocolThreadInfo->m_pSerialPortCom->setFlowControl(FLOW_OFF);
+        pMainUartProtocolThreadInfo->m_pSerialPortCom ->setTimeout(10);
         init_btn_enable(ui);
-        pMainUartProtocolInfo->SetId(ui->line_edit_dev_id->text().toShort());
+        pMainUartProtocolThreadInfo->SetId(ui->line_edit_dev_id->text().toShort());
         ui->btn_uart_close->setEnabled(true);
         ui->btn_uart_open->setDisabled(true);
         ui->btn_socket_open->setDisabled(true);
@@ -275,8 +278,8 @@ void MainWindow::on_btn_uart_open_clicked()
     }
     else
     {
-        pComInfo->com->deleteLater();
-        pComInfo->com_status = false;
+        pMainUartProtocolThreadInfo->m_pSerialPortCom->deleteLater();
+        pMainUartProtocolThreadInfo->m_bComStatus = false;
         append_text_edit_test(QString::fromLocal8Bit("serial open failed!"));
     }
 }
@@ -311,21 +314,21 @@ QString byteArrayToHexString(QString head, const uint8_t* str, uint16_t size, QS
 void MainWindow::on_btn_socket_open_clicked()
 {
     init_btn_enable(ui);
-    pCTcpClientSocketInfo->SetId(ui->line_edit_dev_id->text().toShort());
-    pCTcpClientSocketInfo->SetSocketInfo(ui->line_edit_ipaddr->text(), ui->line_edit_port->text().toInt());
+    pMainTcpSocketThreadInfo->SetId(ui->line_edit_dev_id->text().toShort());
+    pMainTcpSocketThreadInfo->SetSocketInfo(ui->line_edit_ipaddr->text(), ui->line_edit_port->text().toInt());
     ui->btn_uart_close->setDisabled(true);
     ui->btn_uart_open->setDisabled(true);
     ui->btn_socket_open->setDisabled(true);
     ui->btn_socket_close->setEnabled(true);
     append_text_edit_test(QString::fromLocal8Bit("socket appliaction open success!"));
-    protocol_flag = PROTOCOL_SOCKET;
+    protocol_flag = PROTOCOL_TCP;
 }
 
 //断开网络连接
 void MainWindow::on_btn_socket_close_clicked()
 {
     init_btn_disable(ui);
-    pCTcpClientSocketInfo->m_pSocketQueue->clear();
+    pMainTcpSocketThreadInfo->m_pQueue->clear();
     ui->btn_uart_close->setEnabled(true);
     ui->btn_uart_open->setEnabled(true);
     ui->btn_socket_open->setEnabled(true);
