@@ -34,25 +34,14 @@ void CTcpClientSocketInfo::slotDisconnected()
     qDebug()<<"socket disconnected\n";
 }
 
-int CTcpClientSocketInfo::CheckReceiveData(void)
-{
-  return 0;
-}
-
 //接收数据
 void CTcpClientSocketInfo::dataReceived()
 {
-    qDebug()<<"socket recv:"<<"\n";
-    while(tcpSocket->bytesAvailable() > 0)
+    if(pCTcpClientSocketInfo->CheckReceiveData() == RT_OK)
     {
-        QByteArray datagram;
-        datagram.resize(tcpSocket->bytesAvailable());
-
-        DeviceRead((uint8_t *)datagram.data(), datagram.size());
-
-        QString msg = datagram.data();
+       qDebug()<<byteArrayToHexString("Recv Buf:",
+             pCTcpClientSocketInfo->m_pRxBuffer, pCTcpClientSocketInfo->m_RxBufSize, "\n");
     }
-    tcpSocket->disconnectFromHost();
 }
 
 CClientSocketThread::CClientSocketThread(QObject *parent):QThread(parent)
@@ -72,7 +61,6 @@ void CClientSocketThread::run()
     QTcpSocket *pTcpSocket;
     bool is_connect;
     int nLen;
-    QString SendBuf;
     int nStatus;
 
     pCTcpClientSocketInfo->tcpSocket = new QTcpSocket();
@@ -100,9 +88,11 @@ void CClientSocketThread::run()
                 pCTcpClientSocketInfo->DeviceWrite(tx_buffer, nLen);
 
                 //通知主线程更新窗口
-                SendBuf = byteArrayToHexString("Sendbuf:", tx_buffer, nLen, "\n");
-                emit send_edit_test(SendBuf);
+                emit send_edit_test(byteArrayToHexString("Sendbuf:", tx_buffer, nLen, "\n"));
+
+                //等待发送和接收完成
                 pTcpSocket->waitForBytesWritten();
+                pTcpSocket->waitForReadyRead();
             }
             else
             {

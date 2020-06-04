@@ -38,12 +38,17 @@ public:
     CTcpClientSocketInfo(QObject *parent=0, uint8_t *pRxBuffer=nullptr, uint8_t *pTxBuffer=nullptr, int nMaxBufSize = 0);
     ~CTcpClientSocketInfo();
     int DeviceRead(uint8_t *pStart, uint16_t nMaxSize){
-        return tcpSocket->read((char *)pStart, nMaxSize);
+        uint16_t nReadSize = 0;
+
+        if(tcpSocket->bytesAvailable() > 0)
+        {
+          nReadSize = tcpSocket->read((char *)pStart, nMaxSize);
+        }
+        return nReadSize;
     };
     int DeviceWrite(uint8_t *pStart, uint16_t nSize){
         return tcpSocket->write((char *)pStart, nSize);
     };
-    int CheckReceiveData(void);
 
     void SetSocketInfo(QString SIpAddress, int nPort)
     {
@@ -61,7 +66,6 @@ public:
 
 private:
     bool status;
-    QString ipAddr;
 
 public slots:
     void slotConnected();

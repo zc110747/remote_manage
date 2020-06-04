@@ -5,8 +5,11 @@
 #include <QMutex>
 
 //协议相关的指令
-#define PROTOCOL_SEND_HEAD  0x5A
-#define PROTOCOL_RECV_HEAD  0x5B
+#define PROTOCOL_SEND_HEAD          0x5A
+#define PROTOCOL_RECV_HEAD          0x5B
+#define PROTOCOL_RECV_HEAD_SIZE     3
+#define PROTOCOL_CRC_SIZE           2
+#define PROTOCOL_TIMEOUT            4000
 
 //缓存的大小
 #define BUFF_CACHE_SIZE     1200
@@ -14,6 +17,7 @@
 #define RT_OK               0
 #define RT_EMPTY            -1
 #define RT_TIMEOUT          -2
+#define RT_CRC_ERROR        -3
 
 //队列相关的信息
 #define MAX_QUEUE            20
@@ -93,7 +97,7 @@ public:
     ~CProtocolInfo(){};
 
     int CreateSendBuffer(uint8_t nId, uint16_t nSize, uint8_t *pStart, bool bWriteThrough);
-    uint16_t CaclcuCrcVal(uint8_t *pStart, int nSize);
+    uint16_t CrcCalculate(uint8_t *pStart, int nSize);
     uint16_t GetId(void){
         return m_nId;
     }
@@ -106,12 +110,14 @@ public:
     virtual int DeviceRead(uint8_t *pStart, uint16_t nMaxSize) = 0;
     virtual int DeviceWrite(uint8_t *pStart, uint16_t nSize) = 0;
 
-private:
     uint8_t *m_pRxBuffer;
-    uint8_t *m_pTxBuffer;  
+    uint8_t *m_pTxBuffer;
+    int m_RxBufSize{0};  //接收到缓存区总长度
+    int m_RxDataSize{0}; //接收到数据区长度
+
+private:
     uint16_t m_nPacketId{0};
     uint16_t m_nId{0};
-    int m_RxBufSize{0};
     int m_RxTimout{0};
     int m_MaxBufSize;
 };

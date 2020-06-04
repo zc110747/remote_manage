@@ -65,12 +65,6 @@ void CUartThread::run()
     }
 }
 
-//检测接收到的数据
-int CUartProtocolInfo::CheckReceiveData(void)
-{
-  return 0;
-}
-
 //设备写数据
 int CUartProtocolInfo::DeviceWrite(uint8_t *pStart, uint16_t nSize)
 {

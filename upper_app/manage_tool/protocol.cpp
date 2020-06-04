@@ -41,7 +41,7 @@ int CProtocolInfo::CreateSendBuffer(uint8_t nId, uint16_t nSize, uint8_t *pStart
                 }
             }
 
-            nCrcVal = CaclcuCrcVal(&m_pTxBuffer[1], nTotalSize-1);
+            nCrcVal = CrcCalculate(&m_pTxBuffer[1], nTotalSize-1);
             m_pTxBuffer[nTotalSize++] = (uint8_t)(nCrcVal>>8);
             m_pTxBuffer[nTotalSize++] = (uint8_t)(nCrcVal&0xff);
 
@@ -58,7 +58,7 @@ int CProtocolInfo::CreateSendBuffer(uint8_t nId, uint16_t nSize, uint8_t *pStart
 }
 
 //crc校验实现
-uint16_t CProtocolInfo::CaclcuCrcVal(uint8_t *pStart, int nSize)
+uint16_t CProtocolInfo::CrcCalculate(uint8_t *pStart, int nSize)
 {
     if(pStart == NULL || nSize == 0)
     {
@@ -71,14 +71,19 @@ uint16_t CProtocolInfo::CaclcuCrcVal(uint8_t *pStart, int nSize)
 int CProtocolInfo::CheckReceiveData(void)
 {
     int nRead;
-    //int CrcRecv, CrcCacl;
+    int CrcRecv, CrcCacl;
+
+    //回复的初始状态初始状态
+    m_RxBufSize = 0;
+    m_RxTimout = 0;
+    m_RxDataSize = 0;
 
     do
     {
         if(m_RxBufSize == 0)
         {
             nRead = DeviceRead(&m_pRxBuffer[m_RxBufSize], 1);
-            if(nRead != 0 && m_pRxBuffer[0] == PROTOCOL_RECV_HEAD)
+            if(nRead > 0 && m_pRxBuffer[0] == PROTOCOL_RECV_HEAD)
             {
                 m_RxBufSize++;
                 m_RxTimout = 0;
@@ -97,18 +102,44 @@ int CProtocolInfo::CheckReceiveData(void)
             {
                 m_RxTimout = 0;
                 m_RxBufSize += nRead;
+                if(nRead >= PROTOCOL_RECV_HEAD_SIZE)
+                {
+                    int nLen;
 
+                    m_RxDataSize =  m_pRxBuffer[1]<<8 | m_pRxBuffer[2];
+                    nLen = m_RxDataSize + PROTOCOL_RECV_HEAD_SIZE + PROTOCOL_CRC_SIZE;
+                    if(m_RxBufSize >= nLen)
+                    {
+                        /*计算head后到CRC尾之前的所有数据的CRC值*/
+                        CrcRecv = (m_pRxBuffer[nLen-2]<<8) + m_pRxBuffer[nLen-1];
+                        CrcCacl = CrcCalculate(&m_pRxBuffer[1], nLen-PROTOCOL_CRC_SIZE-1);
+                        if(CrcRecv == CrcCacl)
+                        {
+                            qDebug()<<QString("Receive Ok");
+                            break;
+                        }
+                        else
+                        {
+                            qDebug()<<QString("CRC err, Recv:%1, Cacl:%2").arg(CrcRecv, CrcCacl);
+                            return RT_CRC_ERROR;
+                        }
+                    }
+                }
             }
             else
             {
                 m_RxTimout++;
-                QThread::msleep(10);
             }
         }
 
-        if(m_RxTimout > 4000)
+        if(m_RxTimout != 0)
         {
-           return RT_TIMEOUT;
+            QThread::msleep(1);
+            if(m_RxTimout > PROTOCOL_TIMEOUT)
+            {
+               qDebug()<<QString("Receive timeout");
+               return RT_TIMEOUT;
+            }
         }
     }while(1);
 
