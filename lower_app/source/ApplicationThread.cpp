@@ -210,11 +210,20 @@ int CApplicationReg::RefreshAllDevice(void)
                             BeepStatusConvert((pRegVal[2]>>1)&0x01);
                         break;
                         case DEVICE_REBOOT:
-                            if(system("reboot") != -1)
                             {
-                                USR_DEBUG("Wait For System Reboot\r\n");
-                                while(1){
-                                    sleep(1);
+                                pid_t status;
+                                
+                                status = system("reboot");
+                                if(WIFEXITED(status) && (WEXITSTATUS(status) == 0))
+                                {
+                                    USR_DEBUG("Wait For System Reboot:%d\r\n", status);
+                                    while(1){
+                                        sleep(1);
+                                    }
+                                }
+                                else
+                                {
+                                    USR_DEBUG("System Reboot failed, %d\r\n", status);
                                 }
                             }
                         break;

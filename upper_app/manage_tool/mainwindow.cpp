@@ -148,10 +148,11 @@ void init_btn_enable(Ui::MainWindow *ui)
     ui->line_edit_dev_id->setReadOnly(true);
 }
 
-void CmdSendBuffer(uint8_t *pStart, uint16_t nSize, int nCommand, bool isThrough)
+void CmdSendBuffer(uint8_t *pStart, uint16_t nSize, int nCommand, bool isThrough,
+                   std::function<QString(uint8_t *, int)> pfunc)
 {
     QString Strbuf;
-    SSendBuffer *pSendbuf = new SSendBuffer(pStart, nSize, nCommand, isThrough);
+    SSendBuffer *pSendbuf = new SSendBuffer(pStart, nSize, nCommand, isThrough, pfunc);
     if(protocol_flag == PROTOCOL_UART)
     {
         pMainUartProtocolThreadInfo->PostQueue(pSendbuf);
@@ -171,7 +172,7 @@ void MainWindow::on_btn_led_on_clicked()
 {
     SCommandInfo *pCmdInfo = GetCommandPtr(LED_ON_CMD);
     if(pCmdInfo != nullptr)
-        CmdSendBuffer(pCmdInfo->m_pbuffer, pCmdInfo->m_nSize, pCmdInfo->m_nCommand, false);
+        CmdSendBuffer(pCmdInfo->m_pbuffer, pCmdInfo->m_nSize, pCmdInfo->m_nCommand, false, pCmdInfo->m_pFunc);
 }
 
 //关闭LED
@@ -179,7 +180,7 @@ void MainWindow::on_btn_led_off_clicked()
 {
     SCommandInfo *pCmdInfo = GetCommandPtr(LED_OFF_CMD);
     if(pCmdInfo != nullptr)
-        CmdSendBuffer(pCmdInfo->m_pbuffer, pCmdInfo->m_nSize, pCmdInfo->m_nCommand, false);
+        CmdSendBuffer(pCmdInfo->m_pbuffer, pCmdInfo->m_nSize, pCmdInfo->m_nCommand, false, pCmdInfo->m_pFunc);
 }
 
 //打开蜂鸣器
@@ -187,7 +188,7 @@ void MainWindow::on_btn_beep_on_clicked()
 {
     SCommandInfo *pCmdInfo = GetCommandPtr(BEEP_ON_CMD);
     if(pCmdInfo != nullptr)
-        CmdSendBuffer(pCmdInfo->m_pbuffer, pCmdInfo->m_nSize, pCmdInfo->m_nCommand, false);
+        CmdSendBuffer(pCmdInfo->m_pbuffer, pCmdInfo->m_nSize, pCmdInfo->m_nCommand, false, pCmdInfo->m_pFunc);
 }
 
 //关闭蜂鸣器
@@ -195,7 +196,7 @@ void MainWindow::on_btn_beep_off_clicked()
 {
     SCommandInfo *pCmdInfo = GetCommandPtr(BEEP_OFF_CMD);
     if(pCmdInfo != nullptr)
-        CmdSendBuffer(pCmdInfo->m_pbuffer, pCmdInfo->m_nSize, pCmdInfo->m_nCommand, false);
+        CmdSendBuffer(pCmdInfo->m_pbuffer, pCmdInfo->m_nSize, pCmdInfo->m_nCommand, false, pCmdInfo->m_pFunc);
 }
 
 //复位设备
@@ -203,7 +204,15 @@ void MainWindow::on_btn_reboot_clicked()
 {
     SCommandInfo *pCmdInfo = GetCommandPtr(DEV_REBOOT_CMD);
     if(pCmdInfo != nullptr)
-        CmdSendBuffer(pCmdInfo->m_pbuffer, pCmdInfo->m_nSize, pCmdInfo->m_nCommand, false);
+        CmdSendBuffer(pCmdInfo->m_pbuffer, pCmdInfo->m_nSize, pCmdInfo->m_nCommand, false, pCmdInfo->m_pFunc);
+}
+
+//刷新设备
+void MainWindow::on_btn_refresh_clicked()
+{
+    SCommandInfo *pCmdInfo = GetCommandPtr(GET_INFO_CMD);
+    if(pCmdInfo != nullptr)
+        CmdSendBuffer(pCmdInfo->m_pbuffer, pCmdInfo->m_nSize, pCmdInfo->m_nCommand, false, pCmdInfo->m_pFunc);
 }
 
 //指令直接发送的命令
@@ -219,7 +228,7 @@ void MainWindow::on_btn_send_cmd_clicked()
         nCacheBuf[index] = QStrArr[index].toInt(&bStatus, 16);
     }
 
-    CmdSendBuffer(nCacheBuf, nSize, DEV_WRITE_THROUGH_CMD, true);
+    CmdSendBuffer(nCacheBuf, nSize, DEV_WRITE_THROUGH_CMD, true, nullptr);
 }
 
 //关闭串口

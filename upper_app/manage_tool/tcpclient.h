@@ -1,7 +1,6 @@
 #ifndef SOCKETCLIENT_H
 #define SOCKETCLIENT_H
 
-#include <QDebug>
 #include <QObject>
 #include <QThread>
 #include <QTcpSocket>

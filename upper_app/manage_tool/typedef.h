@@ -1,6 +1,9 @@
 #ifndef TYPEDEF_H
 #define TYPEDEF_H
 
+#include <QDebug>
+#include <QString>
+
 typedef unsigned char uint8_t;
 typedef unsigned short uint16_t;
 typedef unsigned int uint32_t;

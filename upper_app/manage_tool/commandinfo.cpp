@@ -1,4 +1,6 @@
-﻿#include "commandinfo.h"
+﻿
+#include "commandinfo.h"
+#include <QString>
 
 static SCommandInfo SCommand[CMD_LIST_SIZE];
 
@@ -23,6 +25,10 @@ static uint8_t dev_reboot_cmd[] = {
     0x02, 0x00, 0x00, 0x00, 0x01, 0x09
 };
 
+static uint8_t get_info_cmd[] = {
+   0x02, 0x00, 0x00, 0x00, 0x03, 0x05, 0x00, 0x00
+};
+
 static uint8_t *pSCommandListBuffer[CMD_LIST_SIZE] =
 {
     led_on_cmd,
@@ -30,6 +36,7 @@ static uint8_t *pSCommandListBuffer[CMD_LIST_SIZE] =
     beep_on_cmd,
     beep_off_cmd,
     dev_reboot_cmd,
+    get_info_cmd,
 };
 
 static uint16_t nSCommandListSize[CMD_LIST_SIZE] =
@@ -39,6 +46,21 @@ static uint16_t nSCommandListSize[CMD_LIST_SIZE] =
     sizeof(beep_on_cmd),
     sizeof(beep_off_cmd),
     sizeof(dev_reboot_cmd),
+    sizeof(get_info_cmd),
+};
+
+static std::function<QString(uint8_t *, int)> FuncList[CMD_LIST_SIZE] = {
+    nullptr,
+    nullptr,
+    nullptr,
+    nullptr,
+    nullptr,
+    //get info cmd执行的回调函数
+    [](uint8_t *pData, int nSize)->QString{
+            QString DecodeBuf = QString("func test, %1, %2\n").arg(nSize, *pData);
+            qDebug()<<DecodeBuf;
+            return DecodeBuf;
+    },
 };
 
 //指令序列初始化
@@ -49,6 +71,7 @@ void CommandInfoInit(void)
         SCommand[index].m_pbuffer = pSCommandListBuffer[index];
         SCommand[index].m_nSize = nSCommandListSize[index];
         SCommand[index].m_nCommand = index;
+        SCommand[index].m_pFunc = FuncList[index];
     }
 }
 
@@ -56,7 +79,7 @@ void CommandInfoInit(void)
 SCommandInfo *GetCommandPtr(uint16_t index)
 {
     if(index < CMD_LIST_SIZE)
-        return &SCommand[index];
+        return (SCommandInfo *)&SCommand[index];
     else
         return nullptr;
 }

@@ -4,7 +4,6 @@
 #include "typedef.h"
 #include <QMutex>
 #include <QThread>
-#include <QDebug>
 
 //协议相关的指令
 #define PROTOCOL_SEND_HEAD          0x5A
@@ -39,11 +38,13 @@ enum PROTOCOL_STATUS
 class SSendBuffer
 {
 public:
-    SSendBuffer(uint8_t *pBuffer = nullptr, int nSize = 0, int nCommand = 0, bool bWriteThrough = false){
+    SSendBuffer(uint8_t *pBuffer = nullptr, int nSize = 0, int nCommand = 0, bool bWriteThrough = false,
+                std::function<QString(uint8_t *, int)> pFunc = nullptr){
         m_nSize = nSize;
         m_pBuffer = pBuffer;
         m_IsWriteThrough = bWriteThrough;
         m_nCommand = nCommand;
+        m_pFunc = pFunc;
     }
     ~SSendBuffer(){
     }
@@ -52,6 +53,7 @@ public:
     uint8_t *m_pBuffer;
     int m_nCommand;
     uint8_t m_IsWriteThrough;
+    std::function<QString(uint8_t *, int)> m_pFunc;
 };
 
 class CProtocolQueue
@@ -112,6 +114,8 @@ public:
             pSendbuffer->m_pBuffer = qinfo_ptr[m_nReadIndex]->m_pBuffer;
             pSendbuffer->m_nSize  = qinfo_ptr[m_nReadIndex]->m_nSize;
             pSendbuffer->m_IsWriteThrough =  qinfo_ptr[m_nReadIndex]->m_IsWriteThrough;
+            pSendbuffer->m_nCommand = qinfo_ptr[m_nReadIndex]->m_nCommand;
+            pSendbuffer->m_pFunc = qinfo_ptr[m_nReadIndex]->m_pFunc;
 
             delete qinfo_ptr[m_nReadIndex];
             qinfo_ptr[m_nReadIndex] = nullptr;

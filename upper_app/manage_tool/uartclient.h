@@ -2,7 +2,6 @@
 #define CUartThread_H_H
 
 #include <QThread>
-#include <QDebug>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "protocol.h"

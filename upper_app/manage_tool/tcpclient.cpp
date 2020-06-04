@@ -5,6 +5,7 @@
 static uint8_t rx_buffer[BUFF_CACHE_SIZE];
 static uint8_t tx_buffer[BUFF_CACHE_SIZE];
 static CTcpSocketThreadInfo *pCTcpSocketThreadInfo;
+static SSendBuffer SendBufferInfo;
 
 CTcpSocketThreadInfo::CTcpSocketThreadInfo(uint8_t *pRxBuffer, uint8_t *pTxBuffer, int nMaxBufSize):
     CProtocolInfo(pRxBuffer, pTxBuffer, nMaxBufSize)
@@ -34,12 +35,15 @@ void CTcpSocketThreadInfo::dataReceived()
     {
        emit send_edit_test(byteArrayToHexString("Recv Buf:",
             m_pRxBuffer, m_RxBufSize, "\n"));
+       if(SendBufferInfo.m_pFunc != nullptr)
+       {
+            emit send_edit_recv(SendBufferInfo.m_pFunc(m_pRxBuffer, m_RxBufSize));
+       }
     }
 }
 
 void CTcpSocketThreadInfo::run()
 {
-    SSendBuffer SendBufferInfo;
     bool is_connect;
     int nLen;
     int nStatus;
@@ -74,6 +78,7 @@ void CTcpSocketThreadInfo::run()
                 //等待发送和接收完成
                 m_pTcpSocket->waitForBytesWritten();
                 m_pTcpSocket->waitForReadyRead();
+
             }
             else
             {

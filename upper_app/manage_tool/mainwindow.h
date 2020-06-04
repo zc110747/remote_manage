@@ -39,6 +39,8 @@ private slots:
 
     void on_btn_reboot_clicked();
 
+    void on_btn_refresh_clicked();
+
 private:
     Ui::MainWindow *ui;
 };
