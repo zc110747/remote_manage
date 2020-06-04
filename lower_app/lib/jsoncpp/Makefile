@@ -1,5 +1,5 @@
 #编译工具和编译选项
-CC = g++
+CC = arm-linux-gnueabihf-g++
 CFLAGS  := -Wall -O3 -std=c++11
 
 #头文件路径

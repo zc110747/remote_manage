@@ -329,6 +329,7 @@ void MainWindow::on_btn_socket_open_clicked()
     ui->btn_uart_open->setDisabled(true);
     ui->btn_socket_open->setDisabled(true);
     ui->btn_socket_close->setEnabled(true);
+    ui->combo_box_socket_type->setDisabled(true);
     append_text_edit_test(QString::fromLocal8Bit("socket appliaction open success!"));
     protocol_flag = PROTOCOL_TCP;
 }
@@ -342,6 +343,7 @@ void MainWindow::on_btn_socket_close_clicked()
     ui->btn_uart_open->setEnabled(true);
     ui->btn_socket_open->setEnabled(true);
     ui->btn_socket_close->setDisabled(true);
+    ui->combo_box_socket_type->setEnabled(true);
     append_text_edit_test(QString::fromLocal8Bit("socket close!"));
     protocol_flag = PROTOCOL_NULL;
 }
