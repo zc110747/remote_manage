@@ -110,19 +110,19 @@ public:
 		nCommand = m_RxCacheDataPtr[0];
 		nRegIndex = m_RxCacheDataPtr[1]<<8 | m_RxCacheDataPtr[2];
 		nRxDataSize = m_RxCacheDataPtr[3]<<8 | m_RxCacheDataPtr[4];
-		pCacheDataBuf = (uint8_t *)malloc(m_MaxCacheBufSize);
 		m_TxBufSize = 0;
 		pApplicationReg = GetApplicationReg();
 		
 		switch (nCommand)
 		{
 			case CMD_REG_READ:
+				pCacheDataBuf = (uint8_t *)malloc(nRxDataSize);
 				pApplicationReg->GetMultipleReg(nRegIndex, nRxDataSize, pCacheDataBuf);
 				m_TxBufSize = CreateTxBuffer(ACK_OK, nRxDataSize, pCacheDataBuf);
+				free(pCacheDataBuf);   
 				break;
 			case CMD_REG_WRITE:	
-				memcpy(pCacheDataBuf, &m_RxCacheDataPtr[5], nRxDataSize);
-				pApplicationReg->SetMultipleReg(nRegIndex, nRxDataSize, pCacheDataBuf);	
+				pApplicationReg->SetMultipleReg(nRegIndex, nRxDataSize, &m_RxCacheDataPtr[5]);	
 				m_TxBufSize = CreateTxBuffer(ACK_OK, 0, NULL);
 				break;
 			case CMD_UPLOAD_CMD:		
@@ -131,8 +131,7 @@ public:
 				break;
 			default:
 				break;
-		}
-		free(pCacheDataBuf);    
+		} 
 
 		/*发送数据，并清空接收数据*/
 		m_RxBufSize = 0;

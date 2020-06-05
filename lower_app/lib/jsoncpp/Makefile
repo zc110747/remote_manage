@@ -1,5 +1,7 @@
 #编译工具和编译选项
-CC = arm-linux-gnueabihf-g++
+HOST = arm-linux-gnueabihf-
+CPU = arm-
+CC = $(HOST)g++
 CFLAGS  := -Wall -O3 -std=c++11
 
 #头文件路径
@@ -7,6 +9,7 @@ JSONCPP_INC_ROOT = include/
 
 OBJS = json_reader.o json_value.o json_writer.o
 LIB = libjsoncpp.a # 目标文件名 
+CP_LIB = $(CPU)libjsoncpp.a
 
 JSONCPP_INC= -I $(JSONCPP_INC_ROOT)
 
@@ -23,7 +26,7 @@ $(LIB) : $(OBJS)
 	rm -f $@
 	ar cr $@ $(OBJS)
 	rm -f $(OBJS)
-	cp $(LIB) ../$(LIB)
+	cp $(LIB) ../$(CP_LIB)
 
 tags :
 	ctags -R *

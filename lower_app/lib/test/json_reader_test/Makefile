@@ -1,12 +1,13 @@
 #编译工具和编译选项
 CC = g++
+CPU = x86-
 CFLAGS  := -Wall -O3 -std=c++11
 
 #头文件路径
 JSONCPP_INC_ROOT = ../../jsoncpp/include
 
 OBJS = json_reader_test.o
-LIB = ../../libjsoncpp.a #链接的库
+LIB = ../../$(CPU)libjsoncpp.a #链接的库
 APP = json_test
 
 JSONCPP_INC= -I $(JSONCPP_INC_ROOT)

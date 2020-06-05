@@ -8,7 +8,7 @@ static SCommandInfo SCommand[CMD_LIST_SIZE];
 //cmd(1Byte) 0x01 读内部状态 0x02 写内部状态 0x03 上传指令 0x04 上传数据
 //reg(2Byte)
 //size(2Byte)
-//reg_value(size byte)
+//reg_value(size byte) -- 读内部状态时无寄存器值
 static uint8_t led_on_cmd[] = {
     0x02, 0x00, 0x00, 0x00, 0x03, 0x03, 0x00, 0x01
 };
@@ -26,7 +26,7 @@ static uint8_t dev_reboot_cmd[] = {
 };
 
 static uint8_t get_info_cmd[] = {
-   0x02, 0x00, 0x00, 0x00, 0x03, 0x05, 0x00, 0x00
+   0x01, 0x00, 0x40, 0x00, 0x34,
 };
 
 static uint8_t *pSCommandListBuffer[CMD_LIST_SIZE] =
