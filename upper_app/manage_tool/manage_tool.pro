@@ -24,7 +24,8 @@ SOURCES += \
     mainwindow.cpp \
     protocol.cpp \
     tcpclient.cpp \
-    uartclient.cpp
+    uartclient.cpp \
+    updclient.cpp
 
 HEADERS += \
     commandinfo.h \
@@ -32,7 +33,8 @@ HEADERS += \
     protocol.h \
     tcpclient.h \
     typedef.h \
-    uartclient.h
+    uartclient.h \
+    udpclient.h
 
 FORMS += \
     mainwindow.ui
