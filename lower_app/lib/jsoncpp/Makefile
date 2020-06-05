@@ -1,6 +1,8 @@
 #编译工具和编译选项
-HOST = arm-linux-gnueabihf-
-CPU = arm-
+#HOST = arm-linux-gnueabihf-
+#CPU = arm-
+HOST =
+CPU = x86-
 CC = $(HOST)g++
 CFLAGS  := -Wall -O3 -std=c++11
 

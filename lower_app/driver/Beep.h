@@ -35,5 +35,7 @@
 /**************************************************************************
 * Global Functon Declaration
 ***************************************************************************/
+void BeepDriveInit(void);
+uint8_t BeepStatusRead(void);
 void BeepStatusConvert(uint8_t nBeepStatus);
 #endif

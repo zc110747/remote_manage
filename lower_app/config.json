@@ -13,6 +13,11 @@
                 "ipaddr":"127.0.0.1",
                 "net_port":8001
         },
+        "Device":{
+                "Serial":"/dev/ttymxc2",
+                "Led":"/dev/led",
+                "Beep":"/dev/beep"
+        },
         "Led0":0,
         "Beep0":0
 }

@@ -136,7 +136,8 @@ void CApplicationReg::SetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize, uint
  *  
  * @return NULL
  */
-int CApplicationReg::DiffSetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize, uint8_t *pDataStart, uint8_t *pDataCompare)
+int CApplicationReg::DiffSetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize, 
+                                        uint8_t *pDataStart, uint8_t *pDataCompare)
 {
     uint16_t nIndex, nEndRegIndex;
 
@@ -164,6 +165,78 @@ int CApplicationReg::DiffSetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize, u
 }
 
 /**
+ * 根据硬件状态更新寄存器
+ * 
+ * @param NULL
+ *  
+ * @return NULL
+ */
+void CApplicationReg::UpdateHardware(void)
+{
+    static uint8_t nRegInfoArray[REG_INFO_NUM];
+    static uint8_t nRegCacheArray[REG_INFO_NUM];
+    struct SRegInfoList *pRegInfoList;
+
+    GetMultipleReg(REG_CONFIG_NUM, REG_INFO_NUM, nRegInfoArray);
+    memcpy(nRegCacheArray, nRegInfoArray, REG_INFO_NUM);
+    pRegInfoList = (struct SRegInfoList *)nRegInfoArray;
+
+    //更新LED的状态
+    pRegInfoList->s_base_status.b.led = LedStatusRead()&0x01;
+    pRegInfoList->s_base_status.b.beep = BeepStatusRead()&0x01;
+
+    //USR_DEBUG("Update HardWare!\r\n");
+    if(memcmp(nRegCacheArray, nRegInfoArray, REG_INFO_NUM) != 0)
+    {
+        SetMultipleReg(REG_CONFIG_NUM, REG_INFO_NUM, nRegInfoArray);
+    }
+}
+
+/**
+ * 根据寄存器配置更新硬件状态
+ * 
+ * @param cmd 执行的读写指令
+ * @param pConfig 配置的数据首地址
+ * @param size 配置的数据长度
+ *  
+ * @return NULL
+ */
+void CApplicationReg::WriteHardware(uint8_t cmd, uint8_t *pConfig, int size)
+{
+    switch(cmd)
+    {
+        case DEVICE_LED0:
+            LedStatusConvert(pConfig[2]&0x01);
+            break;
+        case DEVICE_BEEP:
+            BeepStatusConvert((pConfig[2]>>1)&0x01);
+            break;
+        case DEVICE_REBOOT:
+            {
+                pid_t status;
+
+                status = system("reboot");
+                if(WIFEXITED(status) && (WEXITSTATUS(status) == 0))
+                {
+                    USR_DEBUG("Wait For System Reboot:%d\r\n", status);
+                    while(1){
+                        sleep(1);
+                    }
+                }
+                else
+                {
+                    USR_DEBUG("System Reboot failed, %d\r\n", status);
+                }
+            }
+            break;
+        default:
+            USR_DEBUG("Invalid Cmd!\r\n");
+            break;
+    }
+}
+
+
+/**
  * 根据寄存器更新内部硬件参数
  * 
  * @param NULL
@@ -172,92 +245,64 @@ int CApplicationReg::DiffSetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize, u
  */
 int CApplicationReg::RefreshAllDevice(void)
 {
-    uint8_t *pRegVal;           
-    uint8_t *pRegCacheVal;
+    static uint8_t nRegCacheArray[REG_CONFIG_NUM];
+    static uint8_t nRegValArray[REG_CONFIG_NUM];
     uint8_t  nRegModifyFlag;        //Reg修改状态
     uint16_t nRegConfigStatus;      //Reg配置状态
-
-    pRegVal = (uint8_t *)malloc(REG_CONFIG_NUM);
-    pRegCacheVal = (uint8_t *)malloc(REG_CONFIG_NUM);
+    uint8_t *pRegVal;
+    uint8_t * pRegCacheVal;
+    
+    pRegVal = nRegValArray;
+    pRegCacheVal = nRegCacheArray;
     nRegModifyFlag = 0;
 
-    if(pRegVal != NULL && pRegCacheVal != NULL)
-    {
-        /*读取所有的寄存值并复制到缓存中*/
-        GetMultipleReg(0, REG_CONFIG_NUM, pRegVal);
-        memcpy(pRegCacheVal, pRegVal, REG_CONFIG_NUM); 
+    /*读取设置寄存器的值到缓存中*/
+    GetMultipleReg(0, REG_CONFIG_NUM, pRegVal);
+    memcpy(pRegCacheVal, pRegVal, REG_CONFIG_NUM); 
 
-        /*有设置消息*/
-        nRegConfigStatus = pRegVal[1] <<8 | pRegVal[0];
-        if(nRegConfigStatus&0x01)
+    /*有设置消息*/
+    nRegConfigStatus = pRegVal[1] <<8 | pRegVal[0];
+    if(nRegConfigStatus&0x01)
+    {
+        for(uint8_t nIndex = 1; nIndex<16; nIndex++)
         {
-            /*LED设置处理*/
-            for(uint8_t nIndex = 1; nIndex<16; nIndex++)
+            uint16_t device_cmd = nRegConfigStatus>>nIndex;
+            if(device_cmd == 0)
             {
-                uint16_t device_cmd = nRegConfigStatus>>nIndex;
-                if(device_cmd == 0)
-                {
-                    break;
-                }
-                else if((device_cmd&0x01) != 0)
-                {
-                    switch(nIndex)
-                    {
-                        case DEVICE_LED0:
-                            LedStatusConvert(pRegVal[2]&0x01);
-                        break;
-                        case DEVICE_BEEP:
-                            BeepStatusConvert((pRegVal[2]>>1)&0x01);
-                        break;
-                        case DEVICE_REBOOT:
-                            {
-                                pid_t status;
-                                
-                                status = system("reboot");
-                                if(WIFEXITED(status) && (WEXITSTATUS(status) == 0))
-                                {
-                                    USR_DEBUG("Wait For System Reboot:%d\r\n", status);
-                                    while(1){
-                                        sleep(1);
-                                    }
-                                }
-                                else
-                                {
-                                    USR_DEBUG("System Reboot failed, %d\r\n", status);
-                                }
-                            }
-                        break;
-                        default:
-                        break;
-                    }
-                }         
+                break;
             }
-
-            pRegVal[0] = 0;
-            pRegVal[1] = 0;
-            nRegModifyFlag = 1;
-        }
-  
-        /*更新寄存器状态*/
-        if(nRegModifyFlag == 1){
-            if(DiffSetMultipleReg(0, REG_CONFIG_NUM, pRegVal, pRegCacheVal) == RT_OK){
-                nRegModifyFlag = 0;
-            }
-            else
+            else if((device_cmd&0x01) != 0)
             {
-                free(pRegVal);
-                free(pRegCacheVal);
-                USR_DEBUG("Modify By Other Interface\n");
-                return RT_FAIL;
-            }
+                WriteHardware(nIndex, pRegVal, REG_CONFIG_NUM);
+            }         
         }
 
-        free(pRegVal);
-        free(pRegCacheVal);
+        pRegVal[0] = 0;
+        pRegVal[1] = 0;
+        nRegModifyFlag = 1;
     }
-    else
+
+    /*修改后更新寄存器状态, 确定无其它应用修改后才可以真正更新*/
+    if(nRegModifyFlag == 1)
     {
-        USR_DEBUG("Malloc Error\n");
+        if(DiffSetMultipleReg(0, REG_CONFIG_NUM, pRegVal, pRegCacheVal) == RT_OK)
+        { 
+            nRegModifyFlag = 0;
+        }
+        else
+        {
+            USR_DEBUG("Modify By Other Application\n");
+            return RT_FAIL;
+        }
+    }
+
+    /*更新内部硬件状态到信息寄存器*/
+    static uint16_t loop_read = 0;
+    loop_read++;
+    if(loop_read == 1000)
+    {
+        loop_read = 0;
+        UpdateHardware();   
     }
 
     return RT_OK;

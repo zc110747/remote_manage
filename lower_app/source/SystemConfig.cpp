@@ -47,7 +47,12 @@ static SSystemConfig SSysConifg = {
 
     //硬件状态
     0,
-    0
+    0,
+
+    //设备名称
+    std::string(TTY_DEVICE),
+    std::string(LED_DEVICE),
+    std::string(BEEP_DEVICE),
 };
 
 /**************************************************************************
@@ -105,10 +110,14 @@ int system_config_init(std::string &sConfigfile)
     SSysConifg.m_led0_status = root["Led0"].asInt();
     SSysConifg.m_beep0_status = root["Beep0"].asInt();
 
-    LedStatusConvert((uint8_t)SSysConifg.m_led0_status);
-    BeepStatusConvert((uint8_t)SSysConifg.m_beep0_status);
+    //设备名称
+    SSysConifg.m_dev_led = std::string(root["Device"]["Led"].asString());
+    SSysConifg.m_dev_beep = std::string(root["Device"]["Beep"].asString());
+    SSysConifg.m_dev_serial = std::string(root["Device"]["Serial"].asString());
+
     return EXIT_SUCCESS;
 }
+
 
 /**
  * 获取系统状态配置信息

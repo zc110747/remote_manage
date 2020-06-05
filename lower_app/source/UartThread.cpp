@@ -62,15 +62,15 @@ void UartThreadInit(void)
 	
 	pSystemConfigInfo = GetSSytemConfigInfo();
 
-	if((nComFd = open(TTY_DEVICE, O_RDWR|O_NOCTTY|O_NDELAY))<0)
+	if((nComFd = open(pSystemConfigInfo->m_dev_serial.c_str(), O_RDWR|O_NOCTTY|O_NDELAY))<0)
 	{	
-		USR_DEBUG("Open %s Failed\n", TTY_DEVICE);
+		USR_DEBUG("Open %s Failed\n", pSystemConfigInfo->m_dev_serial.c_str());
 		return;
 	}
 	else
 	{
 		set_opt(nComFd, pSystemConfigInfo->m_baud, pSystemConfigInfo->m_data_bits, pSystemConfigInfo->m_parity, pSystemConfigInfo->m_stop_bits);
-		USR_DEBUG("Open %s Success!\t\n", TTY_DEVICE);
+		USR_DEBUG("Open %s Success!\t\n", pSystemConfigInfo->m_dev_serial.c_str());
 	}
 
 	//创建UART协议管理对象

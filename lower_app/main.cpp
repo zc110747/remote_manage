@@ -18,6 +18,8 @@
 #include "include/SocketTcpThread.h"
 #include "include/SocketUdpThread.h"
 #include "include/SystemConfig.h"
+#include "driver/Beep.h"
+#include "driver/Led.h"
 
 /**************************************************************************
 * Local Macro Definition
@@ -41,6 +43,7 @@
 #if __SYSTEM_DEBUG == 1
 static void SystemTest(void);
 #endif
+static void HardwareDriveInit(void);
 
 /**************************************************************************
 * Function
@@ -82,6 +85,9 @@ int main(int argc, char* argv[])
 		USR_DEBUG("system config read fail, use default\n");
 	}
 
+	//硬件模块初始化
+	HardwareDriveInit();
+
 	/*任务创建*/
 #if __SYSTEM_DEBUG == 0
 	UartThreadInit();
@@ -96,6 +102,12 @@ int main(int argc, char* argv[])
 #endif	
 
 	return result;
+}
+
+static void HardwareDriveInit(void)
+{
+	LedDriveInit();
+	BeepDriveInit();	
 }
 
 /**

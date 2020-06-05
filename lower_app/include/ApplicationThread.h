@@ -38,6 +38,39 @@
 /**************************************************************************
 * Global Type Definition
 ***************************************************************************/
+union UBaseStatus
+{
+    uint32_t d32;
+
+    struct 
+    {
+        uint32_t led:1;
+        uint32_t beep:1;
+        uint32_t reserved:30;
+    }b;
+};
+
+#pragma pack(push)
+#pragma pack(1)
+struct SRegInfoList
+{
+    union UBaseStatus s_base_status; //基础状态信息
+    uint16_t sensor_ia;            
+    uint16_t sensor_als;
+    uint16_t sensor_ps;
+    uint16_t reserved[0];
+    uint32_t sensor_gyro_x;
+    uint32_t sensor_gyro_y; 
+    uint32_t sensor_gyro_z;
+    uint32_t sensor_accel_x;
+    uint32_t sensor_accel_y; 
+    uint32_t sensor_accel_z;
+    uint32_t sensor_temp;
+    uint32_t rtc_lower;
+    uint32_t rtc_high;
+};
+#pragma pack(pop)
+
 class CApplicationReg
 {
 public:
@@ -45,6 +78,8 @@ public:
         ~CApplicationReg();
     
     int RefreshAllDevice(void);
+    void WriteHardware(uint8_t cmd, uint8_t *pRegConfig, int size);
+    void UpdateHardware(void);
     void SetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize, uint8_t *pDataStart);
     uint16_t GetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize, uint8_t *pDataStart);
     int DiffSetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize, uint8_t *pDataStart, uint8_t *pDataCompare);

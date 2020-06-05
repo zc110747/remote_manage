@@ -20,6 +20,7 @@
 ***************************************************************************/
 #include "json/json.h"
 #include <string>
+#include "UsrTypeDef.h"
 
 /**************************************************************************
 * Global Macro Definition
@@ -36,13 +37,18 @@ struct SSystemConfig
     std::string m_tcp_ipaddr;
     int m_tcp_net_port;
 
-    // //网络配置UDP
+    //网络配置UDP
     std::string m_udp_ipaddr;
     int m_udp_net_port;
 
     //硬件状态
     int m_led0_status;
     int m_beep0_status;
+
+    //Device结构
+    std::string m_dev_led;
+    std::string m_dev_beep;
+    std::string m_dev_serial;
 };
 
 /**************************************************************************

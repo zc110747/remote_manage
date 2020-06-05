@@ -19,6 +19,7 @@
 * Include Header Files
 ***************************************************************************/
 #include "../include/UsrTypeDef.h"
+#include "../include/SystemConfig.h"
 
 /**************************************************************************
 * Global Macro Definition
@@ -35,5 +36,7 @@
 /**************************************************************************
 * Global Functon Declaration
 ***************************************************************************/
+void LedDriveInit(void);
+uint8_t LedStatusRead(void);
 void LedStatusConvert(uint8_t nLedStatus);
 #endif
