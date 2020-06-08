@@ -69,7 +69,11 @@ typedef unsigned int uint32_t;
 #define PARITY      'N'
 #define STOPBITS    1
 
-#define DEVICE_ID   0x01/*设备ID*/
+//设备ID
+#define DEVICE_ID   0x01
+
+//设备的延时时间
+#define TIME_LOOP_DELAY 800
 
 /**************************************************************************
 * Global Functon Declaration

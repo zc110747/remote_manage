@@ -14,7 +14,10 @@ https://www.cnblogs.com/zc110747/p/12747213.html
 5.socket(UDP, TCP)的局域网远程管理  
 6.支持基于QT技术的上位机界面化设备管理  
 7.通讯的安全机制处理  
-  
+ 
+项目框架  
+![image](https://github.com/zc110747/remote_manage/blob/master/document/Image/system.png)  
+
 项目结构  
 demo/       快速体验下位机应用的代码  
 document/   文档资料说明  

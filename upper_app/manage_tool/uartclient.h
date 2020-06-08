@@ -7,40 +7,36 @@
 #include "protocol.h"
 #include "qextserialport/qextserialport.h"
 
-class CUartProtocolThreadInfo:public QThread, public CProtocolInfo
+class CUartProtocolInfo:public QWidget, public CProtocolInfo
 {
     Q_OBJECT
 
 public:
-    CUartProtocolThreadInfo(uint8_t *pRxBuffer, uint8_t *pTxBuffer, int nMaxBufSize):
+    CUartProtocolInfo(uint8_t *pRxBuffer, uint8_t *pTxBuffer, int nMaxBufSize):
         CProtocolInfo(pRxBuffer, pTxBuffer, nMaxBufSize){
     }
-    ~CUartProtocolThreadInfo(){
+    ~CUartProtocolInfo(){
     }
 
-    int DeviceRead(uint8_t *pStart, uint16_t nMaxSize);
-    int DeviceWrite(uint8_t *pStart, uint16_t nSize);
-
-    void CloseThread()
-    {
-        m_nIsStop = 0;
+    int DeviceRead(uint8_t *pStart, uint16_t nMaxSize){
+        return m_pSerialPortCom->read((char *)pStart, nMaxSize);
     }
 
-    //串口的硬件信息
+    int DeviceWrite(uint8_t *pStart, uint16_t nSize){
+        m_pSerialPortCom->write((char *)pStart, nSize);
+        return nSize;
+    }
+
+    void UartLoopThread(SSendBuffer *pSendbuffer);
+
     volatile bool m_bComStatus{false};
     QextSerialPort *m_pSerialPortCom;
-
-protected:
-    virtual void run();
 
 signals:
     void send_edit_recv(QString);
     void send_edit_test(QString);
-
-private:
-    volatile bool m_nIsStop{false};
 };
 
 void UartThreadInit(void);
-CUartProtocolThreadInfo *GetUartProtocolInfo(void);
+CUartProtocolInfo *GetUartProtocolInfo(void);
 #endif // CUartThread_H_H

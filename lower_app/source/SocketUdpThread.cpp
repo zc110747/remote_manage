@@ -104,7 +104,8 @@ static void *SocketUdpLoopThread(void *arg)
                 if(is_bind_fail == 0)
                 {
                     is_bind_fail = 1;
-                    SOCKET_DEBUG("Udp Bind Failed!\r\n");
+                    SOCKET_DEBUG("Udp Bind Failed!ServerIp:%s, NetPort:%d\n", pSystemConfigInfo->m_udp_ipaddr.c_str(), 
+                    pSystemConfigInfo->m_udp_net_port);
                 }
                 sleep(1);
             }
@@ -120,13 +121,12 @@ static void *SocketUdpLoopThread(void *arg)
         for(;;)
         {	   
             int nFlag;
-		    nFlag = pUdpProtocolInfo->CheckRxBuffer(socket_fd, &sUdpInfo);
+		    nFlag = pUdpProtocolInfo->CheckRxBuffer(socket_fd, true, &sUdpInfo);
 		    if(nFlag == RT_OK)
             {
                 pUdpProtocolInfo->ExecuteCommand(socket_fd);
                 pUdpProtocolInfo->SendTxBuffer(socket_fd, &sUdpInfo);
                 SOCKET_DEBUG("Udp Process Success\r\n");
-                break;
 		    }
             else
             {
@@ -140,4 +140,5 @@ static void *SocketUdpLoopThread(void *arg)
     }
     
     close(socket_fd);
+    return (void *)0;
 }

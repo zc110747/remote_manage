@@ -19,7 +19,8 @@
                 "UNICODE",
                 "_UNICODE",
                 "__ARM_PCS_VFP",
-                "CONFIG_SPARSE_IRQ"
+                "CONFIG_SPARSE_IRQ",
+                "CONFIG_GPIOLIB"
             ],
             "windowsSdkVersion": "",
             "compilerPath": "",

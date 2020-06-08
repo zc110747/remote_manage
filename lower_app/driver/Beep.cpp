@@ -77,7 +77,7 @@ void BeepStatusConvert(uint8_t nBeepStatus)
         DRIVER_DEBUG("beep write:%d\n", nBeepStatus);
         nVal = nBeepStatus;
         nSize = write(nFd, &nVal, 1);  //将数据写入LED
-        if(nSize != 0)
+        if(nSize < 0)
         {
             DRIVER_DEBUG("Write failed\n");
         }
@@ -106,7 +106,7 @@ uint8_t BeepStatusRead(void)
     if(nFd != -1)
     {
         nSize = read(nFd, &nValue, 1);  //将数据写入LED
-        if(nSize != 0)
+        if(nSize < 0)
         {
             DRIVER_DEBUG("Read failed\n");
         }

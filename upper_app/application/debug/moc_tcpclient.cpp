@@ -20,33 +20,33 @@
 QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
-struct qt_meta_stringdata_CTcpSocketThreadInfo_t {
+struct qt_meta_stringdata_CTcpSocketInfo_t {
     QByteArrayData data[7];
-    char stringdata0[96];
+    char stringdata0[90];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
-    qptrdiff(offsetof(qt_meta_stringdata_CTcpSocketThreadInfo_t, stringdata0) + ofs \
+    qptrdiff(offsetof(qt_meta_stringdata_CTcpSocketInfo_t, stringdata0) + ofs \
         - idx * sizeof(QByteArrayData)) \
     )
-static const qt_meta_stringdata_CTcpSocketThreadInfo_t qt_meta_stringdata_CTcpSocketThreadInfo = {
+static const qt_meta_stringdata_CTcpSocketInfo_t qt_meta_stringdata_CTcpSocketInfo = {
     {
-QT_MOC_LITERAL(0, 0, 20), // "CTcpSocketThreadInfo"
-QT_MOC_LITERAL(1, 21, 14), // "send_edit_recv"
-QT_MOC_LITERAL(2, 36, 0), // ""
-QT_MOC_LITERAL(3, 37, 14), // "send_edit_test"
-QT_MOC_LITERAL(4, 52, 13), // "slotConnected"
-QT_MOC_LITERAL(5, 66, 16), // "slotDisconnected"
-QT_MOC_LITERAL(6, 83, 12) // "dataReceived"
+QT_MOC_LITERAL(0, 0, 14), // "CTcpSocketInfo"
+QT_MOC_LITERAL(1, 15, 14), // "send_edit_recv"
+QT_MOC_LITERAL(2, 30, 0), // ""
+QT_MOC_LITERAL(3, 31, 14), // "send_edit_test"
+QT_MOC_LITERAL(4, 46, 13), // "slotConnected"
+QT_MOC_LITERAL(5, 60, 16), // "slotDisconnected"
+QT_MOC_LITERAL(6, 77, 12) // "dataReceived"
 
     },
-    "CTcpSocketThreadInfo\0send_edit_recv\0"
-    "\0send_edit_test\0slotConnected\0"
+    "CTcpSocketInfo\0send_edit_recv\0\0"
+    "send_edit_test\0slotConnected\0"
     "slotDisconnected\0dataReceived"
 };
 #undef QT_MOC_LITERAL
 
-static const uint qt_meta_data_CTcpSocketThreadInfo[] = {
+static const uint qt_meta_data_CTcpSocketInfo[] = {
 
  // content:
        8,       // revision
@@ -80,10 +80,10 @@ static const uint qt_meta_data_CTcpSocketThreadInfo[] = {
        0        // eod
 };
 
-void CTcpSocketThreadInfo::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
+void CTcpSocketInfo::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        auto *_t = static_cast<CTcpSocketThreadInfo *>(_o);
+        auto *_t = static_cast<CTcpSocketInfo *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->send_edit_recv((*reinterpret_cast< QString(*)>(_a[1]))); break;
@@ -96,15 +96,15 @@ void CTcpSocketThreadInfo::qt_static_metacall(QObject *_o, QMetaObject::Call _c,
     } else if (_c == QMetaObject::IndexOfMethod) {
         int *result = reinterpret_cast<int *>(_a[0]);
         {
-            using _t = void (CTcpSocketThreadInfo::*)(QString );
-            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&CTcpSocketThreadInfo::send_edit_recv)) {
+            using _t = void (CTcpSocketInfo::*)(QString );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&CTcpSocketInfo::send_edit_recv)) {
                 *result = 0;
                 return;
             }
         }
         {
-            using _t = void (CTcpSocketThreadInfo::*)(QString );
-            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&CTcpSocketThreadInfo::send_edit_test)) {
+            using _t = void (CTcpSocketInfo::*)(QString );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&CTcpSocketInfo::send_edit_test)) {
                 *result = 1;
                 return;
             }
@@ -112,34 +112,34 @@ void CTcpSocketThreadInfo::qt_static_metacall(QObject *_o, QMetaObject::Call _c,
     }
 }
 
-QT_INIT_METAOBJECT const QMetaObject CTcpSocketThreadInfo::staticMetaObject = { {
-    &QThread::staticMetaObject,
-    qt_meta_stringdata_CTcpSocketThreadInfo.data,
-    qt_meta_data_CTcpSocketThreadInfo,
+QT_INIT_METAOBJECT const QMetaObject CTcpSocketInfo::staticMetaObject = { {
+    &QWidget::staticMetaObject,
+    qt_meta_stringdata_CTcpSocketInfo.data,
+    qt_meta_data_CTcpSocketInfo,
     qt_static_metacall,
     nullptr,
     nullptr
 } };
 
 
-const QMetaObject *CTcpSocketThreadInfo::metaObject() const
+const QMetaObject *CTcpSocketInfo::metaObject() const
 {
     return QObject::d_ptr->metaObject ? QObject::d_ptr->dynamicMetaObject() : &staticMetaObject;
 }
 
-void *CTcpSocketThreadInfo::qt_metacast(const char *_clname)
+void *CTcpSocketInfo::qt_metacast(const char *_clname)
 {
     if (!_clname) return nullptr;
-    if (!strcmp(_clname, qt_meta_stringdata_CTcpSocketThreadInfo.stringdata0))
+    if (!strcmp(_clname, qt_meta_stringdata_CTcpSocketInfo.stringdata0))
         return static_cast<void*>(this);
     if (!strcmp(_clname, "CProtocolInfo"))
         return static_cast< CProtocolInfo*>(this);
-    return QThread::qt_metacast(_clname);
+    return QWidget::qt_metacast(_clname);
 }
 
-int CTcpSocketThreadInfo::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+int CTcpSocketInfo::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
-    _id = QThread::qt_metacall(_c, _id, _a);
+    _id = QWidget::qt_metacall(_c, _id, _a);
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
@@ -155,14 +155,14 @@ int CTcpSocketThreadInfo::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 
 // SIGNAL 0
-void CTcpSocketThreadInfo::send_edit_recv(QString _t1)
+void CTcpSocketInfo::send_edit_recv(QString _t1)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
 }
 
 // SIGNAL 1
-void CTcpSocketThreadInfo::send_edit_test(QString _t1)
+void CTcpSocketInfo::send_edit_test(QString _t1)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 1, _a);

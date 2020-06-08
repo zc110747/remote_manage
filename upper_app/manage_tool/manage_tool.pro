@@ -19,16 +19,20 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    appthread.cpp \
     commandinfo.cpp \
+    configfile.cpp \
     main.cpp \
     mainwindow.cpp \
     protocol.cpp \
     tcpclient.cpp \
     uartclient.cpp \
-    updclient.cpp
+    udpclient.cpp
 
 HEADERS += \
+    appthread.h \
     commandinfo.h \
+    configfile.h \
     mainwindow.h \
     protocol.h \
     tcpclient.h \

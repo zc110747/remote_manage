@@ -11,7 +11,6 @@
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QLabel>
@@ -52,9 +51,6 @@ public:
     QTextEdit *text_edit_recv;
     QLabel *label_stauts;
     QPushButton *btn_refresh;
-    QCheckBox *check_box_time;
-    QLineEdit *line_edit_time;
-    QLabel *label_time;
     QLabel *label_reboot;
     QPushButton *btn_reboot;
     QFrame *frame_dev;
@@ -68,14 +64,16 @@ public:
     QTextEdit *text_edit_test;
     QPushButton *btn_clear;
     QFrame *frame_socket;
-    QLabel *label_ipaddr;
+    QLabel *label_server_ipaddr;
     QLineEdit *line_edit_ipaddr;
-    QLabel *label_port;
+    QLabel *label_server_port;
     QLineEdit *line_edit_port;
     QPushButton *btn_socket_open;
     QPushButton *btn_socket_close;
     QLabel *label_socket_type;
     QComboBox *combo_box_socket_type;
+    QLabel *label_local_ipaddr;
+    QLineEdit *line_edit_local_ipaddr;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -83,55 +81,55 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(710, 740);
-        MainWindow->setMinimumSize(QSize(710, 720));
-        MainWindow->setMaximumSize(QSize(710, 740));
+        MainWindow->resize(730, 740);
+        MainWindow->setMinimumSize(QSize(730, 720));
+        MainWindow->setMaximumSize(QSize(730, 740));
         MainWindow->setAutoFillBackground(false);
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         frame_uart = new QFrame(centralwidget);
         frame_uart->setObjectName(QString::fromUtf8("frame_uart"));
-        frame_uart->setGeometry(QRect(500, 10, 201, 191));
+        frame_uart->setGeometry(QRect(500, 10, 221, 201));
         frame_uart->setMinimumSize(QSize(100, 100));
         frame_uart->setAutoFillBackground(false);
         frame_uart->setFrameShape(QFrame::StyledPanel);
         frame_uart->setFrameShadow(QFrame::Raised);
         label_comid = new QLabel(frame_uart);
         label_comid->setObjectName(QString::fromUtf8("label_comid"));
-        label_comid->setGeometry(QRect(10, 10, 51, 20));
+        label_comid->setGeometry(QRect(10, 10, 61, 20));
         combo_box_com = new QComboBox(frame_uart);
         combo_box_com->setObjectName(QString::fromUtf8("combo_box_com"));
-        combo_box_com->setGeometry(QRect(70, 10, 121, 21));
+        combo_box_com->setGeometry(QRect(100, 10, 111, 21));
         label_baud = new QLabel(frame_uart);
         label_baud->setObjectName(QString::fromUtf8("label_baud"));
-        label_baud->setGeometry(QRect(10, 40, 51, 20));
+        label_baud->setGeometry(QRect(10, 40, 61, 20));
         combo_box_baud = new QComboBox(frame_uart);
         combo_box_baud->setObjectName(QString::fromUtf8("combo_box_baud"));
-        combo_box_baud->setGeometry(QRect(70, 40, 121, 21));
+        combo_box_baud->setGeometry(QRect(100, 40, 111, 21));
         label_data = new QLabel(frame_uart);
         label_data->setObjectName(QString::fromUtf8("label_data"));
-        label_data->setGeometry(QRect(10, 70, 51, 20));
+        label_data->setGeometry(QRect(10, 70, 61, 20));
         combo_box_data = new QComboBox(frame_uart);
         combo_box_data->setObjectName(QString::fromUtf8("combo_box_data"));
-        combo_box_data->setGeometry(QRect(70, 70, 121, 21));
+        combo_box_data->setGeometry(QRect(100, 70, 111, 21));
         label_stop = new QLabel(frame_uart);
         label_stop->setObjectName(QString::fromUtf8("label_stop"));
-        label_stop->setGeometry(QRect(10, 100, 51, 20));
+        label_stop->setGeometry(QRect(10, 100, 61, 20));
         combo_box_stop = new QComboBox(frame_uart);
         combo_box_stop->setObjectName(QString::fromUtf8("combo_box_stop"));
-        combo_box_stop->setGeometry(QRect(70, 100, 121, 21));
+        combo_box_stop->setGeometry(QRect(100, 100, 111, 21));
         label_parity = new QLabel(frame_uart);
         label_parity->setObjectName(QString::fromUtf8("label_parity"));
-        label_parity->setGeometry(QRect(10, 130, 51, 20));
+        label_parity->setGeometry(QRect(10, 130, 61, 20));
         combo_box_parity = new QComboBox(frame_uart);
         combo_box_parity->setObjectName(QString::fromUtf8("combo_box_parity"));
-        combo_box_parity->setGeometry(QRect(70, 130, 121, 21));
+        combo_box_parity->setGeometry(QRect(100, 130, 111, 21));
         btn_uart_open = new QPushButton(frame_uart);
         btn_uart_open->setObjectName(QString::fromUtf8("btn_uart_open"));
-        btn_uart_open->setGeometry(QRect(10, 160, 71, 23));
+        btn_uart_open->setGeometry(QRect(10, 170, 81, 23));
         btn_uart_close = new QPushButton(frame_uart);
         btn_uart_close->setObjectName(QString::fromUtf8("btn_uart_close"));
-        btn_uart_close->setGeometry(QRect(110, 160, 81, 23));
+        btn_uart_close->setGeometry(QRect(120, 170, 81, 23));
         frame_info = new QFrame(centralwidget);
         frame_info->setObjectName(QString::fromUtf8("frame_info"));
         frame_info->setGeometry(QRect(10, 10, 481, 311));
@@ -165,15 +163,6 @@ public:
         btn_refresh = new QPushButton(frame_info);
         btn_refresh->setObjectName(QString::fromUtf8("btn_refresh"));
         btn_refresh->setGeometry(QRect(90, 90, 91, 21));
-        check_box_time = new QCheckBox(frame_info);
-        check_box_time->setObjectName(QString::fromUtf8("check_box_time"));
-        check_box_time->setGeometry(QRect(200, 90, 51, 21));
-        line_edit_time = new QLineEdit(frame_info);
-        line_edit_time->setObjectName(QString::fromUtf8("line_edit_time"));
-        line_edit_time->setGeometry(QRect(260, 90, 71, 21));
-        label_time = new QLabel(frame_info);
-        label_time->setObjectName(QString::fromUtf8("label_time"));
-        label_time->setGeometry(QRect(340, 90, 41, 21));
         label_reboot = new QLabel(frame_info);
         label_reboot->setObjectName(QString::fromUtf8("label_reboot"));
         label_reboot->setGeometry(QRect(10, 60, 71, 21));
@@ -182,7 +171,7 @@ public:
         btn_reboot->setGeometry(QRect(90, 60, 91, 23));
         frame_dev = new QFrame(centralwidget);
         frame_dev->setObjectName(QString::fromUtf8("frame_dev"));
-        frame_dev->setGeometry(QRect(500, 210, 201, 61));
+        frame_dev->setGeometry(QRect(500, 220, 221, 61));
         frame_dev->setFrameShape(QFrame::StyledPanel);
         frame_dev->setFrameShadow(QFrame::Raised);
         label_dev_id = new QLabel(frame_dev);
@@ -190,7 +179,7 @@ public:
         label_dev_id->setGeometry(QRect(10, 10, 71, 21));
         line_edit_dev_id = new QLineEdit(frame_dev);
         line_edit_dev_id->setObjectName(QString::fromUtf8("line_edit_dev_id"));
-        line_edit_dev_id->setGeometry(QRect(70, 10, 111, 21));
+        line_edit_dev_id->setGeometry(QRect(100, 10, 111, 21));
         frame_test = new QFrame(centralwidget);
         frame_test->setObjectName(QString::fromUtf8("frame_test"));
         frame_test->setGeometry(QRect(10, 330, 481, 381));
@@ -217,37 +206,43 @@ public:
         btn_clear->setGeometry(QRect(10, 350, 92, 28));
         frame_socket = new QFrame(centralwidget);
         frame_socket->setObjectName(QString::fromUtf8("frame_socket"));
-        frame_socket->setGeometry(QRect(500, 280, 201, 191));
+        frame_socket->setGeometry(QRect(500, 280, 221, 221));
         frame_socket->setFrameShape(QFrame::StyledPanel);
         frame_socket->setFrameShadow(QFrame::Raised);
-        label_ipaddr = new QLabel(frame_socket);
-        label_ipaddr->setObjectName(QString::fromUtf8("label_ipaddr"));
-        label_ipaddr->setGeometry(QRect(10, 70, 41, 20));
+        label_server_ipaddr = new QLabel(frame_socket);
+        label_server_ipaddr->setObjectName(QString::fromUtf8("label_server_ipaddr"));
+        label_server_ipaddr->setGeometry(QRect(10, 60, 81, 20));
         line_edit_ipaddr = new QLineEdit(frame_socket);
         line_edit_ipaddr->setObjectName(QString::fromUtf8("line_edit_ipaddr"));
-        line_edit_ipaddr->setGeometry(QRect(60, 70, 121, 20));
-        label_port = new QLabel(frame_socket);
-        label_port->setObjectName(QString::fromUtf8("label_port"));
-        label_port->setGeometry(QRect(10, 110, 41, 20));
+        line_edit_ipaddr->setGeometry(QRect(100, 60, 111, 20));
+        label_server_port = new QLabel(frame_socket);
+        label_server_port->setObjectName(QString::fromUtf8("label_server_port"));
+        label_server_port->setGeometry(QRect(10, 100, 81, 20));
         line_edit_port = new QLineEdit(frame_socket);
         line_edit_port->setObjectName(QString::fromUtf8("line_edit_port"));
-        line_edit_port->setGeometry(QRect(60, 110, 121, 21));
+        line_edit_port->setGeometry(QRect(100, 100, 111, 21));
         btn_socket_open = new QPushButton(frame_socket);
         btn_socket_open->setObjectName(QString::fromUtf8("btn_socket_open"));
-        btn_socket_open->setGeometry(QRect(10, 150, 71, 23));
+        btn_socket_open->setGeometry(QRect(10, 180, 81, 23));
         btn_socket_close = new QPushButton(frame_socket);
         btn_socket_close->setObjectName(QString::fromUtf8("btn_socket_close"));
-        btn_socket_close->setGeometry(QRect(110, 150, 71, 23));
+        btn_socket_close->setGeometry(QRect(120, 180, 81, 23));
         label_socket_type = new QLabel(frame_socket);
         label_socket_type->setObjectName(QString::fromUtf8("label_socket_type"));
-        label_socket_type->setGeometry(QRect(10, 30, 51, 20));
+        label_socket_type->setGeometry(QRect(10, 20, 51, 20));
         combo_box_socket_type = new QComboBox(frame_socket);
         combo_box_socket_type->setObjectName(QString::fromUtf8("combo_box_socket_type"));
-        combo_box_socket_type->setGeometry(QRect(60, 30, 121, 21));
+        combo_box_socket_type->setGeometry(QRect(100, 20, 111, 21));
+        label_local_ipaddr = new QLabel(frame_socket);
+        label_local_ipaddr->setObjectName(QString::fromUtf8("label_local_ipaddr"));
+        label_local_ipaddr->setGeometry(QRect(10, 140, 81, 20));
+        line_edit_local_ipaddr = new QLineEdit(frame_socket);
+        line_edit_local_ipaddr->setObjectName(QString::fromUtf8("line_edit_local_ipaddr"));
+        line_edit_local_ipaddr->setGeometry(QRect(100, 140, 111, 20));
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName(QString::fromUtf8("menubar"));
-        menubar->setGeometry(QRect(0, 0, 710, 26));
+        menubar->setGeometry(QRect(0, 0, 730, 26));
         MainWindow->setMenuBar(menubar);
         statusbar = new QStatusBar(MainWindow);
         statusbar->setObjectName(QString::fromUtf8("statusbar"));
@@ -276,8 +271,6 @@ public:
         btn_beep_off->setText(QApplication::translate("MainWindow", "\345\205\263\351\227\255\350\234\202\351\270\243\345\231\250", nullptr));
         label_stauts->setText(QApplication::translate("MainWindow", "\345\206\205\351\203\250\347\212\266\346\200\201\345\214\272", nullptr));
         btn_refresh->setText(QApplication::translate("MainWindow", "\345\210\267\346\226\260\347\212\266\346\200\201", nullptr));
-        check_box_time->setText(QApplication::translate("MainWindow", "\345\256\232\346\227\266", nullptr));
-        label_time->setText(QApplication::translate("MainWindow", "s", nullptr));
         label_reboot->setText(QApplication::translate("MainWindow", "\345\244\215\344\275\215", nullptr));
         btn_reboot->setText(QApplication::translate("MainWindow", "\345\244\215\344\275\215", nullptr));
         label_dev_id->setText(QApplication::translate("MainWindow", "\350\256\276\345\244\207ID", nullptr));
@@ -286,13 +279,15 @@ public:
         btn_send_cmd->setText(QApplication::translate("MainWindow", "\346\214\207\344\273\244\345\217\221\351\200\201", nullptr));
         label_test->setText(QApplication::translate("MainWindow", "\350\260\203\350\257\225\347\252\227\345\217\243", nullptr));
         btn_clear->setText(QApplication::translate("MainWindow", "\346\270\205\347\251\272\346\225\260\346\215\256", nullptr));
-        label_ipaddr->setText(QApplication::translate("MainWindow", "Ipaddr", nullptr));
-        line_edit_ipaddr->setText(QApplication::translate("MainWindow", "127.0.0.1", nullptr));
-        label_port->setText(QApplication::translate("MainWindow", "Port", nullptr));
+        label_server_ipaddr->setText(QApplication::translate("MainWindow", "\346\234\215\345\212\241\345\231\250IP", nullptr));
+        line_edit_ipaddr->setText(QApplication::translate("MainWindow", "192.168.1.251", nullptr));
+        label_server_port->setText(QApplication::translate("MainWindow", "\346\234\215\345\212\241\345\231\250Port", nullptr));
         line_edit_port->setText(QApplication::translate("MainWindow", "8000", nullptr));
         btn_socket_open->setText(QApplication::translate("MainWindow", "\350\277\236\346\216\245\347\275\221\347\273\234", nullptr));
         btn_socket_close->setText(QApplication::translate("MainWindow", "\346\226\255\345\274\200\347\275\221\347\273\234", nullptr));
         label_socket_type->setText(QApplication::translate("MainWindow", "\345\215\217\350\256\256", nullptr));
+        label_local_ipaddr->setText(QApplication::translate("MainWindow", "\346\234\254\345\234\260IP", nullptr));
+        line_edit_local_ipaddr->setText(QApplication::translate("MainWindow", "192.168.1.105", nullptr));
     } // retranslateUi
 
 };

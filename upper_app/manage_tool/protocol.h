@@ -5,55 +5,27 @@
 #include <QMutex>
 #include <QThread>
 
-//协议相关的指令
-#define PROTOCOL_SEND_HEAD          0x5A
-#define PROTOCOL_RECV_HEAD          0x5B
-#define PROTOCOL_RECV_HEAD_SIZE     3
-#define PROTOCOL_CRC_SIZE           2
-#define PROTOCOL_TIMEOUT            4000
-
-//缓存的大小
-#define BUFF_CACHE_SIZE     1200
-
-#define RT_OK               0
-#define RT_EMPTY            -1
-#define RT_TIMEOUT          -2
-#define RT_CRC_ERROR        -3
-
-//队列相关的信息
-#define MAX_QUEUE            20
-#define QUEUE_INFO_OK        0
-#define QUEUE_INFO_FULL     -1
-#define QUEUE_INFO_INVALID  -2
-#define QUEUE_INFO_EMPTY    -3
-
-enum PROTOCOL_STATUS
-{
-    PROTOCOL_NULL = 0,
-    PROTOCOL_UART,
-    PROTOCOL_TCP,
-    PROTOCOL_UDP
-};
-
 class SSendBuffer
 {
 public:
     SSendBuffer(uint8_t *pBuffer = nullptr, int nSize = 0, int nCommand = 0, bool bWriteThrough = false,
-                std::function<QString(uint8_t *, int)> pFunc = nullptr){
+                std::function<QString(uint8_t *, int)> pFunc = nullptr, PROTOCOL_STATUS nProtocolStatus = PROTOCOL_NULL){
         m_nSize = nSize;
         m_pBuffer = pBuffer;
         m_IsWriteThrough = bWriteThrough;
         m_nCommand = nCommand;
         m_pFunc = pFunc;
+        m_nProtocolStatus = nProtocolStatus;
     }
     ~SSendBuffer(){
     }
 
-    int m_nSize;
     uint8_t *m_pBuffer;
+    int m_nSize;
     int m_nCommand;
     uint8_t m_IsWriteThrough;
     std::function<QString(uint8_t *, int)> m_pFunc;
+    PROTOCOL_STATUS m_nProtocolStatus;
 };
 
 class CProtocolQueue
@@ -87,6 +59,7 @@ public:
         m_nReadIndex = 0;
         m_qLockMutex->unlock();
     }
+
     int QueuePost(SSendBuffer *pSendBuffer)
     {
         if(m_nFreeList == 0)
@@ -107,6 +80,7 @@ public:
 
         return QUEUE_INFO_OK;
     }
+
     int QueuePend(SSendBuffer *pSendbuffer){
         if(m_nFreeList < MAX_QUEUE)
         {
@@ -116,6 +90,7 @@ public:
             pSendbuffer->m_IsWriteThrough =  qinfo_ptr[m_nReadIndex]->m_IsWriteThrough;
             pSendbuffer->m_nCommand = qinfo_ptr[m_nReadIndex]->m_nCommand;
             pSendbuffer->m_pFunc = qinfo_ptr[m_nReadIndex]->m_pFunc;
+            pSendbuffer->m_nProtocolStatus = qinfo_ptr[m_nReadIndex]->m_nProtocolStatus;
 
             delete qinfo_ptr[m_nReadIndex];
             qinfo_ptr[m_nReadIndex] = nullptr;
@@ -127,7 +102,7 @@ public:
             }
             m_nFreeList++;
             m_qLockMutex->unlock();
-            qDebug()<<"queue receive";
+            //qDebug()<<"queue receive";
             return  QUEUE_INFO_OK;
         }
         else{
@@ -148,6 +123,7 @@ class CProtocolInfo
 public:
     CProtocolInfo(uint8_t *pRxBuffer, uint8_t *pTxBuffer, uint8_t nMaxBufSize){
         m_pRxBuffer = pRxBuffer;
+        m_pRxDataBuffer = &pRxBuffer[RECV_DATA_HEAD];
         m_pTxBuffer = pTxBuffer;
         m_MaxBufSize = nMaxBufSize;
         m_pQueue = new CProtocolQueue();
@@ -165,7 +141,8 @@ public:
     void SetId(uint16_t nCurId){
         m_nId = nCurId;
     }
-    int CheckReceiveData(void);
+    int CheckReceiveData(bool IsSignalCheckHead);
+
     int ExecutCommand(SSendBuffer &sBuffer, int nSize);
 
     virtual int DeviceRead(uint8_t *pStart, uint16_t nMaxSize) = 0;
@@ -182,6 +159,7 @@ public:
     }
 
     uint8_t *m_pRxBuffer;
+    uint8_t *m_pRxDataBuffer;
     uint8_t *m_pTxBuffer;
     int m_RxBufSize{0};  //接收到缓存区总长度
     int m_RxDataSize{0}; //接收到数据区长度

@@ -4,16 +4,51 @@
 #include "typedef.h"
 #include <functional>
 
-#define CMD_LIST_SIZE           6
+#define CMD_LIST_SIZE           7
 
-#define LED_ON_CMD              0
-#define LED_OFF_CMD             1
-#define BEEP_ON_CMD             2
-#define BEEP_OFF_CMD            3
-#define DEV_REBOOT_CMD          4
-#define GET_INFO_CMD            5
+#define LED_ON_CMD              0x00
+#define LED_OFF_CMD             0x01
+#define BEEP_ON_CMD             0x02
+#define BEEP_OFF_CMD            0x03
+#define DEV_REBOOT_CMD          0x04
+#define GET_INFO_CMD            0x05
+#define ABORT_CMD               0x06
 
 #define DEV_WRITE_THROUGH_CMD   0xFF
+
+union UBaseStatus
+{
+    uint32_t d32;
+
+    struct
+    {
+        uint32_t led:1;
+        uint32_t beep:1;
+        uint32_t reserved:30;
+    }b;
+};
+
+#pragma pack(push)
+#pragma pack(1)
+struct SRegInfoList
+{
+    union UBaseStatus s_base_status; //基础状态信息
+    uint16_t sensor_ia;
+    uint16_t sensor_als;
+    uint16_t sensor_ps;
+    uint16_t reserved0;
+    uint32_t sensor_gyro_x;
+    uint32_t sensor_gyro_y;
+    uint32_t sensor_gyro_z;
+    uint32_t sensor_accel_x;
+    uint32_t sensor_accel_y;
+    uint32_t sensor_accel_z;
+    uint32_t sensor_temp;
+    uint32_t rtc_lower;
+    uint32_t rtc_high;
+};
+#pragma pack(pop)
+
 struct SCommandInfo
 {
    uint8_t *m_pbuffer;

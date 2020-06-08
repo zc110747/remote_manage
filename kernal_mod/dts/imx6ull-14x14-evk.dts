@@ -405,7 +405,7 @@
 		/*beep pinctrl used add by zc*/
 		pinctrl_beep: beep {
 			fsl,pins = <
-				MX6ULL_PAD_SNVS_TAMPER1__GPIO5_IO01	0x10B0
+				MX6ULL_PAD_SNVS_TAMPER1__GPIO5_IO01	0x400010B0
 			>;
 		};
 		

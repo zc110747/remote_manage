@@ -108,21 +108,26 @@ uint16_t CApplicationReg::GetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize, 
  */
 void CApplicationReg::SetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize, uint8_t *pDataStart)
 {
-    uint16_t nIndex, nEndIndex;
+    uint16_t nIndex, nEndRegIndex, modifySize;
 
-    nEndIndex = nRegIndex+nRegSize;
-    if(nEndIndex>REG_NUM)
-        nEndIndex = REG_NUM;
+    nEndRegIndex = nRegIndex+nRegSize;
+    if(nEndRegIndex>REG_NUM)
+    {
+        nEndRegIndex = REG_NUM;
+    }
+    modifySize = nEndRegIndex-nRegIndex;
 
     pthread_mutex_lock(&m_RegMutex);
-    for(nIndex=nRegIndex; nIndex<nEndIndex; nIndex++)
+    for(nIndex=0; nIndex<modifySize; nIndex++)
     {
-        m_RegVal[nIndex] = *(pDataStart+nIndex);
+        m_RegVal[nRegIndex+nIndex] = *(pDataStart+nIndex);
     }
     pthread_mutex_unlock(&m_RegMutex);
     #if __SYSTEM_DEBUG
     printf("set array:");
-    SystemLogArray(m_RegVal, nRegSize);
+    SystemLogArray(&m_RegVal[nRegIndex], nRegSize);
+    printf("set array:");
+    SystemLogArray(pDataStart, nRegSize);
     #endif
 }
 
@@ -139,11 +144,12 @@ void CApplicationReg::SetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize, uint
 int CApplicationReg::DiffSetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize, 
                                         uint8_t *pDataStart, uint8_t *pDataCompare)
 {
-    uint16_t nIndex, nEndRegIndex;
+    uint16_t nIndex, nEndRegIndex, modifySize;
 
     nEndRegIndex = nRegIndex+nRegSize;
     if(nEndRegIndex>REG_NUM)
         nEndRegIndex = REG_NUM;
+    modifySize = nEndRegIndex-nRegIndex;
 
     pthread_mutex_lock(&m_RegMutex);
     if(memcmp((char *)&m_RegVal[nRegIndex], pDataCompare, nRegSize) != 0)
@@ -152,7 +158,7 @@ int CApplicationReg::DiffSetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize,
         return RT_FAIL;
     }
 
-    for(nIndex=nRegIndex; nIndex<nEndRegIndex; nIndex++)
+    for(nIndex=0; nIndex<modifySize; nIndex++)
     {
         m_RegVal[nIndex] = *(pDataStart+nIndex);
     }
@@ -185,9 +191,10 @@ void CApplicationReg::UpdateHardware(void)
     pRegInfoList->s_base_status.b.led = LedStatusRead()&0x01;
     pRegInfoList->s_base_status.b.beep = BeepStatusRead()&0x01;
 
-    //USR_DEBUG("Update HardWare!\r\n");
     if(memcmp(nRegCacheArray, nRegInfoArray, REG_INFO_NUM) != 0)
     {
+        USR_DEBUG("Update HardWare, led:%d, beep:%d!\r\n", pRegInfoList->s_base_status.b.led,
+        pRegInfoList->s_base_status.b.beep);
         SetMultipleReg(REG_CONFIG_NUM, REG_INFO_NUM, nRegInfoArray);
     }
 }
@@ -299,7 +306,7 @@ int CApplicationReg::RefreshAllDevice(void)
     /*更新内部硬件状态到信息寄存器*/
     static uint16_t loop_read = 0;
     loop_read++;
-    if(loop_read == 1000)
+    if(loop_read == TIME_LOOP_DELAY)
     {
         loop_read = 0;
         UpdateHardware();   

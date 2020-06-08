@@ -20,29 +20,29 @@
 QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
-struct qt_meta_stringdata_CUartProtocolThreadInfo_t {
+struct qt_meta_stringdata_CUartProtocolInfo_t {
     QByteArrayData data[4];
-    char stringdata0[55];
+    char stringdata0[49];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
-    qptrdiff(offsetof(qt_meta_stringdata_CUartProtocolThreadInfo_t, stringdata0) + ofs \
+    qptrdiff(offsetof(qt_meta_stringdata_CUartProtocolInfo_t, stringdata0) + ofs \
         - idx * sizeof(QByteArrayData)) \
     )
-static const qt_meta_stringdata_CUartProtocolThreadInfo_t qt_meta_stringdata_CUartProtocolThreadInfo = {
+static const qt_meta_stringdata_CUartProtocolInfo_t qt_meta_stringdata_CUartProtocolInfo = {
     {
-QT_MOC_LITERAL(0, 0, 23), // "CUartProtocolThreadInfo"
-QT_MOC_LITERAL(1, 24, 14), // "send_edit_recv"
-QT_MOC_LITERAL(2, 39, 0), // ""
-QT_MOC_LITERAL(3, 40, 14) // "send_edit_test"
+QT_MOC_LITERAL(0, 0, 17), // "CUartProtocolInfo"
+QT_MOC_LITERAL(1, 18, 14), // "send_edit_recv"
+QT_MOC_LITERAL(2, 33, 0), // ""
+QT_MOC_LITERAL(3, 34, 14) // "send_edit_test"
 
     },
-    "CUartProtocolThreadInfo\0send_edit_recv\0"
-    "\0send_edit_test"
+    "CUartProtocolInfo\0send_edit_recv\0\0"
+    "send_edit_test"
 };
 #undef QT_MOC_LITERAL
 
-static const uint qt_meta_data_CUartProtocolThreadInfo[] = {
+static const uint qt_meta_data_CUartProtocolInfo[] = {
 
  // content:
        8,       // revision
@@ -66,10 +66,10 @@ static const uint qt_meta_data_CUartProtocolThreadInfo[] = {
        0        // eod
 };
 
-void CUartProtocolThreadInfo::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
+void CUartProtocolInfo::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        auto *_t = static_cast<CUartProtocolThreadInfo *>(_o);
+        auto *_t = static_cast<CUartProtocolInfo *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->send_edit_recv((*reinterpret_cast< QString(*)>(_a[1]))); break;
@@ -79,15 +79,15 @@ void CUartProtocolThreadInfo::qt_static_metacall(QObject *_o, QMetaObject::Call 
     } else if (_c == QMetaObject::IndexOfMethod) {
         int *result = reinterpret_cast<int *>(_a[0]);
         {
-            using _t = void (CUartProtocolThreadInfo::*)(QString );
-            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&CUartProtocolThreadInfo::send_edit_recv)) {
+            using _t = void (CUartProtocolInfo::*)(QString );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&CUartProtocolInfo::send_edit_recv)) {
                 *result = 0;
                 return;
             }
         }
         {
-            using _t = void (CUartProtocolThreadInfo::*)(QString );
-            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&CUartProtocolThreadInfo::send_edit_test)) {
+            using _t = void (CUartProtocolInfo::*)(QString );
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&CUartProtocolInfo::send_edit_test)) {
                 *result = 1;
                 return;
             }
@@ -95,34 +95,34 @@ void CUartProtocolThreadInfo::qt_static_metacall(QObject *_o, QMetaObject::Call 
     }
 }
 
-QT_INIT_METAOBJECT const QMetaObject CUartProtocolThreadInfo::staticMetaObject = { {
-    &QThread::staticMetaObject,
-    qt_meta_stringdata_CUartProtocolThreadInfo.data,
-    qt_meta_data_CUartProtocolThreadInfo,
+QT_INIT_METAOBJECT const QMetaObject CUartProtocolInfo::staticMetaObject = { {
+    &QWidget::staticMetaObject,
+    qt_meta_stringdata_CUartProtocolInfo.data,
+    qt_meta_data_CUartProtocolInfo,
     qt_static_metacall,
     nullptr,
     nullptr
 } };
 
 
-const QMetaObject *CUartProtocolThreadInfo::metaObject() const
+const QMetaObject *CUartProtocolInfo::metaObject() const
 {
     return QObject::d_ptr->metaObject ? QObject::d_ptr->dynamicMetaObject() : &staticMetaObject;
 }
 
-void *CUartProtocolThreadInfo::qt_metacast(const char *_clname)
+void *CUartProtocolInfo::qt_metacast(const char *_clname)
 {
     if (!_clname) return nullptr;
-    if (!strcmp(_clname, qt_meta_stringdata_CUartProtocolThreadInfo.stringdata0))
+    if (!strcmp(_clname, qt_meta_stringdata_CUartProtocolInfo.stringdata0))
         return static_cast<void*>(this);
     if (!strcmp(_clname, "CProtocolInfo"))
         return static_cast< CProtocolInfo*>(this);
-    return QThread::qt_metacast(_clname);
+    return QWidget::qt_metacast(_clname);
 }
 
-int CUartProtocolThreadInfo::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+int CUartProtocolInfo::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
-    _id = QThread::qt_metacall(_c, _id, _a);
+    _id = QWidget::qt_metacall(_c, _id, _a);
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
@@ -138,14 +138,14 @@ int CUartProtocolThreadInfo::qt_metacall(QMetaObject::Call _c, int _id, void **_
 }
 
 // SIGNAL 0
-void CUartProtocolThreadInfo::send_edit_recv(QString _t1)
+void CUartProtocolInfo::send_edit_recv(QString _t1)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
 }
 
 // SIGNAL 1
-void CUartProtocolThreadInfo::send_edit_test(QString _t1)
+void CUartProtocolInfo::send_edit_test(QString _t1)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 1, _a);

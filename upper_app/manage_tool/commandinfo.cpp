@@ -1,4 +1,6 @@
-﻿
+﻿/*!
+    指令相关的数据存储管理实现
+*/
 #include "commandinfo.h"
 #include <QString>
 
@@ -37,6 +39,7 @@ static uint8_t *pSCommandListBuffer[CMD_LIST_SIZE] =
     beep_off_cmd,
     dev_reboot_cmd,
     get_info_cmd,
+    nullptr
 };
 
 static uint16_t nSCommandListSize[CMD_LIST_SIZE] =
@@ -47,6 +50,7 @@ static uint16_t nSCommandListSize[CMD_LIST_SIZE] =
     sizeof(beep_off_cmd),
     sizeof(dev_reboot_cmd),
     sizeof(get_info_cmd),
+    0
 };
 
 static std::function<QString(uint8_t *, int)> FuncList[CMD_LIST_SIZE] = {
@@ -56,14 +60,37 @@ static std::function<QString(uint8_t *, int)> FuncList[CMD_LIST_SIZE] = {
     nullptr,
     nullptr,
     //get info cmd执行的回调函数
-    [](uint8_t *pData, int nSize)->QString{
-            QString DecodeBuf = QString("func test, %1, %2\n").arg(nSize, *pData);
-            qDebug()<<DecodeBuf;
-            return DecodeBuf;
+    [](uint8_t *pRecvData, int nSize)->QString{
+        QString DecodeBuf = "";
+        struct SRegInfoList *pRegInfoList;
+
+        //qDebug()<<nSize;
+        if(nSize > 16)
+        {
+            pRegInfoList = (struct SRegInfoList *)pRecvData;
+            DecodeBuf = QString("Led Status:%1\n").arg(pRegInfoList->s_base_status.b.led);
+            DecodeBuf += QString("Beep Status:%1\n").arg(pRegInfoList->s_base_status.b.beep);
+            DecodeBuf += QString("Sensor Ia:%1\n").arg(pRegInfoList->sensor_ia);
+            DecodeBuf += QString("Sensor Als:%1\n").arg(pRegInfoList->sensor_als);
+            DecodeBuf += QString("Sensor Ps:%1\n").arg(pRegInfoList->sensor_ps);
+            DecodeBuf += QString("Sensor Gyro x:%1\n").arg(pRegInfoList->sensor_gyro_x);
+            DecodeBuf += QString("Sensor Gyro y:%1\n").arg(pRegInfoList->sensor_gyro_y);
+            DecodeBuf += QString("Sensor Gyro z:%1\n").arg(pRegInfoList->sensor_gyro_z);
+            DecodeBuf += QString("Sensor Accel x:%1\n").arg(pRegInfoList->sensor_accel_x);
+            DecodeBuf += QString("Sensor Accel y:%1\n").arg(pRegInfoList->sensor_accel_y);
+            DecodeBuf += QString("Sensor Accel z:%1\n").arg(pRegInfoList->sensor_accel_z);
+            DecodeBuf += QString("Sensor temp:%1\n").arg(pRegInfoList->sensor_temp);
+            DecodeBuf += QString("rtc :%1\n").arg(((uint64_t)pRegInfoList->rtc_high)<<32 | pRegInfoList->rtc_lower);
+        }
+
+        return DecodeBuf;
     },
+    nullptr,
 };
 
-//指令序列初始化
+/*!
+  指令的信息初始化，包含指令数据，长度，指令名称和回调函数的赋值
+*/
 void CommandInfoInit(void)
 {
     for(int index=0; index<CMD_LIST_SIZE; index++)
@@ -75,7 +102,9 @@ void CommandInfoInit(void)
     }
 }
 
-//获取指令指针
+/*!
+  获取指令的信息结构体，为后续数据发送和读取执行提供数据
+*/
 SCommandInfo *GetCommandPtr(uint16_t index)
 {
     if(index < CMD_LIST_SIZE)

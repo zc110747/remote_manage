@@ -48,9 +48,12 @@ public:
 
 	int DeviceRead(int nFd, uint8_t *pDataStart, uint16_t nDataSize, T extra_info)
 	{
-        struct UdpInfo *pUdpInfo = (struct UdpInfo *)extra_info;
-		return recvfrom(nFd, pDataStart, nDataSize, 0, (struct sockaddr *)&(pUdpInfo->clientaddr), 
+		int nLen;
+		struct UdpInfo *pUdpInfo = (struct UdpInfo *)extra_info;
+		nLen = recvfrom(nFd, pDataStart, nDataSize, 0, (struct sockaddr *)&(pUdpInfo->clientaddr), 
 					&(pUdpInfo->client_sock_len));
+
+		return nLen;
 	}
 	int DeviceWrite(int nFd, uint8_t *pDataStart, uint16_t nDataSize, T extra_info)
 	{

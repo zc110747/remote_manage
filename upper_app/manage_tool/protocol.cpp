@@ -1,9 +1,21 @@
-﻿//协议层的实现
+﻿/*!
+    协议相关的创建，校验和解析接收的应用
+*/
 #include "protocol.h"
 #include <QTime>
 #include <QEventLoop>
+#include <QRandomGenerator>
 
-//生成发送数据报文
+/*!
+    生成上位机发送数据协议的函数实现
+    具体结构:
+    协议头 1Byte -- 0x5A
+    数据长度 2Byte
+    设备ID 1Byte
+    数据编号 2Byte
+    实际内部数据 数据长度-3
+    奇偶校验位 2Byte
+*/
 int CProtocolInfo::CreateSendBuffer(uint8_t nId, uint16_t nSize, uint8_t *pStart, bool bWriteThrough)
 {
     if(m_pTxBuffer != nullptr)
@@ -17,7 +29,7 @@ int CProtocolInfo::CreateSendBuffer(uint8_t nId, uint16_t nSize, uint8_t *pStart
 
             //生成随机数
             qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));
-            random = qrand()%65536;
+            random = QRandomGenerator::global()->bounded(65536);
             m_nPacketId = random;
 
             nSendSize = nSize+3;
@@ -54,7 +66,9 @@ int CProtocolInfo::CreateSendBuffer(uint8_t nId, uint16_t nSize, uint8_t *pStart
         return 0;
 }
 
-//crc校验实现
+/*!
+    CRC16校验的代码实现
+*/
 uint16_t CProtocolInfo::CrcCalculate(uint8_t *pStart, int nSize)
 {
     if(pStart == NULL || nSize == 0)
@@ -64,8 +78,10 @@ uint16_t CProtocolInfo::CrcCalculate(uint8_t *pStart, int nSize)
     return 0xffff;
 }
 
-//读取接收数据
-int CProtocolInfo::CheckReceiveData(void)
+/*!
+    接收数据并返回处理结果
+*/
+int CProtocolInfo::CheckReceiveData(bool IsSignalCheckHead)
 {
     int nRead;
     int CrcRecv, CrcCacl;
@@ -77,7 +93,7 @@ int CProtocolInfo::CheckReceiveData(void)
 
     do
     {
-        if(m_RxBufSize == 0)
+        if(m_RxBufSize == 0 && IsSignalCheckHead == false)
         {
             nRead = DeviceRead(&m_pRxBuffer[m_RxBufSize], 1);
             if(nRead > 0 && m_pRxBuffer[0] == PROTOCOL_RECV_HEAD)
@@ -92,11 +108,17 @@ int CProtocolInfo::CheckReceiveData(void)
             }
         }
 
-        if(m_RxBufSize > 0)
+        if(m_RxBufSize > 0 || IsSignalCheckHead == true)
         {
             nRead = DeviceRead(&m_pRxBuffer[m_RxBufSize], m_MaxBufSize-m_RxBufSize);
             if(nRead > 0)
             {
+                if(IsSignalCheckHead == true && m_pRxBuffer[0] != PROTOCOL_RECV_HEAD)
+                {
+                    m_RxBufSize = 0;
+                    return RT_FAIL;
+                }
+
                 m_RxTimout = 0;
                 m_RxBufSize += nRead;
                 if(nRead >= PROTOCOL_RECV_HEAD_SIZE)

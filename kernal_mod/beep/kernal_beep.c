@@ -41,6 +41,7 @@ struct beep_info
 	struct device *device;	/*设备指针*/
     struct device_node *nd; /*设备节点*/
     int beep_gpio;          /*beep使用的GPIO编号*/
+    int beep_status;
 };
 
 struct beep_info beep_driver_info;
@@ -99,7 +100,18 @@ int beep_release(struct inode *inode, struct file *filp)
  */
 ssize_t beep_read(struct file *filp, char __user *buf, size_t count, loff_t *f_pos)
 {
-    return 0;
+    int result;
+    u8 databuf[2];
+
+    //返回int类型,根据int类型与0比较判断返回值
+    databuf[0] = beep_driver_info.beep_status;
+
+    result = copy_to_user(buf, databuf, 1);
+    if(result < 0) {
+		printk(KERN_INFO"kernel read failed!\r\n");
+		return -EFAULT;
+	}
+    return 1;
 }
 
 /**
@@ -295,6 +307,7 @@ static int beep_gpio_init(void)
         return -EINVAL;
     }
 
+    beep_switch(BEEP_OFF);
     printk(KERN_INFO"beep hardware init ok\r\n");
     return 0;
 }
@@ -319,19 +332,17 @@ static void beep_gpio_release(void)
  */
 static void beep_switch(u8 status)
 {
-    u32 value;
-
     switch(status)
     {
         case BEEP_OFF:
             printk(KERN_INFO"beep off\r\n");
-	        value |= (1 << 3);
             gpio_set_value(beep_driver_info.beep_gpio, 1);	
+            beep_driver_info.beep_status = 0;
             break;
         case BEEP_ON:
             printk(KERN_INFO"beep on\r\n");
             gpio_set_value(beep_driver_info.beep_gpio, 0);	
-	        value &= ~(1 << 3);	
+            beep_driver_info.beep_status = 1;
             break;
         default:
             printk(KERN_INFO"Invalid Beep Set");

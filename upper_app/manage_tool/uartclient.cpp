@@ -1,65 +1,57 @@
-﻿//uart任务处理
+﻿/*!
+    Uart通讯的线程处理和回调执行实现
+*/
 #include "uartclient.h"
 #include "mainwindow.h"
 
-static CUartProtocolThreadInfo *pUartProtocolInfo;
+static CUartProtocolInfo *pUartProtocolInfo;
 static uint8_t rx_buffer[BUFF_CACHE_SIZE];
 static uint8_t tx_buffer[BUFF_CACHE_SIZE];
 
-//任务执行函数
-void CUartProtocolThreadInfo::run()
+/*!
+    uart线程循环的应用执行
+*/
+void CUartProtocolInfo::UartLoopThread(SSendBuffer *pSendbuffer)
 {
-    SSendBuffer SendBufferInfo;
     int nLen;
-    int nStatus;
 
-    for(;;)
+    if(m_bComStatus)
     {
-        if(m_nIsStop)
-            return;
+        nLen = this->CreateSendBuffer(this->GetId(), pSendbuffer->m_nSize,
+                                                   pSendbuffer->m_pBuffer, pSendbuffer->m_IsWriteThrough);
+        this->DeviceWrite(tx_buffer, nLen);
+        emit send_edit_test(byteArrayToHexString("Sendbuf:", tx_buffer, nLen, "\n"));
 
-        nStatus  = m_pQueue->QueuePend(&SendBufferInfo);
-        if(nStatus == QUEUE_INFO_OK)
+        if(this->CheckReceiveData(false) == RT_OK)
         {
-            if(m_bComStatus)
+           emit send_edit_test(byteArrayToHexString("Recv Buf:",
+                m_pRxBuffer, m_RxBufSize, "\n"));
+            if(pSendbuffer->m_pFunc != nullptr)
             {
-                nLen = this->CreateSendBuffer(this->GetId(), SendBufferInfo.m_nSize,
-                                                           SendBufferInfo.m_pBuffer, SendBufferInfo.m_IsWriteThrough);
-                this->DeviceWrite(tx_buffer, nLen);
-                emit send_edit_test(byteArrayToHexString("Sendbuf:", tx_buffer, nLen, "\n"));
-
-                if(this->CheckReceiveData() == RT_OK)
-                {
-                   emit send_edit_test(byteArrayToHexString("Recv Buf:",
-                        m_pRxBuffer, m_RxBufSize, "\n"));
-                }
+                 emit send_edit_recv(pSendbuffer->m_pFunc(m_pRxDataBuffer, m_RxBufSize-RECV_DATA_HEAD));
             }
-
-            qDebug()<<"uart thread queue test OK";
+        }
+        else
+        {
+           emit send_edit_test(QString("Receive Failed"));
         }
     }
+
+    qDebug()<<"uart thread queue test OK";
 }
 
-//设备写数据
-int CUartProtocolThreadInfo::DeviceWrite(uint8_t *pStart, uint16_t nSize)
-{
-    m_pSerialPortCom->write((char *)pStart, nSize);
-    return nSize;
-}
-
-//设备读数据
-int CUartProtocolThreadInfo::DeviceRead(uint8_t *pStart, uint16_t nMaxSize)
-{
-    return m_pSerialPortCom->read((char *)pStart, nMaxSize);
-}
-
-//任务初始化
+/*!
+    Uart应用线程初始化
+*/
 void UartThreadInit(void)
 {
-    pUartProtocolInfo = new CUartProtocolThreadInfo(rx_buffer, tx_buffer, BUFF_CACHE_SIZE);
+    pUartProtocolInfo = new CUartProtocolInfo(rx_buffer, tx_buffer, BUFF_CACHE_SIZE);
 }
 
-CUartProtocolThreadInfo *GetUartProtocolInfo(void)
+/*!
+    获取Uart的信息数据结构
+*/
+CUartProtocolInfo *GetUartProtocolInfo(void)
 {
     return pUartProtocolInfo;
 }

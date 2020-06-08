@@ -73,7 +73,7 @@ void LedStatusConvert(uint8_t nLedStatus)
         DRIVER_DEBUG("led write:%d\n", nLedStatus);
         nVal = nLedStatus;
         nSize = write(nFd, &nVal, 1);  //将数据写入LED
-        if(nSize != 0)
+        if(nSize < 0)
         {
             DRIVER_DEBUG("Write failed\n");
         }
@@ -103,7 +103,7 @@ uint8_t LedStatusRead(void)
     if(nFd != -1)
     {
         nSize = read(nFd, &nValue, 1);  //将数据写入LED
-        if(nSize != 0)
+        if(nSize < 0)
         {
             DRIVER_DEBUG("Read failed\n");
         }

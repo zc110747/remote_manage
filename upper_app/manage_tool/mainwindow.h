@@ -17,6 +17,7 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void init();
+    void update_system_config(void);
 
 public slots:
     void append_text_edit_recv(QString s);

@@ -101,7 +101,18 @@ int led_release(struct inode *inode, struct file *filp)
  */
 ssize_t led_read(struct file *filp, char __user *buf, size_t count, loff_t *f_pos)
 {
-    return 0;
+    int result;
+    u8 databuf[2];
+
+    //LED开关和引脚电平相反
+    databuf[0] = (readl(GPIO1_DR))>>3&0x01?0:1;
+
+    result = copy_to_user(buf, databuf, 1);
+    if(result < 0) {
+		printk(KERN_INFO"kernel read failed!\r\n");
+		return -EFAULT;
+	}
+    return 1;
 }
 
 /**

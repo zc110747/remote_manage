@@ -96,11 +96,11 @@ static void *UartLoopThread(void *arg)
 	int size;
 
 	USR_DEBUG("Uart Main Task Start\n");
-	write(nComFd, "Uart Start OK!\n", strlen("Uart Start OK!\n"));
+	//write(nComFd, "Uart Start OK!\n", strlen("Uart Start OK!\n"));
 
 	for(;;)
 	{	   
-		nFlag = pUartProtocolInfo->CheckRxBuffer(nComFd, &size);
+		nFlag = pUartProtocolInfo->CheckRxBuffer(nComFd, false, &size);
 		if(nFlag == RT_OK)
 		{
 			pUartProtocolInfo->ExecuteCommand(nComFd);

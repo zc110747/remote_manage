@@ -1,5 +1,7 @@
-﻿#include "mainwindow.h"
-
+﻿/*!
+    主界面相关显示应用
+*/
+#include "mainwindow.h"
 #include <QApplication>
 #include <QIcon>
 

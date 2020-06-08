@@ -1,4 +1,4 @@
-#ifndef SOCKETCLIENT_H
+﻿#ifndef SOCKETCLIENT_H
 #define SOCKETCLIENT_H
 
 #include <QObject>
@@ -9,13 +9,19 @@
 #include "ui_mainwindow.h"
 #include "protocol.h"
 
-class CTcpSocketThreadInfo:public QThread, public CProtocolInfo
+class CTcpSocketInfo:public QWidget, public CProtocolInfo
 {
     Q_OBJECT
 
 public:
-    CTcpSocketThreadInfo(uint8_t *pRxBuffer=nullptr, uint8_t *pTxBuffer=nullptr, int nMaxBufSize = 0);
-    ~CTcpSocketThreadInfo();
+    CTcpSocketInfo(uint8_t *pRxBuffer, uint8_t *pTxBuffer, int nMaxBufSize):
+        CProtocolInfo(pRxBuffer, pTxBuffer, nMaxBufSize){}
+    ~CTcpSocketInfo()
+    {
+        m_pTcpSocket->deleteLater();
+        delete  m_pServerIp;
+    }
+
     int DeviceRead(uint8_t *pStart, uint16_t nMaxSize){
         uint16_t nReadSize = 0;
 
@@ -25,6 +31,7 @@ public:
         }
         return nReadSize;
     };
+
     int DeviceWrite(uint8_t *pStart, uint16_t nSize){
         return m_pTcpSocket->write((char *)pStart, nSize);
     };
@@ -36,21 +43,15 @@ public:
         }
         m_nPort = nPort;
     }
-    void CloseThread()
-    {
-        m_nIsStop = 1;
-    }
 
+    void TcpClientSocketInitForThread();
+    void TcpClientSocketLoopThread(SSendBuffer *pSendbuffer);
     QTcpSocket *m_pTcpSocket;
     QHostAddress *m_pServerIp;
     int m_nPort;
 
-protected:
-    virtual void run();
-
 private:
     bool status{false};
-    volatile bool m_nIsStop{0};
 
 signals:
     void send_edit_recv(QString);
@@ -63,6 +64,6 @@ public slots:
 };
 
 void TcpClientSocketInit(void);
-CTcpSocketThreadInfo *GetTcpClientSocket();
+CTcpSocketInfo *GetTcpClientSocketInfo();
 
 #endif // SOCKETCLIENT_H

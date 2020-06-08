@@ -174,7 +174,7 @@ static void *SocketTcpDataProcessThread(void *arg)
 
     for(;;)
     {	   
-		nFlag = pTcpProtocolInfo->CheckRxBuffer(client_fd, &size);
+		nFlag = pTcpProtocolInfo->CheckRxBuffer(client_fd, false, &size);
 		if(nFlag == RT_OK)
         {
 			pTcpProtocolInfo->ExecuteCommand(client_fd);

@@ -142,17 +142,19 @@ public:
 	 * 接收数据以及校验
 	 * 
 	 * @param nFd 访问设备的ID
+	 * @param IsSignalCheckHead bool型，兼容UDP的接收实现，UDP协议不支持分片的数据接收
+	 * @param ExtraInfo 兼容UDP的接收实现，需要额外的信息处理
 	 *  
 	 * @return 接收数据和校验的结果
 	 */
-	int CheckRxBuffer(int nFd, T ExtraInfo){
+	int CheckRxBuffer(int nFd, bool IsSignalCheckHead, T ExtraInfo){
 		int nread;
 		int CrcRecv, CrcCacl;
 		struct req_frame *frame_ptr; 
 		frame_ptr = (struct req_frame *)m_RxCachePtr;
 
 		//数据包头的处理
-		if(m_RxBufSize == 0)
+		if(m_RxBufSize == 0 && IsSignalCheckHead == false)
 		{
 			nread = DeviceRead(nFd, &m_RxCachePtr[m_RxBufSize], 1, ExtraInfo);
 			if(nread != 0 &&frame_ptr->head == PROTOCOL_REQ_HEAD)
@@ -169,12 +171,21 @@ public:
 		}
 
 		//数据包的解析
-		if(m_RxBufSize > 0)
+		if(m_RxBufSize > 0 || IsSignalCheckHead == true)
 		{
 			/*从设备中读取数据*/
+			//printf("Udp Thread Recv, %d, %d\n", m_RxBufSize, m_RxCachePtr[0]);
 			nread = DeviceRead(nFd, &m_RxCachePtr[m_RxBufSize], (m_MaxCacheBufSize-m_RxBufSize), ExtraInfo);
+
 			if(nread > 0)
 			{        
+				if(IsSignalCheckHead == true && frame_ptr->head != PROTOCOL_REQ_HEAD)
+				{
+					usleep(1);
+					m_RxBufSize = 0;
+					return RT_FAIL;
+				}
+
 				m_RxTimeout = 0;
 				m_RxBufSize += nread;
 
@@ -236,7 +247,7 @@ public:
 	int SendTxBuffer(int nFd, T ExtraInfo)
 	{
 		SystemLogArray(m_TxCachePtr, m_TxBufSize);
-		DeviceWrite(nFd, m_TxCachePtr, m_TxBufSize, ExtraInfo);
+		return DeviceWrite(nFd, m_TxCachePtr, m_TxBufSize, ExtraInfo);
 	}
 	
 	/**

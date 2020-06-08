@@ -1,0 +1,19 @@
+﻿{       
+        "Serial":{
+                "Com":"COM2",
+                "Baud":"9600",
+                "DataBits":"8",
+                "StopBits":"1",
+                "Parity":"n"
+        },
+        "Device":{
+                "ID":"1"
+        },
+        "Socket":{
+                "Protocol":"TCP",
+                "IpAddr":"192.168.93.1",
+                "LocalIpAddr":"192.168.93.1",
+                "Port":"8000",
+                "Local Port":"8100"
+        }
+}

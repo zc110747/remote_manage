@@ -58,7 +58,7 @@ struct SRegInfoList
     uint16_t sensor_ia;            
     uint16_t sensor_als;
     uint16_t sensor_ps;
-    uint16_t reserved[0];
+    uint16_t reserved0;
     uint32_t sensor_gyro_x;
     uint32_t sensor_gyro_y; 
     uint32_t sensor_gyro_z;
