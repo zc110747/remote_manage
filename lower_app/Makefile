@@ -11,7 +11,10 @@ LOWERAPP_INC_ROOT = lib/jsoncpp/include
 
 LIB = lib/$(CPU)libjsoncpp.a #链接的库
 
-OBJS = main.o source/ApplicationThread.o source/SocketTcpThread.o source/SocketUdpThread.o source/UartThread.o source/SystemConfig.o driver/Beep.o driver/Led.o
+OBJS = main.o source/ApplicationThread.o source/SocketTcpThread.o source/SocketUdpThread.o \
+	   source/UartThread.o source/SystemConfig.o driver/Beep.o driver/Led.o \
+	   source/calculate/CalcCRC16.o
+
 APP = app_demo
 
 LOWERAPP_INC= -I $(LOWERAPP_INC_ROOT)

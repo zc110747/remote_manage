@@ -21,6 +21,7 @@
 ***************************************************************************/
 #include "UsrTypeDef.h"
 #include "ApplicationThread.h"
+#include "calculate/CalcCrc16.h"
 
 /**************************************************************************
 * Global Macro Definition
@@ -44,6 +45,8 @@
 #define ACK_OK					0x00
 #define ACK_INVALID_CMD			0x01
 #define ACK_OTHER_ERR			0xff
+
+#define DEFAULT_CRC_VALUE		0xFFFF
 
 #define BIG_ENDING         		0
 #if BIG_ENDING	
@@ -300,7 +303,9 @@ public:
 	 */
 	uint16_t CrcCalculate(uint8_t *pDataStart, uint16_t nDataSize)
 	{
-		return 0xFFFF;
+		uint16_t nCrcOut;
+		nCrcOut = crc16(DEFAULT_CRC_VALUE, pDataStart, nDataSize);
+		return nCrcOut;
 	}			
 
 	/*设备读写函数，因为不同设备的实现可能不同，用纯虚函数*/

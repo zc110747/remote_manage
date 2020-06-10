@@ -396,6 +396,8 @@ QString byteArrayToHexString(QString head, const uint8_t* str, uint16_t size, QS
     {
         s = QString("%1").arg(str[i], 0, 16);
         if(s.length() == 1)
+            result.append("0x0");
+        else
             result.append("0x");
         result.append(s.toUpper());
         result.append(' ');

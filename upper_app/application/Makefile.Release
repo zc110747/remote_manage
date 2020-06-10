@@ -426,6 +426,51 @@ release\moc_appthread.cpp: ..\manage_tool\appthread.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qicon.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QWidget \
 		ui_mainwindow.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QVariant \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QApplication \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qapplication.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qcoreapplication.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qeventloop.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qdesktopwidget.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qguiapplication.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qinputmethod.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QComboBox \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qcombobox.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractitemdelegate.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qstyleoption.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractspinbox.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qvalidator.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qregularexpression.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qslider.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractslider.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qstyle.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qtabbar.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qrubberband.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qframe.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qabstractitemmodel.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QFrame \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QLabel \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qlabel.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QLineEdit \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qlineedit.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextcursor.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextformat.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qpen.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextoption.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QMenuBar \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qmenubar.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qmenu.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qaction.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qactiongroup.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QPushButton \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qpushbutton.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractbutton.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QStatusBar \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qstatusbar.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QTextEdit \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qtextedit.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractscrollarea.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextdocument.h \
 		release\moc_predefs.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\bin\moc.exe
 	D:\Software\Qt5\5.12.8\msvc2015_64\bin\moc.exe $(DEFINES) --compiler-flavor=msvc --include F:/git-storge/remote_manage/upper_app/application/release/moc_predefs.h -ID:/Software/Qt5/5.12.8/msvc2015_64/mkspecs/win32-msvc -IF:/git-storge/remote_manage/upper_app/manage_tool -ID:/Software/Qt5/5.12.8/msvc2015_64/include -ID:/Software/Qt5/5.12.8/msvc2015_64/include/QtWidgets -ID:/Software/Qt5/5.12.8/msvc2015_64/include/QtGui -ID:/Software/Qt5/5.12.8/msvc2015_64/include/QtANGLE -ID:/Software/Qt5/5.12.8/msvc2015_64/include/QtNetwork -ID:/Software/Qt5/5.12.8/msvc2015_64/include/QtCore -I. -I"C:\StudySoftware\VisualStudio 2015\VC\INCLUDE" -I"C:\StudySoftware\VisualStudio 2015\VC\ATLMFC\INCLUDE" -I"C:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt" -I"C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\shared" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\um" -I"C:\Program Files (x86)\Windows Kits\8.1\include\\winrt" ..\manage_tool\appthread.h -o release\moc_appthread.cpp
@@ -662,6 +707,51 @@ release\moc_tcpclient.cpp: ..\manage_tool\tcpclient.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qicon.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QWidget \
 		ui_mainwindow.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QVariant \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QApplication \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qapplication.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qcoreapplication.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qeventloop.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qdesktopwidget.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qguiapplication.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qinputmethod.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QComboBox \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qcombobox.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractitemdelegate.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qstyleoption.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractspinbox.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qvalidator.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qregularexpression.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qslider.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractslider.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qstyle.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qtabbar.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qrubberband.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qframe.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qabstractitemmodel.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QFrame \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QLabel \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qlabel.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QLineEdit \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qlineedit.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextcursor.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextformat.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qpen.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextoption.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QMenuBar \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qmenubar.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qmenu.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qaction.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qactiongroup.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QPushButton \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qpushbutton.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractbutton.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QStatusBar \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qstatusbar.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QTextEdit \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qtextedit.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractscrollarea.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextdocument.h \
 		..\manage_tool\protocol.h \
 		..\manage_tool\typedef.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QDebug \
@@ -783,6 +873,51 @@ release\moc_uartclient.cpp: ..\manage_tool\uartclient.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qicon.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QWidget \
 		ui_mainwindow.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QVariant \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QApplication \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qapplication.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qcoreapplication.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qeventloop.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qdesktopwidget.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qguiapplication.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qinputmethod.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QComboBox \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qcombobox.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractitemdelegate.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qstyleoption.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractspinbox.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qvalidator.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qregularexpression.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qslider.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractslider.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qstyle.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qtabbar.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qrubberband.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qframe.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qabstractitemmodel.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QFrame \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QLabel \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qlabel.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QLineEdit \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qlineedit.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextcursor.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextformat.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qpen.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextoption.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QMenuBar \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qmenubar.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qmenu.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qaction.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qactiongroup.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QPushButton \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qpushbutton.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractbutton.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QStatusBar \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qstatusbar.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QTextEdit \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qtextedit.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractscrollarea.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextdocument.h \
 		..\manage_tool\protocol.h \
 		..\manage_tool\typedef.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QDebug \
@@ -914,6 +1049,51 @@ release\moc_udpclient.cpp: ..\manage_tool\udpclient.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qicon.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QWidget \
 		ui_mainwindow.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QVariant \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QApplication \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qapplication.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qcoreapplication.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qeventloop.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qdesktopwidget.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qguiapplication.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qinputmethod.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QComboBox \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qcombobox.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractitemdelegate.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qstyleoption.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractspinbox.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qvalidator.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qregularexpression.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qslider.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractslider.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qstyle.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qtabbar.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qrubberband.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qframe.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qabstractitemmodel.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QFrame \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QLabel \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qlabel.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QLineEdit \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qlineedit.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextcursor.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextformat.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qpen.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextoption.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QMenuBar \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qmenubar.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qmenu.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qaction.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qactiongroup.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QPushButton \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qpushbutton.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractbutton.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QStatusBar \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qstatusbar.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QTextEdit \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qtextedit.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractscrollarea.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextdocument.h \
 		..\manage_tool\protocol.h \
 		..\manage_tool\typedef.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QDebug \
@@ -1230,6 +1410,51 @@ release\appthread.obj: ..\manage_tool\appthread.cpp ..\manage_tool\appthread.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qicon.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QWidget \
 		ui_mainwindow.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QVariant \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QApplication \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qapplication.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qcoreapplication.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qeventloop.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qdesktopwidget.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qguiapplication.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qinputmethod.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QComboBox \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qcombobox.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractitemdelegate.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qstyleoption.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractspinbox.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qvalidator.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qregularexpression.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qslider.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractslider.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qstyle.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qtabbar.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qrubberband.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qframe.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qabstractitemmodel.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QFrame \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QLabel \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qlabel.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QLineEdit \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qlineedit.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextcursor.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextformat.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qpen.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextoption.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QMenuBar \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qmenubar.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qmenu.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qaction.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qactiongroup.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QPushButton \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qpushbutton.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractbutton.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QStatusBar \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qstatusbar.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QTextEdit \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qtextedit.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractscrollarea.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextdocument.h \
 		..\manage_tool\uartclient.h \
 		..\manage_tool\qextserialport\qextserialport.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QIODevice \
@@ -1373,7 +1598,19 @@ release\configfile.obj: ..\manage_tool\configfile.cpp ..\manage_tool\configfile.
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qcontiguouscache.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qsharedpointer.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qsharedpointer_impl.h \
-		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QString
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QString \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QFile \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qfile.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qfiledevice.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QJsonDocument \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qjsondocument.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qjsonvalue.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QJsonParseError \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QJsonObject \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qjsonobject.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QJsonArray \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qjsonarray.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QJsonValue
 
 release\main.obj: ..\manage_tool\main.cpp ..\manage_tool\mainwindow.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QMainWindow \
@@ -1601,6 +1838,51 @@ release\mainwindow.obj: ..\manage_tool\mainwindow.cpp ..\manage_tool\mainwindow.
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qicon.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QWidget \
 		ui_mainwindow.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QVariant \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QApplication \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qapplication.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qcoreapplication.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qeventloop.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qdesktopwidget.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qguiapplication.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qinputmethod.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QComboBox \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qcombobox.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractitemdelegate.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qstyleoption.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractspinbox.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qvalidator.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qregularexpression.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qslider.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractslider.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qstyle.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qtabbar.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qrubberband.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qframe.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qabstractitemmodel.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QFrame \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QLabel \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qlabel.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QLineEdit \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qlineedit.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextcursor.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextformat.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qpen.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextoption.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QMenuBar \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qmenubar.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qmenu.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qaction.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qactiongroup.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QPushButton \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qpushbutton.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractbutton.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QStatusBar \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qstatusbar.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QTextEdit \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qtextedit.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractscrollarea.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextdocument.h \
 		..\manage_tool\protocol.h \
 		..\manage_tool\typedef.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QDebug \
@@ -1826,6 +2108,51 @@ release\tcpclient.obj: ..\manage_tool\tcpclient.cpp ..\manage_tool\tcpclient.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qicon.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QWidget \
 		ui_mainwindow.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QVariant \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QApplication \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qapplication.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qcoreapplication.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qeventloop.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qdesktopwidget.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qguiapplication.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qinputmethod.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QComboBox \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qcombobox.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractitemdelegate.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qstyleoption.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractspinbox.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qvalidator.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qregularexpression.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qslider.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractslider.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qstyle.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qtabbar.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qrubberband.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qframe.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qabstractitemmodel.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QFrame \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QLabel \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qlabel.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QLineEdit \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qlineedit.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextcursor.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextformat.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qpen.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextoption.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QMenuBar \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qmenubar.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qmenu.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qaction.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qactiongroup.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QPushButton \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qpushbutton.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractbutton.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QStatusBar \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qstatusbar.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QTextEdit \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qtextedit.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractscrollarea.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextdocument.h \
 		..\manage_tool\protocol.h \
 		..\manage_tool\typedef.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QDebug \
@@ -1944,6 +2271,51 @@ release\uartclient.obj: ..\manage_tool\uartclient.cpp ..\manage_tool\uartclient.
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qicon.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QWidget \
 		ui_mainwindow.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QVariant \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QApplication \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qapplication.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qcoreapplication.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qeventloop.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qdesktopwidget.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qguiapplication.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qinputmethod.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QComboBox \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qcombobox.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractitemdelegate.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qstyleoption.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractspinbox.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qvalidator.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qregularexpression.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qslider.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractslider.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qstyle.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qtabbar.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qrubberband.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qframe.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qabstractitemmodel.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QFrame \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QLabel \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qlabel.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QLineEdit \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qlineedit.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextcursor.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextformat.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qpen.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextoption.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QMenuBar \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qmenubar.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qmenu.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qaction.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qactiongroup.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QPushButton \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qpushbutton.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractbutton.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QStatusBar \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qstatusbar.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QTextEdit \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qtextedit.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractscrollarea.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextdocument.h \
 		..\manage_tool\protocol.h \
 		..\manage_tool\typedef.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QDebug \
@@ -2072,6 +2444,51 @@ release\udpclient.obj: ..\manage_tool\udpclient.cpp ..\manage_tool\udpclient.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qicon.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QWidget \
 		ui_mainwindow.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QVariant \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QApplication \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qapplication.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qcoreapplication.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qeventloop.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qdesktopwidget.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qguiapplication.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qinputmethod.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QComboBox \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qcombobox.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractitemdelegate.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qstyleoption.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractspinbox.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qvalidator.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qregularexpression.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qslider.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractslider.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qstyle.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qtabbar.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qrubberband.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qframe.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\qabstractitemmodel.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QFrame \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QLabel \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qlabel.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QLineEdit \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qlineedit.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextcursor.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextformat.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qpen.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextoption.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QMenuBar \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qmenubar.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qmenu.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qaction.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qactiongroup.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QPushButton \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qpushbutton.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractbutton.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QStatusBar \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qstatusbar.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\QTextEdit \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qtextedit.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtWidgets\qabstractscrollarea.h \
+		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtGui\qtextdocument.h \
 		..\manage_tool\protocol.h \
 		..\manage_tool\typedef.h \
 		D:\Software\Qt5\5.12.8\msvc2015_64\include\QtCore\QDebug \
