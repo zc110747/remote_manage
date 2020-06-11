@@ -29,6 +29,8 @@
 /**************************************************************************
 * Global Macro Definition
 ***************************************************************************/
+#define DEVICE_VERSION          "version 0.0.4 20200610"
+
 #define __SYSTEM_DEBUG          0
 #define __DEBUG_PRINTF			1
 #define __DRIVER_DEBUG          1
@@ -40,6 +42,27 @@
 #define RT_EMPTY            	0x02
 #define RT_TIMEOUT              0x03
 #define RT_INVALID              0x04
+
+//DEVICE
+#define TTY_DEVICE              "/dev/ttymxc2"
+#define LED_DEVICE              "/dev/led"
+#define BEEP_DEVICE             "/dev/beep"
+
+//IPAddress
+#define IP_ADDR                 "127.0.0.1"
+#define PORT                    8000
+
+//UART
+#define BAUD                    115200
+#define DATABITS                8
+#define PARITY                  'N'
+#define STOPBITS                1
+
+//设备ID
+#define DEVICE_ID               0x01
+
+//设备的延时时间
+#define TIME_LOOP_DELAY         800
 
 /**************************************************************************
 * Global Type Definition
@@ -54,26 +77,6 @@ typedef unsigned int uint32_t;
 /**************************************************************************
 * Global Variable Declaration
 ***************************************************************************/
-//DEVICE
-#define TTY_DEVICE  "/dev/ttymxc2"
-#define LED_DEVICE  "/dev/led"
-#define BEEP_DEVICE "/dev/beep"
-
-//IPAddress
-#define IP_ADDR     "127.0.0.1"
-#define PORT        8000
-
-//UART
-#define BAUD        115200
-#define DATABITS    8
-#define PARITY      'N'
-#define STOPBITS    1
-
-//设备ID
-#define DEVICE_ID   0x01
-
-//设备的延时时间
-#define TIME_LOOP_DELAY 800
 
 /**************************************************************************
 * Global Functon Declaration

@@ -59,9 +59,44 @@ static void HardwareDriveInit(void);
 int main(int argc, char* argv[])
 {
     int result = 0;
+	int nConfigDefault = 0;
 	std::string sConfigFile;
+	int c;
+	
+	sConfigFile = std::string("config.json");
+	
+	//命令行输入说明
+	while ((c = getopt(argc, argv, "v::d::f::h")) != -1){
+		switch (c)
+		{
+			case 'd':
+				nConfigDefault = 1;
+				break;
+			case 'f':
+				if(optarg != nullptr)
+				{
+					sConfigFile = std::string(optarg);
+				}
+				break;
+			case '?':
+			case 'h':
+				printf("Usage: app [options] [file]\n");
+				printf("-v       显示版本信息\n");
+				printf("-d       使用默认配置\n");
+				printf("-h       显示帮组选项\n");
+				printf("-f       指定选择的配置文件\n");
+				exit(0);
+				break;
+			case 'v':
+				printf("%s\n", DEVICE_VERSION);
+				exit(0);	
+			default:
+				exit(1);
+				break;
+		}
+	}
 
-	//守护进程初始化
+	//守护进程，用于进程后台执行
     result = daemon(1, 1);
 	if(result < 0)
 	{
@@ -70,21 +105,19 @@ int main(int argc, char* argv[])
 	}
 	
 	//选中配置文件
-	if(argc == 2)
+	if(nConfigDefault == 0)
 	{
-		sConfigFile = std::string(argv[1]);
+		USR_DEBUG("config file:%s\n", sConfigFile.c_str());
+		if(system_config_init(sConfigFile) != EXIT_SUCCESS)
+		{
+			USR_DEBUG("system config read fail, use default\n");
+		}
 	}
 	else
 	{
-		sConfigFile = std::string("config.json");
+		USR_DEBUG("system config use default\n");
 	}
-	USR_DEBUG("config file:%s\n", sConfigFile.c_str());
-
-	if(system_config_init(sConfigFile) != EXIT_SUCCESS)
-	{
-		USR_DEBUG("system config read fail, use default\n");
-	}
-
+	
 	//硬件模块初始化
 	HardwareDriveInit();
 
