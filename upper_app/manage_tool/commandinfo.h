@@ -4,7 +4,7 @@
 #include "typedef.h"
 #include <functional>
 
-#define CMD_LIST_SIZE           7
+#define CMD_LIST_SIZE           8
 
 #define LED_ON_CMD              0x00
 #define LED_OFF_CMD             0x01
@@ -13,6 +13,7 @@
 #define DEV_REBOOT_CMD          0x04
 #define GET_INFO_CMD            0x05
 #define ABORT_CMD               0x06
+#define SYSTEM_UPDATE_CMD       0x07
 
 #define DEV_WRITE_THROUGH_CMD   0xFF
 
@@ -51,10 +52,10 @@ struct SRegInfoList
 
 struct SCommandInfo
 {
-   uint8_t *m_pbuffer;
-   uint16_t m_nSize;
-   uint8_t m_nCommand;
-   std::function<QString(uint8_t *, int)>  m_pFunc;
+    uint8_t *m_pbuffer{nullptr};
+    uint16_t m_nSize{0};
+    uint8_t m_nCommand{0};
+    std::function<QString(uint8_t *, int)>  m_pFunc;
 };
 
 void CommandInfoInit(void);

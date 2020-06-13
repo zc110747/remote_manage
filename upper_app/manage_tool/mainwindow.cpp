@@ -7,6 +7,8 @@
 #include "commandinfo.h"
 #include "appthread.h"
 #include "configfile.h"
+#include <QDir>
+#include <QFileDialog>
 
 static CUartProtocolInfo *pMainUartProtocolInfo;
 static CTcpSocketInfo *pMainTcpSocketThreadInfo;
@@ -41,7 +43,7 @@ MainWindow::~MainWindow()
 
 void QFrame_Init(Ui::MainWindow *ui)
 {
-    ui->centralwidget->setMinimumSize(QSize(740, 720));
+    ui->centralwidget->setMinimumSize(QSize(740, 780));
     ui->frame_uart->setFrameShape(QFrame::Shape::Box);
     ui->frame_uart->setFrameShadow(QFrame::Shadow::Sunken);
     ui->frame_dev->setFrameShape(QFrame::Shape::Box);
@@ -196,10 +198,10 @@ void init_btn_enable(Ui::MainWindow *ui)
     指令数据的发送和创建，提供给应用线程处理
 */
 void CmdSendBuffer(uint8_t *pStart, uint16_t nSize, int nCommand, bool isThrough,
-                   std::function<QString(uint8_t *, int)> pfunc)
+                   std::function<QString(uint8_t *, int)> pfunc, QString pathInfo = nullptr)
 {
     QString Strbuf;
-    SSendBuffer *pSendbuf = new SSendBuffer(pStart, nSize, nCommand, isThrough, pfunc, protocol_flag);
+    SSendBuffer *pSendbuf = new SSendBuffer(pStart, nSize, nCommand, isThrough, pfunc, protocol_flag, pathInfo);
 
     if(pAppThreadInfo->QueuePost(pSendbuf) != QUEUE_INFO_OK)
     {
@@ -466,3 +468,39 @@ void MainWindow::on_btn_socket_close_clicked()
     protocol_flag = PROTOCOL_NULL;
 }
 
+void MainWindow::on_btn_filepath_update_clicked()
+{
+    SCommandInfo *pCmdInfo = GetCommandPtr(SYSTEM_UPDATE_CMD);
+    if(pCmdInfo != nullptr)
+        CmdSendBuffer(pCmdInfo->m_pbuffer, pCmdInfo->m_nSize, pCmdInfo->m_nCommand, false, pCmdInfo->m_pFunc,
+                      ui->combo_box_filepath->itemText( ui->combo_box_filepath->currentIndex()));
+}
+
+/*!
+    选择文件路径
+*/
+void MainWindow::on_btn_filepath_choose_clicked()
+{
+    /*!选择文件目录路径*/
+    QString directory;
+    QFileDialog *pFileDialog = new QFileDialog(this);
+
+    //directory = QDir::toNativeSeparators(QFileDialog::getExistingDirectory(this, tr("choose path"), QDir::currentPath()));
+    pFileDialog->setWindowTitle(tr("Choose Update file"));
+    pFileDialog->setDirectory(QDir::currentPath());
+    pFileDialog->setNameFilter(tr("all file (*)"));
+
+    if(pFileDialog->exec() == QDialog::Accepted)
+    {
+        directory = pFileDialog->selectedFiles()[0];
+    }
+
+    if(!directory.isEmpty())
+    {
+        if(ui->combo_box_filepath->findText(directory) == -1)
+        {
+            ui->combo_box_filepath->addItem(directory);
+        }
+        ui->combo_box_filepath->setCurrentIndex(ui->combo_box_filepath->findText(directory));
+    }
+}

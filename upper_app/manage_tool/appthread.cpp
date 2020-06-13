@@ -2,6 +2,8 @@
 #include "appthread.h"
 #include "uartclient.h"
 #include "tcpclient.h"
+#include "commandinfo.h"
+#include <QFile>
 
 static CUdpSocketInfo *pCUdpSocketThreadInfo;
 static CTcpSocketInfo *pCTcpSocketThreadInfo;
@@ -30,23 +32,34 @@ void CAppThreadInfo::run()
         nStatus = m_pQueue->QueuePend(&SendBufferInfo);
         if(nStatus == QUEUE_INFO_OK)
         {
-            if(SendBufferInfo.m_nProtocolStatus == PROTOCOL_UART)
+            if(SendBufferInfo.m_nCommand != SYSTEM_UPDATE_CMD)
             {
-                pCUartProtocolTreadInfo->UartLoopThread(&SendBufferInfo);
-            }
-            else if(SendBufferInfo.m_nProtocolStatus == PROTOCOL_TCP)
-            {
-                pCTcpSocketThreadInfo->TcpClientSocketLoopThread(&SendBufferInfo);
-            }
-            else if(SendBufferInfo.m_nProtocolStatus == PROTOCOL_UDP)
-            {
-                pCUdpSocketThreadInfo->UdpClientSocketLoopThread(&SendBufferInfo);
+                if(SendBufferInfo.m_nProtocolStatus == PROTOCOL_UART)
+                {
+                    pCUartProtocolTreadInfo->UartLoopThread(&SendBufferInfo);
+                }
+                else if(SendBufferInfo.m_nProtocolStatus == PROTOCOL_TCP)
+                {
+                    pCTcpSocketThreadInfo->TcpClientSocketLoopThread(&SendBufferInfo);
+                }
+                else if(SendBufferInfo.m_nProtocolStatus == PROTOCOL_UDP)
+                {
+                    pCUdpSocketThreadInfo->UdpClientSocketLoopThread(&SendBufferInfo);
+                }
+                else
+                {
+                    qDebug()<<"Invalid Protocol Type";
+                }
             }
             else
             {
-                qDebug()<<"Invalid Protocol Type";
-            }
+                //处理升级的整个流程实现
+                QFile file(SendBufferInfo.m_qPathInfo);
+                if(file.open(QIODevice::ReadOnly))
+                {
 
+                }
+            }
             qDebug()<<"Thread Queue Test Ok";
         }
     }

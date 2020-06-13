@@ -9,13 +9,15 @@ class SSendBuffer
 {
 public:
     SSendBuffer(uint8_t *pBuffer = nullptr, int nSize = 0, int nCommand = 0, bool bWriteThrough = false,
-                std::function<QString(uint8_t *, int)> pFunc = nullptr, PROTOCOL_STATUS nProtocolStatus = PROTOCOL_NULL){
+                std::function<QString(uint8_t *, int)> pFunc = nullptr, PROTOCOL_STATUS nProtocolStatus = PROTOCOL_NULL,
+                QString qPathInfo = nullptr){
         m_nSize = nSize;
         m_pBuffer = pBuffer;
         m_IsWriteThrough = bWriteThrough;
         m_nCommand = nCommand;
         m_pFunc = pFunc;
         m_nProtocolStatus = nProtocolStatus;
+        m_qPathInfo = qPathInfo;
     }
     ~SSendBuffer(){
     }
@@ -24,6 +26,7 @@ public:
     int m_nSize;
     int m_nCommand;
     uint8_t m_IsWriteThrough;
+    QString m_qPathInfo;
     std::function<QString(uint8_t *, int)> m_pFunc;
     PROTOCOL_STATUS m_nProtocolStatus;
 };
@@ -91,6 +94,7 @@ public:
             pSendbuffer->m_nCommand = qinfo_ptr[m_nReadIndex]->m_nCommand;
             pSendbuffer->m_pFunc = qinfo_ptr[m_nReadIndex]->m_pFunc;
             pSendbuffer->m_nProtocolStatus = qinfo_ptr[m_nReadIndex]->m_nProtocolStatus;
+            pSendbuffer->m_qPathInfo = qinfo_ptr[m_nReadIndex]->m_qPathInfo;
 
             delete qinfo_ptr[m_nReadIndex];
             qinfo_ptr[m_nReadIndex] = nullptr;

@@ -39,6 +39,7 @@ static uint8_t *pSCommandListBuffer[CMD_LIST_SIZE] =
     beep_off_cmd,
     dev_reboot_cmd,
     get_info_cmd,
+    nullptr,
     nullptr
 };
 
@@ -50,6 +51,7 @@ static uint16_t nSCommandListSize[CMD_LIST_SIZE] =
     sizeof(beep_off_cmd),
     sizeof(dev_reboot_cmd),
     sizeof(get_info_cmd),
+    0,
     0
 };
 
@@ -85,6 +87,7 @@ static std::function<QString(uint8_t *, int)> FuncList[CMD_LIST_SIZE] = {
 
         return DecodeBuf;
     },
+    nullptr,
     nullptr,
 };
 

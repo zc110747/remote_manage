@@ -31,16 +31,13 @@ private slots:
     void on_btn_beep_off_clicked();
     void on_btn_uart_close_clicked();
     void on_btn_uart_open_clicked();
-
     void on_btn_send_cmd_clicked();
-
     void on_btn_socket_open_clicked();
-
     void on_btn_socket_close_clicked();
-
     void on_btn_reboot_clicked();
-
     void on_btn_refresh_clicked();
+    void on_btn_filepath_update_clicked();
+    void on_btn_filepath_choose_clicked();
 
 private:
     Ui::MainWindow *ui;
