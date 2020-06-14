@@ -32,6 +32,7 @@
 /**************************************************************************
 * Local static Variable Declaration
 ***************************************************************************/
+static int pipe_fd[2];
 
 /**************************************************************************
 * Global Variable Declaration
@@ -44,6 +45,9 @@
 static void SystemTest(void);
 #endif
 static void HardwareDriveInit(void);
+static void PipeInit(void);
+static void PipeWriteClose(void);
+static int PipeReadClose(void);
 
 /**************************************************************************
 * Function
@@ -62,7 +66,6 @@ int main(int argc, char* argv[])
 	int nConfigDefault = 0;
 	std::string sConfigFile;
 	int c;
-	int fd[2];
 	
 	sConfigFile = std::string("config.json");
 	
@@ -121,12 +124,8 @@ int main(int argc, char* argv[])
 	
 	//硬件模块初始化
 	HardwareDriveInit();
+	PipeInit();
 
-    result = pipe(fd);
-    if(result == -1)
-    {
-        USR_DEBUG("pipe init failed\n");
-    }
 
 	/*任务创建*/
 #if __SYSTEM_DEBUG == 0
@@ -135,10 +134,7 @@ int main(int argc, char* argv[])
 	SocketTcpThreadInit();
 	SocketUdpThreadInit();
 	for(;;){
-		int readsize;
-		char buf[256];
-	    readsize = read(fd[0], buf, sizeof(buf));
-		if(readsize > 0)
+		if(PipeReadClose() == 1)
 		{
 			break;
 		}
@@ -150,11 +146,70 @@ int main(int argc, char* argv[])
 	return result;
 }
 
+/**
+ * 硬件驱动初始化
+ * 
+ * @param NULL
+ *  
+ * @return NULL
+ */
 static void HardwareDriveInit(void)
 {
 	LedDriveInit();
 	BeepDriveInit();	
 }
+
+/**
+ * 管道初始化
+ * 
+ * @param NULL
+ *  
+ * @return NULL
+ */
+static void PipeInit(void)
+{
+	int result;
+    result = pipe(pipe_fd);
+    if(result == -1)
+    {
+        USR_DEBUG("pipe init failed\n");
+    }
+}
+
+/**
+ * 管道关闭触发
+ * 
+ * @param NULL
+ *  
+ * @return NULL
+ */
+static void PipeWriteClose(void)
+{
+	write(pipe_fd[1], "close", strlen("close"));
+}
+
+/**
+ * 管道关闭等待结束
+ * 
+ * @param NULL
+ *  
+ * @return NULL
+ */
+static int PipeReadClose(void)
+{
+	char buf;
+	int readsize;
+
+	readsize = read(pipe_fd[0], &buf, sizeof(buf));
+	if(readsize > 0)
+	{
+		USR_DEBUG("pipe read\n");
+	}
+	close(pipe_fd[0]);
+	close(pipe_fd[1]);
+	return 0;
+}
+
 
 /**
  * 打印调试信息接口
