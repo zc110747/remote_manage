@@ -131,13 +131,15 @@ void FileUpdateProcess(void)
     {
         QStringList PathFileNameList = SendBufferInfo.m_qPathInfo.split("/");
         QString PathFileName = PathFileNameList[PathFileNameList.size()-1];
+        QFile outfile(QString("D:/")+PathFileName);
+
         nSize = CreateFileUpdateCmd(ArrayBuffer, PathFileName.toLatin1().data(), PathFileName.size(), file.size());
         SendBufferInfo.m_pBuffer = ArrayBuffer;
         SendBufferInfo.m_nSize = nSize;
         InterfaceProcess();
         nFileBlock = 0;
 
-        while((nReadSize = file.read((char *)&ArrayBuffer[3], FILE_BLOCK_SIZE)) > 0)
+        while((nReadSize = file.read((char *)&ArrayBuffer[5], FILE_BLOCK_SIZE)) > 0)
         {
             nFileBlock++;
             nSize = CreateFileUpdateCmd(ArrayBuffer, nReadSize, nFileBlock);
