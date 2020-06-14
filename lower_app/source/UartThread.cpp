@@ -61,7 +61,6 @@ void UartThreadInit(void)
 	struct SSystemConfig *pSystemConfigInfo;
 	
 	pSystemConfigInfo = GetSSytemConfigInfo();
-
 	if((nComFd = open(pSystemConfigInfo->m_dev_serial.c_str(), O_RDWR|O_NOCTTY|O_NDELAY))<0)
 	{	
 		USR_DEBUG("Open %s Failed\n", pSystemConfigInfo->m_dev_serial.c_str());
@@ -69,7 +68,11 @@ void UartThreadInit(void)
 	}
 	else
 	{
-		set_opt(nComFd, pSystemConfigInfo->m_baud, pSystemConfigInfo->m_data_bits, pSystemConfigInfo->m_parity, pSystemConfigInfo->m_stop_bits);
+		if(set_opt(nComFd, pSystemConfigInfo->m_baud, pSystemConfigInfo->m_data_bits, pSystemConfigInfo->m_parity, pSystemConfigInfo->m_stop_bits) != 0)
+		{
+			USR_DEBUG("uart config failed\n");
+			return;
+		}
 		USR_DEBUG("Open %s Success!\t\n", pSystemConfigInfo->m_dev_serial.c_str());
 	}
 

@@ -53,6 +53,9 @@ static SSystemConfig SSysConifg = {
     std::string(TTY_DEVICE),
     std::string(LED_DEVICE),
     std::string(BEEP_DEVICE),
+
+    //下载文件的路径
+    std::string(UPDATE_FILE_PATH),
 };
 
 /**************************************************************************
@@ -115,6 +118,8 @@ int system_config_init(std::string &sConfigfile)
     SSysConifg.m_dev_beep = std::string(root["Device"]["Beep"].asString());
     SSysConifg.m_dev_serial = std::string(root["Device"]["Serial"].asString());
 
+    //下载路径
+    SSysConifg.m_file_path = std::string(root["FilePath"].asString());
     return EXIT_SUCCESS;
 }
 

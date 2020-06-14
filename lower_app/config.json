@@ -19,5 +19,6 @@
                 "Beep":"/dev/beep"
         },
         "Led0":0,
-        "Beep0":0
+        "Beep0":0,
+	"FilePath":"/usr/download/"
 }

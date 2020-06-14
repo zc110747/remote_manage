@@ -352,10 +352,12 @@ void ApplicationThreadInit(void)
     int nErr;
     pApplicationReg = new CApplicationReg();
 
+    #if __TEST_IN_PC == 0
     nErr = pthread_create(&tid1, NULL, ApplicationLoopTask, NULL);	
     if(nErr != 0){
         USR_DEBUG("App Task Thread Create Err:%d\n", nErr);
     }
+    #endif
 }
 
 /**
@@ -370,7 +372,7 @@ void *ApplicationLoopTask(void *arg)
     USR_DEBUG("App Thread Start\n");
     for(;;){
         if(pApplicationReg->RefreshAllDevice() == RT_OK){
-            usleep(800);      //指令处理完休眠，非RT_OK表示仍有指令需要处理
+            sleep(1);      //指令处理完休眠，非RT_OK表示仍有指令需要处理
         }
     }
 }

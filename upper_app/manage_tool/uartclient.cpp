@@ -11,7 +11,7 @@ static uint8_t tx_buffer[BUFF_CACHE_SIZE];
 /*!
     uart线程循环的应用执行
 */
-void CUartProtocolInfo::UartLoopThread(SSendBuffer *pSendbuffer)
+int CUartProtocolInfo::UartLoopThread(SSendBuffer *pSendbuffer)
 {
     int nLen;
 
@@ -34,10 +34,12 @@ void CUartProtocolInfo::UartLoopThread(SSendBuffer *pSendbuffer)
         else
         {
            emit send_edit_test(QString("Receive Failed"));
+           return RT_FAIL;
         }
     }
 
     qDebug()<<"uart thread queue test OK";
+    return RT_OK;
 }
 
 /*!

@@ -24,6 +24,7 @@ void CUdpSocketInfo::dataReceived()
             emit send_edit_recv(pSendBufferInfo->m_pFunc(m_pRxDataBuffer, m_RxBufSize-RECV_DATA_HEAD));
        }
     }
+    m_pSemphore->release();
 }
 
 /*!
@@ -70,10 +71,23 @@ int CUdpSocketInfo::UdpClientSocketLoopThread(SSendBuffer *pSendbuffer)
 
         //等待发送和接收完成
         m_pUdpSocket->waitForBytesWritten(100);
-        if(m_pUdpSocket->waitForReadyRead(2000) != true)
+
+        if(pSendBufferInfo->m_bUploadStatus)
         {
-            emit send_edit_test(QString("Udp Socket Recv Failed"));
-            return RT_FAIL;
+            m_pUdpSocket->waitForReadyRead();
+        }
+        else
+        {
+            m_pUdpSocket->waitForReadyRead(2000);
+        }
+
+        if(m_pSemphore->tryAcquire(1, 10000))
+        {
+            qDebug()<<"Udpclient.cpp:Semphore Read";
+        }
+        else
+        {
+            qDebug()<<"Udpclient.cpp:Semphore Read Failed";
         }
     }
     else

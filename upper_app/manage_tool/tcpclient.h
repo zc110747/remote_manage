@@ -15,11 +15,14 @@ class CTcpSocketInfo:public QWidget, public CProtocolInfo
 
 public:
     CTcpSocketInfo(uint8_t *pRxBuffer, uint8_t *pTxBuffer, int nMaxBufSize):
-        CProtocolInfo(pRxBuffer, pTxBuffer, nMaxBufSize){}
+        CProtocolInfo(pRxBuffer, pTxBuffer, nMaxBufSize){
+        m_pSemphore = new QSemaphore(0);
+    }
     ~CTcpSocketInfo()
     {
         m_pTcpSocket->deleteLater();
-        delete  m_pServerIp;
+        delete m_pSemphore;
+        delete m_pServerIp;
     }
 
     int DeviceRead(uint8_t *pStart, uint16_t nMaxSize){
@@ -45,10 +48,11 @@ public:
     }
 
     void TcpClientSocketInitForThread();
-    void TcpClientSocketLoopThread(SSendBuffer *pSendbuffer);
+    int TcpClientSocketLoopThread(SSendBuffer *pSendbuffer);
     QTcpSocket *m_pTcpSocket;
     QHostAddress *m_pServerIp;
     int m_nPort;
+    QSemaphore *m_pSemphore;
 
 private:
     bool status{false};

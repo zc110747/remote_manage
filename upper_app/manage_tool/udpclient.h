@@ -14,10 +14,13 @@ class CUdpSocketInfo:public QWidget, public CProtocolInfo
 
 public:
     CUdpSocketInfo(uint8_t *pRxBuffer, uint8_t *pTxBuffer, int nMaxBufSize):
-        CProtocolInfo(pRxBuffer, pTxBuffer, nMaxBufSize){}
+        CProtocolInfo(pRxBuffer, pTxBuffer, nMaxBufSize){
+        m_pSemphore = new QSemaphore(0);
+    }
     ~CUdpSocketInfo()
     {
         m_pUdpSocket->deleteLater();
+        delete  m_pSemphore;
         delete  m_pServerIp;
     }
 
@@ -60,6 +63,7 @@ public:
     QHostAddress *m_pServerIp;
     QHostAddress *m_pLocalIp;
     quint16 m_nPort;
+    QSemaphore *m_pSemphore;
 
 private:
     bool status{false};

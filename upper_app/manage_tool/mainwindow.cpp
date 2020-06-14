@@ -154,6 +154,12 @@ void MainWindow::append_text_edit_recv(QString s)
 */
 void MainWindow::append_text_edit_test(QString s)
 {
+    //对于超长数据，截取后显示
+    if(s.size() > 150)
+    {
+        s = s.mid(0, 40) + "..." + s.mid(s.size()-20, s.size());
+    }
+
     if(ui->text_edit_test->document()->lineCount() > 20)
     {
         ui->text_edit_test->setText(s);
@@ -176,6 +182,7 @@ void init_btn_disable(Ui::MainWindow *ui)
     ui->btn_beep_off->setDisabled(true);
     ui->btn_refresh->setDisabled(true);
     ui->btn_send_cmd->setDisabled(true);
+    ui->btn_filepath_update->setDisabled(true);
     ui->line_edit_dev_id->setReadOnly(false);
 }
 
@@ -191,6 +198,7 @@ void init_btn_enable(Ui::MainWindow *ui)
     ui->btn_beep_off->setEnabled(true);
     ui->btn_refresh->setEnabled(true);
     ui->btn_send_cmd->setEnabled(true);
+    ui->btn_filepath_update->setEnabled(true);
     ui->line_edit_dev_id->setReadOnly(true);
 }
 

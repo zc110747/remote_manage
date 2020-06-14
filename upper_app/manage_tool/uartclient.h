@@ -1,4 +1,4 @@
-#ifndef CUartThread_H_H
+﻿#ifndef CUartThread_H_H
 #define CUartThread_H_H
 
 #include <QThread>
@@ -27,7 +27,7 @@ public:
         return nSize;
     }
 
-    void UartLoopThread(SSendBuffer *pSendbuffer);
+    int UartLoopThread(SSendBuffer *pSendbuffer);
 
     volatile bool m_bComStatus{false};
     QextSerialPort *m_pSerialPortCom;

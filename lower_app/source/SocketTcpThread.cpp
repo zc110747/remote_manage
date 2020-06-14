@@ -179,12 +179,14 @@ static void *SocketTcpDataProcessThread(void *arg)
         {
 			pTcpProtocolInfo->ExecuteCommand(client_fd);
             pTcpProtocolInfo->SendTxBuffer(client_fd, &size);
-            break;
+            if(!pTcpProtocolInfo->GetFileUploadStatus())
+                break;
 		}
         else if(nFlag == RT_FAIL)
         {
             /*判断是否有数据可读取, 不可读则退出*/
             struct timeval client_timeout = {0, 100};
+
             nFlag = select(client_fd, &read_set, NULL, NULL, &client_timeout);
             if(nFlag < 0){
                 break;

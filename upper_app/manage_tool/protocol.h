@@ -22,6 +22,7 @@ public:
     ~SSendBuffer(){
     }
 
+    bool m_bUploadStatus{false};
     uint8_t *m_pBuffer;
     int m_nSize;
     int m_nCommand;

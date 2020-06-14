@@ -49,6 +49,9 @@ struct SSystemConfig
     std::string m_dev_led;
     std::string m_dev_beep;
     std::string m_dev_serial;
+    
+    //文件更新的下载地址
+    std::string m_file_path;
 };
 
 /**************************************************************************

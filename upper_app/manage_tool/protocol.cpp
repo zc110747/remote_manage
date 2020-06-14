@@ -58,7 +58,7 @@ int CProtocolInfo::CreateSendBuffer(uint8_t nId, uint16_t nSize, uint8_t *pStart
     {
         if(bWriteThrough == false)
         {
-            uint8_t nTotalSize, nIndex;
+            uint16_t nTotalSize, nIndex;
             uint16_t nCrcVal;
             uint16_t random;
             uint16_t nSendSize;
@@ -202,7 +202,7 @@ int CProtocolInfo::CheckReceiveData(bool IsSignalCheckHead)
                         CrcCacl = CrcCalculate(&m_pRxBuffer[1], nLen-PROTOCOL_CRC_SIZE-1);
                         if(CrcRecv == CrcCacl)
                         {
-                            qDebug()<<QString("Receive Ok");
+                            qDebug()<<"Protocol.cpp:Receive Ok";
                             break;
                         }
                         else

@@ -22,6 +22,9 @@
 #include "UsrTypeDef.h"
 #include "ApplicationThread.h"
 #include "calculate/CalcCrc16.h"
+#include "SystemConfig.h"
+#include <iostream>
+#include <fstream>
 
 /**************************************************************************
 * Global Macro Definition
@@ -108,31 +111,74 @@ public:
 		uint8_t nCommand;
 		uint16_t nRegIndex, nRxDataSize;
 		uint8_t *pCacheDataBuf;
+		SSystemConfig *pSystemConfig;
 		CApplicationReg  *pApplicationReg;
 
 		nCommand = m_RxCacheDataPtr[0];
-		nRegIndex = m_RxCacheDataPtr[1]<<8 | m_RxCacheDataPtr[2];
-		nRxDataSize = m_RxCacheDataPtr[3]<<8 | m_RxCacheDataPtr[4];
 		m_TxBufSize = 0;
 		pApplicationReg = GetApplicationReg();
-		
+		pSystemConfig = GetSSytemConfigInfo();
+
 		switch (nCommand)
 		{
 			case CMD_REG_READ:
+				nRegIndex = m_RxCacheDataPtr[1]<<8 | m_RxCacheDataPtr[2];
+				nRxDataSize = m_RxCacheDataPtr[3]<<8 | m_RxCacheDataPtr[4];
 				pCacheDataBuf = (uint8_t *)malloc(nRxDataSize);
 				pApplicationReg->GetMultipleReg(nRegIndex, nRxDataSize, pCacheDataBuf);
-				m_TxBufSize = CreateTxBuffer(ACK_OK, nRxDataSize, pCacheDataBuf);
 				free(pCacheDataBuf);   
+				m_isUploadStatus = false;
+				m_TxBufSize = CreateTxBuffer(ACK_OK, nRxDataSize, pCacheDataBuf);
 				break;
 			case CMD_REG_WRITE:	
+				nRegIndex = m_RxCacheDataPtr[1]<<8 | m_RxCacheDataPtr[2];
+				nRxDataSize = m_RxCacheDataPtr[3]<<8 | m_RxCacheDataPtr[4];
 				pApplicationReg->SetMultipleReg(nRegIndex, nRxDataSize, &m_RxCacheDataPtr[5]);	
+				m_isUploadStatus = false;
 				m_TxBufSize = CreateTxBuffer(ACK_OK, 0, NULL);
 				break;
-			case CMD_UPLOAD_CMD:		
+			case CMD_UPLOAD_CMD:
+				char *pName;
+				m_FileSize = ((uint32_t)m_RxCacheDataPtr[1]<<24) | ((uint32_t)m_RxCacheDataPtr[2]<<16) | 
+				((uint32_t)m_RxCacheDataPtr[3]<<8) | ((uint32_t)m_RxCacheDataPtr[4]);
+				m_FileBlock = ((uint16_t)m_RxCacheDataPtr[5]<<8) | m_RxCacheDataPtr[6];
+				pName = (char *)&m_RxCacheDataPtr[7];
+				m_FileName = pSystemConfig->m_file_path + std::string(pName);
+				USR_DEBUG("filesize:%d, name:%s, block:%d\n", m_FileSize, m_FileName.c_str(), m_FileBlock);
+				m_FileStream.open(m_FileName);
+				m_isUploadStatus = true;
+				m_TxBufSize = CreateTxBuffer(ACK_OK, 0, NULL);
 				break;
 			case CMD_UPLOAD_DATA:
+				try
+				{
+					uint16_t filesize;
+					uint16_t fileblock;
+					filesize = ((uint16_t)m_RxCacheDataPtr[1]<<8) | m_RxCacheDataPtr[2];
+					fileblock = ((uint16_t)m_RxCacheDataPtr[3]<<8) | m_RxCacheDataPtr[4];
+					if(!m_FileStream.is_open())
+					{
+						m_FileStream.open(m_FileName);
+					}
+					m_FileStream.write((char *)&m_RxCacheDataPtr[5], filesize);
+					USR_DEBUG("filesize:%d, block:%d, fileblock:%d\n", filesize, fileblock, m_FileBlock);
+					if(fileblock >= m_FileBlock)
+					{
+						m_isUploadStatus = false;
+						m_FileStream.close();
+					}
+					m_TxBufSize = CreateTxBuffer(ACK_OK, 0, NULL);
+				}
+				catch(const std::exception& e)
+				{
+					std::cerr << e.what() << '\n';
+				}
+				
+
 				break;
 			default:
+				m_isUploadStatus = false;
+				m_TxBufSize = CreateTxBuffer(ACK_OK, 0, NULL);
 				break;
 		} 
 
@@ -160,17 +206,22 @@ public:
 		if(m_RxBufSize == 0 && IsSignalCheckHead == false)
 		{
 			nread = DeviceRead(nFd, &m_RxCachePtr[m_RxBufSize], 1, ExtraInfo);
-			if(nread != 0 &&frame_ptr->head == PROTOCOL_REQ_HEAD)
+			if(nread > 0 &&frame_ptr->head == PROTOCOL_REQ_HEAD)
 			{
 				m_RxBufSize++;
 				m_RxTimeout = 0;
 			}
-			else
+			else if(nread < 0)
 			{
-				usleep(1);
 				m_RxBufSize = 0;
 				return RT_FAIL;
 			}
+			else
+			{
+				m_RxBufSize = 0;
+				return RT_EMPTY;
+			}
+			
 		}
 
 		//数据包的解析
@@ -308,6 +359,18 @@ public:
 		return nCrcOut;
 	}			
 
+	/**
+	 * 获取文件上传状态
+	 * 
+	 * @param NULL
+	 *  
+	 * @return 文件上传状态
+	 */
+	bool GetFileUploadStatus(void)
+	{
+		return m_isUploadStatus;
+	}
+
 	/*设备读写函数，因为不同设备的实现可能不同，用纯虚函数*/
 	virtual int DeviceRead(int nFd, uint8_t *pDataStart, uint16_t nDataSize, T ExtraInfo)=0;  
 	virtual int DeviceWrite(int nFd, uint8_t *pDataStart, uint16_t nDataSize, T ExtraInfo)=0;
@@ -322,6 +385,11 @@ private:
 	uint16_t m_MaxCacheBufSize;  	//最大的数据长度
 	uint16_t m_PacketNum;	  		//数据包的编号,用于数据校验同步
 	uint32_t m_RxTimeout; 			//超时时间
+	uint16_t m_FileSize;			//文件的总长度
+	uint16_t m_FileBlock;           //文件的总块数
+	bool  m_isUploadStatus;			//文件传输模式
+	std::string m_FileName;			//用于保存文件名称的
+	std::ofstream m_FileStream;
 };
 
 /**************************************************************************

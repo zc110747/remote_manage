@@ -62,6 +62,7 @@ int main(int argc, char* argv[])
 	int nConfigDefault = 0;
 	std::string sConfigFile;
 	int c;
+	int fd[2];
 	
 	sConfigFile = std::string("config.json");
 	
@@ -121,6 +122,12 @@ int main(int argc, char* argv[])
 	//硬件模块初始化
 	HardwareDriveInit();
 
+    result = pipe(fd);
+    if(result == -1)
+    {
+        USR_DEBUG("pipe init failed\n");
+    }
+
 	/*任务创建*/
 #if __SYSTEM_DEBUG == 0
 	UartThreadInit();
@@ -128,7 +135,13 @@ int main(int argc, char* argv[])
 	SocketTcpThreadInit();
 	SocketUdpThreadInit();
 	for(;;){
-		sleep(10);
+		int readsize;
+		char buf[256];
+	    readsize = read(fd[0], buf, sizeof(buf));
+		if(readsize > 0)
+		{
+			break;
+		}
 	}
 #else
 	SystemTest();

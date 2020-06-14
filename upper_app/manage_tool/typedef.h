@@ -3,6 +3,7 @@
 
 #include <QDebug>
 #include <QString>
+#include <QSemaphore>
 
 typedef unsigned char uint8_t;
 typedef unsigned short uint16_t;
@@ -21,10 +22,10 @@ typedef unsigned int uint32_t;
 #define PROTOCOL_RECV_HEAD          0x5B
 #define PROTOCOL_RECV_HEAD_SIZE     3
 #define PROTOCOL_CRC_SIZE           2
-#define PROTOCOL_TIMEOUT            100
+#define PROTOCOL_TIMEOUT            3000
 
 //缓存的大小
-#define BUFF_CACHE_SIZE     1200
+#define BUFF_CACHE_SIZE             1200
 
 //接收数据的头部长度
 #define RECV_DATA_HEAD          7
@@ -42,6 +43,8 @@ typedef unsigned int uint32_t;
 #define QUEUE_INFO_INVALID  -2
 #define QUEUE_INFO_EMPTY    -3
 
+//文件大小
+#define FILE_BLOCK_SIZE             500
 
 #define DEFAULT_CONFIG_FILE "config.json"
 //当前的协议类型

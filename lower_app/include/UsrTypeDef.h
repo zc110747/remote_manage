@@ -35,6 +35,7 @@
 #define __DEBUG_PRINTF			1
 #define __DRIVER_DEBUG          1
 #define __SOCKET_DEBUG          1
+#define __TEST_IN_PC            0
 
 /*返回状态*/
 #define RT_OK               	0x00
@@ -47,6 +48,9 @@
 #define TTY_DEVICE              "/dev/ttymxc2"
 #define LED_DEVICE              "/dev/led"
 #define BEEP_DEVICE             "/dev/beep"
+
+//DEFAULT
+#define UPDATE_FILE_PATH        "/usr/download/"
 
 //IPAddress
 #define IP_ADDR                 "127.0.0.1"

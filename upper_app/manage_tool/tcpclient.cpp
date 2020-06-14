@@ -14,7 +14,7 @@ static SSendBuffer *pSendBufferInfo;
 */
 void CTcpSocketInfo::slotConnected()
 {
-    qDebug()<<"socket connect\n";
+    qDebug()<<"Tcpclient.cpp:Socket Connect";
 }
 
 /*!
@@ -22,7 +22,7 @@ void CTcpSocketInfo::slotConnected()
 */
 void CTcpSocketInfo::slotDisconnected()
 {
-    qDebug()<<"socket disconnected\n";
+    qDebug()<<"Tcpclient.cpp:Socket Disconnected";
 }
 
 /*!
@@ -39,25 +39,39 @@ void CTcpSocketInfo::dataReceived()
             emit send_edit_recv(pSendBufferInfo->m_pFunc(m_pRxDataBuffer, m_RxBufSize-RECV_DATA_HEAD));
        }
     }
+    m_pSemphore->release();
 }
 
 /*!
     Tcp Socket循环的应用执行
 */
-void CTcpSocketInfo::TcpClientSocketLoopThread(SSendBuffer *pSendbuffer)
+int CTcpSocketInfo::TcpClientSocketLoopThread(SSendBuffer *pSendbuffer)
 {
     bool is_connect;
     int nLen;
 
     pSendBufferInfo = pSendbuffer;
-    m_pTcpSocket->abort();
-    if(m_pTcpSocket->state() != QAbstractSocket::ConnectedState)
+
+    if(pSendBufferInfo->m_bUploadStatus == false)
     {
-        m_pTcpSocket->connectToHost(*m_pServerIp, m_nPort);
+        m_pTcpSocket->abort();
+        if(m_pTcpSocket->state() != QAbstractSocket::ConnectedState)
+        {
+            m_pTcpSocket->connectToHost(*m_pServerIp, m_nPort);
+            is_connect = m_pTcpSocket->waitForConnected(300);
+        }
+        else
+        {
+            is_connect = true;
+        }
     }
+    else
+    {
+        is_connect = true;
+    }
+
     nLen = this->CreateSendBuffer(this->GetId(), pSendbuffer->m_nSize,
                                   pSendbuffer->m_pBuffer, pSendbuffer->m_IsWriteThrough);
-    is_connect = m_pTcpSocket->waitForConnected(300);
     if(is_connect)
     {
         emit send_edit_test(QString("tcp socket client ok"));
@@ -68,13 +82,31 @@ void CTcpSocketInfo::TcpClientSocketLoopThread(SSendBuffer *pSendbuffer)
 
         //等待发送和接收完成
         m_pTcpSocket->waitForBytesWritten(1000);
-        m_pTcpSocket->waitForReadyRead(1000);
+
+        if(pSendBufferInfo->m_bUploadStatus)
+        {
+            m_pTcpSocket->waitForReadyRead();
+        }
+        else
+        {
+            m_pTcpSocket->waitForReadyRead(2000);
+        }
+
+        if(m_pSemphore->tryAcquire(1, 10000))
+        {
+            qDebug()<<"Tcpclient.cpp:Semphore Read";
+        }
+        else
+        {
+            qDebug()<<"Tcpclient.cpp:Semphore Read Failed";
+        }
     }
     else
     {
         emit send_edit_test(QString("socket client fail\n"));
+        return RT_FAIL;
     }
-    qDebug()<<"thread queue test OK\n";
+    return RT_OK;
 }
 
 /*!
