@@ -25,6 +25,9 @@
 #include "SystemConfig.h"
 #include <iostream>
 #include <fstream>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 /**************************************************************************
 * Global Macro Definition
@@ -97,7 +100,31 @@ public:
 		m_PacketNum = 0;
 		m_RxTimeout = 0;
 	};
-		~CProtocolInfo(void){};
+	~CProtocolInfo(void){};
+
+	/**
+	 * 判断路径是否存在，不存在则创建路径
+	 * 
+	 * @param fd 执行的设备ID号
+	 *  
+	 * @return 执行执行的结果
+	 */
+	int dir_process(const char *pDirPath)
+	{
+		DIR *pDirInfo;
+
+		if(pDirPath == NULL)
+			return -1;
+		else if((pDirInfo=opendir(pDirPath)) != NULL)
+		{
+			closedir(pDirInfo); //判断目录是否存在，存在则关闭信息，避免泄露
+		}
+		else
+		{
+			mkdir(pDirPath, 0775);
+		}
+		return 0;
+	}
 
 	/**
 	 * 执行具体的指令
@@ -143,8 +170,9 @@ public:
 				((uint32_t)m_RxCacheDataPtr[3]<<8) | ((uint32_t)m_RxCacheDataPtr[4]);
 				m_FileBlock = ((uint16_t)m_RxCacheDataPtr[5]<<8) | m_RxCacheDataPtr[6];
 				pName = (char *)&m_RxCacheDataPtr[7];
+				dir_process(pSystemConfig->m_file_path.c_str());
 				m_FileName = pSystemConfig->m_file_path + std::string(pName);
-				USR_DEBUG("filesize:%d, name:%s, block:%d\n", m_FileSize, m_FileName.c_str(), m_FileBlock);
+				//USR_DEBUG("filesize:%d, name:%s, block:%d\n", m_FileSize, m_FileName.c_str(), m_FileBlock);
 				m_FileStream.open(m_FileName);
 				m_isUploadStatus = true;
 				m_TxBufSize = CreateTxBuffer(ACK_OK, 0, NULL);
