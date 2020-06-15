@@ -44,7 +44,9 @@ typedef unsigned int uint32_t;
 #define QUEUE_INFO_EMPTY    -3
 
 //文件大小
-#define FILE_BLOCK_SIZE             500
+#define FILE_BLOCK_SIZE     1000
+
+#define TEST_DEBUG          0
 
 #define DEFAULT_CONFIG_FILE "config.json"
 //当前的协议类型

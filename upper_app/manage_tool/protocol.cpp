@@ -202,7 +202,9 @@ int CProtocolInfo::CheckReceiveData(bool IsSignalCheckHead)
                         CrcCacl = CrcCalculate(&m_pRxBuffer[1], nLen-PROTOCOL_CRC_SIZE-1);
                         if(CrcRecv == CrcCacl)
                         {
+                            #if TEST_DEBUG == 1
                             qDebug()<<"Protocol.cpp:Receive Ok";
+                            #endif
                             break;
                         }
                         else

@@ -63,31 +63,29 @@ int CUdpSocketInfo::UdpClientSocketLoopThread(SSendBuffer *pSendbuffer)
             }
         }
 
-        qDebug()<<this->DeviceWrite(tx_buffer, nLen);
+        this->DeviceWrite(tx_buffer, nLen);
 
         emit send_edit_test(QString("Udp Socket Send Ok"));
         //通知主线程更新窗口
         emit send_edit_test(byteArrayToHexString("Sendbuf:", tx_buffer, nLen, "\n"));
 
         //等待发送和接收完成
-        m_pUdpSocket->waitForBytesWritten(100);
+        qDebug()<<m_pUdpSocket->waitForBytesWritten(1000);
 
-        if(pSendBufferInfo->m_bUploadStatus)
+        if(m_pUdpSocket->waitForReadyRead(2000))
         {
-            m_pUdpSocket->waitForReadyRead();
+            if(m_pSemphore->tryAcquire(1, 2000))
+            {
+                qDebug()<<"Udpclient.cpp:Semphore Read";
+            }
+            else
+            {
+                emit send_edit_test(QString("Udp Socket Semphore failed"));
+            }
         }
         else
         {
-            m_pUdpSocket->waitForReadyRead(2000);
-        }
-
-        if(m_pSemphore->tryAcquire(1, 10000))
-        {
-            qDebug()<<"Udpclient.cpp:Semphore Read";
-        }
-        else
-        {
-            qDebug()<<"Udpclient.cpp:Semphore Read Failed";
+            emit send_edit_test(QString("Udp Socket Read Failed"));
         }
     }
     else

@@ -32,8 +32,10 @@ void CTcpSocketInfo::dataReceived()
 {
     if(this->CheckReceiveData(false) == RT_OK)
     {
+       #if TEST_DEBUG == 1
        emit send_edit_test(byteArrayToHexString("Recv Buf:",
             m_pRxBuffer, m_RxBufSize, "\n"));
+       #endif
        if(pSendBufferInfo->m_pFunc != nullptr)
        {
             emit send_edit_recv(pSendBufferInfo->m_pFunc(m_pRxDataBuffer, m_RxBufSize-RECV_DATA_HEAD));
@@ -74,11 +76,15 @@ int CTcpSocketInfo::TcpClientSocketLoopThread(SSendBuffer *pSendbuffer)
                                   pSendbuffer->m_pBuffer, pSendbuffer->m_IsWriteThrough);
     if(is_connect)
     {
+        #if TEST_DEBUG == 1
         emit send_edit_test(QString("tcp socket client ok"));
+        #endif
         this->DeviceWrite(tx_buffer, nLen);
 
         //通知主线程更新窗口
+        #if TEST_DEBUG == 1
         emit send_edit_test(byteArrayToHexString("Sendbuf:", tx_buffer, nLen, "\n"));
+        #endif
 
         //等待发送和接收完成
         m_pTcpSocket->waitForBytesWritten(1000);
@@ -94,11 +100,15 @@ int CTcpSocketInfo::TcpClientSocketLoopThread(SSendBuffer *pSendbuffer)
 
         if(m_pSemphore->tryAcquire(1, 10000))
         {
+            #if TEST_DEBUG == 1
             qDebug()<<"Tcpclient.cpp:Semphore Read";
+            #endif
         }
         else
         {
+            #if TEST_DEBUG == 1
             qDebug()<<"Tcpclient.cpp:Semphore Read Failed";
+            #endif
         }
     }
     else

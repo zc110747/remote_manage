@@ -120,7 +120,7 @@ int CreateFileUpdateCmd(uint8_t *pDst, uint16_t nFileSize, uint16_t nFileBlock)
 */
 void FileUpdateProcess(void)
 {
-    static uint8_t ArrayBuffer[512];
+    static uint8_t ArrayBuffer[2000];
     uint16_t nReadSize;
     int nSize;
     int nFileBlock;
@@ -143,7 +143,9 @@ void FileUpdateProcess(void)
         {
             nFileBlock++;
             nSize = CreateFileUpdateCmd(ArrayBuffer, nReadSize, nFileBlock);
+            #if TEST_DEBUG == 1
             qDebug()<<"AppThread.cpp:Send Size"<<nSize;
+            #endif
             SendBufferInfo.m_nSize = nSize;
             SendBufferInfo.m_bUploadStatus = true;
             InterfaceProcess();
