@@ -25,6 +25,7 @@
 #include <fcntl.h>
 #include <termios.h>
 #include <stdlib.h>
+#include <errno.h>
 
 /**************************************************************************
 * Global Macro Definition
@@ -38,11 +39,13 @@
 #define __TEST_IN_PC            0
 
 /*返回状态*/
-#define RT_OK               	0x00
-#define RT_FAIL             	0x01
-#define RT_EMPTY            	0x02
-#define RT_TIMEOUT              0x03
-#define RT_INVALID              0x04
+#define RT_INVALID_BUF_SIZE     -3
+#define RT_INVALID_MQ           -2
+#define RT_OK               	0
+#define RT_FAIL             	1
+#define RT_EMPTY            	2
+#define RT_TIMEOUT              3
+#define RT_INVALID              4
 
 //DEVICE
 #define TTY_DEVICE              "/dev/ttymxc2"
@@ -66,7 +69,7 @@
 #define DEVICE_ID               0x01
 
 //设备的延时时间
-#define TIME_LOOP_DELAY         800
+//#define TIME_LOOP_DELAY         800
 
 /**************************************************************************
 * Global Type Definition

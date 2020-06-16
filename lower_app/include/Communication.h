@@ -19,14 +19,33 @@
 * Include Header Files
 ***************************************************************************/
 #include "UsrTypeDef.h"
+#include <mqueue.h>
 
 /**************************************************************************
 * Global Macro Definition
 ***************************************************************************/
+#define MAIN_MQ       1
+#define APP_MQ        2
 
 /**************************************************************************
 * Global Type Definition
 ***************************************************************************/
+class CCommunicationInfo
+{
+public:
+    CCommunicationInfo(){};
+        ~CCommunicationInfo(){};
+
+    int CreateMqInfomation(void);                                       //创建消息队列
+    int CloseMqInformation(void);                                       //释放消息队列
+    int WaitMqInformation(uint8_t info, char *buf, int bufsize);        //向消息队列投递消息
+    int SendMqInformation(uint8_t info, char *buf, int bufsize, int prio); //发送数据给消息队列
+
+private:
+    mqd_t m_MainMqd{-1};
+    mqd_t m_AppMqd{-1};
+    int isMqOk;
+};
 
 /**************************************************************************
 * Global Variable Declaration
@@ -35,5 +54,5 @@
 /**************************************************************************
 * Global Functon Declaration
 ***************************************************************************/
-void template_test(void);
+CCommunicationInfo *GetCommunicationInfo(void);
 #endif

@@ -16,6 +16,9 @@
 #include "../driver/Led.h"
 #include "../driver/Beep.h"
 #include "../include/ApplicationThread.h"
+#include "../include/Communication.h"
+#include <signal.h>
+#include <sys/time.h>
 
 /**************************************************************************
 * Local Macro Definition
@@ -28,11 +31,12 @@
 /**************************************************************************
 * Local static Variable Declaration
 ***************************************************************************/
+static CApplicationReg *pApplicationReg;
+static CCommunicationInfo *pCommunicationInfo;
 
 /**************************************************************************
 * Global Variable Declaration
 ***************************************************************************/
-CApplicationReg *pApplicationReg;
 
 /**************************************************************************
 * Function
@@ -242,6 +246,46 @@ void CApplicationReg::WriteHardware(uint8_t cmd, uint8_t *pConfig, int size)
     }
 }
 
+/**
+ * 定时器触发的回调
+ * 
+ * @param NULL
+ *  
+ * @return NULL
+ */
+void TimerSignalHandler(int signo)
+{
+    char buf = 1;
+    pCommunicationInfo->SendMqInformation(APP_MQ, &buf, sizeof(buf), 1);
+}
+
+/**
+ * 用于触发的Timer定时器动作
+ * 
+ * @param NULL
+ *  
+ * @return NULL
+ */
+void CApplicationReg::TimerSingalStart(void)
+{
+    static struct itimerval tick = {0};
+
+    signal(SIGALRM, TimerSignalHandler);
+    
+    //初始执行的定时器计数值
+    tick.it_value.tv_sec = 1;
+    tick.it_value.tv_usec = 0;
+
+    //后续定时器执行的加载值
+    tick.it_interval.tv_sec = 1;
+    tick.it_interval.tv_usec = 0;
+
+    if(setitimer(ITIMER_REAL, &tick, NULL) < 0)
+    {
+        USR_DEBUG("Set timer failed!\n");
+    }
+    USR_DEBUG("Set timer Start!\n");
+}
 
 /**
  * 根据寄存器更新内部硬件参数
@@ -304,13 +348,7 @@ int CApplicationReg::RefreshAllDevice(void)
     }
 
     /*更新内部硬件状态到信息寄存器*/
-    static uint16_t loop_read = 0;
-    loop_read++;
-    if(loop_read == TIME_LOOP_DELAY)
-    {
-        loop_read = 0;
-        UpdateHardware();   
-    }
+    UpdateHardware();
 
     return RT_OK;
 }
@@ -351,14 +389,22 @@ void ApplicationThreadInit(void)
     pthread_t tid1;
     int nErr;
     pApplicationReg = new CApplicationReg();
+    pCommunicationInfo = GetCommunicationInfo();
 
-    #if __TEST_IN_PC == 0
+    //创建消息队列
+    if(pCommunicationInfo->CreateMqInfomation() == RT_INVALID_MQ)
+    {
+        return;
+    }
+
+    //创建应用线程
     nErr = pthread_create(&tid1, NULL, ApplicationLoopTask, NULL);	
     if(nErr != 0){
         USR_DEBUG("App Task Thread Create Err:%d\n", nErr);
     }
-    #endif
 }
+
+char buf[8193];
 
 /**
  * app模块初始化
@@ -369,10 +415,27 @@ void ApplicationThreadInit(void)
  */
 void *ApplicationLoopTask(void *arg)
 {
+    int flag;
+
     USR_DEBUG("App Thread Start\n");
-    for(;;){
-        if(pApplicationReg->RefreshAllDevice() == RT_OK){
-            sleep(1);      //指令处理完休眠，非RT_OK表示仍有指令需要处理
+    pApplicationReg->TimerSingalStart();
+
+    for(;;)
+    {
+        flag = pCommunicationInfo->WaitMqInformation(APP_MQ, buf, sizeof(buf));
+        if(flag > 0)
+        {
+            pApplicationReg->RefreshAllDevice();
         }
+        else
+        {
+            break;
+        }     
     }
+
+    USR_DEBUG("Application Tread Stop!\n");
+    pCommunicationInfo->CloseMqInformation();
+    
+    //将线程和进程脱离,释放线程
+    pthread_detach(pthread_self());
 }

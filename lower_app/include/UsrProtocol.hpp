@@ -28,6 +28,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include "Communication.h"
 
 /**************************************************************************
 * Global Macro Definition
@@ -140,11 +141,14 @@ public:
 		uint8_t *pCacheDataBuf;
 		SSystemConfig *pSystemConfig;
 		CApplicationReg  *pApplicationReg;
+		static CCommunicationInfo *pCommunicationInfo;
+		char buf = 1;
 
 		nCommand = m_RxCacheDataPtr[0];
 		m_TxBufSize = 0;
 		pApplicationReg = GetApplicationReg();
 		pSystemConfig = GetSSytemConfigInfo();
+		pCommunicationInfo = GetCommunicationInfo();
 
 		switch (nCommand)
 		{
@@ -153,6 +157,7 @@ public:
 				nRxDataSize = m_RxCacheDataPtr[3]<<8 | m_RxCacheDataPtr[4];
 				pCacheDataBuf = (uint8_t *)malloc(nRxDataSize);
 				pApplicationReg->GetMultipleReg(nRegIndex, nRxDataSize, pCacheDataBuf);
+				pCommunicationInfo->SendMqInformation(APP_MQ, &buf, sizeof(buf), 0);
 				free(pCacheDataBuf);   
 				m_isUploadStatus = false;
 				m_TxBufSize = CreateTxBuffer(ACK_OK, nRxDataSize, pCacheDataBuf);
@@ -161,6 +166,7 @@ public:
 				nRegIndex = m_RxCacheDataPtr[1]<<8 | m_RxCacheDataPtr[2];
 				nRxDataSize = m_RxCacheDataPtr[3]<<8 | m_RxCacheDataPtr[4];
 				pApplicationReg->SetMultipleReg(nRegIndex, nRxDataSize, &m_RxCacheDataPtr[5]);	
+				pCommunicationInfo->SendMqInformation(APP_MQ, &buf, sizeof(buf), 0);
 				m_isUploadStatus = false;
 				m_TxBufSize = CreateTxBuffer(ACK_OK, 0, NULL);
 				break;

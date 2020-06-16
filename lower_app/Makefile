@@ -4,7 +4,7 @@
 HOST=
 CPU=x86-
 CC = $(HOST)g++
-CFLAGS  := -O3 -std=c++11 -lpthread -fno-strict-aliasing
+CFLAGS  := -O3 -std=c++11 -lpthread -fno-strict-aliasing -lrt
 
 #头文件路径
 LOWERAPP_INC_ROOT = lib/jsoncpp/include
@@ -13,7 +13,7 @@ LIB = lib/$(CPU)libjsoncpp.a #链接的库
 
 OBJS = main.o source/ApplicationThread.o source/SocketTcpThread.o source/SocketUdpThread.o \
 	   source/UartThread.o source/SystemConfig.o driver/Beep.o driver/Led.o \
-	   source/calculate/CalcCRC16.o
+	   source/calculate/CalcCRC16.o source/Communication.o
 
 APP = app_demo
 

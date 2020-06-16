@@ -77,6 +77,7 @@ public:
     CApplicationReg(void);
         ~CApplicationReg();
     
+    void TimerSingalStart(void);
     int RefreshAllDevice(void);
     void WriteHardware(uint8_t cmd, uint8_t *pRegConfig, int size);
     void UpdateHardware(void);
