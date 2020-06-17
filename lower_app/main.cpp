@@ -18,6 +18,7 @@
 #include "include/SocketTcpThread.h"
 #include "include/SocketUdpThread.h"
 #include "include/SystemConfig.h"
+#include "include/Communication.h"
 #include "driver/Beep.h"
 #include "driver/Led.h"
 
@@ -45,9 +46,6 @@ static int pipe_fd[2];
 static void SystemTest(void);
 #endif
 static void HardwareDriveInit(void);
-static void PipeInit(void);
-static void PipeWriteClose(void);
-static int PipeReadClose(void);
 
 /**************************************************************************
 * Function
@@ -124,8 +122,6 @@ int main(int argc, char* argv[])
 	
 	//硬件模块初始化
 	HardwareDriveInit();
-	PipeInit();
-
 
 	/*任务创建*/
 #if __SYSTEM_DEBUG == 0
@@ -134,15 +130,27 @@ int main(int argc, char* argv[])
 	SocketTcpThreadInit();
 	SocketUdpThreadInit();
 	for(;;){
-		if(PipeReadClose() == 1)
+		static char buf[8193];
+		int flag;
+		CCommunicationInfo *pCommunicationInfo;
+		pCommunicationInfo = GetCommunicationInfo();
+		flag = pCommunicationInfo->WaitMqInformation(MAIN_MQ, buf, sizeof(buf));
+		if(flag != -1)
 		{
+			pCommunicationInfo->CloseMqInformation(MAIN_MQ);
 			break;
+		}
+		else
+		{
+			USR_DEBUG("Mq Wait Error,Error Code:%s\n", strerror(errno));
+			sleep(100);
 		}
 	}
 #else
 	SystemTest();
 #endif	
 
+	USR_DEBUG("Process app_demo stop\n");
 	return result;
 }
 
@@ -158,58 +166,6 @@ static void HardwareDriveInit(void)
 	LedDriveInit();
 	BeepDriveInit();	
 }
-
-/**
- * 管道初始化
- * 
- * @param NULL
- *  
- * @return NULL
- */
-static void PipeInit(void)
-{
-	int result;
-    result = pipe(pipe_fd);
-    if(result == -1)
-    {
-        USR_DEBUG("pipe init failed\n");
-    }
-}
-
-/**
- * 管道关闭触发
- * 
- * @param NULL
- *  
- * @return NULL
- */
-static void PipeWriteClose(void)
-{
-	write(pipe_fd[1], "close", strlen("close"));
-}
-
-/**
- * 管道关闭等待结束
- * 
- * @param NULL
- *  
- * @return NULL
- */
-static int PipeReadClose(void)
-{
-	char buf;
-	int readsize;
-
-	readsize = read(pipe_fd[0], &buf, sizeof(buf));
-	if(readsize > 0)
-	{
-		USR_DEBUG("pipe read\n");
-	}
-	close(pipe_fd[0]);
-	close(pipe_fd[1]);
-	return 0;
-}
-
 
 /**
  * 打印调试信息接口

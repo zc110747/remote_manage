@@ -429,12 +429,12 @@ void *ApplicationLoopTask(void *arg)
         }
         else
         {
+            USR_DEBUG("Mq Information Error, Application Tread Stop!\n");
             break;
         }     
     }
 
-    USR_DEBUG("Application Tread Stop!\n");
-    pCommunicationInfo->CloseMqInformation();
+    pCommunicationInfo->CloseMqInformation(APP_MQ);
     
     //将线程和进程脱离,释放线程
     pthread_detach(pthread_self());

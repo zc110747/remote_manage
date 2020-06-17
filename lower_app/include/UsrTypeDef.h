@@ -30,7 +30,7 @@
 /**************************************************************************
 * Global Macro Definition
 ***************************************************************************/
-#define DEVICE_VERSION          "version 0.0.4 20200610"
+#define DEVICE_VERSION          "version 0.0.5 20200617"
 
 #define __SYSTEM_DEBUG          0
 #define __DEBUG_PRINTF			1

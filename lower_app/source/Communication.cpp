@@ -58,7 +58,7 @@ int CCommunicationInfo::CreateMqInfomation(void)
     if(m_MainMqd < 0)
     {
         USR_DEBUG("MAIN MQ Create Failed, error:%s\n", strerror(errno));
-        isMqOk = false;
+        isMainMqOk = false;
         return RT_INVALID_MQ;
     }
 
@@ -66,13 +66,16 @@ int CCommunicationInfo::CreateMqInfomation(void)
     m_AppMqd = mq_open("/AppMq", O_RDWR | O_CREAT, 0666, &attr);
     if(m_AppMqd < 0)
     {
+        mq_close(m_MainMqd); //失败需要将上一个关闭
+        m_MainMqd = -1;
         USR_DEBUG("APP MQ Send Failed, error:%s\n", strerror(errno));
-        isMqOk = false;
+        isAppMqOk = false;
         return RT_INVALID_MQ;
     }
 
     USR_DEBUG("Mq Create Ok\n");
-    isMqOk = true;
+    isMainMqOk = true;
+    isAppMqOk = true;
     return RT_OK;
 }
 
@@ -93,28 +96,36 @@ int CCommunicationInfo::WaitMqInformation(uint8_t info, char *buf, int bufsize)
     struct mq_attr attr_old;
     uint32_t prio;
 
-    if(isMqOk == false)
-    {
-        return RT_INVALID_MQ;
-    }
     switch(info)
     {
         case MAIN_MQ:
-            mq_getattr(m_MainMqd, &attr);
-            if(bufsize < attr.mq_msgsize)
+            if(isMainMqOk)
             {
-                USR_DEBUG("Main Mq Receive Fifo Little\n");
-                return RT_INVALID_BUF_SIZE;
+                mq_getattr(m_MainMqd, &attr);
+                nReadSize = mq_receive(m_MainMqd, buf, bufsize, &prio);
+                //USR_DEBUG("Wait for Mq Receive, Mqd:%d, %d, %s, %d\n", m_MainMqd, nReadSize, strerror(errno), (int)attr.mq_msgsize);
             }
-            nReadSize = mq_receive(m_MainMqd, buf, bufsize, &prio);
+            else
+            {
+                USR_DEBUG("Invalid Main Mq\n");
+                return RT_INVALID_MQ;
+            }    
             break;
         case APP_MQ:
-            mq_getattr(m_AppMqd, &attr);
-            nReadSize = mq_receive(m_AppMqd, buf, bufsize, &prio);
-            //USR_DEBUG("Wait for Mq Receive, Mqd:%d, %d, %s, %d\n", m_AppMqd, nReadSize, strerror(errno), (int)attr.mq_msgsize);
+            if(isAppMqOk)
+            {
+                mq_getattr(m_AppMqd, &attr);
+                nReadSize = mq_receive(m_AppMqd, buf, bufsize, &prio);
+                //USR_DEBUG("Wait for Mq Receive, Mqd:%d, %d, %s, %d\n", m_AppMqd, nReadSize, strerror(errno), (int)attr.mq_msgsize);
+            }
+            else
+            {
+                USR_DEBUG("Invalid Mq\n");
+                return RT_INVALID_MQ;
+            }
             break;
         default:
-            USR_DEBUG("Invalid Receive MQ Info");
+            USR_DEBUG("Invalid Receive MQ Info\n");
             break;
     }
     return nReadSize;
@@ -133,18 +144,28 @@ int CCommunicationInfo::WaitMqInformation(uint8_t info, char *buf, int bufsize)
 int CCommunicationInfo::SendMqInformation(uint8_t info, char *buf, int bufsize, int prio)
 {
     int nWriteSize = -1;
-    if(isMqOk == false)
-    {
-        return RT_INVALID_MQ;
-    }
 
     switch (info)
     {
         case MAIN_MQ:
-            nWriteSize = mq_send(m_MainMqd, buf, bufsize, prio);
+            if(isMainMqOk)
+            {
+                nWriteSize = mq_send(m_MainMqd, buf, bufsize, prio);
+            }
+            else
+            {
+                return RT_INVALID_MQ;
+            }
             break;
         case APP_MQ:
-            nWriteSize = mq_send(m_AppMqd, buf, bufsize, prio);
+            if(isAppMqOk)
+            {
+                nWriteSize = mq_send(m_AppMqd, buf, bufsize, prio);
+            }
+            else
+            {
+                return RT_INVALID_MQ;
+            }
             break;
         default:
             USR_DEBUG("Invalid Send MQ Info\n");
@@ -160,12 +181,28 @@ int CCommunicationInfo::SendMqInformation(uint8_t info, char *buf, int bufsize, 
  *  
  * @return 返回消息队列的关闭状态
  */
-int CCommunicationInfo::CloseMqInformation(void)
+int CCommunicationInfo::CloseMqInformation(uint8_t info)
 {
-    if(m_MainMqd>=0)
-        close(m_MainMqd);
-    if(m_AppMqd>=0)
-        close(m_AppMqd);
+    switch(info)
+    {
+        case MAIN_MQ:
+            if(isMainMqOk)
+            {
+                close(m_MainMqd);
+                m_MainMqd = -1;
+            }
+            break;
+        case APP_MQ:
+            if(isAppMqOk)
+            {
+                close(m_AppMqd);
+                m_AppMqd = -1;
+            }
+            break;
+        default:
+            USR_DEBUG("Invalid Mq Close Info\n");
+            break;
+    }
 
     return RT_OK;
 }
