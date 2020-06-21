@@ -15,6 +15,7 @@
 /*@{*/
 #include "../driver/Led.h"
 #include "../driver/Beep.h"
+#include "../driver/IcmSpi.h"
 #include "../include/ApplicationThread.h"
 #include "../include/Communication.h"
 #include <signal.h>
@@ -85,6 +86,8 @@ uint16_t CApplicationReg::GetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize, 
 {
     uint16_t nIndex;
 
+    assert(pDataStart != nullptr);
+
     if(nRegSize > REG_NUM)
         nRegSize = REG_NUM;
 
@@ -113,6 +116,8 @@ uint16_t CApplicationReg::GetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize, 
 void CApplicationReg::SetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize, uint8_t *pDataStart)
 {
     uint16_t nIndex, nEndRegIndex, modifySize;
+
+    assert(pDataStart != nullptr);
 
     nEndRegIndex = nRegIndex+nRegSize;
     if(nEndRegIndex>REG_NUM)
@@ -149,6 +154,8 @@ int CApplicationReg::DiffSetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize,
                                         uint8_t *pDataStart, uint8_t *pDataCompare)
 {
     uint16_t nIndex, nEndRegIndex, modifySize;
+
+    assert(pDataStart != nullptr && pDataCompare != nullptr);
 
     nEndRegIndex = nRegIndex+nRegSize;
     if(nEndRegIndex>REG_NUM)
@@ -194,6 +201,14 @@ void CApplicationReg::UpdateHardware(void)
     //更新LED的状态
     pRegInfoList->s_base_status.b.led = LedStatusRead()&0x01;
     pRegInfoList->s_base_status.b.beep = BeepStatusRead()&0x01;
+    // struct SSpiInfo *pSSpiInfo = SpiDevInfoRead();
+    // pRegInfoList->sensor_gyro_x = pSSpiInfo->gyro_x_adc;
+    // pRegInfoList->sensor_gyro_y = pSSpiInfo->gyro_y_adc;
+	// pRegInfoList->sensor_gyro_z = pSSpiInfo->gyro_z_adc;
+	// pRegInfoList->sensor_accel_x = pSSpiInfo->accel_x_adc;
+	// pRegInfoList->sensor_accel_y = pSSpiInfo->accel_y_adc;
+	// pRegInfoList->sensor_accel_z = pSSpiInfo->accel_z_adc;
+	// pRegInfoList->sensor_temp = pSSpiInfo->temp_adc;
 
     if(memcmp(nRegCacheArray, nRegInfoArray, REG_INFO_NUM) != 0)
     {
@@ -214,6 +229,8 @@ void CApplicationReg::UpdateHardware(void)
  */
 void CApplicationReg::WriteHardware(uint8_t cmd, uint8_t *pConfig, int size)
 {
+    assert(pConfig != nullptr);
+
     switch(cmd)
     {
         case DEVICE_LED0:
@@ -404,7 +421,7 @@ void ApplicationThreadInit(void)
     }
 }
 
-char buf[8193];
+
 
 /**
  * app模块初始化
@@ -416,7 +433,8 @@ char buf[8193];
 void *ApplicationLoopTask(void *arg)
 {
     int flag;
-
+    char buf[256];  
+    
     USR_DEBUG("App Thread Start\n");
     pApplicationReg->TimerSingalStart();
 

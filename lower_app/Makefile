@@ -1,8 +1,8 @@
 #编译工具和编译选项
-#HOST = arm-linux-gnueabihf-
-#CPU = arm-
-HOST=
-CPU=x86-
+HOST = arm-linux-gnueabihf-
+CPU = arm-
+#HOST=
+#CPU=x86-
 CC = $(HOST)g++
 CFLAGS  := -O3 -std=c++11 -lpthread -fno-strict-aliasing -lrt
 
@@ -13,7 +13,7 @@ LIB = lib/$(CPU)libjsoncpp.a #链接的库
 
 OBJS = main.o source/ApplicationThread.o source/SocketTcpThread.o source/SocketUdpThread.o \
 	   source/UartThread.o source/SystemConfig.o driver/Beep.o driver/Led.o \
-	   source/calculate/CalcCRC16.o source/Communication.o
+	   source/calculate/CalcCRC16.o source/Communication.o driver/IcmSpi.o
 
 APP = app_demo
 

@@ -308,7 +308,7 @@ static int beep_gpio_init(void)
     }
 
     beep_switch(BEEP_OFF);
-    printk(KERN_INFO"beep hardware init ok\r\n");
+    printk(KERN_INFO"beep hardware init ok\r\n");4
     return 0;
 }
 

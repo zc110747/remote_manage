@@ -105,10 +105,10 @@ uint8_t BeepStatusRead(void)
     nFd = open(pSystemConfigInfo->m_dev_beep.c_str(), O_RDONLY | O_NDELAY);
     if(nFd != -1)
     {
-        nSize = read(nFd, &nValue, 1);  //将数据写入LED
+        nSize = read(nFd, &nValue, 1);  //读取Beep的值
         if(nSize < 0)
         {
-            DRIVER_DEBUG("Read failed\n");
+            DRIVER_DEBUG("Beep Read failed, error:%s\n", strerror(errno));
         }
         close(nFd);
     }

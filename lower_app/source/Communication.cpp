@@ -2,7 +2,7 @@
  * File      : InterprocessCom.cpp
  * InterProcessCom线程通讯实现
  * COPYRIGHT (C) 2020, zc
- *
+ * 
  * Change Logs:
  * Date           Author       Notes
  * 2020-5-4      zc           the first version
@@ -52,8 +52,12 @@ int CCommunicationInfo::CreateMqInfomation(void)
 {
     struct mq_attr attr;
 
+    //删除当前已经存在的队列, 否则设置的配置无效
+    mq_unlink("/MainMq");
+    mq_unlink("/AppMq");
+
     attr.mq_maxmsg=4;
-    attr.mq_msgsize=32;
+    attr.mq_msgsize=128;
     m_MainMqd = mq_open("/MainMq", O_RDWR | O_CREAT, 0666, &attr);
     if(m_MainMqd < 0)
     {
@@ -95,6 +99,8 @@ int CCommunicationInfo::WaitMqInformation(uint8_t info, char *buf, int bufsize)
     struct mq_attr attr;
     struct mq_attr attr_old;
     uint32_t prio;
+
+    assert(buf != nullptr);
 
     switch(info)
     {
@@ -145,6 +151,8 @@ int CCommunicationInfo::SendMqInformation(uint8_t info, char *buf, int bufsize, 
 {
     int nWriteSize = -1;
 
+    assert(buf != nullptr);
+    
     switch (info)
     {
         case MAIN_MQ:

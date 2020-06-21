@@ -123,7 +123,6 @@ int system_config_init(std::string &sConfigfile)
     return EXIT_SUCCESS;
 }
 
-
 /**
  * 获取系统状态配置信息
  * 
@@ -135,3 +134,42 @@ SSystemConfig *GetSSytemConfigInfo(void)
 {
     return &SSysConifg;
 }
+
+
+/**
+ * 显示系统的配置信息
+ * 
+ * @param NULL
+ *  
+ * @return NULL
+ */
+#if __SYSTEM_DEBUG == 1
+void ShowSSystemConfigInfo(void)
+{
+    //Serial
+    std::cout<<"Baud:"<<SSysConifg.m_baud<<std::endl;
+    std::cout<<"DataBits:"<<SSysConifg.m_data_bits<<std::endl;
+    std::cout<<"StopBits:"<<SSysConifg.m_stop_bits<<std::endl;
+    std::cout<<"Parity:"<<SSysConifg.m_parity<<std::endl;
+
+    //Tcp
+    std::cout<<"Tcp Ipaddr:"<<SSysConifg.m_tcp_ipaddr<<std::endl;
+    std::cout<<"Tcp Port:"<<SSysConifg.m_tcp_net_port<<std::endl;
+
+    //Udp
+    std::cout<<"Udp Ipaddr:"<<SSysConifg.m_udp_ipaddr<<std::endl;
+    std::cout<<"Udp port:"<<SSysConifg.m_udp_net_port<<std::endl;
+
+    //Hardwart Status
+    std::cout<<"led status:"<<SSysConifg.m_led0_status<<std::endl;
+    std::cout<<"beep status:"<<SSysConifg.m_beep0_status<<std::endl;
+
+    //Device Name
+    std::cout<<"tty dev:"<<SSysConifg.m_dev_serial<<std::endl;
+    std::cout<<"led dev:"<<SSysConifg.m_dev_led<<std::endl;
+    std::cout<<"beep dev:"<<SSysConifg.m_dev_beep<<std::endl;
+
+    //Download Directory
+    std::cout<<"Download:"<<SSysConifg.m_file_path<<std::endl;
+}
+#endif

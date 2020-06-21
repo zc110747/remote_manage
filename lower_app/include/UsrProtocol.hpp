@@ -157,10 +157,13 @@ public:
 				nRxDataSize = m_RxCacheDataPtr[3]<<8 | m_RxCacheDataPtr[4];
 				pCacheDataBuf = (uint8_t *)malloc(nRxDataSize);
 				pApplicationReg->GetMultipleReg(nRegIndex, nRxDataSize, pCacheDataBuf);
+				//printf("nRegIndex:%d\n", nRegIndex);
+				//SystemLogArray(pCacheDataBuf, nRxDataSize);
 				pCommunicationInfo->SendMqInformation(APP_MQ, &buf, sizeof(buf), 0);
-				free(pCacheDataBuf);   
 				m_isUploadStatus = false;
 				m_TxBufSize = CreateTxBuffer(ACK_OK, nRxDataSize, pCacheDataBuf);
+				free(pCacheDataBuf);   
+				pCacheDataBuf = nullptr;
 				break;
 			case CMD_REG_WRITE:	
 				nRegIndex = m_RxCacheDataPtr[1]<<8 | m_RxCacheDataPtr[2];
@@ -389,6 +392,8 @@ public:
 	uint16_t CrcCalculate(uint8_t *pDataStart, uint16_t nDataSize)
 	{
 		uint16_t nCrcOut;
+
+		assert(pDataStart != nullptr);
 		nCrcOut = crc16(DEFAULT_CRC_VALUE, pDataStart, nDataSize);
 		return nCrcOut;
 	}			

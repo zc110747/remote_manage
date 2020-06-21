@@ -26,6 +26,10 @@
 #include <termios.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <memory>
+
+//#define NDEBUG  //用于控制是否开启单元测试的宏
+#include <assert.h>
 
 /**************************************************************************
 * Global Macro Definition

@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
 	sConfigFile = std::string("config.json");
 	
 	//命令行输入说明
-	while ((c = getopt(argc, argv, "v::d::f::h")) != -1){
+	while ((c = getopt(argc, argv, "v:d:f:h::")) != -1){
 		switch (c)
 		{
 			case 'd':
@@ -119,7 +119,7 @@ int main(int argc, char* argv[])
 	{
 		USR_DEBUG("system config use default\n");
 	}
-	
+
 	//硬件模块初始化
 	HardwareDriveInit();
 
@@ -193,7 +193,7 @@ static uint8_t 	rx_buffer[TEST_BUFFER_SZIE];
 static uint8_t  tx_buffer[TEST_BUFFER_SZIE];
 const uint8_t test_command[] = {
 	0x5a, 0x00, 0x0B, 0x01, 0x32, 0x23, 0x02, 0x00, 
-	0x00, 0x00, 0x03, 0x07, 0x00, 0x01, 0x87, 0x27
+	0x00, 0x00, 0x03, 0x07, 0x00, 0x01, 0x54, 0x3f
 };
 
 template<class T>
@@ -246,13 +246,14 @@ static void SystemTest(void)
 	CApplicationReg *pApplicationReg;
 	CTestProtocolInfo<int *> *pTesetProtocolInfo;
 
+	ShowSSystemConfigInfo();
 	pApplicationReg = new CApplicationReg();
 	pTesetProtocolInfo = new CTestProtocolInfo<int *>(rx_buffer, tx_buffer, TEST_BUFFER_SZIE);
 	/*更新设备处理指针*/
 	SetApplicationReg(pApplicationReg);
 
 	/*执行接收数据的处理指令*/
-	nFlag = pTesetProtocolInfo->CheckRxBuffer(nFd, &size);
+	nFlag = pTesetProtocolInfo->CheckRxBuffer(nFd, false, &size);
 	if(nFlag == RT_OK){
 		pTesetProtocolInfo->ExecuteCommand(nFd);
 		pApplicationReg->RefreshAllDevice();

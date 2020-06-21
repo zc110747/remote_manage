@@ -67,4 +67,7 @@ struct SSystemConfig
 ***************************************************************************/
 int system_config_init(std::string &sConfigfile);
 SSystemConfig *GetSSytemConfigInfo(void);
+#if __SYSTEM_DEBUG == 1
+void ShowSSystemConfigInfo(void);
+#endif
 #endif

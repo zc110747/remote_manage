@@ -105,7 +105,7 @@ uint8_t LedStatusRead(void)
         nSize = read(nFd, &nValue, 1);  //将数据写入LED
         if(nSize < 0)
         {
-            DRIVER_DEBUG("Read failed\n");
+            DRIVER_DEBUG("Led Read failed, error:%s\n", strerror(errno));
         }
         close(nFd);
     }
