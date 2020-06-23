@@ -130,11 +130,11 @@ int main(int argc, char* argv[])
 	SocketTcpThreadInit();
 	SocketUdpThreadInit();
 	for(;;){
-		static char buf[8193];
+		static char MainMqFlag;
 		int flag;
 		CCommunicationInfo *pCommunicationInfo;
 		pCommunicationInfo = GetCommunicationInfo();
-		flag = pCommunicationInfo->WaitMqInformation(MAIN_MQ, buf, sizeof(buf));
+		flag = pCommunicationInfo->WaitMqInformation(MAIN_MQ, &MainMqFlag, sizeof(MainMqFlag));
 		if(flag != -1)
 		{
 			pCommunicationInfo->CloseMqInformation(MAIN_MQ);

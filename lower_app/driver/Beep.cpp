@@ -85,7 +85,7 @@ void BeepStatusConvert(uint8_t nBeepStatus)
     }
     else
     {
-        DRIVER_DEBUG("beep open %s failed, val:%d!\n", pSystemConfigInfo->m_dev_led.c_str(), nBeepStatus);
+        DRIVER_DEBUG("beep open %s failed, val:%d!\n", pSystemConfigInfo->m_dev_beep.c_str(), nBeepStatus);
     }
 }
 

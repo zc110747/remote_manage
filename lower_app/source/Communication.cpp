@@ -99,7 +99,6 @@ int CCommunicationInfo::WaitMqInformation(uint8_t info, char *buf, int bufsize)
     struct mq_attr attr;
     struct mq_attr attr_old;
     uint32_t prio;
-
     assert(buf != nullptr);
 
     switch(info)
@@ -107,9 +106,21 @@ int CCommunicationInfo::WaitMqInformation(uint8_t info, char *buf, int bufsize)
         case MAIN_MQ:
             if(isMainMqOk)
             {
+                char *ptr = nullptr;
                 mq_getattr(m_MainMqd, &attr);
-                nReadSize = mq_receive(m_MainMqd, buf, bufsize, &prio);
-                //USR_DEBUG("Wait for Mq Receive, Mqd:%d, %d, %s, %d\n", m_MainMqd, nReadSize, strerror(errno), (int)attr.mq_msgsize);
+                if(attr.mq_maxmsg > 0)
+                {
+                    ptr = new char[attr.mq_maxmsg];
+                    nReadSize = mq_receive(m_MainMqd, ptr, attr.mq_maxmsg, &prio);
+                    memcpy(buf, ptr, (bufsize>attr.mq_maxmsg?attr.mq_maxmsg:bufsize));
+                    delete ptr;
+                    ptr = nullptr;
+                    //USR_DEBUG("Wait for Mq Receive, Mqd:%d, %d, %s, %d\n", m_MainMqd, nReadSize, strerror(errno), (int)attr.mq_msgsize);
+                }
+                else
+                {
+                    return RT_INVALID_MQ_SIZE;
+                }
             }
             else
             {
@@ -120,8 +131,22 @@ int CCommunicationInfo::WaitMqInformation(uint8_t info, char *buf, int bufsize)
         case APP_MQ:
             if(isAppMqOk)
             {
+                char *ptr = nullptr;
                 mq_getattr(m_AppMqd, &attr);
-                nReadSize = mq_receive(m_AppMqd, buf, bufsize, &prio);
+                if(attr.mq_maxmsg > 0)
+                {
+                    ptr = new char[attr.mq_maxmsg];
+                    nReadSize = mq_receive(m_AppMqd, buf, bufsize, &prio);
+                    memcpy(buf, ptr, (bufsize>attr.mq_maxmsg?attr.mq_maxmsg:bufsize));
+                    delete ptr;
+                    ptr = nullptr;
+                    //USR_DEBUG("Wait for Mq Receive, Mqd:%d, %d, %s, %d\n", m_MainMqd, nReadSize, strerror(errno), (int)attr.mq_msgsize);
+                }
+                else
+                {
+                    return RT_INVALID_MQ_SIZE;
+                }
+                
                 //USR_DEBUG("Wait for Mq Receive, Mqd:%d, %d, %s, %d\n", m_AppMqd, nReadSize, strerror(errno), (int)attr.mq_msgsize);
             }
             else

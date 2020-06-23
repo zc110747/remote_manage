@@ -421,8 +421,6 @@ void ApplicationThreadInit(void)
     }
 }
 
-
-
 /**
  * app模块初始化
  * 
@@ -433,14 +431,14 @@ void ApplicationThreadInit(void)
 void *ApplicationLoopTask(void *arg)
 {
     int flag;
-    char buf[256];  
+    char MqFlag;  
     
     USR_DEBUG("App Thread Start\n");
     pApplicationReg->TimerSingalStart();
 
     for(;;)
     {
-        flag = pCommunicationInfo->WaitMqInformation(APP_MQ, buf, sizeof(buf));
+        flag = pCommunicationInfo->WaitMqInformation(APP_MQ, &MqFlag, sizeof(MqFlag));
         if(flag > 0)
         {
             pApplicationReg->RefreshAllDevice();
@@ -456,4 +454,6 @@ void *ApplicationLoopTask(void *arg)
     
     //将线程和进程脱离,释放线程
     pthread_detach(pthread_self());
+
+    return (void *)0;
 }

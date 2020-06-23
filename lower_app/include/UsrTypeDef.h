@@ -43,6 +43,7 @@
 #define __TEST_IN_PC            0
 
 /*返回状态*/
+#define RT_INVALID_MQ_SIZE      -4
 #define RT_INVALID_BUF_SIZE     -3
 #define RT_INVALID_MQ           -2
 #define RT_OK               	0
