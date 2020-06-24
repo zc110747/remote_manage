@@ -42,19 +42,19 @@ make menuconfig
 增加文件的传输机制，包含指令和数据传输，测试UDP和TCP文件传输满足要求
 
 下一步计划:
+单元测试的模块添加
 配合SPI驱动的底层更新实现    
 文件的断点重传功能
 TCP对于数据传输处理增加线程池
-QT界面的搭配实现(独立进程)  
 提供数据库sqlite而非共享内存的替换方案  
-通讯数据的安全加密openssl  
+通讯数据的安全加密openssl 
 
 代码结构:  
-driver/ 硬件驱动的实现  
-include/ 头文件路径
-lib/ 应用编写需要的外部支持库
-source/ 应用代码实现
-template/ 代码结构模板  
+driver/     硬件驱动的实现  
+include/    头文件路径
+lib/        应用编写需要的外部支持库
+source/     应用代码实现
+template/   代码结构基础模板  
 
 编译方法:  
 修改Makefile内的注释:

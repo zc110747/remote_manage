@@ -9,9 +9,9 @@ https://www.cnblogs.com/zc110747/p/12747213.html
 具体实现功能需求  
 1.对嵌入式Linux中字符型驱动设备，I2C, SPI等进行访问,支持设备树  
 2.支持配置管理，允许通过文件管理设备启动状态(配置文件使用JSON格式)  
-3.对Linux应用层接口，多线程/多进程知识学习和应用  
-4.串口的远程管理，包含自定义协议的知识处理  
-5.socket(UDP, TCP)的局域网远程管理  
+3.对Linux应用层API接口和多线程的应用,支持线程同步 
+4.串口的远程管理，基于自定义协议  
+5.socket(UDP, TCP)的局域网远程管理，兼容自定义协议  
 6.支持基于QT技术的上位机界面化设备管理  
 7.通讯的安全机制处理  
  
@@ -19,25 +19,25 @@ https://www.cnblogs.com/zc110747/p/12747213.html
 ![image](https://github.com/zc110747/remote_manage/blob/master/document/Image/system.png)  
 
 项目结构  
-demo/       快速体验下位机应用的代码  
-document/   文档资料说明  
-kernal_mod/ 内核驱动模块实现  
-lower_app/  嵌入式Linux平台中C++代码实现  
-server/     嵌入式Linux平台的服务器支持node环境和前端网页   
-test/       用于测试和应用执行的固件库等
-upper_app/  上位机代码基于QT控制实现  
+demo/           快速体验下位机应用的代码  
+document/       文档资料说明  
+kernal_mod/     内核驱动模块实现  
+lower_app/      嵌入式Linux平台中通讯应用  
+qt_lower_app/   嵌入式Linux平台QT界面应用
+server/         嵌入式Linux平台的服务器支持node环境和前端网页   
+test/           用于测试和应用执行的固件库等
+upper_app/      基于QT的上位机界面应用实现  
 
 硬件适配和兼容性:  
-下位机驱动适配平台(kernal_mod):正点原子I.MX6U-ALPHA 开发板  
-下位机应用层适配平台(lower_app):兼容嵌入式Linux平台，仅修改配置json文件即可支持不同平台  
-上位机兼容性(upper_app):仅测试window10平台， QT5.12.9工具，不保证其它本版本系统的兼容性  
+下位机驱动适配平台(kernal_mod):正点原子I.MX6U-ALPHA开发板  
+下位机应用层适配平台(lower_app):兼容所有Linux平台(除WSL中对于mq不支持), 仅修改配置json文件即可支持不同应用情况, 可通过修改配置满足不同环境下的需求。  
+上位机兼容性(upper_app):目前仅测试window10平台, QT5.12.9工具，目前不保证其它本版本系统的兼容性  
 
 编译环境  
 下位机交叉编译工具:    
 arm-linux-gnueabihf-gcc编译内核模块  
-arm-linux-gnueabihf-g++编译应用层实现  
-版本v4.9.3  
-上位机编译工具: QT5.12.8  
-目前Makefile中路径为绝对路径，实际编译需要修改。  
+arm-linux-gnueabihf-g++(版本v4.9.3)/g++(版本目前无限制)编译应用层实现  
+上位机编译工具
+QT5.12.8, 后续版本同样兼容 
 
 本项目是我学习嵌入式Linux开发，结合自身目前的产品开发经验，形成的综合性项目，在设计上会考虑实际产品开发中的各种细节问题，其中的思路大部分嵌入式Linux产品开发中是共通的，如果有问题可直接联系我的QQ地址(见个人资料)
