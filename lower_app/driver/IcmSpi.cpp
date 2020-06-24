@@ -12,8 +12,8 @@
  * @addtogroup IMX6ULL
  */
 /*@{*/
-
 #include "IcmSpi.h"
+#include "../include/SystemConfig.h"
 
 /**************************************************************************
 * Local Macro Definition
@@ -27,6 +27,7 @@
 * Local static Variable Declaration
 ***************************************************************************/
 static struct SSpiInfo spi_info;
+static struct SSystemConfig *pSystemConfigInfo;
 
 /**************************************************************************
 * Global Variable Declaration
@@ -57,7 +58,9 @@ SSpiInfo *SpiDevInfoRead(void)
     ssize_t nSize;
     uint32_t databuf[7];
 
-    nFd = open("/dev/icm20608", O_RDWR);
+    pSystemConfigInfo = GetSSytemConfigInfo();
+
+    nFd = open(pSystemConfigInfo->m_dev_icm_spi.c_str(), O_RDWR);
     if(nFd != -1)
     {
         nSize = read(nFd, databuf, sizeof(databuf));
@@ -78,15 +81,13 @@ SSpiInfo *SpiDevInfoRead(void)
         else
         {
             USR_DEBUG("read spi device failed, error:%s\n", strerror(errno));
-        }
-        
+        }    
         close(nFd);
     }
     else
     {
-        USR_DEBUG("open spi device failed, error:%s\n", strerror(errno));
+        USR_DEBUG("open %s failed, error:%s\n", pSystemConfigInfo->m_dev_icm_spi.c_str(), strerror(errno));
     }
     
-
     return &spi_info;
 }

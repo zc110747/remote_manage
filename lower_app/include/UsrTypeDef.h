@@ -56,6 +56,7 @@
 #define TTY_DEVICE              "/dev/ttymxc2"
 #define LED_DEVICE              "/dev/led"
 #define BEEP_DEVICE             "/dev/beep"
+#define ICM_SPI_DEVICE          "/dev/icm20608"
 
 //DEFAULT
 #define UPDATE_FILE_PATH        "/usr/download/"

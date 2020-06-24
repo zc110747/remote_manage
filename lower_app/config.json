@@ -16,7 +16,8 @@
         "Device":{
                 "Serial":"/dev/ttymxc2",
                 "Led":"/dev/led",
-                "Beep":"/dev/beep"
+                "Beep":"/dev/beep",
+                "IcmSpi":"/dev/icm20608"
         },
         "Led0":0,
         "Beep0":0,
