@@ -14,8 +14,8 @@
  */
 /*@{*/
 
-#include "../include/UartThread.h"
 #include "../include/SystemConfig.h"
+#include "../include/UartThread.h"
 
 /**************************************************************************
 * Local Macro Definition

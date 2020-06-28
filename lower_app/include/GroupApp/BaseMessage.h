@@ -1,64 +1,45 @@
 /*
- * File      : SystemConfig.h
- * This file is for system config 
+ * File      : BaseMessage.h
+ * 基础消息队列说明
  * COPYRIGHT (C) 2020, zc
  *
  * Change Logs:
  * Date           Author       Notes
- * 2020-5-30      zc           the first version
+ * 2020-5-4      zc           the first version
  */
 
 /**
  * @addtogroup IMX6ULL
  */
 /*@{*/
-#ifndef _INCLUDE_SYSTEM_CONFIG_H
-#define _INCLUDE_SYSTEM_CONFIG_H
+#ifndef _INCLUDE_BASE_MESSAGE_H
+#define _INCLUDE_BASE_MESSAGE_H
 
 /***************************************************************************
 * Include Header Files
 ***************************************************************************/
-#include "json/json.h"
-#include <string>
-#include "UsrTypeDef.h"
+#include "../UsrTypeDef.h"
 
 /**************************************************************************
 * Global Macro Definition
 ***************************************************************************/
-struct SSystemConfig
-{
-    //串口配置
-    int m_baud;
-    int m_data_bits;
-    int m_stop_bits;
-    std::string m_parity;
-
-    //网络配置TCP
-    std::string m_tcp_ipaddr;
-    int m_tcp_net_port;
-
-    //网络配置UDP
-    std::string m_udp_ipaddr;
-    int m_udp_net_port;
-
-    //硬件状态
-    int m_led0_status;
-    int m_beep0_status;
-
-    //Device结构
-    std::string m_dev_led;
-    std::string m_dev_beep;
-    std::string m_dev_serial;
-    std::string m_dev_icm_spi;
-    std::string m_dev_rtc;
-    
-    //文件更新的下载地址
-    std::string m_file_path;
-};
+#define MAIN_BASE_MESSAGE                   1    
+#define APP_BASE_MESSAGE                    2
 
 /**************************************************************************
 * Global Type Definition
 ***************************************************************************/
+class CBaseMessageInfo
+{
+public:
+    CBaseMessageInfo(){};
+        ~CBaseMessageInfo(){};
+
+    virtual int CreateInfomation(void) = 0;                                 
+    virtual int CloseInformation(uint8_t info) = 0;                           
+    virtual int WaitInformation(uint8_t info, char *buf, int bufsize) = 0;    
+    virtual int SendInformation(uint8_t info, char *buf, int bufsize, int prio) = 0;    
+};
 
 /**************************************************************************
 * Global Variable Declaration
@@ -67,9 +48,4 @@ struct SSystemConfig
 /**************************************************************************
 * Global Functon Declaration
 ***************************************************************************/
-int system_config_init(std::string &sConfigfile);
-SSystemConfig *GetSSytemConfigInfo(void);
-#if __SYSTEM_DEBUG == 1
-void ShowSSystemConfigInfo(void);
-#endif
 #endif

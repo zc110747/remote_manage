@@ -70,19 +70,19 @@ static std::function<QString(uint8_t *, int)> FuncList[CMD_LIST_SIZE] = {
         if(nSize > 16)
         {
             pRegInfoList = (struct SRegInfoList *)pRecvData;
-            DecodeBuf = QString("Led Status:%1\n").arg(pRegInfoList->s_base_status.b.led);
-            DecodeBuf += QString("Beep Status:%1\n").arg(pRegInfoList->s_base_status.b.beep);
-            DecodeBuf += QString("Sensor Ia:%1\n").arg(pRegInfoList->sensor_ia);
-            DecodeBuf += QString("Sensor Als:%1\n").arg(pRegInfoList->sensor_als);
-            DecodeBuf += QString("Sensor Ps:%1\n").arg(pRegInfoList->sensor_ps);
-            DecodeBuf += QString("Sensor Gyro x:%1\n").arg(pRegInfoList->sensor_gyro_x);
-            DecodeBuf += QString("Sensor Gyro y:%1\n").arg(pRegInfoList->sensor_gyro_y);
-            DecodeBuf += QString("Sensor Gyro z:%1\n").arg(pRegInfoList->sensor_gyro_z);
-            DecodeBuf += QString("Sensor Accel x:%1\n").arg(pRegInfoList->sensor_accel_x);
-            DecodeBuf += QString("Sensor Accel y:%1\n").arg(pRegInfoList->sensor_accel_y);
-            DecodeBuf += QString("Sensor Accel z:%1\n").arg(pRegInfoList->sensor_accel_z);
-            DecodeBuf += QString("Sensor temp:%1\n").arg(pRegInfoList->sensor_temp);
-            DecodeBuf += QString("rtc :%1\n").arg(((uint64_t)pRegInfoList->rtc_high)<<32 | pRegInfoList->rtc_lower);
+            DecodeBuf = QString::fromLocal8Bit("LED显示:%1\n").arg(pRegInfoList->s_base_status.b.led==0?"OFF":"ON"); //LED状态
+            DecodeBuf += QString::fromLocal8Bit("蜂鸣器状态:%1\n").arg(pRegInfoList->s_base_status.b.beep==0?"OFF":"ON"); //蜂鸣器状态
+            DecodeBuf += QString::fromLocal8Bit("环境光强度:%1\n").arg(pRegInfoList->sensor_ia);
+            DecodeBuf += QString::fromLocal8Bit("接近距离:%1\n").arg(pRegInfoList->sensor_als);
+            DecodeBuf += QString::fromLocal8Bit("红外线强度:%1\n").arg(pRegInfoList->sensor_ps);
+            DecodeBuf += QString::fromLocal8Bit("陀螺仪x方向:%1 °/s\n").arg((float)pRegInfoList->sensor_gyro_x/16.4);
+            DecodeBuf += QString::fromLocal8Bit("陀螺仪y方向:%1 °/s\n").arg((float)pRegInfoList->sensor_gyro_y/16.4);
+            DecodeBuf += QString::fromLocal8Bit("陀螺仪z方向:%1 °/s\n").arg((float)pRegInfoList->sensor_gyro_z/16.4);
+            DecodeBuf += QString::fromLocal8Bit("加速度x方向:%1 fg\n").arg((float)pRegInfoList->sensor_accel_x/2048);
+            DecodeBuf += QString::fromLocal8Bit("加速度y方向:%1 fg\n").arg((float)pRegInfoList->sensor_accel_y/2048);
+            DecodeBuf += QString::fromLocal8Bit("加速度z方向:%1 fg\n").arg((float)pRegInfoList->sensor_accel_z/2048);
+            DecodeBuf += QString::fromLocal8Bit("温度:%1°C\n").arg((float)(pRegInfoList->sensor_temp-25)/326.8 + 25);
+            DecodeBuf += QString::fromLocal8Bit("RTC定时器时钟:%1\n").arg(((uint64_t)pRegInfoList->rtc_high)<<32 | pRegInfoList->rtc_lower);
         }
 
         return DecodeBuf;

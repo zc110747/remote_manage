@@ -17,7 +17,8 @@
                 "Serial":"/dev/ttymxc2",
                 "Led":"/dev/led",
                 "Beep":"/dev/beep",
-                "IcmSpi":"/dev/icm20608"
+                "IcmSpi":"/dev/icm20608",
+                "Rtc":"/dev/rtc"
         },
         "Led0":0,
         "Beep0":0,

@@ -21,14 +21,16 @@
 ***************************************************************************/
 #include "UsrTypeDef.h"
 #include "ApplicationThread.h"
-#include "calculate/CalcCrc16.h"
+#include "GroupApp/MqManage.h"
+#include "GroupApp/FifoManage.h"
+#include "GroupApp/CalcCrc16.h"
 #include "SystemConfig.h"
 #include <iostream>
 #include <fstream>
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include "Communication.h"
+
 
 /**************************************************************************
 * Global Macro Definition
@@ -141,14 +143,18 @@ public:
 		uint8_t *pCacheDataBuf;
 		SSystemConfig *pSystemConfig;
 		CApplicationReg  *pApplicationReg;
-		static CCommunicationInfo *pCommunicationInfo;
+		static CBaseMessageInfo *pBaseMessageInfo;
 		char buf = 1;
 
 		nCommand = m_RxCacheDataPtr[0];
 		m_TxBufSize = 0;
 		pApplicationReg = GetApplicationReg();
 		pSystemConfig = GetSSytemConfigInfo();
-		pCommunicationInfo = GetCommunicationInfo();
+		#if __WORK_IN_WSL == 1
+		pBaseMessageInfo = static_cast<CBaseMessageInfo *>(GetFifoMessageInfo());
+		#else
+		pBaseMessageInfo = static_cast<CBaseMessageInfo *>(GetMqMessageInfo());
+		#endif
 
 		switch (nCommand)
 		{
@@ -159,7 +165,7 @@ public:
 				pApplicationReg->GetMultipleReg(nRegIndex, nRxDataSize, pCacheDataBuf);
 				//printf("nRegIndex:%d\n", nRegIndex);
 				//SystemLogArray(pCacheDataBuf, nRxDataSize);
-				pCommunicationInfo->SendMqInformation(APP_MQ, &buf, sizeof(buf), 0);
+				pBaseMessageInfo->SendInformation(APP_BASE_MESSAGE, &buf, sizeof(buf), 0);
 				m_isUploadStatus = false;
 				m_TxBufSize = CreateTxBuffer(ACK_OK, nRxDataSize, pCacheDataBuf);
 				free(pCacheDataBuf);   
@@ -169,7 +175,7 @@ public:
 				nRegIndex = m_RxCacheDataPtr[1]<<8 | m_RxCacheDataPtr[2];
 				nRxDataSize = m_RxCacheDataPtr[3]<<8 | m_RxCacheDataPtr[4];
 				pApplicationReg->SetMultipleReg(nRegIndex, nRxDataSize, &m_RxCacheDataPtr[5]);	
-				pCommunicationInfo->SendMqInformation(APP_MQ, &buf, sizeof(buf), 0);
+				pBaseMessageInfo->SendInformation(APP_BASE_MESSAGE, &buf, sizeof(buf), 0);
 				m_isUploadStatus = false;
 				m_TxBufSize = CreateTxBuffer(ACK_OK, 0, NULL);
 				break;

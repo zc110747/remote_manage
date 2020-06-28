@@ -18,9 +18,11 @@
 #include "include/SocketTcpThread.h"
 #include "include/SocketUdpThread.h"
 #include "include/SystemConfig.h"
-#include "include/Communication.h"
+#include "include/GroupApp/FifoManage.h"
+#include "include/GroupApp/MqManage.h"
 #include "driver/Beep.h"
 #include "driver/Led.h"
+#include "driver/Rtc.h"
 
 /**************************************************************************
 * Local Macro Definition
@@ -125,19 +127,23 @@ int main(int argc, char* argv[])
 
 	/*任务创建*/
 #if __SYSTEM_DEBUG == 0
-	UartThreadInit();
 	ApplicationThreadInit();
+	UartThreadInit();
 	SocketTcpThreadInit();
 	SocketUdpThreadInit();
 	for(;;){
 		static char MainMqFlag;
 		int flag;
-		CCommunicationInfo *pCommunicationInfo;
-		pCommunicationInfo = GetCommunicationInfo();
-		flag = pCommunicationInfo->WaitMqInformation(MAIN_MQ, &MainMqFlag, sizeof(MainMqFlag));
+		CBaseMessageInfo *pBaseMessageInfo;
+		#if __WORK_IN_WSL == 1
+		pBaseMessageInfo = static_cast<CBaseMessageInfo *>(GetFifoMessageInfo());
+		#else
+		pBaseMessageInfo = static_cast<CBaseMessageInfo *>(GetMqMessageInfo());
+		#endif
+		flag = pBaseMessageInfo->WaitInformation(MAIN_BASE_MESSAGE, &MainMqFlag, sizeof(MainMqFlag));
 		if(flag != -1)
 		{
-			pCommunicationInfo->CloseMqInformation(MAIN_MQ);
+			pBaseMessageInfo->CloseInformation(MAIN_BASE_MESSAGE);
 			break;
 		}
 		else
@@ -150,7 +156,7 @@ int main(int argc, char* argv[])
 	SystemTest();
 #endif	
 
-	USR_DEBUG("Process app_demo stop\n");
+	USR_DEBUG("Process app_demo stop, error:%s\n", strerror(errno));
 	return result;
 }
 
@@ -165,6 +171,7 @@ static void HardwareDriveInit(void)
 {
 	LedDriveInit();
 	BeepDriveInit();	
+	RtcDriveInit();
 }
 
 /**

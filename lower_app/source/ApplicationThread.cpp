@@ -13,13 +13,15 @@
  * @addtogroup IMX6ULL
  */
 /*@{*/
+#include <signal.h>
 #include "../driver/Led.h"
 #include "../driver/Beep.h"
+#include "../driver/Rtc.h"
 #include "../driver/IcmSpi.h"
 #include "../include/ApplicationThread.h"
-#include "../include/Communication.h"
-#include <signal.h>
-#include <sys/time.h>
+#include "../include/GroupApp/MqManage.h"
+#include "../include/GroupApp/FifoManage.h"
+
 
 /**************************************************************************
 * Local Macro Definition
@@ -33,7 +35,7 @@
 * Local static Variable Declaration
 ***************************************************************************/
 static CApplicationReg *pApplicationReg;
-static CCommunicationInfo *pCommunicationInfo;
+static CBaseMessageInfo *pBaseMessageInfo;
 
 /**************************************************************************
 * Global Variable Declaration
@@ -193,6 +195,8 @@ void CApplicationReg::UpdateHardware(void)
     static uint8_t nRegInfoArray[REG_INFO_NUM];
     static uint8_t nRegCacheArray[REG_INFO_NUM];
     struct SRegInfoList *pRegInfoList;
+    struct rtc_time rtc_tm;
+    int readflag;
 
     GetMultipleReg(REG_CONFIG_NUM, REG_INFO_NUM, nRegInfoArray);
     memcpy(nRegCacheArray, nRegInfoArray, REG_INFO_NUM);
@@ -209,6 +213,13 @@ void CApplicationReg::UpdateHardware(void)
 	// pRegInfoList->sensor_accel_y = pSSpiInfo->accel_y_adc;
 	// pRegInfoList->sensor_accel_z = pSSpiInfo->accel_z_adc;
 	// pRegInfoList->sensor_temp = pSSpiInfo->temp_adc;
+    
+    readflag = RtcDevRead(&rtc_tm);
+    if(readflag != -1){
+        pRegInfoList->rtc_sec = rtc_tm.tm_sec;
+        pRegInfoList->rtc_minute = rtc_tm.tm_min;
+        pRegInfoList->rtc_hour = rtc_tm.tm_hour;
+    }
 
     if(memcmp(nRegCacheArray, nRegInfoArray, REG_INFO_NUM) != 0)
     {
@@ -273,7 +284,7 @@ void CApplicationReg::WriteHardware(uint8_t cmd, uint8_t *pConfig, int size)
 void TimerSignalHandler(int signo)
 {
     char buf = 1;
-    pCommunicationInfo->SendMqInformation(APP_MQ, &buf, sizeof(buf), 1);
+    pBaseMessageInfo->SendInformation(APP_MQ, &buf, sizeof(buf), 1);
 }
 
 /**
@@ -406,10 +417,14 @@ void ApplicationThreadInit(void)
     pthread_t tid1;
     int nErr;
     pApplicationReg = new CApplicationReg();
-    pCommunicationInfo = GetCommunicationInfo();
+    #if __WORK_IN_WSL == 1
+    pBaseMessageInfo = static_cast<CBaseMessageInfo *>(GetFifoMessageInfo());
+    #else
+    pBaseMessageInfo = static_cast<CBaseMessageInfo *>(GetMqMessageInfo());
+    #endif
 
     //创建消息队列
-    if(pCommunicationInfo->CreateMqInfomation() == RT_INVALID_MQ)
+    if(pBaseMessageInfo->CreateInfomation() == RT_INVALID_MQ)
     {
         return;
     }
@@ -438,19 +453,19 @@ void *ApplicationLoopTask(void *arg)
 
     for(;;)
     {
-        flag = pCommunicationInfo->WaitMqInformation(APP_MQ, &MqFlag, sizeof(MqFlag));
+        flag = pBaseMessageInfo->WaitInformation(APP_BASE_MESSAGE, &MqFlag, sizeof(MqFlag));
         if(flag > 0)
         {
             pApplicationReg->RefreshAllDevice();
         }
         else
         {
-            USR_DEBUG("Mq Information Error, Application Tread Stop!\n");
+            USR_DEBUG("App Information Error, Application Tread Stop!\n");
             break;
         }     
     }
 
-    pCommunicationInfo->CloseMqInformation(APP_MQ);
+    pBaseMessageInfo->CloseInformation(APP_BASE_MESSAGE);
     
     //将线程和进程脱离,释放线程
     pthread_detach(pthread_self());

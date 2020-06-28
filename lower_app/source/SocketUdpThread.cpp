@@ -13,8 +13,8 @@
  */
 /*@{*/
 
-#include "../include/SocketUdpThread.h"
 #include "../include/SystemConfig.h"
+#include "../include/SocketUdpThread.h"
 
 /**************************************************************************
 * Local Macro Definition

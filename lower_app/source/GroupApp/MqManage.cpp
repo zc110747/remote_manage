@@ -1,6 +1,6 @@
 /*
- * File      : InterprocessCom.cpp
- * InterProcessCom线程通讯实现
+ * File      : MqManage.cpp
+ * 使用Posix MessageQueue的进程间通讯方案
  * COPYRIGHT (C) 2020, zc
  * 
  * Change Logs:
@@ -12,10 +12,11 @@
  */
 /*@{*/
 
+#include "../../include/GroupApp/MqManage.h"
+
 /**************************************************************************
 * Local Macro Definition
 ***************************************************************************/
-#include "../include/Communication.h"
 
 /**************************************************************************
 * Local Type Definition
@@ -24,7 +25,7 @@
 /**************************************************************************
 * Local static Variable Declaration
 ***************************************************************************/
-static CCommunicationInfo CommunicationInfo;
+static CMqMessageInfo MqMessageInfo;
 
 /**************************************************************************
 * Global Variable Declaration
@@ -41,6 +42,7 @@ static CCommunicationInfo CommunicationInfo;
 /**************************************************************************
 * Function
 ***************************************************************************/
+#if __WORK_IN_WSL == 0
 /**
  * 创建POSIX消息队列
  * 
@@ -48,7 +50,7 @@ static CCommunicationInfo CommunicationInfo;
  *  
  * @return 消息队列创建的结果
  */
-int CCommunicationInfo::CreateMqInfomation(void)
+int CMqMessageInfo::CreateInfomation(void)
 {
     struct mq_attr attr;
 
@@ -93,7 +95,7 @@ int CCommunicationInfo::CreateMqInfomation(void)
  * 
  * @return 返回消息队列的关闭状态
  */
-int CCommunicationInfo::WaitMqInformation(uint8_t info, char *buf, int bufsize)
+int CMqMessageInfo::WaitInformation(uint8_t info, char *buf, int bufsize)
 {
     int nReadSize = -1;
     struct mq_attr attr;
@@ -172,7 +174,7 @@ int CCommunicationInfo::WaitMqInformation(uint8_t info, char *buf, int bufsize)
  * 
  * @return 返回消息队列的关闭状态
  */
-int CCommunicationInfo::SendMqInformation(uint8_t info, char *buf, int bufsize, int prio)
+int CMqMessageInfo::SendInformation(uint8_t info, char *buf, int bufsize, int prio)
 {
     int nWriteSize = -1;
 
@@ -214,7 +216,7 @@ int CCommunicationInfo::SendMqInformation(uint8_t info, char *buf, int bufsize, 
  *  
  * @return 返回消息队列的关闭状态
  */
-int CCommunicationInfo::CloseMqInformation(uint8_t info)
+int CMqMessageInfo::CloseInformation(uint8_t info)
 {
     switch(info)
     {
@@ -239,6 +241,7 @@ int CCommunicationInfo::CloseMqInformation(uint8_t info)
 
     return RT_OK;
 }
+#endif
 
 /**
  * 获取线程间通讯接口
@@ -247,7 +250,7 @@ int CCommunicationInfo::CloseMqInformation(uint8_t info)
  *  
  * @return 返回线程间通讯的信息
  */
-CCommunicationInfo *GetCommunicationInfo(void)
+CMqMessageInfo *GetMqMessageInfo(void)
 {
-    return &CommunicationInfo;
+    return &MqMessageInfo;
 }

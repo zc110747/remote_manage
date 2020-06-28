@@ -27,6 +27,8 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <memory>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 //#define NDEBUG  //用于控制是否开启单元测试的宏
 #include <assert.h>
@@ -34,13 +36,14 @@
 /**************************************************************************
 * Global Macro Definition
 ***************************************************************************/
-#define DEVICE_VERSION          "version 0.0.5 20200617"
+#define DEVICE_VERSION          "version 0.0.6 20200628"
 
 #define __SYSTEM_DEBUG          0
 #define __DEBUG_PRINTF			1
 #define __DRIVER_DEBUG          1
 #define __SOCKET_DEBUG          1
 #define __TEST_IN_PC            0
+#define __WORK_IN_WSL           1   //在WSL中，Posix Mq不支持，改为FIFO方案
 
 /*返回状态*/
 #define RT_INVALID_MQ_SIZE      -4
@@ -57,6 +60,7 @@
 #define LED_DEVICE              "/dev/led"
 #define BEEP_DEVICE             "/dev/beep"
 #define ICM_SPI_DEVICE          "/dev/icm20608"
+#define RTC_DEVICE              "/dev/rtc"
 
 //DEFAULT
 #define UPDATE_FILE_PATH        "/usr/download/"

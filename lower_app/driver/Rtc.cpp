@@ -12,8 +12,7 @@
  * @addtogroup IMX6ULL
  */
 /*@{*/
-#include "IcmSpi.h"
-#include "../include/SystemConfig.h"
+#include "Rtc.h"
 
 /**************************************************************************
 * Local Macro Definition
@@ -26,7 +25,6 @@
 /**************************************************************************
 * Local static Variable Declaration
 ***************************************************************************/
-static struct SSpiInfo spi_info;
 static struct SSystemConfig *pSystemConfigInfo;
 
 /**************************************************************************
@@ -45,48 +43,41 @@ static struct SSystemConfig *pSystemConfigInfo;
 * Function
 ***************************************************************************/
 /**
- * 读取icm20608(spi接口)的状态信息
+ * RTC驱动需要初始化的信息
  * 
  * @param NULL
  *  
  * @return NULL
  */
-SSpiInfo *SpiDevInfoRead(void)
+void RtcDriveInit(void)
 {
-    int nFd;
-    uint8_t nValue = 0;
-    ssize_t nSize;
-    uint32_t databuf[7];
-
     pSystemConfigInfo = GetSSytemConfigInfo();
-    nFd = open(pSystemConfigInfo->m_dev_icm_spi.c_str(), O_RDWR);
-    if(nFd != -1)
-    {
-        nSize = read(nFd, databuf, sizeof(databuf));
-        if(nSize > 0)
-        {
-           	spi_info.gyro_x_adc = databuf[0];
-			spi_info.gyro_y_adc = databuf[1];
-			spi_info.gyro_z_adc = databuf[2];
-			spi_info.accel_x_adc = databuf[3];
-			spi_info.accel_y_adc = databuf[4];
-			spi_info.accel_z_adc = databuf[5];
-			spi_info.temp_adc = databuf[6];
-            printf("\r\n原始值:\r\n");
-			printf("gx = %d, gy = %d, gz = %d\r\n", spi_info.gyro_x_adc, spi_info.gyro_y_adc, spi_info.gyro_z_adc);
-			printf("ax = %d, ay = %d, az = %d\r\n", spi_info.accel_x_adc, spi_info.accel_y_adc, spi_info.accel_z_adc);
-			printf("temp = %d\r\n", spi_info.temp_adc);
-        }
-        else
-        {
-            USR_DEBUG("read spi device failed, error:%s\n", strerror(errno));
-        }    
-        close(nFd);
+}
+
+/**
+ * RTC读取参数值
+ * 
+ * @param pRtcTime 获取的RTC结果值
+ *  
+ * @return 返回RTC读取结果的处理状态
+ */
+int RtcDevRead(struct rtc_time *pRtcTime)
+{
+    int rtc_fd;
+    int retval;
+
+    rtc_fd = open(pSystemConfigInfo->m_dev_rtc.c_str(), O_RDONLY);
+    if(rtc_fd < 0){
+        //USR_DEBUG("Open %s Failed, error:%s\n", pSystemConfigInfo->m_dev_rtc.c_str(), strerror(errno));
+        return RT_INVALID;
     }
-    else
+
+    retval = ioctl(rtc_fd, RTC_RD_TIME, pRtcTime);
+    if(retval == -1)
     {
-        USR_DEBUG("open %s failed, error:%s\n", pSystemConfigInfo->m_dev_icm_spi.c_str(), strerror(errno));
+        USR_DEBUG("Read %s Failed, error:%s\n", pSystemConfigInfo->m_dev_rtc.c_str(), strerror(errno));
+        return RT_INVALID;
     }
-    
-    return &spi_info;
+
+    return RT_OK;
 }

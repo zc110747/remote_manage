@@ -12,11 +12,11 @@
  * @addtogroup IMX6ULL
  */
 /*@{*/
-#include "../include/SocketTcpThread.h"
 #include <netinet/in.h>
 #include <sys/types.h>
 #include <arpa/inet.h>
 #include "../include/SystemConfig.h"
+#include "../include/SocketTcpThread.h"
 
 /**************************************************************************
 * Local Macro Definition
