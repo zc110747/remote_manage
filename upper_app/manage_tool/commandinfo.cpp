@@ -28,7 +28,7 @@ static uint8_t dev_reboot_cmd[] = {
 };
 
 static uint8_t get_info_cmd[] = {
-   0x01, 0x00, 0x40, 0x00, 0x34,
+   0x01, 0x00, 0x40, 0x00, 0x36,
 };
 
 static uint8_t *pSCommandListBuffer[CMD_LIST_SIZE] =
@@ -82,7 +82,8 @@ static std::function<QString(uint8_t *, int)> FuncList[CMD_LIST_SIZE] = {
             DecodeBuf += QString::fromLocal8Bit("加速度y方向:%1 fg\n").arg((float)pRegInfoList->sensor_accel_y/2048);
             DecodeBuf += QString::fromLocal8Bit("加速度z方向:%1 fg\n").arg((float)pRegInfoList->sensor_accel_z/2048);
             DecodeBuf += QString::fromLocal8Bit("温度:%1°C\n").arg((float)(pRegInfoList->sensor_temp-25)/326.8 + 25);
-            DecodeBuf += QString::fromLocal8Bit("RTC定时器时钟:%1\n").arg(((uint64_t)pRegInfoList->rtc_high)<<32 | pRegInfoList->rtc_lower);
+            DecodeBuf += QString::fromLocal8Bit("RTC定时器时钟:%1:%2:%3\n").arg(pRegInfoList->rtc_hour).arg(pRegInfoList->rtc_minute)
+                                                .arg(pRegInfoList->rtc_minute);
         }
 
         return DecodeBuf;

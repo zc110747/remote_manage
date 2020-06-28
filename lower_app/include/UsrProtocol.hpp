@@ -30,6 +30,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <memory>
 
 
 /**************************************************************************
@@ -140,7 +141,6 @@ public:
 	{
 		uint8_t nCommand;
 		uint16_t nRegIndex, nRxDataSize;
-		uint8_t *pCacheDataBuf;
 		SSystemConfig *pSystemConfig;
 		CApplicationReg  *pApplicationReg;
 		static CBaseMessageInfo *pBaseMessageInfo;
@@ -159,17 +159,17 @@ public:
 		switch (nCommand)
 		{
 			case CMD_REG_READ:
-				nRegIndex = m_RxCacheDataPtr[1]<<8 | m_RxCacheDataPtr[2];
-				nRxDataSize = m_RxCacheDataPtr[3]<<8 | m_RxCacheDataPtr[4];
-				pCacheDataBuf = (uint8_t *)malloc(nRxDataSize);
-				pApplicationReg->GetMultipleReg(nRegIndex, nRxDataSize, pCacheDataBuf);
-				//printf("nRegIndex:%d\n", nRegIndex);
-				//SystemLogArray(pCacheDataBuf, nRxDataSize);
-				pBaseMessageInfo->SendInformation(APP_BASE_MESSAGE, &buf, sizeof(buf), 0);
-				m_isUploadStatus = false;
-				m_TxBufSize = CreateTxBuffer(ACK_OK, nRxDataSize, pCacheDataBuf);
-				free(pCacheDataBuf);   
-				pCacheDataBuf = nullptr;
+				{
+					nRegIndex = m_RxCacheDataPtr[1]<<8 | m_RxCacheDataPtr[2];
+					nRxDataSize = m_RxCacheDataPtr[3]<<8 | m_RxCacheDataPtr[4];
+					std::unique_ptr<uint8_t> uq_reg(new uint8_t[nRxDataSize]);
+					pApplicationReg->GetMultipleReg(nRegIndex, nRxDataSize, uq_reg.get());
+					printf("nRegIndex:%d, size:%d\n", nRegIndex, nRxDataSize);
+					SystemLogArray(uq_reg.get(), nRxDataSize);
+					pBaseMessageInfo->SendInformation(APP_BASE_MESSAGE, &buf, sizeof(buf), 0);
+					m_isUploadStatus = false;
+					m_TxBufSize = CreateTxBuffer(ACK_OK, nRxDataSize, uq_reg.get());
+				}
 				break;
 			case CMD_REG_WRITE:	
 				nRegIndex = m_RxCacheDataPtr[1]<<8 | m_RxCacheDataPtr[2];

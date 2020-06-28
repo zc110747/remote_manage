@@ -43,7 +43,7 @@
 #define __DRIVER_DEBUG          1
 #define __SOCKET_DEBUG          1
 #define __TEST_IN_PC            0
-#define __WORK_IN_WSL           1   //在WSL中，Posix Mq不支持，改为FIFO方案
+#define __WORK_IN_WSL           0   //在WSL中，Posix Mq不支持，改为FIFO方案
 
 /*返回状态*/
 #define RT_INVALID_MQ_SIZE      -4
@@ -60,7 +60,7 @@
 #define LED_DEVICE              "/dev/led"
 #define BEEP_DEVICE             "/dev/beep"
 #define ICM_SPI_DEVICE          "/dev/icm20608"
-#define RTC_DEVICE              "/dev/rtc"
+#define RTC_DEVICE              "/dev/rtc0"
 
 //DEFAULT
 #define UPDATE_FILE_PATH        "/usr/download/"

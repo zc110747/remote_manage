@@ -45,8 +45,9 @@ struct SRegInfoList
     uint32_t sensor_accel_y;
     uint32_t sensor_accel_z;
     uint32_t sensor_temp;
-    uint32_t rtc_lower;
-    uint32_t rtc_high;
+    uint32_t rtc_sec;
+    uint32_t rtc_minute;
+    uint32_t rtc_hour;
 };
 #pragma pack(pop)
 

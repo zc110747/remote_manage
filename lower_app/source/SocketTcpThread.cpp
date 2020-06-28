@@ -107,10 +107,16 @@ static void *SocketTcpLoopThread(void *arg)
             result = bind(server_fd, (struct sockaddr *)&serverip, sizeof(serverip));
             if(result == -1)
             {
+                static int check;
                 if(is_bind_fail == 0)
                 {
                     is_bind_fail = 1;
-                    SOCKET_DEBUG("Tcp Bind Failed!\r\n");
+                    SOCKET_DEBUG("Tcp Bind %s Failed!, error:%s\r\n",  pSystemConfigInfo->m_tcp_ipaddr.c_str(), strerror(errno));
+                    if(errno == EADDRINUSE)
+                    {
+                        close(server_fd);
+                        return (void *)0;
+                    }              
                 }
                 sleep(1);
             }
@@ -151,6 +157,8 @@ static void *SocketTcpLoopThread(void *arg)
     {
         SOCKET_DEBUG("Tcp Init Failed!\r\n");
     }
+
+    close(server_fd);
     return (void *)0;
 }
 

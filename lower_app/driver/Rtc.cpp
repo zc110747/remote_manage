@@ -78,6 +78,7 @@ int RtcDevRead(struct rtc_time *pRtcTime)
         USR_DEBUG("Read %s Failed, error:%s\n", pSystemConfigInfo->m_dev_rtc.c_str(), strerror(errno));
         return RT_INVALID;
     }
-
+    
+    close(rtc_fd);
     return RT_OK;
 }

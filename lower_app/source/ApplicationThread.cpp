@@ -215,16 +215,21 @@ void CApplicationReg::UpdateHardware(void)
 	// pRegInfoList->sensor_temp = pSSpiInfo->temp_adc;
     
     readflag = RtcDevRead(&rtc_tm);
-    if(readflag != -1){
+    if(readflag == RT_OK){
         pRegInfoList->rtc_sec = rtc_tm.tm_sec;
         pRegInfoList->rtc_minute = rtc_tm.tm_min;
         pRegInfoList->rtc_hour = rtc_tm.tm_hour;
     }
+    else
+    {
+        USR_DEBUG("read rtc failed, error:%s\n", strerror(errno));
+    }
+    
 
     if(memcmp(nRegCacheArray, nRegInfoArray, REG_INFO_NUM) != 0)
     {
-        USR_DEBUG("Update HardWare, led:%d, beep:%d!\r\n", pRegInfoList->s_base_status.b.led,
-        pRegInfoList->s_base_status.b.beep);
+        //printf("Update HardWare, led:%d, beep:%d!\r\n", pRegInfoList->s_base_status.b.led, pRegInfoList->s_base_status.b.beep);
+        //printf("time:%d, %d, %d\n", pRegInfoList->rtc_hour, pRegInfoList->rtc_minute, pRegInfoList->rtc_sec);
         SetMultipleReg(REG_CONFIG_NUM, REG_INFO_NUM, nRegInfoArray);
     }
 }
@@ -301,11 +306,11 @@ void CApplicationReg::TimerSingalStart(void)
     signal(SIGALRM, TimerSignalHandler);
     
     //初始执行的定时器计数值
-    tick.it_value.tv_sec = 1;
+    tick.it_value.tv_sec = 2;
     tick.it_value.tv_usec = 0;
 
     //后续定时器执行的加载值
-    tick.it_interval.tv_sec = 1;
+    tick.it_interval.tv_sec = 2;
     tick.it_interval.tv_usec = 0;
 
     if(setitimer(ITIMER_REAL, &tick, NULL) < 0)

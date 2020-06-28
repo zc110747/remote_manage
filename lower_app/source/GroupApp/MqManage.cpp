@@ -13,6 +13,7 @@
 /*@{*/
 
 #include "../../include/GroupApp/MqManage.h"
+#include <memory>
 
 /**************************************************************************
 * Local Macro Definition
@@ -68,7 +69,7 @@ int CMqMessageInfo::CreateInfomation(void)
         return RT_INVALID_MQ;
     }
 
-    attr.mq_maxmsg=128;
+    attr.mq_maxmsg=20;
     m_AppMqd = mq_open("/AppMq", O_RDWR | O_CREAT, 0666, &attr);
     if(m_AppMqd < 0)
     {
@@ -108,15 +109,12 @@ int CMqMessageInfo::WaitInformation(uint8_t info, char *buf, int bufsize)
         case MAIN_MQ:
             if(isMainMqOk)
             {
-                char *ptr = nullptr;
                 mq_getattr(m_MainMqd, &attr);
                 if(attr.mq_maxmsg > 0)
                 {
-                    ptr = new char[attr.mq_maxmsg];
-                    nReadSize = mq_receive(m_MainMqd, ptr, attr.mq_maxmsg, &prio);
-                    memcpy(buf, ptr, (bufsize>attr.mq_maxmsg?attr.mq_maxmsg:bufsize));
-                    delete ptr;
-                    ptr = nullptr;
+                    std::unique_ptr<char> up_main(new char[attr.mq_msgsize]);
+                    nReadSize = mq_receive(m_MainMqd, up_main.get(), attr.mq_msgsize, &prio);
+                    memcpy(buf, up_main.get(), (bufsize>attr.mq_maxmsg?attr.mq_maxmsg:bufsize));
                     //USR_DEBUG("Wait for Mq Receive, Mqd:%d, %d, %s, %d\n", m_MainMqd, nReadSize, strerror(errno), (int)attr.mq_msgsize);
                 }
                 else
@@ -133,15 +131,12 @@ int CMqMessageInfo::WaitInformation(uint8_t info, char *buf, int bufsize)
         case APP_MQ:
             if(isAppMqOk)
             {
-                char *ptr = nullptr;
                 mq_getattr(m_AppMqd, &attr);
                 if(attr.mq_maxmsg > 0)
                 {
-                    ptr = new char[attr.mq_maxmsg];
-                    nReadSize = mq_receive(m_AppMqd, buf, bufsize, &prio);
-                    memcpy(buf, ptr, (bufsize>attr.mq_maxmsg?attr.mq_maxmsg:bufsize));
-                    delete ptr;
-                    ptr = nullptr;
+                    std::unique_ptr<char> up_app(new char[attr.mq_msgsize]);
+                    nReadSize = mq_receive(m_AppMqd, up_app.get(), attr.mq_msgsize, &prio);
+                    memcpy(buf, up_app.get(), (bufsize>attr.mq_msgsize?attr.mq_msgsize:bufsize));
                     //USR_DEBUG("Wait for Mq Receive, Mqd:%d, %d, %s, %d\n", m_MainMqd, nReadSize, strerror(errno), (int)attr.mq_msgsize);
                 }
                 else
