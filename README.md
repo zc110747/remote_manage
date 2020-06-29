@@ -23,9 +23,9 @@ demo/           快速体验下位机应用的代码
 document/       文档资料说明  
 kernal_mod/     内核驱动模块实现  
 lower_app/      嵌入式Linux平台中通讯应用  
-qt_lower_app/   嵌入式Linux平台QT界面应用
+qt_lower_app/   嵌入式Linux平台QT界面应用  
 server/         嵌入式Linux平台的服务器支持node环境和前端网页   
-test/           用于测试和应用执行的固件库等
+test/           用于测试和应用执行的固件库等  
 upper_app/      基于QT的上位机界面应用实现  
 
 硬件适配和兼容性:  
