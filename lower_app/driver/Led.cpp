@@ -101,7 +101,7 @@ uint8_t LedStatusRead(void)
     nFd = open(pSystemConfigInfo->m_dev_led.c_str(), O_RDONLY | O_NDELAY);
     if(nFd != -1)
     {
-        nSize = read(nFd, &nValue, 1);  //将数据写入LED
+        nSize = read(nFd, &nValue, 1); 
         if(nSize < 0)
         {
             DRIVER_DEBUG("Led Read failed, error:%s\n", strerror(errno));

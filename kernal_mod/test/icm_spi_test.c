@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 
 	while (1) {
 		ret = read(fd, databuf, sizeof(databuf));
-		if(ret > 0) { 			/* 数据读取成功 */
+		if(ret == 0) { 			/* 数据读取成功 */
 			gyro_x_adc = databuf[0];
 			gyro_y_adc = databuf[1];
 			gyro_z_adc = databuf[2];
@@ -69,6 +69,10 @@ int main(int argc, char *argv[])
 			printf("act ax = %.2fg, act ay = %.2fg, act az = %.2fg\r\n", accel_x_act, accel_y_act, accel_z_act);
 			printf("act temp = %.2f°C\r\n", temp_act);
 		}
+		else
+		{
+			printf("read failed\n");
+		}	
 		sleep(1);
 	}
 	close(fd);	/* 关闭文件 */	
