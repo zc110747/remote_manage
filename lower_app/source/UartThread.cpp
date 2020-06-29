@@ -114,7 +114,9 @@ static void *UartLoopThread(void *arg)
 			usleep(50); //通讯结束让出线程
 		}
 	}
-	return (void *)0;
+
+	pthread_detach(pthread_self()); 
+    pthread_exit((void *)0);
 }
 
 /**

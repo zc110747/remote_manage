@@ -159,7 +159,8 @@ static void *SocketTcpLoopThread(void *arg)
     }
 
     close(server_fd);
-    return (void *)0;
+    pthread_detach(pthread_self()); 
+    pthread_exit((void *)0);
 }
 
 /**
@@ -209,6 +210,6 @@ static void *SocketTcpDataProcessThread(void *arg)
     SOCKET_DEBUG("Socket Process Success\r\n");
     close(client_fd);
     pthread_detach(pthread_self());
-    return  (void *)0;
+    pthread_exit((void *)0);
 }
 

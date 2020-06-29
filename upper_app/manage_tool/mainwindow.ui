@@ -7,19 +7,19 @@
     <x>0</x>
     <y>0</y>
     <width>730</width>
-    <height>800</height>
+    <height>850</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>730</width>
-    <height>800</height>
+    <height>850</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>730</width>
-    <height>800</height>
+    <height>850</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -201,7 +201,7 @@
       <x>10</x>
       <y>10</y>
       <width>481</width>
-      <height>371</height>
+      <height>421</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -294,8 +294,11 @@
        <x>10</x>
        <y>120</y>
        <width>461</width>
-       <height>181</height>
+       <height>231</height>
       </rect>
+     </property>
+     <property name="acceptDrops">
+      <bool>false</bool>
      </property>
      <property name="readOnly">
       <bool>true</bool>
@@ -357,7 +360,7 @@
      <property name="geometry">
       <rect>
        <x>430</x>
-       <y>310</y>
+       <y>360</y>
        <width>41</width>
        <height>21</height>
       </rect>
@@ -370,7 +373,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>310</y>
+       <y>360</y>
        <width>71</width>
        <height>21</height>
       </rect>
@@ -383,8 +386,8 @@
      <property name="geometry">
       <rect>
        <x>80</x>
-       <y>310</y>
-       <width>341</width>
+       <y>360</y>
+       <width>331</width>
        <height>21</height>
       </rect>
      </property>
@@ -393,7 +396,7 @@
      <property name="geometry">
       <rect>
        <x>400</x>
-       <y>340</y>
+       <y>390</y>
        <width>71</width>
        <height>21</height>
       </rect>
@@ -449,9 +452,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>390</y>
+      <y>440</y>
       <width>481</width>
-      <height>371</height>
+      <height>351</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -464,7 +467,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>0</y>
+       <y>10</y>
        <width>81</width>
        <height>20</height>
       </rect>
@@ -477,7 +480,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>20</y>
+       <y>40</y>
        <width>381</width>
        <height>31</height>
       </rect>
@@ -487,7 +490,7 @@
      <property name="geometry">
       <rect>
        <x>400</x>
-       <y>20</y>
+       <y>40</y>
        <width>71</width>
        <height>31</height>
       </rect>
@@ -500,7 +503,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>60</y>
+       <y>80</y>
        <width>71</width>
        <height>20</height>
       </rect>
@@ -513,9 +516,9 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>80</y>
+       <y>110</y>
        <width>461</width>
-       <height>221</height>
+       <height>201</height>
       </rect>
      </property>
      <property name="readOnly">

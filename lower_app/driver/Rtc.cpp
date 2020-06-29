@@ -13,6 +13,7 @@
  */
 /*@{*/
 #include "Rtc.h"
+#include <time.h>
 
 /**************************************************************************
 * Local Macro Definition
@@ -63,6 +64,8 @@ void RtcDriveInit(void)
  */
 int RtcDevRead(struct rtc_time *pRtcTime)
 {
+//桌面端测试不包含rtc,使用系统时钟替代
+#if __WORK_IN_WSL == 0
     int rtc_fd;
     int retval;
 
@@ -78,7 +81,17 @@ int RtcDevRead(struct rtc_time *pRtcTime)
         USR_DEBUG("Read %s Failed, error:%s\n", pSystemConfigInfo->m_dev_rtc.c_str(), strerror(errno));
         return RT_INVALID;
     }
-    
     close(rtc_fd);
+#else
+    time_t timep;
+    struct tm mytime, *p;
+
+    time(&timep);
+    p = localtime_r(&timep, &mytime); //gmtime_r将秒数转换成UTC时钟的时区值
+
+    pRtcTime->tm_sec = p->tm_sec;
+    pRtcTime->tm_min = p->tm_min;
+    pRtcTime->tm_hour = p->tm_hour;
+#endif
     return RT_OK;
 }

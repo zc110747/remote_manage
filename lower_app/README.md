@@ -44,14 +44,14 @@ make menuconfig
 ## version 0.0.6 20200628
 SPI驱动添加lower和upper的处理  
 线程同步支持Posix Mq和FIFO两种实现, 以应对WSL中不支持Mq的运行环境  
-RTC驱动添加lower和upper的处理  
+RTC驱动添加lower和upper的处理, 增加基于系统time的替代方案
 
 下一步计划:
 单元测试的模块添加 
 文件的断点重传功能
-TCP对于数据传输处理增加线程池
+TCP对于数据传输处理增加线程池/epoll替代方案的实现
 提供数据库sqlite而非共享内存的替换方案  
-通讯数据的安全加密openssl 
+通讯数据的安全加密openssl
 
 代码结构:  
 driver/     硬件驱动的实现  

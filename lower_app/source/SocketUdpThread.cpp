@@ -140,5 +140,6 @@ static void *SocketUdpLoopThread(void *arg)
     }
     
     close(socket_fd);
-    return (void *)0;
+    pthread_detach(pthread_self()); //分离线程, 此时线程与创建的进程无关，后续执行join返回值22
+    pthread_exit((void *)0);
 }
