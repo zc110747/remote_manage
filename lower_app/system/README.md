@@ -76,5 +76,4 @@ CPU = arm-
 #HOST=
 #CPU=x86-
 ```
-HOST根据具体的嵌入式Linux平台选择, 目前提供的jsoncpp库只支持PC端和imx6ull, 使用其它平台需要修改重新编译JsonCPP的库。  
-scp -r app_demo config.json root@192.168.1.251:/usr/app  
+HOST根据具体的嵌入式Linux平台选择, 目前提供的jsoncpp库只支持PC端和imx6ull, 使用其它平台需要修改重新编译   JsonCPP的库。  

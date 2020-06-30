@@ -23,7 +23,6 @@
 #include "driver/Beep.h"
 #include "driver/Led.h"
 #include "driver/Rtc.h"
-#include "driver/IcmSpi.h"
 
 /**************************************************************************
 * Local Macro Definition
@@ -173,7 +172,6 @@ static void HardwareDriveInit(void)
 	LedDriveInit();
 	BeepDriveInit();	
 	RtcDriveInit();
-	SpiDriverInit();
 }
 
 /**

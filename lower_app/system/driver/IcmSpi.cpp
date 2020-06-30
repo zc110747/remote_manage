@@ -27,7 +27,7 @@
 * Local static Variable Declaration
 ***************************************************************************/
 static struct SSpiInfo spi_info;
-static int spi_fd;
+static struct SSystemConfig *pSystemConfigInfo;
 
 /**************************************************************************
 * Global Variable Declaration
@@ -45,29 +45,6 @@ static int spi_fd;
 * Function
 ***************************************************************************/
 /**
- * 打开SPI设备
- * 
- * @param NULL
- *  
- * @return NULL
- */
-void SpiDriverInit(void)
-{
-    static struct SSystemConfig *pSystemConfigInfo;
-    pSystemConfigInfo = GetSSytemConfigInfo();
-    spi_fd = open(pSystemConfigInfo->m_dev_icm_spi.c_str(), O_RDWR);
-
-    if(spi_fd < 0){
-        USR_DEBUG("open spi device %s failed, error:%s\n", pSystemConfigInfo->m_dev_icm_spi.c_str(), strerror(errno));
-    }
-    else
-    {
-        USR_DEBUG("open spi device %s success, id:%d\n", pSystemConfigInfo->m_dev_icm_spi.c_str(), spi_fd);
-    }
-    
-}
-
-/**
  * 读取icm20608(spi接口)的状态信息
  * 
  * @param NULL
@@ -76,14 +53,17 @@ void SpiDriverInit(void)
  */
 SSpiInfo *SpiDevInfoRead(void)
 {
+    int nFd;
     uint8_t nValue = 0;
-    ssize_t nSize = 0;
-    int databuf[7];
+    ssize_t nSize;
+    uint32_t databuf[7];
 
-    if(spi_fd != -1)
+    pSystemConfigInfo = GetSSytemConfigInfo();
+    nFd = open(pSystemConfigInfo->m_dev_icm_spi.c_str(), O_RDWR);
+    if(nFd != -1)
     {
-        nSize = read(spi_fd, databuf, sizeof(databuf));
-        if(nSize == 0)
+        nSize = read(nFd, databuf, sizeof(databuf));
+        if(nSize > 0)
         {
            	spi_info.gyro_x_adc = databuf[0];
 			spi_info.gyro_y_adc = databuf[1];
@@ -92,15 +72,20 @@ SSpiInfo *SpiDevInfoRead(void)
 			spi_info.accel_y_adc = databuf[4];
 			spi_info.accel_z_adc = databuf[5];
 			spi_info.temp_adc = databuf[6];
+            printf("\r\n原始值:\r\n");
+			printf("gx = %d, gy = %d, gz = %d\r\n", spi_info.gyro_x_adc, spi_info.gyro_y_adc, spi_info.gyro_z_adc);
+			printf("ax = %d, ay = %d, az = %d\r\n", spi_info.accel_x_adc, spi_info.accel_y_adc, spi_info.accel_z_adc);
+			printf("temp = %d\r\n", spi_info.temp_adc);
         }
-        else if(nSize < 0)
+        else
         {
-            USR_DEBUG("read spi %d device failed, error:%s\n", spi_fd, strerror(errno));
-        } 
+            USR_DEBUG("read spi device failed, error:%s\n", strerror(errno));
+        }    
+        close(nFd);
     }
     else
     {
-        USR_DEBUG("open spi device failed, error:%s\n", strerror(errno));
+        USR_DEBUG("open %s failed, error:%s\n", pSystemConfigInfo->m_dev_icm_spi.c_str(), strerror(errno));
     }
     
     return &spi_info;

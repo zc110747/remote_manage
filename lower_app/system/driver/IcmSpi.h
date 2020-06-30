@@ -45,6 +45,5 @@ struct SSpiInfo
 /**************************************************************************
 * Global Functon Declaration
 ***************************************************************************/
-void SpiDriverInit(void);
 SSpiInfo *SpiDevInfoRead(void);
 #endif

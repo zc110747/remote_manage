@@ -205,9 +205,7 @@ void CApplicationReg::UpdateHardware(void)
     //更新LED的状态
     pRegInfoList->s_base_status.b.led = LedStatusRead()&0x01;
     pRegInfoList->s_base_status.b.beep = BeepStatusRead()&0x01;
-    
-    //更新SPI状态
-    struct SSpiInfo *pSSpiInfo = SpiDevInfoRead();
+    // struct SSpiInfo *pSSpiInfo = SpiDevInfoRead();
     // pRegInfoList->sensor_gyro_x = pSSpiInfo->gyro_x_adc;
     // pRegInfoList->sensor_gyro_y = pSSpiInfo->gyro_y_adc;
 	// pRegInfoList->sensor_gyro_z = pSSpiInfo->gyro_z_adc;
