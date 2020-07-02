@@ -22,6 +22,7 @@
 #include "BaseMessage.h"
 #include <mqueue.h>
 
+#if __WORK_IN_WSL == 1
 /**************************************************************************
 * Global Macro Definition
 ***************************************************************************/
@@ -37,17 +38,10 @@ public:
     CFifoManageInfo(){};
         ~CFifoManageInfo(){};
 
-    #if __WORK_IN_WSL == 0
-    int CreateInfomation(void){};                                             //创建并打开FIFO
-    int CloseInformation(uint8_t info){};                                     //关闭FIFO	
-    int WaitInformation(uint8_t info, char *buf, int bufsize){};              //等待FIFO数据接收
-    int SendInformation(uint8_t info, char *buf, int bufsize, int prio){};    //向FIFO中投递数据
-    #else
     int CreateInfomation(void);                                             //创建并打开FIFO
     int CloseInformation(uint8_t info);                                     //关闭FIFO	
     int WaitInformation(uint8_t info, char *buf, int bufsize);              //等待FIFO数据接收
     int SendInformation(uint8_t info, char *buf, int bufsize, int prio);    //向FIFO中投递数据
-    #endif
 
 private:
     int m_rfd_main{-1};
@@ -55,6 +49,7 @@ private:
     int m_rfd_app{-1};
     int m_wfd_app{-1};
 };
+
 
 /**************************************************************************
 * Global Variable Declaration
@@ -64,4 +59,5 @@ private:
 * Global Functon Declaration
 ***************************************************************************/
 CFifoManageInfo *GetFifoMessageInfo(void);
+#endif
 #endif

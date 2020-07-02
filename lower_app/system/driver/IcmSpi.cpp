@@ -26,8 +26,7 @@
 /**************************************************************************
 * Local static Variable Declaration
 ***************************************************************************/
-static struct SSpiInfo spi_info;
-static struct SSystemConfig *pSystemConfigInfo;
+static int spi_fd;
 
 /**************************************************************************
 * Global Variable Declaration
@@ -45,48 +44,80 @@ static struct SSystemConfig *pSystemConfigInfo;
 * Function
 ***************************************************************************/
 /**
- * 读取icm20608(spi接口)的状态信息
+ * 配置icm20608-spi的驱动
  * 
  * @param NULL
  *  
  * @return NULL
  */
-SSpiInfo *SpiDevInfoRead(void)
+void SpiDriverInit(void)
 {
-    int nFd;
+    struct SSystemConfig *pSystemConfigInfo;
+
+    pSystemConfigInfo = GetSSytemConfigInfo();
+    spi_fd = open(pSystemConfigInfo->m_dev_icm_spi.c_str(), O_RDWR);
+    if(spi_fd == -1)
+    {
+        DRIVER_DEBUG("Spi Open %s Failed, Error:%s\n", 
+                    pSystemConfigInfo->m_dev_icm_spi.c_str(), strerror(errno));
+    }
+}
+
+/**
+ * 释放icm20608-spi应用资源
+ * 
+ * @param NULL
+ *  
+ * @return NULL
+ */
+void SpiDriverRelease(void)
+{
+    close(spi_fd);
+}
+
+/**
+ * 读取icm20608(spi接口)的状态信息
+ * 
+ * @param pSpiInfo SPI读取icm20608状态信息
+ *  
+ * @return Spi读取设备的状态
+ */
+int SpiDevInfoRead(SSpiInfo *pSpiInfo)
+{
     uint8_t nValue = 0;
     ssize_t nSize;
     uint32_t databuf[7];
 
-    pSystemConfigInfo = GetSSytemConfigInfo();
-    nFd = open(pSystemConfigInfo->m_dev_icm_spi.c_str(), O_RDWR);
-    if(nFd != -1)
+    if(spi_fd != -1)
     {
-        nSize = read(nFd, databuf, sizeof(databuf));
-        if(nSize > 0)
+        nSize = read(spi_fd, databuf, sizeof(databuf));
+        if(nSize == 0)
         {
-           	spi_info.gyro_x_adc = databuf[0];
-			spi_info.gyro_y_adc = databuf[1];
-			spi_info.gyro_z_adc = databuf[2];
-			spi_info.accel_x_adc = databuf[3];
-			spi_info.accel_y_adc = databuf[4];
-			spi_info.accel_z_adc = databuf[5];
-			spi_info.temp_adc = databuf[6];
+           	pSpiInfo->gyro_x_adc = databuf[0];
+			pSpiInfo->gyro_y_adc = databuf[1];
+			pSpiInfo->gyro_z_adc = databuf[2];
+			pSpiInfo->accel_x_adc = databuf[3];
+			pSpiInfo->accel_y_adc = databuf[4];
+			pSpiInfo->accel_z_adc = databuf[5];
+			pSpiInfo->temp_adc = databuf[6];
             printf("\r\n原始值:\r\n");
-			printf("gx = %d, gy = %d, gz = %d\r\n", spi_info.gyro_x_adc, spi_info.gyro_y_adc, spi_info.gyro_z_adc);
-			printf("ax = %d, ay = %d, az = %d\r\n", spi_info.accel_x_adc, spi_info.accel_y_adc, spi_info.accel_z_adc);
-			printf("temp = %d\r\n", spi_info.temp_adc);
+			printf("gx = %d, gy = %d, gz = %d\r\n", pSpiInfo->gyro_x_adc, 
+                    pSpiInfo->gyro_y_adc, pSpiInfo->gyro_z_adc);
+			printf("ax = %d, ay = %d, az = %d\r\n", pSpiInfo->accel_x_adc, 
+                    pSpiInfo->accel_y_adc, pSpiInfo->accel_z_adc);
+			printf("temp = %d\r\n", pSpiInfo->temp_adc);
         }
         else
         {
             USR_DEBUG("read spi device failed, error:%s\n", strerror(errno));
+            return RT_INVALID;
         }    
-        close(nFd);
     }
     else
     {
-        USR_DEBUG("open %s failed, error:%s\n", pSystemConfigInfo->m_dev_icm_spi.c_str(), strerror(errno));
+        //USR_DEBUG("open %s failed, error:%s\n", pSystemConfigInfo->m_dev_icm_spi.c_str(), strerror(errno));
+        return RT_INVALID;
     }
     
-    return &spi_info;
+    return RT_OK;
 }

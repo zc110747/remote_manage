@@ -36,7 +36,16 @@
 /**************************************************************************
 * Global Functon Declaration
 ***************************************************************************/
+
+/*配置LED的驱动*/
 void LedDriveInit(void);
+
+/*释放LED应用资源*/
+void LedDriverRelease(void);
+
+/*获取LED当前的状态*/
 uint8_t LedStatusRead(void);
+
+/*修改LED的当前状态*/
 void LedStatusConvert(uint8_t nLedStatus);
 #endif

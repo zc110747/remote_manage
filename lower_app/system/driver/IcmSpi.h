@@ -29,12 +29,25 @@
 ***************************************************************************/
 struct SSpiInfo
 {
+    /*陀螺仪x轴角速度*/
     int gyro_x_adc;
+
+    /*陀螺仪y轴角速度*/
     int gyro_y_adc;
+
+    /*陀螺仪z轴角速度*/
     int gyro_z_adc;
+
+    /*加速度计x轴加速度*/
     int accel_x_adc;
+
+    /*加速度计y轴加速度*/
     int accel_y_adc;
+
+    /*加速度计z轴加速度*/
     int accel_z_adc;
+
+    /*温度信息*/
     int temp_adc;
 };
 
@@ -45,5 +58,13 @@ struct SSpiInfo
 /**************************************************************************
 * Global Functon Declaration
 ***************************************************************************/
-SSpiInfo *SpiDevInfoRead(void);
+
+/*配置icm20608-spi的驱动*/
+void SpiDriverInit(void);
+
+/*释放icm20608-spi应用资源*/
+void SpiDriverRelease(void);
+
+/*读取icm20608(spi接口)的状态信息*/
+int SpiDevInfoRead(SSpiInfo *pSpiInfo);
 #endif

@@ -23,6 +23,7 @@
 #include "driver/Beep.h"
 #include "driver/Led.h"
 #include "driver/Rtc.h"
+#include "driver/IcmSpi.h"
 
 /**************************************************************************
 * Local Macro Definition
@@ -47,30 +48,36 @@ static int pipe_fd[2];
 #if __SYSTEM_DEBUG == 1
 static void SystemTest(void);
 #endif
+
+/*硬件驱动初始化配置*/
 static void HardwareDriveInit(void);
+
+/*硬件驱动资源释放*/
+static void HardwareDriverRelease(void);
 
 /**************************************************************************
 * Function
 ***************************************************************************/
 /**
- * 代码执行入口函数
+ * 进程执行入口函数
  * 
- * @param argc 输入的字符串长度
- * @param argv 输入的字符串数组
+ * @param argc 输入命令行的参数数目
+ * @param argv 输入命令行的参数指针数组
  *  
- * @return the error code, 0 on initialization successfully.
+ * @return 进程执行的返回状态(非异常状态下不返回)
  */
 int main(int argc, char* argv[])
 {
+	int c;
     int result = 0;
 	int nConfigDefault = 0;
 	std::string sConfigFile;
-	int c;
-	
+
 	sConfigFile = std::string("config.json");
 	
 	//命令行输入说明
-	while ((c = getopt(argc, argv, "v:d:f:h::")) != -1){
+	while ((c = getopt(argc, argv, "v:d:f:h::")) != -1)
+	{
 		switch (c)
 		{
 			case 'd':
@@ -122,16 +129,16 @@ int main(int argc, char* argv[])
 		USR_DEBUG("system config use default\n");
 	}
 
-	//硬件模块初始化
 	HardwareDriveInit();
 
-	/*任务创建*/
 #if __SYSTEM_DEBUG == 0
+	/*任务创建和初始化*/
 	ApplicationThreadInit();
 	UartThreadInit();
 	SocketTcpThreadInit();
 	SocketUdpThreadInit();
-	for(;;){
+	for(;;)
+	{
 		static char MainMqFlag;
 		int flag;
 		CBaseMessageInfo *pBaseMessageInfo;
@@ -156,12 +163,13 @@ int main(int argc, char* argv[])
 	SystemTest();
 #endif	
 
+	HardwareDriverRelease();
 	USR_DEBUG("Process app_demo stop, error:%s\n", strerror(errno));
 	return result;
 }
 
 /**
- * 硬件驱动初始化
+ * 硬件驱动初始化配置
  * 
  * @param NULL
  *  
@@ -172,6 +180,22 @@ static void HardwareDriveInit(void)
 	LedDriveInit();
 	BeepDriveInit();	
 	RtcDriveInit();
+	SpiDriverInit();
+}
+
+/**
+ * 硬件驱动资源释放
+ * 
+ * @param NULL
+ *  
+ * @return NULL
+ */
+static void HardwareDriverRelease(void)
+{
+	LedDriverRelease();
+	BeepDriverRelease();
+	RtcDriverRelease();
+	SpiDriverRelease();
 }
 
 /**

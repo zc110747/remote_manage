@@ -35,7 +35,16 @@
 /**************************************************************************
 * Global Functon Declaration
 ***************************************************************************/
+
+/*配置蜂鸣器的驱动*/
 void BeepDriveInit(void);
+
+/*释放蜂鸣器应用资源*/
+void BeepDriverRelease(void);
+
+/*获取蜂鸣器当前的状态*/
 uint8_t BeepStatusRead(void);
+
+/*修改蜂鸣器的当前状态*/
 void BeepStatusConvert(uint8_t nBeepStatus);
 #endif

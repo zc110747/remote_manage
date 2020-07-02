@@ -195,6 +195,7 @@ void CApplicationReg::UpdateHardware(void)
     static uint8_t nRegInfoArray[REG_INFO_NUM];
     static uint8_t nRegCacheArray[REG_INFO_NUM];
     struct SRegInfoList *pRegInfoList;
+    struct SSpiInfo SpiInfo;
     struct rtc_time rtc_tm;
     int readflag;
 
@@ -205,17 +206,22 @@ void CApplicationReg::UpdateHardware(void)
     //更新LED的状态
     pRegInfoList->s_base_status.b.led = LedStatusRead()&0x01;
     pRegInfoList->s_base_status.b.beep = BeepStatusRead()&0x01;
-    // struct SSpiInfo *pSSpiInfo = SpiDevInfoRead();
-    // pRegInfoList->sensor_gyro_x = pSSpiInfo->gyro_x_adc;
-    // pRegInfoList->sensor_gyro_y = pSSpiInfo->gyro_y_adc;
-	// pRegInfoList->sensor_gyro_z = pSSpiInfo->gyro_z_adc;
-	// pRegInfoList->sensor_accel_x = pSSpiInfo->accel_x_adc;
-	// pRegInfoList->sensor_accel_y = pSSpiInfo->accel_y_adc;
-	// pRegInfoList->sensor_accel_z = pSSpiInfo->accel_z_adc;
-	// pRegInfoList->sensor_temp = pSSpiInfo->temp_adc;
     
+    readflag = SpiDevInfoRead(&SpiInfo);
+    if(readflag == RT_OK)
+    {
+        pRegInfoList->sensor_gyro_x = SpiInfo.gyro_x_adc;
+        pRegInfoList->sensor_gyro_y =SpiInfo.gyro_y_adc;
+        pRegInfoList->sensor_gyro_z =SpiInfo.gyro_z_adc;
+        pRegInfoList->sensor_accel_x =SpiInfo.accel_x_adc;
+        pRegInfoList->sensor_accel_y =SpiInfo.accel_y_adc;
+        pRegInfoList->sensor_accel_z =SpiInfo.accel_z_adc;
+        pRegInfoList->sensor_temp =SpiInfo.temp_adc;
+    }
+
     readflag = RtcDevRead(&rtc_tm);
-    if(readflag == RT_OK){
+    if(readflag == RT_OK)
+    {
         pRegInfoList->rtc_sec = rtc_tm.tm_sec;
         pRegInfoList->rtc_minute = rtc_tm.tm_min;
         pRegInfoList->rtc_hour = rtc_tm.tm_hour;

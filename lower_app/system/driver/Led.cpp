@@ -26,7 +26,7 @@
 /**************************************************************************
 * Local static Variable Declaration
 ***************************************************************************/
-static struct SSystemConfig *pSystemConfigInfo;
+static int led_fd;
 
 /**************************************************************************
 * Global Variable Declaration
@@ -40,7 +40,7 @@ static struct SSystemConfig *pSystemConfigInfo;
 * Function
 ***************************************************************************/
 /**
- * LED驱动需要初始化的信息
+ * 配置LED的驱动
  * 
  * @param NULL
  *  
@@ -48,13 +48,35 @@ static struct SSystemConfig *pSystemConfigInfo;
  */
 void LedDriveInit(void)
 {
+    struct SSystemConfig *pSystemConfigInfo;
     pSystemConfigInfo = GetSSytemConfigInfo();
-
-    LedStatusConvert((uint8_t)(pSystemConfigInfo->m_led0_status));
+ 
+    led_fd = open(pSystemConfigInfo->m_dev_led.c_str(), O_RDWR | O_NDELAY);
+    if(led_fd != -1)
+    {
+        LedStatusConvert((uint8_t)(pSystemConfigInfo->m_led0_status));
+    }
+    else
+    {
+        DRIVER_DEBUG("Led Open %s Failed, Error:%s!\n",
+                    pSystemConfigInfo->m_dev_led.c_str(), strerror(errno));
+    }
 }
 
 /**
- * LED开关转换函数
+ * 释放LED应用资源
+ * 
+ * @param NULL
+ *  
+ * @return NULL
+ */
+void LedDriverRelease(void)
+{
+    close(led_fd);
+}
+
+/**
+ * 修改LED的当前状态
  * 
  * @param nBeepStatus 设置LED的开关状态
  *  
@@ -62,31 +84,27 @@ void LedDriveInit(void)
  */
 void LedStatusConvert(uint8_t nLedStatus)
 {
-    int nFd;
     uint8_t nVal;
     ssize_t nSize;
 
-    nFd = open(pSystemConfigInfo->m_dev_led.c_str(), O_RDWR | O_NDELAY);
-    if(nFd != -1)
+    if(led_fd != -1)
     {
-        DRIVER_DEBUG("led write:%d\n", nLedStatus);
+        DRIVER_DEBUG("Led Write:%d\n", nLedStatus);
         nVal = nLedStatus;
-        nSize = write(nFd, &nVal, 1);  //将数据写入LED
+        nSize = write(led_fd, &nVal, 1);  //将数据写入LED
         if(nSize < 0)
         {
-            DRIVER_DEBUG("Write failed\n");
+            DRIVER_DEBUG("Write Failed\n");
         }
-        close(nFd);
     }
     else
     {
-        DRIVER_DEBUG("led open %s failed, val:%d!\n", pSystemConfigInfo->m_dev_led.c_str(), nLedStatus);
+        DRIVER_DEBUG("Led Open Failed, Write Val:%d!\n", nLedStatus);
     }
-    
 }
 
 /**
- * 获取LED状态
+ * 获取LED当前的状态
  * 
  * @param nBeepStatus 获取LED状态
  *  
@@ -94,19 +112,21 @@ void LedStatusConvert(uint8_t nLedStatus)
  */
 uint8_t LedStatusRead(void)
 {
-    int nFd;
     uint8_t nValue = 0;
     ssize_t nSize;
 
-    nFd = open(pSystemConfigInfo->m_dev_led.c_str(), O_RDONLY | O_NDELAY);
-    if(nFd != -1)
+    if(led_fd != -1)
     {
-        nSize = read(nFd, &nValue, 1);  //将数据写入LED
+        nSize = read(led_fd, &nValue, 1);  //将数据写入LED
         if(nSize < 0)
         {
-            DRIVER_DEBUG("Led Read failed, error:%s\n", strerror(errno));
+            DRIVER_DEBUG("Led Read Failed, Error:%s\n", strerror(errno));
         }
-        close(nFd);
     }
+    else
+    {
+        //DRIVER_DEBUG("Led Open Failed, Read Error!\n");
+    }
+    
     return nValue;
 }

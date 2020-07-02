@@ -27,7 +27,7 @@
 /**************************************************************************
 * Local static Variable Declaration
 ***************************************************************************/
-static struct SSystemConfig *pSystemConfigInfo;
+static int beep_fd;
 
 /**************************************************************************
 * Global Variable Declaration
@@ -45,7 +45,7 @@ static struct SSystemConfig *pSystemConfigInfo;
 * Function
 ***************************************************************************/
 /**
- * BEEP驱动需要初始化的信息
+ * 配置蜂鸣器的驱动
  * 
  * @param NULL
  *  
@@ -53,64 +53,86 @@ static struct SSystemConfig *pSystemConfigInfo;
  */
 void BeepDriveInit(void)
 {
+    struct SSystemConfig *pSystemConfigInfo;
     pSystemConfigInfo = GetSSytemConfigInfo();
 
-    BeepStatusConvert((uint8_t)(pSystemConfigInfo->m_beep0_status));
+    beep_fd = open(pSystemConfigInfo->m_dev_beep.c_str(), O_RDWR | O_NDELAY);
+    if(beep_fd != -1)
+    {
+        BeepStatusConvert((uint8_t)(pSystemConfigInfo->m_beep0_status));
+    }
+    else
+    {
+        DRIVER_DEBUG("Beep Open %s Failed, Error:%s\n", 
+                    pSystemConfigInfo->m_dev_beep.c_str(), strerror(errno));
+    }   
 }
 
 /**
- * beep开关转换函数
+ * 释放蜂鸣器应用资源
  * 
- * @param nBeepStatus 设置蜂鸣器的开关状态
+ * @param NULL
+ *  
+ * @return NULL
+ */
+void BeepDriverRelease(void)
+{
+    close(beep_fd);
+}
+
+/**
+ * 修改蜂鸣器的当前状态
+ * 
+ * @param nBeepStatus 配置蜂鸣器的开关状态
  *  
  * @return NULL
  */
 void BeepStatusConvert(uint8_t nBeepStatus)
 {
-    int nFd;
     uint8_t nVal;
     ssize_t nSize;
 
-    nFd = open(pSystemConfigInfo->m_dev_beep.c_str(), O_RDWR | O_NDELAY);
-    if(nFd != -1)
+    if(beep_fd != -1)
     {
-        DRIVER_DEBUG("beep write:%d\n", nBeepStatus);
+        DRIVER_DEBUG("Beep Write:%d\n", nBeepStatus);
         nVal = nBeepStatus;
-        nSize = write(nFd, &nVal, 1);  //将数据写入LED
+        nSize = write(beep_fd, &nVal, 1);  //将数据写入LED
         if(nSize < 0)
         {
-            DRIVER_DEBUG("Write failed\n");
+            DRIVER_DEBUG("Write Failed\n");
         }
-        close(nFd);
     }
     else
     {
-        DRIVER_DEBUG("beep open %s failed, val:%d!\n", pSystemConfigInfo->m_dev_beep.c_str(), nBeepStatus);
+        DRIVER_DEBUG("Beep Open Failed, Write Val:%d!\n", nBeepStatus);
     }
 }
 
 /**
- * 获取BEEP开关状态
+ * 获取蜂鸣器当前的状态
  * 
- * @param nBeepStatus 获取BEEP状态
+ * @param nBeepStatus NULL
  *  
- * @return BEEP的开关状态
+ * @return 蜂鸣器的当前工作状态
  */
 uint8_t BeepStatusRead(void)
 {
-    int nFd;
     uint8_t nValue = 0;
     ssize_t nSize;
 
-    nFd = open(pSystemConfigInfo->m_dev_beep.c_str(), O_RDONLY | O_NDELAY);
-    if(nFd != -1)
+    if(beep_fd != -1)
     {
-        nSize = read(nFd, &nValue, 1);  //读取Beep的值
+        nSize = read(beep_fd, &nValue, 1);  //读取Beep的值
         if(nSize < 0)
         {
-            DRIVER_DEBUG("Beep Read failed, error:%s\n", strerror(errno));
+            DRIVER_DEBUG("Beep Read Failed, Error:%s\n", strerror(errno));
         }
-        close(nFd);
     }
+    else
+    {
+        //DRIVER_DEBUG("Beep Open Failed, Read Error!\n");
+    }
+    
     return nValue;
 }
+

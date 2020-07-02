@@ -38,12 +38,14 @@
 ***************************************************************************/
 #define DEVICE_VERSION          "version 0.0.6 20200628"
 
+/*自定义协议应用测试*/
 #define __SYSTEM_DEBUG          0
+#define __WORK_IN_WSL           1   //在WSL中，Posix Mq不支持，改为FIFO方案
+
+/*调试打印口显示*/
 #define __DEBUG_PRINTF			1
 #define __DRIVER_DEBUG          1
 #define __SOCKET_DEBUG          1
-#define __TEST_IN_PC            0
-#define __WORK_IN_WSL           1   //在WSL中，Posix Mq不支持，改为FIFO方案
 
 /*返回状态*/
 #define RT_INVALID_MQ_SIZE      -4
@@ -55,31 +57,29 @@
 #define RT_TIMEOUT              3
 #define RT_INVALID              4
 
-//DEVICE
+//默认设备信息
 #define TTY_DEVICE              "/dev/ttymxc2"
 #define LED_DEVICE              "/dev/led"
 #define BEEP_DEVICE             "/dev/beep"
 #define ICM_SPI_DEVICE          "/dev/icm20608"
 #define RTC_DEVICE              "/dev/rtc0"
 
-//DEFAULT
+//默认下载路径
 #define UPDATE_FILE_PATH        "/usr/download/"
 
-//IPAddress
+//默认IP地址和端口
 #define IP_ADDR                 "127.0.0.1"
-#define PORT                    8000
+#define TCP_PORT                8000
+#define UDP_PORT                8001
 
-//UART
+//默认串口配置信息
 #define BAUD                    115200
 #define DATABITS                8
-#define PARITY                  'N'
 #define STOPBITS                1
+#define PARITY                  "n"
 
-//设备ID
+//默认设备ID
 #define DEVICE_ID               0x01
-
-//设备的延时时间
-//#define TIME_LOOP_DELAY         800
 
 /**************************************************************************
 * Global Type Definition

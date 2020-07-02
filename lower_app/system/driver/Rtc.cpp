@@ -27,6 +27,7 @@
 * Local static Variable Declaration
 ***************************************************************************/
 static struct SSystemConfig *pSystemConfigInfo;
+static int rtc_fd;
 
 /**************************************************************************
 * Global Variable Declaration
@@ -44,7 +45,7 @@ static struct SSystemConfig *pSystemConfigInfo;
 * Function
 ***************************************************************************/
 /**
- * RTC驱动需要初始化的信息
+ * 配置RTC的驱动初始化
  * 
  * @param NULL
  *  
@@ -53,10 +54,30 @@ static struct SSystemConfig *pSystemConfigInfo;
 void RtcDriveInit(void)
 {
     pSystemConfigInfo = GetSSytemConfigInfo();
+
+#if __WORK_IN_WSL == 0
+    rtc_fd = open(pSystemConfigInfo->m_dev_rtc.c_str(), O_RDONLY);
+    if(rtc_fd == -1)
+    {
+        DRIVER_DEBUG("rtc open %s failed!\n", pSystemConfigInfo->m_dev_rtc.c_str());
+    }
+#endif
 }
 
 /**
- * RTC读取参数值
+ * 释放RTC应用资源
+ * 
+ * @param NULL
+ *  
+ * @return NULL
+ */
+void RtcDriverRelease(void)
+{
+    close(rtc_fd);
+}
+
+/**
+ * 读取系统当前的时钟状态信息
  * 
  * @param pRtcTime 获取的RTC结果值
  *  
@@ -66,22 +87,21 @@ int RtcDevRead(struct rtc_time *pRtcTime)
 {
 //桌面端测试不包含rtc,使用系统时钟替代
 #if __WORK_IN_WSL == 0
-    int rtc_fd;
     int retval;
 
-    rtc_fd = open(pSystemConfigInfo->m_dev_rtc.c_str(), O_RDONLY);
-    if(rtc_fd < 0){
-        //USR_DEBUG("Open %s Failed, error:%s\n", pSystemConfigInfo->m_dev_rtc.c_str(), strerror(errno));
-        return RT_INVALID;
-    }
-
-    retval = ioctl(rtc_fd, RTC_RD_TIME, pRtcTime);
-    if(retval == -1)
+    if(rtc_fd != -1)
     {
-        USR_DEBUG("Read %s Failed, error:%s\n", pSystemConfigInfo->m_dev_rtc.c_str(), strerror(errno));
+        retval = ioctl(rtc_fd, RTC_RD_TIME, pRtcTime);
+        if(retval == -1)
+        {
+            USR_DEBUG("Read %s Failed, error:%s\n", pSystemConfigInfo->m_dev_rtc.c_str(), strerror(errno));
+            return RT_INVALID;
+        }
+    }
+    else
+    {
         return RT_INVALID;
     }
-    close(rtc_fd);
 #else
     time_t timep;
     struct tm mytime, *p;
@@ -93,5 +113,6 @@ int RtcDevRead(struct rtc_time *pRtcTime)
     pRtcTime->tm_min = p->tm_min;
     pRtcTime->tm_hour = p->tm_hour;
 #endif
+
     return RT_OK;
 }

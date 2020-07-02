@@ -68,6 +68,8 @@ struct SSystemConfig
 * Global Functon Declaration
 ***************************************************************************/
 int system_config_init(std::string &sConfigfile);
+
+/*获取当前的系统配置信息*/
 SSystemConfig *GetSSytemConfigInfo(void);
 #if __SYSTEM_DEBUG == 1
 void ShowSSystemConfigInfo(void);

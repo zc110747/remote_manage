@@ -39,6 +39,12 @@
 /**************************************************************************
 * Global Functon Declaration
 ***************************************************************************/
+/*配置RTC的驱动初始化*/
 void RtcDriveInit(void);
+
+/*释放RTC应用资源*/
+void RtcDriverRelease(void);
+
+/*读取系统当前的时钟状态信息*/
 int RtcDevRead(struct rtc_time *pRtcTime);
 #endif

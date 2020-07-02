@@ -31,18 +31,18 @@
 ***************************************************************************/
 static SSystemConfig SSysConifg = {
     //串口配置
-    115200,
-    8,
-    1,
-    std::string("n"),
+    BAUD,
+    DATABITS,
+    STOPBITS,
+    std::string(PARITY),
 
     //TCP网络设置
-    std::string("127.0.0.1"),
-    8000,
+    std::string(IP_ADDR),
+    TCP_PORT,
 
     //UDP网络设置
-    std::string("127.0.0.1"),
-    8001,
+    std::string(IP_ADDR),
+    UDP_PORT,
 
     //硬件状态
     0,
