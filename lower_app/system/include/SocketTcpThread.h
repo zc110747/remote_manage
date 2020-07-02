@@ -37,11 +37,14 @@ class CTcpProtocolInfo:public CProtocolInfo<T>
 public:
 	using CProtocolInfo<T>::CProtocolInfo;
 
+	/*TCP Socket数据读取接口*/
 	int DeviceRead(int nFd, uint8_t *pDataStart, uint16_t nDataSize, T ExtraInfo)
 	{
 		*ExtraInfo = recv(nFd, pDataStart, nDataSize, 0);
 		return *ExtraInfo;
 	}
+
+	/*TCP Socket数据写入接口*/
 	int DeviceWrite(int nFd, uint8_t *pDataStart, uint16_t nDataSize, T ExtraInfo)
 	{
 		*ExtraInfo = send(nFd, pDataStart, nDataSize, 0);
@@ -56,5 +59,7 @@ public:
 /**************************************************************************
 * Global Functon Declaration
 ***************************************************************************/
+
+/*TCP网络通讯任务和数据初始化*/
 void SocketTcpThreadInit(void);
 #endif

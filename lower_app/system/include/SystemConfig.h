@@ -27,32 +27,32 @@
 ***************************************************************************/
 struct SSystemConfig
 {
-    //串口配置
+    /*串口配置*/
     int m_baud;
     int m_data_bits;
     int m_stop_bits;
     std::string m_parity;
 
-    //网络配置TCP
+    /*TCP Socket配置*/
     std::string m_tcp_ipaddr;
     int m_tcp_net_port;
 
-    //网络配置UDP
+    /*UDP Socket配置*/
     std::string m_udp_ipaddr;
     int m_udp_net_port;
 
-    //硬件状态
+    /*硬件的初始化状态*/
     int m_led0_status;
     int m_beep0_status;
 
-    //Device结构
+    /*Device配置信息*/
     std::string m_dev_led;
     std::string m_dev_beep;
     std::string m_dev_serial;
     std::string m_dev_icm_spi;
     std::string m_dev_rtc;
     
-    //文件更新的下载地址
+    /*文件更新的下载地址*/
     std::string m_file_path;
 };
 
@@ -67,7 +67,9 @@ struct SSystemConfig
 /**************************************************************************
 * Global Functon Declaration
 ***************************************************************************/
-int system_config_init(std::string &sConfigfile);
+
+/*系统配置信息初始化*/
+int SystemConfigInfo(std::string &sConfigfile);
 
 /*获取当前的系统配置信息*/
 SSystemConfig *GetSSytemConfigInfo(void);

@@ -1,6 +1,6 @@
 /*
- * File      : template.cpp
- * template file
+ * File      : Rtc.cpp
+ * Rtc应用层驱动实现
  * COPYRIGHT (C) 2020, zc
  *
  * Change Logs:

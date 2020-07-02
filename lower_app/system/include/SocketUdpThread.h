@@ -46,6 +46,7 @@ class CUdpProtocolInfo:public CProtocolInfo<T>
 public:
 	using CProtocolInfo<T>::CProtocolInfo;
 
+	/*UDP Socket数据读取接口*/
 	int DeviceRead(int nFd, uint8_t *pDataStart, uint16_t nDataSize, T extra_info)
 	{
 		int nLen;
@@ -55,6 +56,8 @@ public:
 
 		return nLen;
 	}
+
+	/*UDP Socket数据写入接口*/
 	int DeviceWrite(int nFd, uint8_t *pDataStart, uint16_t nDataSize, T extra_info)
 	{
 		struct UdpInfo *pUdpInfo = (struct UdpInfo *)extra_info;
@@ -70,5 +73,7 @@ public:
 /**************************************************************************
 * Global Functon Declaration
 ***************************************************************************/
+
+/*UDP Socket线程初始化实现*/
 void SocketUdpThreadInit(void);
 #endif

@@ -1,6 +1,6 @@
 ﻿/*
- * File      : SocketThread.cpp
- * Socket应用执行任务
+ * File      : SocketTcpThread.cpp
+ * Tcp Socket通讯线程处理
  * COPYRIGHT (C) 2020, zc
  *
  * Change Logs:
@@ -46,17 +46,17 @@ static uint8_t  nTxCacheBuffer[SOCKET_BUFFER_SIZE];
 * Local Function Declaration
 ***************************************************************************/
 
-/**************************************************************************
-* Local Function
-***************************************************************************/
+/*TCP通讯应用处理主线程*/
 static void *SocketTcpLoopThread(void *arg);
+
+/*TCP通讯数据处理线程*/
 static void *SocketTcpDataProcessThread(void *arg);
 
 /**************************************************************************
 * Function
 ***************************************************************************/
 /**
- * TCP网络通讯接口初始化
+ * TCP网络通讯任务和数据初始化
  * 
  * @param NULL
  *  
@@ -100,8 +100,14 @@ static void *SocketTcpLoopThread(void *arg)
 
     server_fd = socket(AF_INET, SOCK_STREAM, 0);
     if(server_fd != -1)
-    {
-        
+    {   
+        int one = 1;
+
+#ifndef WIN32
+        /*Linux平台默认断开后2min内处于Wait Time状态，不允许重新绑定，需要添加配置，允许在该状态下重新绑定*/
+        setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, (void*) &one, (socklen_t)sizeof(one));
+#endif
+
         do 
         {
             result = bind(server_fd, (struct sockaddr *)&serverip, sizeof(serverip));
@@ -114,8 +120,7 @@ static void *SocketTcpLoopThread(void *arg)
                     SOCKET_DEBUG("Tcp Bind %s Failed!, error:%s\r\n",  pSystemConfigInfo->m_tcp_ipaddr.c_str(), strerror(errno));
                     if(errno == EADDRINUSE)
                     {
-                        close(server_fd);
-                        return (void *)0;
+                        server_fd = socket(AF_INET, SOCK_STREAM, 0);
                     }              
                 }
                 sleep(1);

@@ -1,6 +1,6 @@
 /*
- * File      : app_task.cpp
- * appliction task
+ * File      : ApplicationThread.cpp
+ * 硬件相关的状态配置和读取的线程处理
  * COPYRIGHT (C) 2020, zc
  *
  * Change Logs:
@@ -22,7 +22,6 @@
 #include "../include/GroupApp/MqManage.h"
 #include "../include/GroupApp/FifoManage.h"
 
-
 /**************************************************************************
 * Local Macro Definition
 ***************************************************************************/
@@ -42,12 +41,17 @@ static CBaseMessageInfo *pBaseMessageInfo;
 ***************************************************************************/
 
 /**************************************************************************
+* Local Function Declaration
+***************************************************************************/
+
+/*硬件状态相关应用处理接口*/
+void *ApplicationLoopThread(void *arg);
+
+/**************************************************************************
 * Function
 ***************************************************************************/
-void *ApplicationLoopTask(void *arg);
-
 /**
- * 内部数据构造函数
+ * 构造函数
  * 
  * @param NULL
  *  
@@ -64,7 +68,7 @@ CApplicationReg::CApplicationReg(void)
 }
 
 /**
- * 内部数据析构函数
+ * 析构函数
  * 
  * @param NULL
  *  
@@ -76,7 +80,7 @@ CApplicationReg::~CApplicationReg()
 }
 
 /**
- * 获取内部寄存器变量的值
+ * 从内部共享数据寄存器中读取数据
  * 
  * @param nRegIndex  待读取寄存器的起始地址
  * @param nRegSize   读取的寄存器的数量
@@ -107,7 +111,7 @@ uint16_t CApplicationReg::GetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize, 
 }
 
 /**
- * 设置数据到内部寄存器
+ * 将数据写入内部共享的数据寄存器
  * 
  * @param nRegIndex 设置寄存器的起始地址
  * @param nRegSize  设置的寄存器的数量
@@ -143,14 +147,14 @@ void CApplicationReg::SetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize, uint
 }
 
 /**
- * 判断数据是否变化后修改数据，变化了表明了其它线程修改了指令
+ * 带判断是否修改的写入寄存器实现，变化了表明了其它线程修改了指令
  * 
  * @param nRegIndex 寄存器的起始地址
  * @param nRegSize 读取的寄存器的数量
  * @param pDataStart 设置数据的地址
  * @param psrc   缓存的原始寄存器数据
  *  
- * @return NULL
+ * @return 寄存器的比较写入处理结果
  */
 int CApplicationReg::DiffSetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize, 
                                         uint8_t *pDataStart, uint8_t *pDataCompare)
@@ -184,13 +188,13 @@ int CApplicationReg::DiffSetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize,
 }
 
 /**
- * 根据硬件状态更新寄存器
+ * 读取硬件状态并更新到寄存器中
  * 
  * @param NULL
  *  
  * @return NULL
  */
-void CApplicationReg::UpdateHardware(void)
+void CApplicationReg::ReadDeviceStatus(void)
 {
     static uint8_t nRegInfoArray[REG_INFO_NUM];
     static uint8_t nRegCacheArray[REG_INFO_NUM];
@@ -249,7 +253,7 @@ void CApplicationReg::UpdateHardware(void)
  *  
  * @return NULL
  */
-void CApplicationReg::WriteHardware(uint8_t cmd, uint8_t *pConfig, int size)
+void CApplicationReg::WriteDeviceConfig(uint8_t cmd, uint8_t *pConfig, int size)
 {
     assert(pConfig != nullptr);
 
@@ -286,20 +290,21 @@ void CApplicationReg::WriteHardware(uint8_t cmd, uint8_t *pConfig, int size)
 }
 
 /**
- * 定时器触发的回调
+ * 状态更新定时触发的执行函数
  * 
- * @param NULL
+ * @param signo 触发传入的数据
  *  
  * @return NULL
  */
-void TimerSignalHandler(int signo)
+static void TimerSignalHandler(int signo)
 {
     char buf = 1;
-    pBaseMessageInfo->SendInformation(APP_MQ, &buf, sizeof(buf), 1);
+
+    pBaseMessageInfo->SendInformation(APP_BASE_MESSAGE, &buf, sizeof(buf), 1);
 }
 
 /**
- * 用于触发的Timer定时器动作
+ * 状态更新定时触发源启动
  * 
  * @param NULL
  *  
@@ -327,11 +332,11 @@ void CApplicationReg::TimerSingalStart(void)
 }
 
 /**
- * 根据寄存器更新内部硬件参数
+ * 进行所有硬件的处理, 包含硬件配置和状态读取
  * 
  * @param NULL
  *  
- * @return NULL
+ * @return 硬件处理的执行结果
  */
 int CApplicationReg::RefreshAllDevice(void)
 {
@@ -363,7 +368,7 @@ int CApplicationReg::RefreshAllDevice(void)
             }
             else if((device_cmd&0x01) != 0)
             {
-                WriteHardware(nIndex, pRegVal, REG_CONFIG_NUM);
+                WriteDeviceConfig(nIndex, pRegVal, REG_CONFIG_NUM);
             }         
         }
 
@@ -387,13 +392,13 @@ int CApplicationReg::RefreshAllDevice(void)
     }
 
     /*更新内部硬件状态到信息寄存器*/
-    UpdateHardware();
+    ReadDeviceStatus();
 
     return RT_OK;
 }
 
 /**
- * 获取寄存器数据结构体指针
+ * 获取共享寄存器数据结构体指针
  * 
  * @param NULL
  *  
@@ -405,7 +410,7 @@ CApplicationReg *GetApplicationReg(void)
 }
 
 /**
- * 设置寄存器结构体指针
+ * 设置共享寄存器结构体指针
  * 
  * @param NULL
  *  
@@ -417,7 +422,7 @@ void SetApplicationReg(CApplicationReg *pAppReg)
 }
 
 /**
- * app模块任务初始化
+ * 硬件和状态相关应用处理线程初始化执行
  * 
  * @param NULL
  *  
@@ -441,31 +446,31 @@ void ApplicationThreadInit(void)
     }
 
     //创建应用线程
-    nErr = pthread_create(&tid1, NULL, ApplicationLoopTask, NULL);	
+    nErr = pthread_create(&tid1, NULL, ApplicationLoopThread, NULL);	
     if(nErr != 0){
         USR_DEBUG("App Task Thread Create Err:%d\n", nErr);
     }
 }
 
 /**
- * app模块初始化
+ * 硬件和状态相关应用处理执行函数
  * 
  * @param arg 线程传递的参数
  *  
  * @return NULL
  */
-void *ApplicationLoopTask(void *arg)
+void *ApplicationLoopThread(void *arg)
 {
-    int flag;
-    char MqFlag;  
+    int Flag;
+    char InfoData;  
     
     USR_DEBUG("App Thread Start\n");
     pApplicationReg->TimerSingalStart();
 
     for(;;)
     {
-        flag = pBaseMessageInfo->WaitInformation(APP_BASE_MESSAGE, &MqFlag, sizeof(MqFlag));
-        if(flag > 0)
+        Flag = pBaseMessageInfo->WaitInformation(APP_BASE_MESSAGE, &InfoData, sizeof(InfoData));
+        if(Flag > 0)
         {
             pApplicationReg->RefreshAllDevice();
         }

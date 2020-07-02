@@ -119,7 +119,7 @@ int main(int argc, char* argv[])
 	if(nConfigDefault == 0)
 	{
 		USR_DEBUG("config file:%s\n", sConfigFile.c_str());
-		if(system_config_init(sConfigFile) != EXIT_SUCCESS)
+		if(SystemConfigInfo(sConfigFile) != EXIT_SUCCESS)
 		{
 			USR_DEBUG("system config read fail, use default\n");
 		}

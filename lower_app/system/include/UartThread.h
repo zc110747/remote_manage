@@ -37,11 +37,14 @@ class CUartProtocolInfo:public CProtocolInfo<T>
 public:
 	using CProtocolInfo<T>::CProtocolInfo;
 
+	/*串口的通讯读接口*/
 	int DeviceRead(int nFd, uint8_t *pDataStart, uint16_t nDataSize, T ExtraInfo)
 	{
 		*ExtraInfo = read(nFd, pDataStart, nDataSize);
 		return *ExtraInfo;
 	}
+
+	/*串口的通讯写接口*/
 	int DeviceWrite(int nFd, uint8_t *pDataStart, uint16_t nDataSize, T ExtraInfo)
 	{
 		*ExtraInfo = write(nFd, pDataStart, nDataSize);
@@ -56,5 +59,7 @@ public:
 /**************************************************************************
 * Global Functon Declaration
 ***************************************************************************/
+
+/*Uart通讯相关的线程初始化*/
 void UartThreadInit(void);
 #endif

@@ -1,6 +1,6 @@
 /*
  * File      : IcmSpi.h
- * This file is for ICM interface
+ * Icm20608-spi应用层驱动实现接口
  * COPYRIGHT (C) 2020, zc
  *
  * Change Logs:

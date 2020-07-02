@@ -1,6 +1,6 @@
 /*
  * File      : SystemConfig.cpp
- * This file is for SystemConfig
+ * 系统配置信息文件处理
  * COPYRIGHT (C) 2020, zc
  *
  * Change Logs:
@@ -58,7 +58,6 @@ static SSystemConfig SSysConifg = {
     //下载文件的路径
     std::string(UPDATE_FILE_PATH),
 };
-
 /**************************************************************************
 * Global Variable Declaration
 ***************************************************************************/
@@ -68,20 +67,16 @@ static SSystemConfig SSysConifg = {
 ***************************************************************************/
 
 /**************************************************************************
-* Local Function
-***************************************************************************/
-
-/**************************************************************************
 * Function
 ***************************************************************************/
 /**
- * 系统硬件初始化
+ * 系统配置信息初始化
  * 
- * @param NULL
+ * @param sConfigfile 传入的系统配置信息文件
  *  
  * @return 硬件配置处理的结果
  */
-int system_config_init(std::string &sConfigfile)
+int SystemConfigInfo(std::string &sConfigfile)
 {
     Json::Value root;
     std::ifstream ifs;

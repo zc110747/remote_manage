@@ -1,6 +1,6 @@
 /*
- * File      : uart_task.cpp
- * uart hardware process task
+ * File      : UartThread.cpp
+ * Uart通讯线程处理
  * COPYRIGHT (C) 2020, zc
  *
  * Change Logs:
@@ -39,16 +39,20 @@ static uint8_t 	nComFd;
 ***************************************************************************/
 
 /**************************************************************************
-* Local Function
+* Local Function Declaration
 ***************************************************************************/
+
+/*Uart通讯主循环执行线程*/
 static void *UartLoopThread(void *arg);
+
+/*Uart串口通讯配置接口*/
 static int set_opt(int, int, int, std::string, int);
 
 /**************************************************************************
 * Function
 ***************************************************************************/
 /**
- * uart模块任务初始化
+ * Uart通讯相关的线程初始化
  * 
  * @param NULL
  *  

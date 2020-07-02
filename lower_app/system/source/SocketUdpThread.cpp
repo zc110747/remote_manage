@@ -1,6 +1,6 @@
 /*
- * File      : template.cpp
- * template file
+ * File      : SocketUdpThread.cpp
+ * Udp Socket通讯的线程处理
  * COPYRIGHT (C) 2020, zc
  *
  * Change Logs:
@@ -39,16 +39,14 @@ static uint8_t  nTxCacheBuffer[UDP_BUFFER_SIZE];
 * Local Function Declaration
 ***************************************************************************/
 
-/**************************************************************************
-* Local Function
-***************************************************************************/
+/*Udp Socket通讯处理线程*/
 static void *SocketUdpLoopThread(void *arg);
 
 /**************************************************************************
 * Function
 ***************************************************************************/
 /**
- * UDP Socket通讯初始化
+ * UDP Socket线程初始化实现
  * 
  * @param NULL
  *  

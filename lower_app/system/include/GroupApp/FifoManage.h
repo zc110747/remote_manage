@@ -38,18 +38,32 @@ public:
     CFifoManageInfo(){};
         ~CFifoManageInfo(){};
 
-    int CreateInfomation(void);                                             //创建并打开FIFO
-    int CloseInformation(uint8_t info);                                     //关闭FIFO	
-    int WaitInformation(uint8_t info, char *buf, int bufsize);              //等待FIFO数据接收
-    int SendInformation(uint8_t info, char *buf, int bufsize, int prio);    //向FIFO中投递数据
+    /*创建并打开FIFO*/
+    int CreateInfomation(void);                        
+
+    /*关闭FIFO并释放资源*/
+    int CloseInformation(uint8_t info);         
+    
+    /*等待FIFO数据接收*/
+    int WaitInformation(uint8_t info, char *buf, int bufsize);              
+
+    /*向FIFO中投递数据*/
+    int SendInformation(uint8_t info, char *buf, int bufsize, int prio);  
 
 private:
+
+    /*主FIFO读描述符*/
     int m_rfd_main{-1};
+
+    /*主FIFO写描述符*/
     int m_wfd_main{-1};
+
+    /*应用FIFO读描述符*/
     int m_rfd_app{-1};
+
+    /*应用FIFO写描述符*/
     int m_wfd_app{-1};
 };
-
 
 /**************************************************************************
 * Global Variable Declaration

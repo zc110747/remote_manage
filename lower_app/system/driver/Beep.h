@@ -1,6 +1,6 @@
 /*
  * File      : beep.h
- * beep application
+ * beep应用层驱动实现接口
  * COPYRIGHT (C) 2020, zc
  *
  * Change Logs:

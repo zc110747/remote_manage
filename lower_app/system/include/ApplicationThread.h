@@ -54,20 +54,47 @@ union UBaseStatus
 #pragma pack(1)
 struct SRegInfoList
 {
-    union UBaseStatus s_base_status; //基础状态信息
-    uint16_t sensor_ia;            
+    /*系统基本状态信息，包含LED，Beep状态*/
+    union UBaseStatus s_base_status;
+
+    /*传感器红外线强度*/
+    uint16_t sensor_ir; 
+
+    /*传感器环境光强度*/        
     uint16_t sensor_als;
+
+    /*传感器接近距离*/  
     uint16_t sensor_ps;
     uint16_t reserved0;
+
+    /*陀螺仪x轴角速度*/
     uint32_t sensor_gyro_x;
+
+    /*陀螺仪y轴角速度*/
     uint32_t sensor_gyro_y; 
+
+    /*陀螺仪z轴角速度*/
     uint32_t sensor_gyro_z;
+
+    /*加速度计x轴加速度*/
     uint32_t sensor_accel_x;
+
+    /*加速度计y轴加速度*/
     uint32_t sensor_accel_y; 
+
+    /*加速度计z轴加速度*/
     uint32_t sensor_accel_z;
+
+    /*温度采样*/
     uint32_t sensor_temp;
+
+    /*rtc时钟秒计数*/
     uint32_t rtc_sec;
+
+    /*rtc时钟分钟计数*/
     uint32_t rtc_minute;
+
+    /*rtc时钟小时计数*/
     uint32_t rtc_hour;
 };
 #pragma pack(pop)
@@ -78,12 +105,25 @@ public:
     CApplicationReg(void);
         ~CApplicationReg();
     
+    /*状态更新定时触发源启动*/
     void TimerSingalStart(void);
+
+    /*进行所有硬件的处理, 包含硬件配置和状态读取*/
     int RefreshAllDevice(void);
-    void WriteHardware(uint8_t cmd, uint8_t *pRegConfig, int size);
-    void UpdateHardware(void);
+
+    /*根据寄存器配置更新硬件状态*/
+    void WriteDeviceConfig(uint8_t cmd, uint8_t *pRegConfig, int size);
+
+    /*读取硬件状态并更新到寄存器中*/
+    void ReadDeviceStatus(void);
+
+    /*将数据写入内部共享的数据寄存器*/
     void SetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize, uint8_t *pDataStart);
+
+    /*从内部共享数据寄存器中读取数据*/
     uint16_t GetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize, uint8_t *pDataStart);
+    
+    /*带判断是否修改的写入寄存器实现*/
     int DiffSetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize, uint8_t *pDataStart, uint8_t *pDataCompare);
 private:
     uint8_t m_RegVal[REG_NUM];
@@ -97,7 +137,13 @@ private:
 /**************************************************************************
 * Global Functon Declaration
 ***************************************************************************/
+
+/*硬件和状态相关应用处理线程初始化执行*/
 void ApplicationThreadInit(void);
+
+/*获取寄存器数据结构体指针*/
 CApplicationReg *GetApplicationReg(void);
+
+/*设置共享寄存器结构体指针*/
 void SetApplicationReg(CApplicationReg *pAppReg);
 #endif

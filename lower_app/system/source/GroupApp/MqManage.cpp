@@ -1,6 +1,6 @@
 /*
  * File      : MqManage.cpp
- * 使用Posix MessageQueue的进程间通讯方案
+ * 基于Posix MessageQueue的进程间通讯方案
  * COPYRIGHT (C) 2020, zc
  * 
  * Change Logs:
@@ -15,6 +15,7 @@
 #include "../../include/GroupApp/MqManage.h"
 #include <memory>
 
+#if __WORK_IN_WSL == 0
 /**************************************************************************
 * Local Macro Definition
 ***************************************************************************/
@@ -37,13 +38,8 @@ static CMqMessageInfo MqMessageInfo;
 ***************************************************************************/
 
 /**************************************************************************
-* Local Function
-***************************************************************************/
-
-/**************************************************************************
 * Function
 ***************************************************************************/
-#if __WORK_IN_WSL == 0
 /**
  * 创建POSIX消息队列
  * 
@@ -65,7 +61,6 @@ int CMqMessageInfo::CreateInfomation(void)
     if(m_MainMqd < 0)
     {
         USR_DEBUG("MAIN MQ Create Failed, error:%s\n", strerror(errno));
-        isMainMqOk = false;
         return RT_INVALID_MQ;
     }
 
@@ -76,13 +71,10 @@ int CMqMessageInfo::CreateInfomation(void)
         mq_close(m_MainMqd); //失败需要将上一个关闭
         m_MainMqd = -1;
         USR_DEBUG("APP MQ Send Failed, error:%s\n", strerror(errno));
-        isAppMqOk = false;
         return RT_INVALID_MQ;
     }
 
     USR_DEBUG("Mq Create Ok\n");
-    isMainMqOk = true;
-    isAppMqOk = true;
     return RT_OK;
 }
 
@@ -107,7 +99,7 @@ int CMqMessageInfo::WaitInformation(uint8_t info, char *buf, int bufsize)
     switch(info)
     {
         case MAIN_MQ:
-            if(isMainMqOk)
+            if(m_MainMqd > 0)
             {
                 mq_getattr(m_MainMqd, &attr);
                 if(attr.mq_maxmsg > 0)
@@ -129,7 +121,7 @@ int CMqMessageInfo::WaitInformation(uint8_t info, char *buf, int bufsize)
             }    
             break;
         case APP_MQ:
-            if(isAppMqOk)
+            if(m_AppMqd > 0)
             {
                 mq_getattr(m_AppMqd, &attr);
                 if(attr.mq_maxmsg > 0)
@@ -178,7 +170,7 @@ int CMqMessageInfo::SendInformation(uint8_t info, char *buf, int bufsize, int pr
     switch (info)
     {
         case MAIN_MQ:
-            if(isMainMqOk)
+            if(m_MainMqd > 0)
             {
                 nWriteSize = mq_send(m_MainMqd, buf, bufsize, prio);
             }
@@ -188,7 +180,7 @@ int CMqMessageInfo::SendInformation(uint8_t info, char *buf, int bufsize, int pr
             }
             break;
         case APP_MQ:
-            if(isAppMqOk)
+            if(m_AppMqd > 0)
             {
                 nWriteSize = mq_send(m_AppMqd, buf, bufsize, prio);
             }
@@ -216,14 +208,14 @@ int CMqMessageInfo::CloseInformation(uint8_t info)
     switch(info)
     {
         case MAIN_MQ:
-            if(isMainMqOk)
+            if(m_MainMqd > 0)
             {
                 close(m_MainMqd);
                 m_MainMqd = -1;
             }
             break;
         case APP_MQ:
-            if(isAppMqOk)
+            if(m_AppMqd > 0)
             {
                 close(m_AppMqd);
                 m_AppMqd = -1;
@@ -236,7 +228,6 @@ int CMqMessageInfo::CloseInformation(uint8_t info)
 
     return RT_OK;
 }
-#endif
 
 /**
  * 获取线程间通讯接口
@@ -249,3 +240,4 @@ CMqMessageInfo *GetMqMessageInfo(void)
 {
     return &MqMessageInfo;
 }
+#endif

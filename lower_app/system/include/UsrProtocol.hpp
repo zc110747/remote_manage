@@ -1,6 +1,6 @@
 /*
  * File      : protocol.h
- * protocol layer interface
+ * 协议层的通讯执行接口
  * COPYRIGHT (C) 2020, zc
  *
  * Change Logs:
@@ -31,7 +31,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <memory>
-
 
 /**************************************************************************
 * Global Macro Definition

@@ -1,6 +1,6 @@
 /*
- * File      : MqManage.cpp
- * 使用Posix MessageQueue的进程间通讯方案
+ * File      : FifoMessage.cpp
+ * 基于Fifo的进程间通讯方案
  * COPYRIGHT (C) 2020, zc
  * 
  * Change Logs:
@@ -14,6 +14,7 @@
 
 #include "../../include/GroupApp/FifoManage.h"
 
+#if __WORK_IN_WSL == 1
 /**************************************************************************
 * Local Macro Definition
 ***************************************************************************/
@@ -39,13 +40,8 @@ static CFifoManageInfo FifoMessageInfo;
 ***************************************************************************/
 
 /**************************************************************************
-* Local Function
-***************************************************************************/
-
-/**************************************************************************
 * Function
 ***************************************************************************/
-#if __WORK_IN_WSL == 1
 /**
  * 创建FIFO命名管道
  * 
@@ -203,8 +199,14 @@ int CFifoManageInfo::CloseInformation(uint8_t info)
 
     if(m_wfd_app > 0)
         close(m_wfd_app);
+
+    m_rfd_main = -1;
+    m_rfd_app = -1;
+    m_wfd_main = -1;
+    m_wfd_app = -1;
+    return RT_OK;
 }
-#endif
+
 
 /**
  * 获取线程间通讯接口
@@ -217,3 +219,4 @@ CFifoManageInfo *GetFifoMessageInfo(void)
 {   
     return &FifoMessageInfo;
 }
+#endif

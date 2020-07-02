@@ -1,6 +1,6 @@
 /*
- * File      : template.h
- * This file is template file interface
+ * File      : Led.h
+ * beep应用层驱动实现接口
  * COPYRIGHT (C) 2020, zc
  *
  * Change Logs:

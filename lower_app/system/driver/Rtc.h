@@ -1,6 +1,6 @@
 /*
  * File      : Rtc.h
- * This file is for RTC Interface
+ * Rtc应用层驱动接口
  * COPYRIGHT (C) 2020, zc
  *
  * Change Logs:

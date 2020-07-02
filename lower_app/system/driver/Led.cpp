@@ -1,6 +1,6 @@
 /*
  * File      : led.cpp
- * template file
+ * Led应用层驱动实现
  * COPYRIGHT (C) 2020, zc
  *
  * Change Logs:

@@ -1,6 +1,6 @@
 /*
- * File      : template.cpp
- * template file
+ * File      : IcmSpi.cpp
+ * Icm20608-spi应用层驱动实现
  * COPYRIGHT (C) 2020, zc
  *
  * Change Logs:
@@ -100,12 +100,12 @@ int SpiDevInfoRead(SSpiInfo *pSpiInfo)
 			pSpiInfo->accel_y_adc = databuf[4];
 			pSpiInfo->accel_z_adc = databuf[5];
 			pSpiInfo->temp_adc = databuf[6];
-            printf("\r\n原始值:\r\n");
-			printf("gx = %d, gy = %d, gz = %d\r\n", pSpiInfo->gyro_x_adc, 
-                    pSpiInfo->gyro_y_adc, pSpiInfo->gyro_z_adc);
-			printf("ax = %d, ay = %d, az = %d\r\n", pSpiInfo->accel_x_adc, 
-                    pSpiInfo->accel_y_adc, pSpiInfo->accel_z_adc);
-			printf("temp = %d\r\n", pSpiInfo->temp_adc);
+            // printf("\r\n原始值:\r\n");
+			// printf("gx = %d, gy = %d, gz = %d\r\n", pSpiInfo->gyro_x_adc, 
+            //         pSpiInfo->gyro_y_adc, pSpiInfo->gyro_z_adc);
+			// printf("ax = %d, ay = %d, az = %d\r\n", pSpiInfo->accel_x_adc, 
+            //         pSpiInfo->accel_y_adc, pSpiInfo->accel_z_adc);
+			// printf("temp = %d\r\n", pSpiInfo->temp_adc);
         }
         else
         {

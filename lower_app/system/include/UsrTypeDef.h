@@ -1,6 +1,6 @@
 ﻿/*
  * File      : typedef.h
- * system define
+ * 系统宏定义相关的实现
  * COPYRIGHT (C) 2020, zc
  *
  * Change Logs:
@@ -40,7 +40,7 @@
 
 /*自定义协议应用测试*/
 #define __SYSTEM_DEBUG          0
-#define __WORK_IN_WSL           1   //在WSL中，Posix Mq不支持，改为FIFO方案
+#define __WORK_IN_WSL           1  //在WSL中，Posix Mq不支持，改为FIFO方案
 
 /*调试打印口显示*/
 #define __DEBUG_PRINTF			1
