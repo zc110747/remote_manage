@@ -22,6 +22,9 @@
 #include <linux/errno.h>
 #include <linux/gpio.h>
 #include <linux/cdev.h>
+#include <linux/of.h>
+#include <linux/of_address.h>
+#include <linux/of_gpio.h>
 #include <asm/mach/map.h>
 #include <asm/uaccess.h>
 #include <asm/io.h>
@@ -35,6 +38,9 @@ struct led_info
     struct cdev cdev;       /*设备接口*/
     struct class *class;	/*设备类指针*/
 	struct device *device;	/*设备指针*/
+    struct device_node *nd; /*设备节点*/
+    int led_gpio;           /*led对应的引脚接口*/
+    int led_status;         /*led的状态更新*/
 }led_driver_info;
 
 #define DEFAULT_MAJOR                   0          /*默认主设备号*/
@@ -45,15 +51,11 @@ struct led_info
 #define LED_OFF                         0
 #define LED_ON                          1
 
-/*GPIO控制相关的寄存器*/
-static void __iomem *IMX6U_CCM_CCGR1;
-static void __iomem *SW_MUX_GPIO1_IO03;
-static void __iomem *SW_PAD_GPIO1_IO03;
-static void __iomem *GPIO1_DR;
-static void __iomem *GPIO1_GDIR;  
+#define TREE_NODE_NAME                  "/led"
+#define TREE_GPIO_NAME                  "led-gpio"
 
 /*内部接口*/
-static void led_gpio_init(void);
+static int led_gpio_init(void);
 static void led_gpio_release(void);
 static void led_switch(u8 status);
 
@@ -105,7 +107,7 @@ ssize_t led_read(struct file *filp, char __user *buf, size_t count, loff_t *f_po
     u8 databuf[2];
 
     //LED开关和引脚电平相反
-    databuf[0] = (readl(GPIO1_DR))>>3&0x01?0:1;
+    databuf[0] = led_driver_info.led_status;
 
     result = copy_to_user(buf, databuf, 1);
     if(result < 0) {
@@ -191,6 +193,14 @@ static int __init led_module_init(void)
     led_driver_info.major = DEFAULT_MAJOR;
     led_driver_info.minor = DEFAULT_MINOR;
 
+    /*硬件初始化*/
+    result = led_gpio_init();
+    if(result != 0)
+    {
+        printk(KERN_INFO"led gpio init failed\n0");
+        return result;
+    }
+
     /*在总线上创建设备*/    
     /*1.申请字符设备号*/
     if(led_driver_info.major){
@@ -248,9 +258,6 @@ static int __init led_module_init(void)
 		printk(KERN_INFO"device create successed!\r\n");
 	}
 
-    /*硬件初始化*/
-    led_gpio_init();
-
     return 0;
 
 }
@@ -285,41 +292,36 @@ module_exit(led_module_exit);
  *
  * @return NULL
  */
-static void led_gpio_init(void)
+static int led_gpio_init(void)
 {
-    u32  value;
+    int ret;
 
-    /*1. 寄存器地址映射*/
-    IMX6U_CCM_CCGR1 = ioremap(0X020C406C, 4);     //时钟使能 
-	SW_MUX_GPIO1_IO03 = ioremap(0X020E0068, 4);   //复用功能设置
-  	SW_PAD_GPIO1_IO03 = ioremap(0X020E02F4, 4);   //设置PAD的输出状态
-	GPIO1_DR = ioremap(0X0209C000, 4);            //设置LED输出
-	GPIO1_GDIR = ioremap(0X0209C004, 4);          //设置GPIO的状态
+    /*1.获取设备节点*/
+    led_driver_info.nd = of_find_node_by_path(TREE_NODE_NAME);
+    if(led_driver_info.nd == NULL){
+        printk(KERN_INFO"led node no find\n");
+        return -EINVAL;
+    }
 
-    /*2.时钟使能*/
-    value = readl(IMX6U_CCM_CCGR1);
-	value &= ~(3 << 26);	
-	value |= (3 << 26);
-	writel(value, IMX6U_CCM_CCGR1);
-	printk("led write 0");
+    /*2.获取设备树中的gpio属性编号*/
+    led_driver_info.led_gpio = of_get_named_gpio(led_driver_info.nd, TREE_GPIO_NAME, 0);
+    if(led_driver_info.led_gpio < 0){
+        printk(KERN_INFO"led-gpio no find\n");
+        return -EINVAL;
+    }
 
-    /*3.复用功能设置*/
-    writel(5, SW_MUX_GPIO1_IO03);
+    /*3.设置beep对应GPIO输出*/
+    ret = gpio_direction_output(led_driver_info.led_gpio, 1);
+    if(ret<0){
+        printk(KERN_INFO"led gpio config error\n");
+        return -EINVAL;
+    }
 
-    /*4.引脚IO功能设置*/
-    writel(0x10B0, SW_PAD_GPIO1_IO03);
+    led_switch(LED_OFF);
 
-    /*5.引脚输出功能配置*/
-    value = readl(GPIO1_GDIR);
-	value |= (1 << 3);	/* 设置新值 */
-	writel(value, GPIO1_GDIR); 
-
-    /*5.关闭LED显示，高电平关闭*/
-    value = readl(GPIO1_DR);
-	value |= (1 << 3);	
-	writel(value, GPIO1_DR);
-
-    printk(KERN_INFO"led hardware init ok\r\n");
+    printk(KERN_INFO"led tree hardware init ok\r\n");
+    
+    return 0;
 }
 
 /**
@@ -331,11 +333,6 @@ static void led_gpio_init(void)
  */
 static void led_gpio_release(void)
 {
-    iounmap(IMX6U_CCM_CCGR1);
-    iounmap(SW_MUX_GPIO1_IO03);
-    iounmap(SW_PAD_GPIO1_IO03);
-    iounmap(GPIO1_DR);
-    iounmap(GPIO1_GDIR);
 }
 
 /**
@@ -347,20 +344,17 @@ static void led_gpio_release(void)
  */
 static void led_switch(u8 status)
 {
-    u32 value;
-    value = readl(GPIO1_DR);
-
     switch(status)
     {
         case LED_OFF:
             printk(KERN_INFO"led off\r\n");
-	        value |= (1 << 3);	
-	        writel(value, GPIO1_DR);
+            gpio_set_value(led_driver_info.led_gpio, 1);
+            led_driver_info.led_status = 0;
             break;
         case LED_ON:
             printk(KERN_INFO"led on\r\n");
-	        value &= ~(1 << 3);	
-	        writel(value, GPIO1_DR);
+	        gpio_set_value(led_driver_info.led_gpio, 0);
+	        led_driver_info.led_status = 1;
             break;
         default:
             printk(KERN_INFO"Invalid LED Set");

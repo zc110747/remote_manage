@@ -46,25 +46,30 @@ SPI驱动添加lower和upper的处理
 线程同步支持Posix Mq和FIFO两种实现, 以应对WSL中不支持Mq的运行环境  
 RTC驱动添加lower和upper的处理, 增加基于系统time的替代方案
 
-下一步计划:
-单元测试的模块添加 
-文件的断点重传功能
-TCP对于数据传输处理增加线程池/epoll替代方案的实现
-提供数据库sqlite而非共享内存的替换方案  
-通讯数据的安全加密openssl
+目前待解决Bug:
+SPI和LED的驱动不能够共存，初步判断修改LED驱动  
+
+下一步计划:  
+添加I2C传感器的上下位机处理  
+单元测试的模块添加  
+文件的断点重传功能  
+TCP对于数据传输处理增加线程池/epoll替代方案的实现  
+提供数据库sqlite而非共享内存的替换方案   
+通讯数据的安全加密openssl  
+增加远程命令行的访问  
 
 代码结构:  
 driver/     硬件驱动的实现  
-include/    头文件路径
-lib/        应用编写需要的外部支持库
-source/     应用代码实现
-template/   代码结构基础模板  
+include/    头文件路径  
+lib/        应用编写需要的外部支持库  
+source/     应用代码实现  
+template/   代码结构基础模板   
 
-编译方法:  
-修改Makefile内的注释:
-PC端平台选择    
-```bash
-#HOST = arm-linux-gnueabihf-
+编译方法:   
+修改Makefile内的注释:  
+PC端平台选择     
+```bash  
+#HOST = arm-linux-gnueabihf-  
 #CPU = arm-
 HOST=
 CPU=x86-
@@ -76,4 +81,4 @@ CPU = arm-
 #HOST=
 #CPU=x86-
 ```
-HOST根据具体的嵌入式Linux平台选择, 目前提供的jsoncpp库只支持PC端和imx6ull, 使用其它平台需要修改重新编译   JsonCPP的库。  
+HOST根据具体的嵌入式Linux平台选择, 目前提供的jsoncpp库只支持PC端和imx6ull, 使用其它平台需要修改重新编译JsonCPP的库。  

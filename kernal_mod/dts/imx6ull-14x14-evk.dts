@@ -107,6 +107,15 @@
 		status = "okay";
 	};
 
+	/*led add by zc*/
+	led {
+		compatible = "gpio-led";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpio_leds>;
+		led-gpio = <&gpio1 3 GPIO_ACTIVE_LOW>;
+		status = "okay";
+	};
+
 	gpio_keys: gpio_keys@0 {
 		compatible = "gpio-keys";
 		pinctrl-names = "default";

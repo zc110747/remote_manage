@@ -3,16 +3,8 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/**",
-                "F:/arm-linux/include",
-                "F:/arm-linux/include/uapi",
-                "F:/arm-linux/tools/include",
-                "F:/arm-linux/tools/include",
-                "F:/arm-linux/arch/arm/include/",
-                "F:/arm-linux/arch/arm/include/asm",
-                "F:/arm-gcc/include",
-                "F:/arm-gcc/arm-linux-gnueabihf/libc/usr/include",
-                "F:/arm-gcc/arm-linux-gnueabihf/libc/usr/include/linux"
+                "${env.includePath}",
+                "${workspaceFolder}/**"
             ],
             "defines": [
                 "_DEBUG",
@@ -20,13 +12,14 @@
                 "_UNICODE",
                 "__ARM_PCS_VFP",
                 "CONFIG_SPARSE_IRQ",
-                "CONFIG_GPIOLIB"
+                "CONFIG_GPIOLIB",
+                "MODULE"
             ],
             "windowsSdkVersion": "",
             "compilerPath": "",
-            "cStandard": "",
-            "cppStandard": "",
-            "intelliSenseMode": ""
+            "cStandard": "c99",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "gcc-x64"
         }
     ],
     "version": 4
