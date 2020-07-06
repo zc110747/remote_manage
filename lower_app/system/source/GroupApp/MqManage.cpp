@@ -104,7 +104,7 @@ int CMqMessageInfo::WaitInformation(uint8_t info, char *buf, int bufsize)
                 mq_getattr(m_MainMqd, &attr);
                 if(attr.mq_maxmsg > 0)
                 {
-                    std::unique_ptr<char> up_main(new char[attr.mq_msgsize]);
+                    std::unique_ptr<char[]> up_main(new char[attr.mq_msgsize]);
                     nReadSize = mq_receive(m_MainMqd, up_main.get(), attr.mq_msgsize, &prio);
                     memcpy(buf, up_main.get(), (bufsize>attr.mq_maxmsg?attr.mq_maxmsg:bufsize));
                     //USR_DEBUG("Wait for Mq Receive, Mqd:%d, %d, %s, %d\n", m_MainMqd, nReadSize, strerror(errno), (int)attr.mq_msgsize);
@@ -126,7 +126,7 @@ int CMqMessageInfo::WaitInformation(uint8_t info, char *buf, int bufsize)
                 mq_getattr(m_AppMqd, &attr);
                 if(attr.mq_maxmsg > 0)
                 {
-                    std::unique_ptr<char> up_app(new char[attr.mq_msgsize]);
+                    std::unique_ptr<char[]> up_app(new char[attr.mq_msgsize]);
                     nReadSize = mq_receive(m_AppMqd, up_app.get(), attr.mq_msgsize, &prio);
                     memcpy(buf, up_app.get(), (bufsize>attr.mq_msgsize?attr.mq_msgsize:bufsize));
                     //USR_DEBUG("Wait for Mq Receive, Mqd:%d, %d, %s, %d\n", m_MainMqd, nReadSize, strerror(errno), (int)attr.mq_msgsize);

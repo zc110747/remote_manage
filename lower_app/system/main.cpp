@@ -129,14 +129,16 @@ int main(int argc, char* argv[])
 		USR_DEBUG("system config use default\n");
 	}
 
+#if __SYSTEM_DEBUG == 0
+	/*硬件相关初始化*/
 	HardwareDriveInit();
 
-#if __SYSTEM_DEBUG == 0
-	/*任务创建和初始化*/
+	/*任务创建*/
 	ApplicationThreadInit();
 	UartThreadInit();
 	SocketTcpThreadInit();
 	SocketUdpThreadInit();
+
 	for(;;)
 	{
 		static char MainMqFlag;
@@ -159,11 +161,11 @@ int main(int argc, char* argv[])
 			sleep(100);
 		}
 	}
+	HardwareDriverRelease();
 #else
 	SystemTest();
 #endif	
 
-	HardwareDriverRelease();
 	USR_DEBUG("Process app_demo stop, error:%s\n", strerror(errno));
 	return result;
 }

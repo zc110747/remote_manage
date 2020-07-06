@@ -161,7 +161,7 @@ public:
 				{
 					nRegIndex = m_RxCacheDataPtr[1]<<8 | m_RxCacheDataPtr[2];
 					nRxDataSize = m_RxCacheDataPtr[3]<<8 | m_RxCacheDataPtr[4];
-					std::unique_ptr<uint8_t> uq_reg(new uint8_t[nRxDataSize]);
+					std::unique_ptr<uint8_t[]> uq_reg(new uint8_t[nRxDataSize]);
 					pApplicationReg->GetMultipleReg(nRegIndex, nRxDataSize, uq_reg.get());
 					//printf("nRegIndex:%d, size:%d\n", nRegIndex, nRxDataSize);
 					//SystemLogArray(uq_reg.get(), nRxDataSize);

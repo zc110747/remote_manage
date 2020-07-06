@@ -34,9 +34,6 @@ struct client_udp
 /**************************************************************************
 * Local static Variable Declaration
 ***************************************************************************/
-static CTcpProtocolInfo<int *> *pTcpProtocolInfo;
-static uint8_t 	nRxCacheBuffer[SOCKET_BUFFER_SIZE];
-static uint8_t  nTxCacheBuffer[SOCKET_BUFFER_SIZE];
 
 /**************************************************************************
 * Global Variable Declaration
@@ -67,7 +64,6 @@ void SocketTcpThreadInit(void)
 	int nErr;
 	pthread_t tid1;
 
-    pTcpProtocolInfo = new CTcpProtocolInfo<int *>(nRxCacheBuffer, nTxCacheBuffer, SOCKET_BUFFER_SIZE);
     nErr = pthread_create(&tid1, NULL, SocketTcpLoopThread, NULL);
 	if(nErr != 0)
     {
@@ -178,10 +174,15 @@ static void *SocketTcpLoopThread(void *arg)
 static void *SocketTcpDataProcessThread(void *arg)
 {
     int nFlag;
-    int client_fd = *(int *)arg;
+    int size;
+    int client_fd = *static_cast<int *>(arg);
     uint8_t is_loop = 0;
     fd_set read_set;
-    int size;
+    CTcpProtocolInfo<int *> *pTcpProtocolInfo;
+    std::unique_ptr<uint8_t[]> nRxCacheBuffer(new uint8_t[SOCKET_BUFFER_SIZE]);
+    std::unique_ptr<uint8_t[]> nTxCacheBuffer(new uint8_t[SOCKET_BUFFER_SIZE]);
+    pTcpProtocolInfo = new CTcpProtocolInfo<int *>(nRxCacheBuffer.get(), 
+                            nTxCacheBuffer.get(), SOCKET_BUFFER_SIZE);
 
     FD_ZERO(&read_set);
     FD_SET(client_fd ,&read_set);
