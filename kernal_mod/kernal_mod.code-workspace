@@ -6,7 +6,8 @@
 	],
 	"settings": {
 		"files.associations": {
-			"types.h": "c"
+			"types.h": "c",
+			"*.tcc": "c"
 		}
 	}
 }

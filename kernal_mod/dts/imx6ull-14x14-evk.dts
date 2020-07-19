@@ -278,14 +278,8 @@
 	pinctrl-0 = <&pinctrl_i2c1>;
 	status = "okay";
 
-	mag3110@0e {
-		compatible = "fsl,mag3110";
-		reg = <0x0e>;
-		position = <2>;
-	};
-
 	ap3216c@1e {
-		compatible = "ap3216c";
+		compatible = "alientek,ap3216c";
 		reg = <0x1e>;
 	};
 };
