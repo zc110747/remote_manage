@@ -234,7 +234,7 @@ static ssize_t ap3216_read(struct file *filp, char __user *buf, size_t cnt, loff
 	data[1] = pApInfo->als;
 	data[2] = pApInfo->ps;
 	err = copy_to_user(buf, data, sizeof(data));
-	return 0;
+	return cnt;
 }
 
 /**
@@ -296,6 +296,7 @@ static int ap3216_probe(struct i2c_client *client, const struct i2c_device_id *i
 	//获取client的信息
 	ap_info.dev.private_data = client;
 
+	printk(KERN_INFO"I2c-Ap3216 Driver Init Ok!\r\n");
 	return 0;
 }
 

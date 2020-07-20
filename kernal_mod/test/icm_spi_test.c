@@ -41,7 +41,8 @@ int main(int argc, char *argv[])
 
 	while (1) {
 		ret = read(fd, databuf, sizeof(databuf));
-		if(ret > 0) { 			/* 数据读取成功 */
+		if(ret >= 0) { 			/* 数据读取成功 */
+
 			gyro_x_adc = databuf[0];
 			gyro_y_adc = databuf[1];
 			gyro_z_adc = databuf[2];
@@ -59,7 +60,7 @@ int main(int argc, char *argv[])
 			accel_z_act = (float)(accel_z_adc) / 2048;
 			temp_act = ((float)(temp_adc) - 25 ) / 326.8 + 25;
 
-
+			printf("read size:%d\r\n", ret);
 			printf("\r\n原始值:\r\n");
 			printf("gx = %d, gy = %d, gz = %d\r\n", gyro_x_adc, gyro_y_adc, gyro_z_adc);
 			printf("ax = %d, ay = %d, az = %d\r\n", accel_x_adc, accel_y_adc, accel_z_adc);

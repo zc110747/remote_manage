@@ -91,7 +91,7 @@ int SpiDevInfoRead(SSpiInfo *pSpiInfo)
     if(spi_fd != -1)
     {
         nSize = read(spi_fd, databuf, sizeof(databuf));
-        if(nSize == 0)
+        if(nSize >= 0)
         {
            	pSpiInfo->gyro_x_adc = databuf[0];
 			pSpiInfo->gyro_y_adc = databuf[1];

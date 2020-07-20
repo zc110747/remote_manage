@@ -367,6 +367,7 @@ static int icm20608_probe(struct spi_device *spi)
 		return PTR_ERR(icm_info.dev.device);
 	}
 
+	printk(KERN_INFO"SPI Driver Init Ok!\r\n");
 	return 0;
 }
 

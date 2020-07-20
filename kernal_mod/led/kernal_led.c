@@ -226,7 +226,7 @@ static int __init led_module_init(void)
         printk(KERN_INFO"dev alloc or set ok, major:%d, minor:%d\r\n", led_driver_info.major,  led_driver_info.minor);	
     }
     
-    /*2.配置设备信息，将设备接口和设备号进行关联*/
+    /*2.初始化设备信息，将设备接口和设备号进行关联*/
     cdev_init(&led_driver_info.cdev, &led_fops);
     led_driver_info.cdev.owner = THIS_MODULE;
     result = cdev_add(&led_driver_info.cdev, led_driver_info.dev_id, DEVICE_LED_CNT);
@@ -264,6 +264,7 @@ static int __init led_module_init(void)
 		printk(KERN_INFO"device create successed!\r\n");
 	}
 
+    printk(KERN_INFO"Led Driver Init Ok!\r\n");
     return 0;
 
 }
