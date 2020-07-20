@@ -32,17 +32,19 @@
 /*设备相关参数*/
 struct led_info
 {
-    dev_t dev_id;           /*总设备号*/
-    int major;              /*主设备号*/
-    int minor;              /*从设备号*/
-    struct cdev cdev;       /*设备接口*/
-    struct class *class;	/*设备类指针*/
-	struct device *device;	/*设备指针*/
-    struct device_node *nd; /*设备节点*/
-    int led_gpio;           /*led对应的引脚接口*/
-    int led_status;         /*led的状态更新*/
-}led_driver_info;
+    dev_t dev_id;               /*总设备号*/
+    int major;                  /*主设备号*/
+    int minor;                  /*从设备号*/
+    struct cdev cdev;           /*设备接口*/
+    struct class *class;	    /*设备类指针*/
+	struct device *device;	    /*设备指针*/
+    struct device_node *nd;     /*设备节点*/
+    int led_gpio;               /*led对应的引脚接口*/
+    int led_status;             /*led的状态更新*/
+    atomic_long_t lock;         /*不允许LED被其它应用访问的lock函数*/
+};
 
+struct led_info led_driver_info;
 #define DEFAULT_MAJOR                   0          /*默认主设备号*/
 #define DEFAULT_MINOR                   0          /*默认从设备号*/
 #define DEVICE_LED_CNT			        1		   /* 设备号个数 */
@@ -59,11 +61,6 @@ static int led_gpio_init(void);
 static void led_gpio_release(void);
 static void led_switch(u8 status);
 
-MODULE_AUTHOR("zc");				        //模块作者
-MODULE_LICENSE("GPL v2");                     //模块许可协议
-MODULE_DESCRIPTION("led driver");             //模块许描述
-MODULE_ALIAS("led_driver");                   //模块别名
-
 /**
  * 打开LED，获取LED资源
  * 
@@ -74,6 +71,11 @@ MODULE_ALIAS("led_driver");                   //模块别名
  */
 int led_open(struct inode *inode, struct file *filp)
 {
+    if(!atomic_dec_and_test(&led_driver_info.lock))
+    {
+        atomic_inc(&led_driver_info.lock); //atomic_dec_and_test会执行减操作，此处恢复
+        return -EBUSY;
+    }
     filp->private_data = &led_driver_info;
     return 0;
 }
@@ -88,6 +90,7 @@ int led_open(struct inode *inode, struct file *filp)
  */
 int led_release(struct inode *inode, struct file *filp)
 {
+    atomic_inc(&led_driver_info.lock);
     return 0;
 }
 
@@ -190,6 +193,9 @@ static int __init led_module_init(void)
 {
     int result;
 
+    /*设置原子的保护操作*/
+    atomic_set(&led_driver_info.lock, 1);
+
     led_driver_info.major = DEFAULT_MAJOR;
     led_driver_info.minor = DEFAULT_MINOR;
 
@@ -220,7 +226,7 @@ static int __init led_module_init(void)
         printk(KERN_INFO"dev alloc or set ok, major:%d, minor:%d\r\n", led_driver_info.major,  led_driver_info.minor);	
     }
     
-    /*2.添加设备到相应总线上*/
+    /*2.配置设备信息，将设备接口和设备号进行关联*/
     cdev_init(&led_driver_info.cdev, &led_fops);
     led_driver_info.cdev.owner = THIS_MODULE;
     result = cdev_add(&led_driver_info.cdev, led_driver_info.dev_id, DEVICE_LED_CNT);
@@ -229,10 +235,10 @@ static int __init led_module_init(void)
         printk(KERN_INFO"cdev add failed\r\n");
         return result;
     }else{
-	printk(KERN_INFO"device add Success!\r\n");	
+	    printk(KERN_INFO"device add Success!\r\n");	
     }
 
-    /* 4、创建类 */
+    /* 3、创建类 */
 	led_driver_info.class = class_create(THIS_MODULE, DEVICE_LED_NAME);
 	if (IS_ERR(led_driver_info.class)) {
 		printk(KERN_INFO"class create failed!\r\n");
@@ -244,7 +250,7 @@ static int __init led_module_init(void)
 		printk(KERN_INFO"class create successed!\r\n");
 	}
 
-	/* 5、创建设备 */
+	/* 4、创建设备 */
 	led_driver_info.device = device_create(led_driver_info.class, NULL, led_driver_info.dev_id, NULL, DEVICE_LED_NAME);
 	if (IS_ERR(led_driver_info.device)) {
 		printk(KERN_INFO"device create failed!\r\n");
@@ -261,7 +267,7 @@ static int __init led_module_init(void)
     return 0;
 
 }
-module_init(led_module_init);
+
 
 /**
  * 驱动释放时执行的退出函数
@@ -282,8 +288,6 @@ static void __exit led_module_exit(void)
     /*硬件资源释放*/
     led_gpio_release();
 }
-module_exit(led_module_exit);
-
 
 /**
  * LED硬件初始化，引脚GPIO1_IO03
@@ -361,3 +365,10 @@ static void led_switch(u8 status)
             break;
     }
 }
+
+module_init(led_module_init);
+module_exit(led_module_exit);
+MODULE_AUTHOR("zc");				            //模块作者
+MODULE_LICENSE("GPL v2");                       //模块许可协议
+MODULE_DESCRIPTION("led driver");               //模块许描述
+MODULE_ALIAS("led_driver");                     //模块别名

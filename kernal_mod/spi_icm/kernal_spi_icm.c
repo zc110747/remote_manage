@@ -443,4 +443,3 @@ MODULE_AUTHOR("zc");				                //模块作者
 MODULE_LICENSE("GPL v2");                           //模块许可协议
 MODULE_DESCRIPTION("icm20608 driver");              //模块许描述
 MODULE_ALIAS("spi_icm20608_driver");                //模块别名
-
