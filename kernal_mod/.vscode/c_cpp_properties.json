@@ -13,14 +13,13 @@
                 "__ARM_PCS_VFP",
                 "CONFIG_SPARSE_IRQ",
                 "CONFIG_GPIOLIB",
-                "MODULE",
-                "__USE_XOPEN",
-                "BITS_PER_LONG=32"
+                "CONFIG_OF",
+                "__USE_XOPEN"
             ],
-            "compilerPath": "D:/Software/Visual Studio 2015/VC/bin/amd64_arm/cl.exe",
+            "compilerPath": "D:\\Software\\mingw64\\bin\\gcc.exe",
             "cStandard": "c99",
             "cppStandard": "c++17",
-            "intelliSenseMode": "msvc-x64"
+            "intelliSenseMode": "gcc-x64"
         }
     ],
     "version": 4

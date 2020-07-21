@@ -129,7 +129,7 @@ static s32 icm20608_write_regs(struct icm20608_dev *dev, u8 reg, u8 *buf, u8 len
 	struct spi_device *spi = (struct spi_device *)dev->private_data;
 
 	t = kzalloc(sizeof(struct spi_transfer), GFP_KERNEL);	/* 申请内存 */
-	gpio_set_value(dev->cs_gpio, 0);			/* 片选拉低 */
+	gpio_set_value(dev->cs_gpio, 0);						/* 片选拉低 */
 
 	/* 第1次，发送要读取的寄存地址 */
 	txdata[0] = reg & ~0x80;	/* 写数据的时候寄存器地址bit8要清零 */
