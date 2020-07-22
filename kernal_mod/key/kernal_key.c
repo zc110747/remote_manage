@@ -47,7 +47,7 @@ struct key_info key_driver_info;
 #define DEFAULT_MAJOR                   0          /*默认主设备号*/
 #define DEFAULT_MINOR                   0          /*默认从设备号*/
 #define DEVICE_key_CNT			        1		   /* 设备号个数 */
-#define DEVICE_key_NAME			        "led"      /* 设备名 */
+#define DEVICE_key_NAME			        "key"     /* 设备名 */
 
 #define key_OFF                         0
 #define key_ON                          1
