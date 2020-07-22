@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 	{
 		nSize = read(fd, databuf, sizeof(databuf));
 		if(nSize >= 0)
-		{ 			/* 数据读取成功 */
+		{ 			
 			ir =  databuf[0]; 	/* ir传感器数据 */
 			als = databuf[1]; 	/* als传感器数据 */
 			ps =  databuf[2]; 	/* ps传感器数据 */

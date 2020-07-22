@@ -51,6 +51,7 @@ struct SSystemConfig
     std::string m_dev_serial;
     std::string m_dev_icm_spi;
     std::string m_dev_rtc;
+    std::string m_dev_ap_i2c;
     
     /*文件更新的下载地址*/
     std::string m_file_path;

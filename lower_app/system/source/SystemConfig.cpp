@@ -54,6 +54,7 @@ static SSystemConfig SSysConifg = {
     std::string(BEEP_DEVICE),
     std::string(ICM_SPI_DEVICE),
     std::string(RTC_DEVICE),
+    std::string(AP_I2C_DEVICE),
 
     //下载文件的路径
     std::string(UPDATE_FILE_PATH),
@@ -110,11 +111,12 @@ int SystemConfigInfo(std::string &sConfigfile)
     SSysConifg.m_beep0_status = root["Beep0"].asInt();
 
     //设备名称
-    SSysConifg.m_dev_led = std::string(root["Device"]["Led"].asString());
-    SSysConifg.m_dev_beep = std::string(root["Device"]["Beep"].asString());
-    SSysConifg.m_dev_serial = std::string(root["Device"]["Serial"].asString());
-    SSysConifg.m_dev_icm_spi = std::string(root["Device"]["IcmSpi"].asString());
-    SSysConifg.m_dev_rtc = std::string(root["Device"]["Rtc"].asString());
+    SSysConifg.m_dev_led = root["Device"]["Led"].asString();
+    SSysConifg.m_dev_beep = root["Device"]["Beep"].asString();
+    SSysConifg.m_dev_serial = root["Device"]["Serial"].asString();
+    SSysConifg.m_dev_icm_spi = root["Device"]["IcmSpi"].asString();
+    SSysConifg.m_dev_rtc = root["Device"]["Rtc"].asString();
+    SSysConifg.m_dev_ap_i2c = root["Device"]["ApI2c"].asString();
 
     //下载路径
     SSysConifg.m_file_path = std::string(root["FilePath"].asString());

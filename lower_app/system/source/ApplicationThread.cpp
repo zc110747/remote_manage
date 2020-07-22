@@ -18,6 +18,7 @@
 #include "../driver/Beep.h"
 #include "../driver/Rtc.h"
 #include "../driver/IcmSpi.h"
+#include "../driver/ApI2c.h"
 #include "../include/ApplicationThread.h"
 #include "../include/GroupApp/MqManage.h"
 #include "../include/GroupApp/FifoManage.h"
@@ -201,16 +202,20 @@ void CApplicationReg::ReadDeviceStatus(void)
     struct SRegInfoList *pRegInfoList;
     struct SSpiInfo SpiInfo;
     struct rtc_time rtc_tm;
+    struct SApInfo ApInfo;
     int readflag;
 
     GetMultipleReg(REG_CONFIG_NUM, REG_INFO_NUM, nRegInfoArray);
     memcpy(nRegCacheArray, nRegInfoArray, REG_INFO_NUM);
     pRegInfoList = (struct SRegInfoList *)nRegInfoArray;
 
-    //更新LED的状态
+    //更新led的状态
     pRegInfoList->s_base_status.b.led = LedStatusRead()&0x01;
+
+    //更新beep的状态
     pRegInfoList->s_base_status.b.beep = BeepStatusRead()&0x01;
     
+    //读取SPI设备的状态
     readflag = SpiDevInfoRead(&SpiInfo);
     if(readflag == RT_OK)
     {
@@ -223,6 +228,7 @@ void CApplicationReg::ReadDeviceStatus(void)
         pRegInfoList->sensor_temp =SpiInfo.temp_adc;
     }
 
+    //读取RTC时钟
     readflag = RtcDevRead(&rtc_tm);
     if(readflag == RT_OK)
     {
@@ -235,7 +241,19 @@ void CApplicationReg::ReadDeviceStatus(void)
         USR_DEBUG("read rtc failed, error:%s\n", strerror(errno));
     }
     
-
+    //读取I2c设备状态
+    readflag = I2cDevInfoRead(&ApInfo);
+    if(readflag == RT_OK)
+    {
+        pRegInfoList->sensor_ir = ApInfo.ir;
+        pRegInfoList->sensor_ps = ApInfo.ps;
+        pRegInfoList->sensor_als = ApInfo.als;
+    }
+    else
+    {
+        USR_DEBUG("read ap3216-i2c failed, error:%s\n", strerror(errno));
+    }
+    
     if(memcmp(nRegCacheArray, nRegInfoArray, REG_INFO_NUM) != 0)
     {
         //printf("Update HardWare, led:%d, beep:%d!\r\n", pRegInfoList->s_base_status.b.led, pRegInfoList->s_base_status.b.beep);

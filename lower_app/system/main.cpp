@@ -24,6 +24,7 @@
 #include "driver/Led.h"
 #include "driver/Rtc.h"
 #include "driver/IcmSpi.h"
+#include "driver/ApI2c.h"
 
 /**************************************************************************
 * Local Macro Definition
@@ -183,6 +184,7 @@ static void HardwareDriveInit(void)
 	BeepDriveInit();	
 	RtcDriveInit();
 	SpiDriverInit();
+	I2cDriverInit();
 }
 
 /**
@@ -198,6 +200,7 @@ static void HardwareDriverRelease(void)
 	BeepDriverRelease();
 	RtcDriverRelease();
 	SpiDriverRelease();
+	I2cDriverRelease();
 }
 
 /**

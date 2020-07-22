@@ -63,6 +63,7 @@
 #define BEEP_DEVICE             "/dev/beep"
 #define ICM_SPI_DEVICE          "/dev/icm20608"
 #define RTC_DEVICE              "/dev/rtc0"
+#define AP_I2C_DEVICE           "/dev/ap3216"
 
 //默认下载路径
 #define UPDATE_FILE_PATH        "/usr/download/"
