@@ -61,6 +61,11 @@ void MainWindow::init()
     SystemConfigInfoInit();
     pSystemConfigInfo = GetSystemConfigInfo();
 
+    //设置table的分页参数
+    ui->tabWidget->setTabText(0, QString::fromLocal8Bit("设备管理"));
+    ui->tabWidget->setTabText(1, QString::fromLocal8Bit("图像处理"));
+    ui->tabWidget->setCurrentIndex(0);
+
     //添加COM口
     QStringList comList;
     for (int i = 1; i <= 20; i++) {

@@ -7,19 +7,19 @@
     <x>0</x>
     <y>0</y>
     <width>730</width>
-    <height>850</height>
+    <height>830</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>730</width>
-    <height>850</height>
+    <height>830</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>730</width>
-    <height>850</height>
+    <height>830</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -195,217 +195,6 @@
      </property>
     </widget>
    </widget>
-   <widget class="QFrame" name="frame_info">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>481</width>
-      <height>421</height>
-     </rect>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::StyledPanel</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Raised</enum>
-    </property>
-    <widget class="QLabel" name="label_led">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>2</y>
-       <width>71</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>LED控制</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="btn_led_on">
-     <property name="geometry">
-      <rect>
-       <x>90</x>
-       <y>0</y>
-       <width>91</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>打开LED</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="btn_led_off">
-     <property name="geometry">
-      <rect>
-       <x>200</x>
-       <y>0</y>
-       <width>91</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>关闭LED</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_beep">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>30</y>
-       <width>71</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>BEEP控制</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="btn_beep_on">
-     <property name="geometry">
-      <rect>
-       <x>90</x>
-       <y>30</y>
-       <width>91</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>打开蜂鸣器</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="btn_beep_off">
-     <property name="geometry">
-      <rect>
-       <x>200</x>
-       <y>30</y>
-       <width>91</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>关闭蜂鸣器</string>
-     </property>
-    </widget>
-    <widget class="QTextEdit" name="text_edit_recv">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>120</y>
-       <width>461</width>
-       <height>231</height>
-      </rect>
-     </property>
-     <property name="acceptDrops">
-      <bool>false</bool>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_stauts">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>90</y>
-       <width>81</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>内部状态区</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="btn_refresh">
-     <property name="geometry">
-      <rect>
-       <x>90</x>
-       <y>90</y>
-       <width>91</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>刷新状态</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_reboot">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>60</y>
-       <width>71</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>复位</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="btn_reboot">
-     <property name="geometry">
-      <rect>
-       <x>90</x>
-       <y>60</y>
-       <width>91</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>复位</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="btn_filepath_choose">
-     <property name="geometry">
-      <rect>
-       <x>430</x>
-       <y>360</y>
-       <width>41</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>...</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_file_path">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>360</y>
-       <width>71</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>文件路径</string>
-     </property>
-    </widget>
-    <widget class="QComboBox" name="combo_box_filepath">
-     <property name="geometry">
-      <rect>
-       <x>80</x>
-       <y>360</y>
-       <width>331</width>
-       <height>21</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="btn_filepath_update">
-     <property name="geometry">
-      <rect>
-       <x>400</x>
-       <y>390</y>
-       <width>71</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>文件更新</string>
-     </property>
-    </widget>
-   </widget>
    <widget class="QFrame" name="frame_dev">
     <property name="geometry">
      <rect>
@@ -445,97 +234,6 @@
      </property>
      <property name="text">
       <string>1</string>
-     </property>
-    </widget>
-   </widget>
-   <widget class="QFrame" name="frame_test">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>440</y>
-      <width>481</width>
-      <height>351</height>
-     </rect>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::StyledPanel</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Raised</enum>
-    </property>
-    <widget class="QLabel" name="label_cmd">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>10</y>
-       <width>81</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>自定义指令</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="line_edit_cmd">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>40</y>
-       <width>381</width>
-       <height>31</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="btn_send_cmd">
-     <property name="geometry">
-      <rect>
-       <x>400</x>
-       <y>40</y>
-       <width>71</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>指令发送</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_test">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>80</y>
-       <width>71</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>调试窗口</string>
-     </property>
-    </widget>
-    <widget class="QTextEdit" name="text_edit_test">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>110</y>
-       <width>461</width>
-       <height>201</height>
-      </rect>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="btn_clear">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>320</y>
-       <width>92</width>
-       <height>28</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>清空数据</string>
      </property>
     </widget>
    </widget>
@@ -680,6 +378,356 @@
      <property name="text">
       <string>192.168.1.105</string>
      </property>
+    </widget>
+   </widget>
+   <widget class="QTabWidget" name="tabWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>481</width>
+      <height>771</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>1</number>
+    </property>
+    <widget class="QWidget" name="deviceTab">
+     <attribute name="title">
+      <string notr="true"/>
+     </attribute>
+     <widget class="QFrame" name="frame_info">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>481</width>
+        <height>431</height>
+       </rect>
+      </property>
+      <property name="autoFillBackground">
+       <bool>true</bool>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <widget class="QLabel" name="label_led">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>10</y>
+         <width>71</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>LED控制</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_led_on">
+       <property name="geometry">
+        <rect>
+         <x>90</x>
+         <y>10</y>
+         <width>91</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>打开LED</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_led_off">
+       <property name="geometry">
+        <rect>
+         <x>200</x>
+         <y>10</y>
+         <width>91</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>关闭LED</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_beep">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>40</y>
+         <width>71</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>BEEP控制</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_beep_on">
+       <property name="geometry">
+        <rect>
+         <x>90</x>
+         <y>40</y>
+         <width>91</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>打开蜂鸣器</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_beep_off">
+       <property name="geometry">
+        <rect>
+         <x>200</x>
+         <y>40</y>
+         <width>91</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>关闭蜂鸣器</string>
+       </property>
+      </widget>
+      <widget class="QTextEdit" name="text_edit_recv">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>130</y>
+         <width>461</width>
+         <height>231</height>
+        </rect>
+       </property>
+       <property name="acceptDrops">
+        <bool>false</bool>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_stauts">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>100</y>
+         <width>81</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>内部状态区</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_refresh">
+       <property name="geometry">
+        <rect>
+         <x>90</x>
+         <y>100</y>
+         <width>91</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>刷新状态</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_reboot">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>70</y>
+         <width>71</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>复位</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_reboot">
+       <property name="geometry">
+        <rect>
+         <x>90</x>
+         <y>70</y>
+         <width>91</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>复位</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_filepath_choose">
+       <property name="geometry">
+        <rect>
+         <x>430</x>
+         <y>370</y>
+         <width>41</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_file_path">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>370</y>
+         <width>71</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>文件路径</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="combo_box_filepath">
+       <property name="geometry">
+        <rect>
+         <x>90</x>
+         <y>370</y>
+         <width>331</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_filepath_update">
+       <property name="geometry">
+        <rect>
+         <x>400</x>
+         <y>400</y>
+         <width>71</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>文件更新</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QFrame" name="frame_test">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>430</y>
+        <width>481</width>
+        <height>331</height>
+       </rect>
+      </property>
+      <property name="autoFillBackground">
+       <bool>true</bool>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <widget class="QLabel" name="label_cmd">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>10</y>
+         <width>81</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>自定义指令</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="line_edit_cmd">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>381</width>
+         <height>31</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_send_cmd">
+       <property name="geometry">
+        <rect>
+         <x>400</x>
+         <y>30</y>
+         <width>71</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>指令发送</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_test">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>70</y>
+         <width>71</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>调试窗口</string>
+       </property>
+      </widget>
+      <widget class="QTextEdit" name="text_edit_test">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>100</y>
+         <width>461</width>
+         <height>171</height>
+        </rect>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_clear">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>280</y>
+         <width>92</width>
+         <height>28</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>清空数据</string>
+       </property>
+      </widget>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="ImageTable">
+     <attribute name="title">
+      <string/>
+     </attribute>
+     <widget class="QFrame" name="image_rame">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>481</width>
+        <height>751</height>
+       </rect>
+      </property>
+      <property name="autoFillBackground">
+       <bool>true</bool>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+     </widget>
     </widget>
    </widget>
   </widget>
