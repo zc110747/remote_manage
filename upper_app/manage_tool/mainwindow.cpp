@@ -24,6 +24,26 @@ void init_btn_disable(Ui::MainWindow *ui);
 void init_btn_enable(Ui::MainWindow *ui);
 void QFrame_Init(Ui::MainWindow *ui);
 
+static void load_image(QLabel *label, QString Path)
+{
+    QImage image;
+    if(!(image.load(Path))){
+        qDebug()<<"Image load failed, Path:"<<Path;
+        return;
+    }
+    qDebug()<<"Image load ok";
+    label->clear();
+    label->setPixmap(QPixmap::fromImage(image));
+    label->setScaledContents(true);
+}
+
+static void load_image(QLabel *label, QImage *pImage)
+{
+    label->clear();
+    label->setPixmap(QPixmap::fromImage(*pImage));
+    label->setScaledContents(true);
+}
+
 //类的实现
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -50,6 +70,8 @@ void QFrame_Init(Ui::MainWindow *ui)
     ui->frame_dev->setFrameShadow(QFrame::Shadow::Sunken);
     ui->frame_socket->setFrameShape(QFrame::Shape::Box);
     ui->frame_socket->setFrameShadow(QFrame::Shadow::Sunken);
+    //ui->label_image->setStyleSheet("border-image:url(:/image/test.jpg);");
+    load_image(ui->label_image, QString(QDir::currentPath()+"/image/test.jpg"));
 }
 
 /*!
@@ -62,9 +84,7 @@ void MainWindow::init()
     pSystemConfigInfo = GetSystemConfigInfo();
 
     //设置table的分页参数
-    ui->tabWidget->setTabText(0, QString::fromLocal8Bit("设备管理"));
-    ui->tabWidget->setTabText(1, QString::fromLocal8Bit("图像处理"));
-    ui->tabWidget->setCurrentIndex(0);
+    ui->tabWidget->setCurrentIndex(1);
 
     //添加COM口
     QStringList comList;
@@ -516,4 +536,36 @@ void MainWindow::on_btn_filepath_choose_clicked()
         }
         ui->combo_box_filepath->setCurrentIndex(ui->combo_box_filepath->findText(directory));
     }
+}
+
+void MainWindow::on_btn_img_choose_clicked()
+{
+    /*!选择文件目录路径*/
+    QString directory;
+    QFileDialog *pFileDialog = new QFileDialog(this);
+
+    //directory = QDir::toNativeSeparators(QFileDialog::getExistingDirectory(this, tr("choose path"), QDir::currentPath()));
+    pFileDialog->setWindowTitle(tr("Choose Update file"));
+    pFileDialog->setDirectory(QDir::currentPath());
+    pFileDialog->setNameFilter(tr("images file (*.jpg *.png *.bmp)"));
+
+    if(pFileDialog->exec() == QDialog::Accepted)
+    {
+        directory = pFileDialog->selectedFiles()[0];
+    }
+
+    if(!directory.isEmpty())
+    {
+        if(ui->combox_img_path->findText(directory) == -1)
+        {
+            ui->combox_img_path->addItem(directory);
+        }
+        ui->combox_img_path->setCurrentIndex(ui->combox_img_path->findText(directory));
+    }
+}
+
+void MainWindow::on_btn_img_show_clicked()
+{
+    QString path = ui->combox_img_path->currentText();
+    load_image(ui->label_image, path);
 }

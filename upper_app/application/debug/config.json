@@ -1,1 +1,0 @@
-{"Device":{"ID":"1"},"Serial":{"Baud":"115200","Com":"COM1","DataBits":"8","Parity":"N","StopBits":"1"},"Socket":{"IpAddr":"127.0.0.1","LocalIpAddr":"127.0.0.1","LocalPort":"8100","Port":"8000","Protocol":"TCP"}}

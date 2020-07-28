@@ -39,6 +39,10 @@ private slots:
     void on_btn_filepath_update_clicked();
     void on_btn_filepath_choose_clicked();
 
+    void on_btn_img_choose_clicked();
+
+    void on_btn_img_show_clicked();
+
 private:
     Ui::MainWindow *ui;
 };

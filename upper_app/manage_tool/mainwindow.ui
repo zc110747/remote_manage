@@ -394,7 +394,7 @@
     </property>
     <widget class="QWidget" name="deviceTab">
      <attribute name="title">
-      <string notr="true"/>
+      <string notr="true">设备管理</string>
      </attribute>
      <widget class="QFrame" name="frame_info">
       <property name="geometry">
@@ -707,15 +707,15 @@
     </widget>
     <widget class="QWidget" name="ImageTable">
      <attribute name="title">
-      <string/>
+      <string>图像处理</string>
      </attribute>
-     <widget class="QFrame" name="image_rame">
+     <widget class="QFrame" name="frame_image">
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
-        <width>481</width>
-        <height>751</height>
+        <y>-20</y>
+        <width>491</width>
+        <height>771</height>
        </rect>
       </property>
       <property name="autoFillBackground">
@@ -727,6 +727,68 @@
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
+      <widget class="QLabel" name="label_image">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>10</y>
+         <width>481</width>
+         <height>381</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_img_path">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>400</y>
+         <width>72</width>
+         <height>15</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>图像路径</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="combox_img_path">
+       <property name="geometry">
+        <rect>
+         <x>80</x>
+         <y>400</y>
+         <width>331</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_img_choose">
+       <property name="geometry">
+        <rect>
+         <x>420</x>
+         <y>400</y>
+         <width>41</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_img_show">
+       <property name="geometry">
+        <rect>
+         <x>370</x>
+         <y>430</y>
+         <width>92</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>显示图像</string>
+       </property>
+      </widget>
      </widget>
     </widget>
    </widget>

@@ -22,6 +22,7 @@ SOURCES += \
     appthread.cpp \
     commandinfo.cpp \
     configfile.cpp \
+    imageprocess.cpp \
     main.cpp \
     mainwindow.cpp \
     protocol.cpp \
@@ -33,6 +34,7 @@ HEADERS += \
     appthread.h \
     commandinfo.h \
     configfile.h \
+    imageprocess.h \
     mainwindow.h \
     protocol.h \
     tcpclient.h \
@@ -52,3 +54,5 @@ DISTFILES += \
     icon.rc
 
 RC_FILE = icon.rc
+
+RESOURCES += main.qrc
