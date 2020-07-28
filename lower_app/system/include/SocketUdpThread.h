@@ -74,6 +74,10 @@ public:
 * Global Functon Declaration
 ***************************************************************************/
 
+#if SOCKET_UDP_MODULE_ON == 1
 /*UDP Socket线程初始化实现*/
 void SocketUdpThreadInit(void);
+#else
+#define SocketUdpThreadInit() 
+#endif
 #endif

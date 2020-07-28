@@ -17,6 +17,7 @@
 #include "../include/SystemConfig.h"
 #include "../include/UartThread.h"
 
+#if UART_MODULE_ON == 1
 /**************************************************************************
 * Local Macro Definition
 ***************************************************************************/
@@ -233,4 +234,4 @@ static int set_opt(int nFd, int nBaud, int nDataBits, std::string cParity, int n
 	USR_DEBUG("Serial Config Done Success!\n\r");
 	return 0;
 }
-
+#endif

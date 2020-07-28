@@ -38,6 +38,10 @@
 ***************************************************************************/
 #define DEVICE_VERSION          "version 0.0.7 20200724"
 
+#define UART_MODULE_ON          1
+#define SOCKET_TCP_MODULE_ON    1
+#define SOCKET_UDP_MODULE_ON    1
+
 /*自定义协议应用测试*/
 #define __SYSTEM_DEBUG          0
 #define __WORK_IN_WSL           1  //在WSL中，Posix Mq不支持，改为FIFO方案

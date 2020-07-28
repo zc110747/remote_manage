@@ -60,6 +60,11 @@ public:
 * Global Functon Declaration
 ***************************************************************************/
 
+#if SOCKET_TCP_MODULE_ON == 1
 /*TCP网络通讯任务和数据初始化*/
 void SocketTcpThreadInit(void);
+#else
+#define SocketTcpThreadInit() {}
+#endif
+
 #endif

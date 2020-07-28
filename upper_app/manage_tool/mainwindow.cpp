@@ -7,6 +7,7 @@
 #include "commandinfo.h"
 #include "appthread.h"
 #include "configfile.h"
+#include "imageprocess.h"
 #include <QDir>
 #include <QFileDialog>
 
@@ -16,6 +17,8 @@ static CUdpSocketInfo *pMainUdpSocketInfo;
 static CAppThreadInfo *pAppThreadInfo;
 static PROTOCOL_STATUS protocol_flag;
 static struct SSystemConfig *pSystemConfigInfo;
+static class COpencvImgProcess OpencvImgProcess;
+
 
 #define FRAM_STYLE  "QFrame{border-radius:10px}"
 
@@ -23,26 +26,6 @@ static struct SSystemConfig *pSystemConfigInfo;
 void init_btn_disable(Ui::MainWindow *ui);
 void init_btn_enable(Ui::MainWindow *ui);
 void QFrame_Init(Ui::MainWindow *ui);
-
-static void load_image(QLabel *label, QString Path)
-{
-    QImage image;
-    if(!(image.load(Path))){
-        qDebug()<<"Image load failed, Path:"<<Path;
-        return;
-    }
-    qDebug()<<"Image load ok";
-    label->clear();
-    label->setPixmap(QPixmap::fromImage(image));
-    label->setScaledContents(true);
-}
-
-static void load_image(QLabel *label, QImage *pImage)
-{
-    label->clear();
-    label->setPixmap(QPixmap::fromImage(*pImage));
-    label->setScaledContents(true);
-}
 
 //类的实现
 MainWindow::MainWindow(QWidget *parent)
@@ -71,7 +54,7 @@ void QFrame_Init(Ui::MainWindow *ui)
     ui->frame_socket->setFrameShape(QFrame::Shape::Box);
     ui->frame_socket->setFrameShadow(QFrame::Shadow::Sunken);
     //ui->label_image->setStyleSheet("border-image:url(:/image/test.jpg);");
-    load_image(ui->label_image, QString(QDir::currentPath()+"/image/test.jpg"));
+    OpencvImgProcess.load_image(ui->label_image, QString(QDir::currentPath()+"/image/test.jpg"));
 }
 
 /*!
@@ -567,5 +550,5 @@ void MainWindow::on_btn_img_choose_clicked()
 void MainWindow::on_btn_img_show_clicked()
 {
     QString path = ui->combox_img_path->currentText();
-    load_image(ui->label_image, path);
+    OpencvImgProcess.load_image(ui->label_image, path);
 }

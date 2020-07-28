@@ -16,6 +16,7 @@
 #include "../include/SystemConfig.h"
 #include "../include/SocketUdpThread.h"
 
+#if SOCKET_UDP_MODULE_ON == 1
 /**************************************************************************
 * Local Macro Definition
 ***************************************************************************/
@@ -141,3 +142,4 @@ static void *SocketUdpLoopThread(void *arg)
     pthread_detach(pthread_self()); //分离线程, 此时线程与创建的进程无关，后续执行join返回值22
     pthread_exit((void *)0);
 }
+#endif

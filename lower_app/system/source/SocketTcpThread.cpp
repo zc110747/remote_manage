@@ -18,6 +18,7 @@
 #include "../include/SystemConfig.h"
 #include "../include/SocketTcpThread.h"
 
+#if SOCKET_TCP_MODULE_ON == 1
 /**************************************************************************
 * Local Macro Definition
 ***************************************************************************/
@@ -218,4 +219,4 @@ static void *SocketTcpDataProcessThread(void *arg)
     pthread_detach(pthread_self());
     pthread_exit((void *)0);
 }
-
+#endif
