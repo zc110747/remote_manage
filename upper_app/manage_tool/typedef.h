@@ -9,6 +9,9 @@ typedef unsigned char uint8_t;
 typedef unsigned short uint16_t;
 typedef unsigned int uint32_t;
 
+#define USE_OPENCV              1  //是否使用OPENCV模块
+
+
 #define UDP_DEFAULT_PORT        8100
 
 #define RT_PROTOCOL_OK          0

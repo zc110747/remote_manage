@@ -4,89 +4,131 @@
 #include "typedef.h"
 
 #include <QFileDialog>
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-class COpencvImgProcess;
+#if USE_OPENCV == 1
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#endif
 
-// 图像转换
 class COpencvImgProcess
 {
 public:
     COpencvImgProcess(){};
     ~COpencvImgProcess(){};
-//    QImage cvMattoImage(const cv::Mat& mat)
-//    {
-//        if(mat.type() == CV_8UC1)					// 单通道
-//        {
-//            QImage image(mat.cols, mat.rows, QImage::Format_Indexed8);
-//            image.setColorCount(256);				// 灰度级数256
-//                for (int i = 0; i < 256; i++)
-//                {
-//                    image.setColor(i, qRgb(i, i, i));
-//                }
-//                uchar *pSrc = mat.data;					// 复制mat数据
-//                for (int row = 0; row < mat.rows; row++)
-//                {
-//                    uchar *pDest = image.scanLine(row);
-//                    memcpy(pDest, pSrc, mat.cols);
-//                    pSrc += mat.step;
-//                }
-//                return image;
-//            }
 
-//            else if (mat.type() == CV_8UC3)				// 3通道
-//            {
-//                const uchar *pSrc = (const uchar*)mat.data;			// 复制像素
-//                QImage image(pSrc, mat.cols, mat.rows, (int)mat.step, QImage::Format_RGB888);	// R, G, B 对应 0,1,2
-//                return image.rgbSwapped();				// rgbSwapped是为了显示效果色彩好一些。
-//            }
-//            else if (mat.type() == CV_8UC4)
-//            {
-//                const uchar *pSrc = (const uchar*)mat.data;			// 复制像素
-//                    // Create QImage with same dimensions as input Mat
-//                QImage image(pSrc,mat.cols, mat.rows, (int)mat.step, QImage::Format_ARGB32);		// B,G,R,A 对应 0,1,2,3
-//                return image.copy();
-//            }
-//            else
-//            {
-//                return QImage();
-//            }
-//    }
+    //根据地址加载图像
+    bool load_image(QLabel *label, QString Path);
+    void load_image(QLabel *label, const QImage &image);
 
-    //virtual cv::Mat QImage2cvMat(QImage image) = 0;			// QImage 改成 Mat
-    //virtual QImage splitBGR(QImage src, int color) = 0;			// 提取RGB分量
-    //virtual QImage splitColor(QImage src, cv::String model, int color) = 0;		// 提取分量
-
-    void load_image(QLabel *label, QString Path)
+    void set_file_extra(const QString &str)
     {
-        QImage image;
-        if(!(image.load(Path))){
-            qDebug()<<"Image load failed, Path:"<<Path;
-            return;
-        }
-        qDebug()<<"Image load ok";
-        label->clear();
-        label->setPixmap(QPixmap::fromImage(image));
-        label->setScaledContents(true);
-//        cv::Mat ImgMat = cv::imread(Path.toStdString(), 1);
-//        QImage image = cvMattoImage(ImgMat);
-//        qDebug()<<"Image load ok";
-//        label->clear();
-//        label->setPixmap(QPixmap::fromImage(image));
-//        label->setScaledContents(true);
+        file_extra = str;
     }
 
-    void load_image(QLabel *label, QImage *pImage)
+    const QString get_file_extra()
     {
-        label->clear();
-        label->setPixmap(QPixmap::fromImage(*pImage));
-        label->setScaledContents(true);
+        return file_extra;
     }
+
+#if USE_OPENCV == 1
+    void load_image(QLabel *label, const cv::Mat &mat);
+
+    //图像均值滤波
+    bool blur_image(QLabel *label, QString Path);
+
+    //图像灰度转换
+    bool gray_image(QLabel *label, QString Path);
+
+    //图像腐蚀 -- 高亮部分缩小
+    bool erode_image(QLabel *label, QString Path);
+
+    //图像膨胀 -- 高亮部分扩大
+    bool dilate_image(QLabel *label, QString Path);
+
+    //边缘检测
+    bool canny_image(QLabel *label, QString Path);
+
+    //线性扩展
+    bool line_scale_image(QLabel *label, QString Path);
+
+    //非线性扩展
+    bool noline_scale_image(QLabel *label, QString Path);
+
+    //直方图均衡
+    bool equalizeHist_image(QLabel *label, QString Path);
+
+    //仿射变换
+    bool warpaffine_image(QLabel *label, QString Path);
+
+    //霍夫线变换
+    bool houghlines_image(QLabel *label, QString Path);
+
+    //直方图
+    bool hist_image(QLabel *label, QString Path);
+#else
+    //图像均值滤波
+    void blur_image(QLabel *label, QString Path){
+        return load_image(label, Path);
+    };
+
+    //图像腐蚀 -- 高亮部分缩小
+    void erode_image(QLabel *label, QString Path){
+        return load_image(label, Path);
+    };
+
+    //图像膨胀 -- 高亮部分扩大
+    void dilate_image(QLabel *label, QString Path){
+       return load_image(label, Path);
+    };
+
+    //边缘检测
+    void canny_image(QLabel *label, QString Path){
+        return load_image(label, Path);
+    };
+
+
+    //线性扩展
+    bool line_scale_image(QLabel *label, QString Path){
+        return load_image(label, Path);
+    };
+
+    //非线性扩展
+    bool noline_scale_image(QLabel *label, QString Path){
+        return load_image(label, Path);
+    };
+
+    //直方图均衡
+    bool equalizeHist_image(QLabel *label, QString Path){
+        return load_image(label, Path);
+    };
+
+    //仿射变换
+    bool warpaffine_image(QLabel *label, QString Path){
+        return load_image(label, Path);
+    };
+
+    //霍夫线变换
+    bool houghlines_image(QLabel *label, QString Path){
+        return load_image(label, Path);
+    }
+
+    //直方图
+    bool hist_image(QLabel *label, QString Path)｛
+        return load_image(label, Path);
+    ｝
+#endif
+
+private:
+    QString file_extra{""};
+
+#if USE_OPENCV == 1
+    //将Opencv内部图像转变为QImage对象
+    QImage cvMattoQImage(const cv::Mat& mat);
+    cv::Mat QImagetocvMat(const QImage &image);			// QImage 改成 Mat
+#endif
 };
 
 

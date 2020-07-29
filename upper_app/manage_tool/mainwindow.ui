@@ -712,7 +712,7 @@
      <widget class="QFrame" name="frame_image">
       <property name="geometry">
        <rect>
-        <x>0</x>
+        <x>10</x>
         <y>-20</y>
         <width>491</width>
         <height>771</height>
@@ -779,14 +779,248 @@
       <widget class="QPushButton" name="btn_img_show">
        <property name="geometry">
         <rect>
-         <x>370</x>
+         <x>391</x>
          <y>430</y>
-         <width>92</width>
+         <width>71</width>
          <height>31</height>
         </rect>
        </property>
        <property name="text">
-        <string>显示图像</string>
+        <string>加载图像</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_img_base">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>500</y>
+         <width>71</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>原始图像</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_img_blur">
+       <property name="geometry">
+        <rect>
+         <x>110</x>
+         <y>500</y>
+         <width>71</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>图像滤波</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_img_erode">
+       <property name="geometry">
+        <rect>
+         <x>210</x>
+         <y>500</y>
+         <width>71</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>图像腐蚀</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_img_cmd">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>470</y>
+         <width>101</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>图像处理指令</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_img_dilate">
+       <property name="geometry">
+        <rect>
+         <x>320</x>
+         <y>500</y>
+         <width>71</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>图像膨胀</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_img_canny">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>540</y>
+         <width>71</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>边缘检测</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_img_log">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>430</y>
+         <width>341</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>log:图像未加载</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_img_gray">
+       <property name="geometry">
+        <rect>
+         <x>110</x>
+         <y>540</y>
+         <width>71</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>灰度转换</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_img_save">
+       <property name="geometry">
+        <rect>
+         <x>310</x>
+         <y>430</y>
+         <width>71</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>保存图像</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_img_cmd_2">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>620</y>
+         <width>101</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>交互指令</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_img_sync">
+       <property name="geometry">
+        <rect>
+         <x>110</x>
+         <y>640</y>
+         <width>71</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>图像同步</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_img_trans">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>640</y>
+         <width>71</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>图像传输</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_img_line_scale">
+       <property name="geometry">
+        <rect>
+         <x>210</x>
+         <y>540</y>
+         <width>71</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>线性扩展</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_img_noline_scale">
+       <property name="geometry">
+        <rect>
+         <x>320</x>
+         <y>540</y>
+         <width>91</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>非线性扩展</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_img_equalizeHist">
+       <property name="geometry">
+        <rect>
+         <x>320</x>
+         <y>580</y>
+         <width>91</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>直方图均衡</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_img_wrap">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>580</y>
+         <width>71</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>仿射变换</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_img_HoughLines">
+       <property name="geometry">
+        <rect>
+         <x>210</x>
+         <y>580</y>
+         <width>81</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>霍夫线变换</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_img_backProj">
+       <property name="geometry">
+        <rect>
+         <x>110</x>
+         <y>580</y>
+         <width>81</width>
+         <height>28</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>直方图显示</string>
        </property>
       </widget>
      </widget>

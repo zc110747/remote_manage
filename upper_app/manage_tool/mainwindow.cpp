@@ -54,7 +54,12 @@ void QFrame_Init(Ui::MainWindow *ui)
     ui->frame_socket->setFrameShape(QFrame::Shape::Box);
     ui->frame_socket->setFrameShadow(QFrame::Shadow::Sunken);
     //ui->label_image->setStyleSheet("border-image:url(:/image/test.jpg);");
-    OpencvImgProcess.load_image(ui->label_image, QString(QDir::currentPath()+"/image/test.jpg"));
+
+    if(OpencvImgProcess.load_image(ui->label_image, QString(QDir::currentPath()+"/image/test.jpg")))
+    {
+        ui->label_img_log->setText(QString::fromUtf8("log:图像加载成功"));
+        OpencvImgProcess.set_file_extra("");
+    }
 }
 
 /*!
@@ -550,5 +555,285 @@ void MainWindow::on_btn_img_choose_clicked()
 void MainWindow::on_btn_img_show_clicked()
 {
     QString path = ui->combox_img_path->currentText();
-    OpencvImgProcess.load_image(ui->label_image, path);
+    if(path.isEmpty())
+    {
+        path = QString(QDir::currentPath()+"/image/test.jpg");
+    }
+
+    if(OpencvImgProcess.load_image(ui->label_image, path))
+    {
+        ui->label_img_log->setText(QString::fromUtf8("log:图像加载成功"));
+        OpencvImgProcess.set_file_extra("");
+    }
+    else
+    {
+        ui->label_img_log->setText(QString::fromUtf8("log:图像加载失败"));
+    }
+}
+
+void MainWindow::on_btn_img_base_clicked()
+{
+    on_btn_img_show_clicked();
+}
+
+void MainWindow::on_btn_img_blur_clicked()
+{
+    QString path = ui->combox_img_path->currentText();
+    if(path.isEmpty())
+    {
+        path = QString(QDir::currentPath()+"/image/test.jpg");
+    }
+
+    if(OpencvImgProcess.blur_image(ui->label_image, path))
+    {
+        #if USE_OPENCV == 1
+        ui->label_img_log->setText(QString::fromUtf8("log:图像均值滤波处理成功"));
+        #else
+        ui->label_img_log->setText(QString::fromUtf8("log:不支持OpenCV模式，显示原图"));
+        #endif
+        OpencvImgProcess.set_file_extra("_blur");
+    }
+    else
+    {
+        ui->label_img_log->setText(QString::fromUtf8("log:图像加载失败"));
+    }
+}
+
+void MainWindow::on_btn_img_erode_clicked()
+{
+    QString path = ui->combox_img_path->currentText();
+    if(path.isEmpty())
+    {
+        path = QString(QDir::currentPath()+"/image/test.jpg");
+    }
+
+    if(OpencvImgProcess.erode_image(ui->label_image, path))
+    {
+        #if USE_OPENCV == 1
+        ui->label_img_log->setText(QString::fromUtf8("log:图像腐蚀处理成功"));
+        #else
+        ui->label_img_log->setText(QString::fromUtf8("log:不支持OpenCV模式，显示原图"));
+        #endif
+        OpencvImgProcess.set_file_extra("_erode");
+    }
+    else
+    {
+        ui->label_img_log->setText(QString::fromUtf8("log:图像加载失败"));
+    }
+}
+
+void MainWindow::on_btn_img_dilate_clicked()
+{
+    QString path = ui->combox_img_path->currentText();
+    if(path.isEmpty())
+    {
+        path = QString(QDir::currentPath()+"/image/test.jpg");
+    }
+
+    if(OpencvImgProcess.dilate_image(ui->label_image, path))
+    {
+        #if USE_OPENCV == 1
+        ui->label_img_log->setText(QString::fromUtf8("log:图像膨胀处理成功"));
+        #else
+        ui->label_img_log->setText(QString::fromUtf8("log:不支持OpenCV模式，显示原图"));
+        #endif
+        OpencvImgProcess.set_file_extra("_dilate");
+    }
+    else
+    {
+        ui->label_img_log->setText(QString::fromUtf8("log:图像加载失败"));
+    }
+}
+
+void MainWindow::on_btn_img_canny_clicked()
+{
+    QString path = ui->combox_img_path->currentText();
+    if(path.isEmpty())
+    {
+        path = QString(QDir::currentPath()+"/image/test.jpg");
+    }
+
+    if(OpencvImgProcess.canny_image(ui->label_image, path))
+    {
+        #if USE_OPENCV == 1
+        ui->label_img_log->setText(QString::fromUtf8("log:图像边缘检测处理成功"));
+        #else
+        ui->label_img_log->setText(QString::fromUtf8("log:不支持OpenCV模式，显示原图"));
+        #endif
+        OpencvImgProcess.set_file_extra("_canny");
+    }
+    else
+    {
+        ui->label_img_log->setText(QString::fromUtf8("log:图像加载失败"));
+    }
+}
+
+void MainWindow::on_btn_img_gray_clicked()
+{
+    QString path = ui->combox_img_path->currentText();
+    if(path.isEmpty())
+    {
+        path = QString(QDir::currentPath()+"/image/test.jpg");
+    }
+
+    if(OpencvImgProcess.gray_image(ui->label_image, path))
+    {
+        #if USE_OPENCV == 1
+        ui->label_img_log->setText(QString::fromUtf8("log:图像灰度转换处理成功"));
+        #else
+        ui->label_img_log->setText(QString::fromUtf8("log:不支持OpenCV模式，显示原图"));
+        #endif
+        OpencvImgProcess.set_file_extra("_gray");
+    }
+    else
+    {
+        ui->label_img_log->setText(QString::fromUtf8("log:图像加载失败"));
+    }
+}
+
+void MainWindow::on_btn_img_save_clicked()
+{
+    const QPixmap *pixMap =  ui->label_image->pixmap();
+    QImage Image = pixMap->toImage();
+    Image.save("test"+OpencvImgProcess.get_file_extra()+".jpg", "jpg", 100);
+    ui->label_img_log->setText(QString::fromUtf8("log:图像保存成功"));
+}
+
+void MainWindow::on_btn_img_line_scale_clicked()
+{
+    QString path = ui->combox_img_path->currentText();
+    if(path.isEmpty())
+    {
+        path = QString(QDir::currentPath()+"/image/test.jpg");
+    }
+
+    if(OpencvImgProcess.line_scale_image(ui->label_image, path))
+    {
+        #if USE_OPENCV == 1
+        ui->label_img_log->setText(QString::fromUtf8("log:图像线性转换处理成功"));
+        #else
+        ui->label_img_log->setText(QString::fromUtf8("log:不支持OpenCV模式，显示原图"));
+        #endif
+        OpencvImgProcess.set_file_extra("_gray");
+    }
+    else
+    {
+        ui->label_img_log->setText(QString::fromUtf8("log:图像加载失败"));
+    }
+}
+
+void MainWindow::on_btn_img_noline_scale_clicked()
+{
+    QString path = ui->combox_img_path->currentText();
+    if(path.isEmpty())
+    {
+        path = QString(QDir::currentPath()+"/image/test.jpg");
+    }
+
+    if(OpencvImgProcess.noline_scale_image(ui->label_image, path))
+    {
+        #if USE_OPENCV == 1
+        ui->label_img_log->setText(QString::fromUtf8("log:图像非线性转换处理成功"));
+        #else
+        ui->label_img_log->setText(QString::fromUtf8("log:不支持OpenCV模式，显示原图"));
+        #endif
+        OpencvImgProcess.set_file_extra("_gray");
+    }
+    else
+    {
+        ui->label_img_log->setText(QString::fromUtf8("log:图像加载失败"));
+    }
+}
+
+void MainWindow::on_btn_img_equalizeHist_clicked()
+{
+    QString path = ui->combox_img_path->currentText();
+    if(path.isEmpty())
+    {
+        path = QString(QDir::currentPath()+"/image/test.jpg");
+    }
+
+    if(OpencvImgProcess.equalizeHist_image(ui->label_image, path))
+    {
+        #if USE_OPENCV == 1
+        ui->label_img_log->setText(QString::fromUtf8("log:图像直方图均衡处理成功"));
+        #else
+        ui->label_img_log->setText(QString::fromUtf8("log:不支持OpenCV模式，显示原图"));
+        #endif
+        OpencvImgProcess.set_file_extra("_equalizeHist");
+    }
+    else
+    {
+        ui->label_img_log->setText(QString::fromUtf8("log:图像加载失败"));
+    }
+}
+
+
+void MainWindow::on_btn_img_wrap_clicked()
+{
+    QString path = ui->combox_img_path->currentText();
+    if(path.isEmpty())
+    {
+        path = QString(QDir::currentPath()+"/image/test.jpg");
+    }
+
+    if(OpencvImgProcess.warpaffine_image(ui->label_image, path))
+    {
+        #if USE_OPENCV == 1
+        ui->label_img_log->setText(QString::fromUtf8("log:图像仿射变换处理成功"));
+        #else
+        ui->label_img_log->setText(QString::fromUtf8("log:不支持OpenCV模式，显示原图"));
+        #endif
+        OpencvImgProcess.set_file_extra("_warp");
+    }
+    else
+    {
+        ui->label_img_log->setText(QString::fromUtf8("log:图像加载失败"));
+    }
+}
+
+void MainWindow::on_btn_img_HoughLines_clicked()
+{
+    QString path = ui->combox_img_path->currentText();
+    if(path.isEmpty())
+    {
+        path = QString(QDir::currentPath()+"/image/test.jpg");
+    }
+
+    if(OpencvImgProcess.houghlines_image(ui->label_image, path))
+    {
+        #if USE_OPENCV == 1
+        ui->label_img_log->setText(QString::fromUtf8("log:图像霍夫线检测成功"));
+        #else
+        ui->label_img_log->setText(QString::fromUtf8("log:不支持OpenCV模式，显示原图"));
+        #endif
+        OpencvImgProcess.set_file_extra("_warp");
+    }
+    else
+    {
+        ui->label_img_log->setText(QString::fromUtf8("log:图像加载失败"));
+    }
+}
+
+void MainWindow::on_btn_img_backProj_clicked()
+{
+    QString path = ui->combox_img_path->currentText();
+    if(path.isEmpty())
+    {
+        path = QString(QDir::currentPath()+"/image/test.jpg");
+    }
+
+    if(OpencvImgProcess.hist_image(ui->label_image, path))
+    {
+        #if USE_OPENCV == 1
+        ui->label_img_log->setText(QString::fromUtf8("log:图像直方图计算成功"));
+        #else
+        ui->label_img_log->setText(QString::fromUtf8("log:不支持OpenCV模式，显示原图"));
+        #endif
+        OpencvImgProcess.set_file_extra("_warp");
+    }
+    else
+    {
+        ui->label_img_log->setText(QString::fromUtf8("log:图像加载失败"));
+    }
 }
