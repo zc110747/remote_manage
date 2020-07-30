@@ -26,9 +26,12 @@
    <string>MainWindow</string>
   </property>
   <property name="autoFillBackground">
-   <bool>false</bool>
+   <bool>true</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="autoFillBackground">
+    <bool>true</bool>
+   </property>
    <widget class="QFrame" name="frame_uart">
     <property name="geometry">
      <rect>
@@ -204,6 +207,9 @@
       <height>51</height>
      </rect>
     </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
     <property name="frameShape">
      <enum>QFrame::StyledPanel</enum>
     </property>
@@ -245,6 +251,9 @@
       <width>221</width>
       <height>211</height>
      </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
     </property>
     <property name="frameShape">
      <enum>QFrame::StyledPanel</enum>
@@ -389,10 +398,16 @@
       <height>771</height>
      </rect>
     </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
     <property name="currentIndex">
      <number>1</number>
     </property>
     <widget class="QWidget" name="deviceTab">
+     <property name="autoFillBackground">
+      <bool>true</bool>
+     </property>
      <attribute name="title">
       <string notr="true">设备管理</string>
      </attribute>
@@ -706,16 +721,19 @@
      </widget>
     </widget>
     <widget class="QWidget" name="ImageTable">
+     <property name="autoFillBackground">
+      <bool>true</bool>
+     </property>
      <attribute name="title">
       <string>图像处理</string>
      </attribute>
      <widget class="QFrame" name="frame_image">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>0</x>
         <y>-20</y>
-        <width>491</width>
-        <height>771</height>
+        <width>501</width>
+        <height>781</height>
        </rect>
       </property>
       <property name="autoFillBackground">
@@ -730,9 +748,9 @@
       <widget class="QLabel" name="label_image">
        <property name="geometry">
         <rect>
-         <x>0</x>
+         <x>-10</x>
          <y>10</y>
-         <width>481</width>
+         <width>491</width>
          <height>381</height>
         </rect>
        </property>
@@ -743,7 +761,7 @@
       <widget class="QLabel" name="label_img_path">
        <property name="geometry">
         <rect>
-         <x>0</x>
+         <x>10</x>
          <y>400</y>
          <width>72</width>
          <height>15</height>
@@ -831,7 +849,7 @@
       <widget class="QLabel" name="label_img_cmd">
        <property name="geometry">
         <rect>
-         <x>0</x>
+         <x>10</x>
          <y>470</y>
          <width>101</width>
          <height>16</height>
@@ -870,9 +888,9 @@
       <widget class="QLabel" name="label_img_log">
        <property name="geometry">
         <rect>
-         <x>0</x>
+         <x>10</x>
          <y>430</y>
-         <width>341</width>
+         <width>301</width>
          <height>31</height>
         </rect>
        </property>
@@ -909,7 +927,7 @@
       <widget class="QLabel" name="label_img_cmd_2">
        <property name="geometry">
         <rect>
-         <x>0</x>
+         <x>10</x>
          <y>620</y>
          <width>101</width>
          <height>16</height>
@@ -922,27 +940,30 @@
       <widget class="QPushButton" name="btn_img_sync">
        <property name="geometry">
         <rect>
-         <x>110</x>
+         <x>150</x>
          <y>640</y>
          <width>71</width>
          <height>31</height>
         </rect>
        </property>
+       <property name="toolTipDuration">
+        <number>0</number>
+       </property>
        <property name="text">
-        <string>图像同步</string>
+        <string>视频采集</string>
        </property>
       </widget>
       <widget class="QPushButton" name="btn_img_trans">
        <property name="geometry">
         <rect>
-         <x>10</x>
+         <x>330</x>
          <y>640</y>
          <width>71</width>
          <height>31</height>
         </rect>
        </property>
        <property name="text">
-        <string>图像传输</string>
+        <string>图像捕获</string>
        </property>
       </widget>
       <widget class="QPushButton" name="btn_img_line_scale">
@@ -1021,6 +1042,42 @@
        </property>
        <property name="text">
         <string>直方图显示</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="comboBox">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>640</y>
+         <width>121</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <item>
+        <property name="text">
+         <string>本地摄像头</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>网络摄像头</string>
+        </property>
+       </item>
+      </widget>
+      <widget class="QPushButton" name="btn_img_sync_2">
+       <property name="geometry">
+        <rect>
+         <x>240</x>
+         <y>640</y>
+         <width>71</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="toolTipDuration">
+        <number>0</number>
+       </property>
+       <property name="text">
+        <string>视频关闭</string>
        </property>
       </widget>
      </widget>

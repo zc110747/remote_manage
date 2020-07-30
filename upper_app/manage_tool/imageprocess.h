@@ -70,22 +70,27 @@ public:
     bool hist_image(QLabel *label, QString Path);
 #else
     //图像均值滤波
-    void blur_image(QLabel *label, QString Path){
+    bool blur_image(QLabel *label, QString Path){
+        return load_image(label, Path);
+    };
+
+    //图像灰度转换
+    bool gray_image(QLabel *label, QString Path){
         return load_image(label, Path);
     };
 
     //图像腐蚀 -- 高亮部分缩小
-    void erode_image(QLabel *label, QString Path){
+    bool erode_image(QLabel *label, QString Path){
         return load_image(label, Path);
     };
 
     //图像膨胀 -- 高亮部分扩大
-    void dilate_image(QLabel *label, QString Path){
+    bool dilate_image(QLabel *label, QString Path){
        return load_image(label, Path);
     };
 
     //边缘检测
-    void canny_image(QLabel *label, QString Path){
+    bool canny_image(QLabel *label, QString Path){
         return load_image(label, Path);
     };
 
@@ -116,15 +121,18 @@ public:
     }
 
     //直方图
-    bool hist_image(QLabel *label, QString Path)｛
+    bool hist_image(QLabel *label, QString Path){
         return load_image(label, Path);
-    ｝
+    }
 #endif
 
 private:
     QString file_extra{""};
 
 #if USE_OPENCV == 1
+
+    cv::Mat m_cvBasicMat;
+
     //将Opencv内部图像转变为QImage对象
     QImage cvMattoQImage(const cv::Mat& mat);
     cv::Mat QImagetocvMat(const QImage &image);			// QImage 改成 Mat

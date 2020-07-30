@@ -106,6 +106,8 @@ public:
     QPushButton *btn_img_wrap;
     QPushButton *btn_img_HoughLines;
     QPushButton *btn_img_backProj;
+    QComboBox *comboBox;
+    QPushButton *btn_img_sync_2;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -116,9 +118,10 @@ public:
         MainWindow->resize(730, 830);
         MainWindow->setMinimumSize(QSize(730, 830));
         MainWindow->setMaximumSize(QSize(730, 830));
-        MainWindow->setAutoFillBackground(false);
+        MainWindow->setAutoFillBackground(true);
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
+        centralwidget->setAutoFillBackground(true);
         frame_uart = new QFrame(centralwidget);
         frame_uart->setObjectName(QString::fromUtf8("frame_uart"));
         frame_uart->setGeometry(QRect(500, 10, 221, 201));
@@ -165,6 +168,7 @@ public:
         frame_dev = new QFrame(centralwidget);
         frame_dev->setObjectName(QString::fromUtf8("frame_dev"));
         frame_dev->setGeometry(QRect(500, 230, 221, 51));
+        frame_dev->setAutoFillBackground(true);
         frame_dev->setFrameShape(QFrame::StyledPanel);
         frame_dev->setFrameShadow(QFrame::Raised);
         label_dev_id = new QLabel(frame_dev);
@@ -176,6 +180,7 @@ public:
         frame_socket = new QFrame(centralwidget);
         frame_socket->setObjectName(QString::fromUtf8("frame_socket"));
         frame_socket->setGeometry(QRect(500, 300, 221, 211));
+        frame_socket->setAutoFillBackground(true);
         frame_socket->setFrameShape(QFrame::StyledPanel);
         frame_socket->setFrameShadow(QFrame::Raised);
         label_server_ipaddr = new QLabel(frame_socket);
@@ -211,8 +216,10 @@ public:
         tabWidget = new QTabWidget(centralwidget);
         tabWidget->setObjectName(QString::fromUtf8("tabWidget"));
         tabWidget->setGeometry(QRect(10, 10, 481, 771));
+        tabWidget->setAutoFillBackground(true);
         deviceTab = new QWidget();
         deviceTab->setObjectName(QString::fromUtf8("deviceTab"));
+        deviceTab->setAutoFillBackground(true);
         frame_info = new QFrame(deviceTab);
         frame_info->setObjectName(QString::fromUtf8("frame_info"));
         frame_info->setGeometry(QRect(0, 0, 481, 431));
@@ -295,18 +302,19 @@ public:
         tabWidget->setTabText(tabWidget->indexOf(deviceTab), QString::fromUtf8("\350\256\276\345\244\207\347\256\241\347\220\206"));
         ImageTable = new QWidget();
         ImageTable->setObjectName(QString::fromUtf8("ImageTable"));
+        ImageTable->setAutoFillBackground(true);
         frame_image = new QFrame(ImageTable);
         frame_image->setObjectName(QString::fromUtf8("frame_image"));
-        frame_image->setGeometry(QRect(10, -20, 491, 771));
+        frame_image->setGeometry(QRect(0, -20, 501, 781));
         frame_image->setAutoFillBackground(true);
         frame_image->setFrameShape(QFrame::StyledPanel);
         frame_image->setFrameShadow(QFrame::Raised);
         label_image = new QLabel(frame_image);
         label_image->setObjectName(QString::fromUtf8("label_image"));
-        label_image->setGeometry(QRect(0, 10, 481, 381));
+        label_image->setGeometry(QRect(-10, 10, 491, 381));
         label_img_path = new QLabel(frame_image);
         label_img_path->setObjectName(QString::fromUtf8("label_img_path"));
-        label_img_path->setGeometry(QRect(0, 400, 72, 15));
+        label_img_path->setGeometry(QRect(10, 400, 72, 15));
         combox_img_path = new QComboBox(frame_image);
         combox_img_path->setObjectName(QString::fromUtf8("combox_img_path"));
         combox_img_path->setGeometry(QRect(80, 400, 331, 21));
@@ -327,7 +335,7 @@ public:
         btn_img_erode->setGeometry(QRect(210, 500, 71, 31));
         label_img_cmd = new QLabel(frame_image);
         label_img_cmd->setObjectName(QString::fromUtf8("label_img_cmd"));
-        label_img_cmd->setGeometry(QRect(0, 470, 101, 16));
+        label_img_cmd->setGeometry(QRect(10, 470, 101, 16));
         btn_img_dilate = new QPushButton(frame_image);
         btn_img_dilate->setObjectName(QString::fromUtf8("btn_img_dilate"));
         btn_img_dilate->setGeometry(QRect(320, 500, 71, 31));
@@ -336,7 +344,7 @@ public:
         btn_img_canny->setGeometry(QRect(10, 540, 71, 31));
         label_img_log = new QLabel(frame_image);
         label_img_log->setObjectName(QString::fromUtf8("label_img_log"));
-        label_img_log->setGeometry(QRect(0, 430, 341, 31));
+        label_img_log->setGeometry(QRect(10, 430, 301, 31));
         btn_img_gray = new QPushButton(frame_image);
         btn_img_gray->setObjectName(QString::fromUtf8("btn_img_gray"));
         btn_img_gray->setGeometry(QRect(110, 540, 71, 31));
@@ -345,13 +353,14 @@ public:
         btn_img_save->setGeometry(QRect(310, 430, 71, 31));
         label_img_cmd_2 = new QLabel(frame_image);
         label_img_cmd_2->setObjectName(QString::fromUtf8("label_img_cmd_2"));
-        label_img_cmd_2->setGeometry(QRect(0, 620, 101, 16));
+        label_img_cmd_2->setGeometry(QRect(10, 620, 101, 16));
         btn_img_sync = new QPushButton(frame_image);
         btn_img_sync->setObjectName(QString::fromUtf8("btn_img_sync"));
-        btn_img_sync->setGeometry(QRect(110, 640, 71, 31));
+        btn_img_sync->setGeometry(QRect(150, 640, 71, 31));
+        btn_img_sync->setToolTipDuration(0);
         btn_img_trans = new QPushButton(frame_image);
         btn_img_trans->setObjectName(QString::fromUtf8("btn_img_trans"));
-        btn_img_trans->setGeometry(QRect(10, 640, 71, 31));
+        btn_img_trans->setGeometry(QRect(330, 640, 71, 31));
         btn_img_line_scale = new QPushButton(frame_image);
         btn_img_line_scale->setObjectName(QString::fromUtf8("btn_img_line_scale"));
         btn_img_line_scale->setGeometry(QRect(210, 540, 71, 31));
@@ -370,6 +379,15 @@ public:
         btn_img_backProj = new QPushButton(frame_image);
         btn_img_backProj->setObjectName(QString::fromUtf8("btn_img_backProj"));
         btn_img_backProj->setGeometry(QRect(110, 580, 81, 28));
+        comboBox = new QComboBox(frame_image);
+        comboBox->addItem(QString());
+        comboBox->addItem(QString());
+        comboBox->setObjectName(QString::fromUtf8("comboBox"));
+        comboBox->setGeometry(QRect(10, 640, 121, 31));
+        btn_img_sync_2 = new QPushButton(frame_image);
+        btn_img_sync_2->setObjectName(QString::fromUtf8("btn_img_sync_2"));
+        btn_img_sync_2->setGeometry(QRect(240, 640, 71, 31));
+        btn_img_sync_2->setToolTipDuration(0);
         tabWidget->addTab(ImageTable, QString());
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
@@ -440,14 +458,18 @@ public:
         btn_img_gray->setText(QApplication::translate("MainWindow", "\347\201\260\345\272\246\350\275\254\346\215\242", nullptr));
         btn_img_save->setText(QApplication::translate("MainWindow", "\344\277\235\345\255\230\345\233\276\345\203\217", nullptr));
         label_img_cmd_2->setText(QApplication::translate("MainWindow", "\344\272\244\344\272\222\346\214\207\344\273\244", nullptr));
-        btn_img_sync->setText(QApplication::translate("MainWindow", "\345\233\276\345\203\217\345\220\214\346\255\245", nullptr));
-        btn_img_trans->setText(QApplication::translate("MainWindow", "\345\233\276\345\203\217\344\274\240\350\276\223", nullptr));
+        btn_img_sync->setText(QApplication::translate("MainWindow", "\350\247\206\351\242\221\351\207\207\351\233\206", nullptr));
+        btn_img_trans->setText(QApplication::translate("MainWindow", "\345\233\276\345\203\217\346\215\225\350\216\267", nullptr));
         btn_img_line_scale->setText(QApplication::translate("MainWindow", "\347\272\277\346\200\247\346\211\251\345\261\225", nullptr));
         btn_img_noline_scale->setText(QApplication::translate("MainWindow", "\351\235\236\347\272\277\346\200\247\346\211\251\345\261\225", nullptr));
         btn_img_equalizeHist->setText(QApplication::translate("MainWindow", "\347\233\264\346\226\271\345\233\276\345\235\207\350\241\241", nullptr));
         btn_img_wrap->setText(QApplication::translate("MainWindow", "\344\273\277\345\260\204\345\217\230\346\215\242", nullptr));
         btn_img_HoughLines->setText(QApplication::translate("MainWindow", "\351\234\215\345\244\253\347\272\277\345\217\230\346\215\242", nullptr));
         btn_img_backProj->setText(QApplication::translate("MainWindow", "\347\233\264\346\226\271\345\233\276\346\230\276\347\244\272", nullptr));
+        comboBox->setItemText(0, QApplication::translate("MainWindow", "\346\234\254\345\234\260\346\221\204\345\203\217\345\244\264", nullptr));
+        comboBox->setItemText(1, QApplication::translate("MainWindow", "\347\275\221\347\273\234\346\221\204\345\203\217\345\244\264", nullptr));
+
+        btn_img_sync_2->setText(QApplication::translate("MainWindow", "\350\247\206\351\242\221\345\205\263\351\227\255", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(ImageTable), QApplication::translate("MainWindow", "\345\233\276\345\203\217\345\244\204\347\220\206", nullptr));
     } // retranslateUi
 

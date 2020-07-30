@@ -45,9 +45,9 @@ HEADERS += \
 FORMS += \
     mainwindow.ui
 
-INCLUDEPATH += E:\git-system\opencv_install\include
+INCLUDEPATH += $$PWD\..\..\..\opencv_install\include
 
-LIBS += E:\git-system\opencv_install\x64\mingw\lib\libopencv_*.a
+LIBS += $$PWD\..\..\..\opencv_install\x64\mingw\lib\libopencv_*.a
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -1339,10 +1339,8 @@ debug/configfile.o: ../manage_tool/configfile.cpp ../manage_tool/configfile.h \
 		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/QJsonValue
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\configfile.o ..\manage_tool\configfile.cpp
 
-debug/imageprocess.o: ../manage_tool/imageprocess.cpp ../manage_tool/imageprocess.h \
-		../manage_tool/typedef.h \
-		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/QDebug \
-		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qdebug.h \
+debug/imageprocess.o: ../manage_tool/imageprocess.cpp D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/QVector \
+		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qvector.h \
 		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qalgorithms.h \
 		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qglobal.h \
 		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qconfig-bootstrapped.h \
@@ -1365,14 +1363,13 @@ debug/imageprocess.o: ../manage_tool/imageprocess.cpp ../manage_tool/imageproces
 		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qmutex.h \
 		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qnumeric.h \
 		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qversiontagging.h \
-		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qhash.h \
-		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qchar.h \
 		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qiterator.h \
 		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qlist.h \
 		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qrefcount.h \
 		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qarraydata.h \
 		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qhashfunctions.h \
 		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qstring.h \
+		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qchar.h \
 		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qbytearray.h \
 		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qnamespace.h \
 		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qstringliteral.h \
@@ -1384,6 +1381,12 @@ debug/imageprocess.o: ../manage_tool/imageprocess.cpp ../manage_tool/imageproces
 		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qstringlist.h \
 		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qregexp.h \
 		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qstringmatcher.h \
+		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qpoint.h \
+		../manage_tool/imageprocess.h \
+		../manage_tool/typedef.h \
+		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/QDebug \
+		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qdebug.h \
+		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qhash.h \
 		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qmap.h \
 		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qtextstream.h \
 		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qiodevice.h \
@@ -1399,8 +1402,6 @@ debug/imageprocess.o: ../manage_tool/imageprocess.cpp ../manage_tool/imageproces
 		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qlocale.h \
 		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qvariant.h \
 		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qshareddata.h \
-		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qvector.h \
-		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qpoint.h \
 		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qset.h \
 		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qcontiguouscache.h \
 		D:/Software/Qt5/5.12.8/mingw73_64/include/QtCore/qsharedpointer.h \
@@ -1452,6 +1453,13 @@ debug/imageprocess.o: ../manage_tool/imageprocess.cpp ../manage_tool/imageproces
 		D:/Software/Qt5/5.12.8/mingw73_64/include/QtGui/qevent.h \
 		D:/Software/Qt5/5.12.8/mingw73_64/include/QtGui/qvector2d.h \
 		D:/Software/Qt5/5.12.8/mingw73_64/include/QtGui/qtouchdevice.h \
+		../manage_tool/mainwindow.h \
+		D:/Software/Qt5/5.12.8/mingw73_64/include/QtWidgets/QMainWindow \
+		D:/Software/Qt5/5.12.8/mingw73_64/include/QtWidgets/qmainwindow.h \
+		D:/Software/Qt5/5.12.8/mingw73_64/include/QtWidgets/qtabwidget.h \
+		D:/Software/Qt5/5.12.8/mingw73_64/include/QtGui/qicon.h \
+		D:/Software/Qt5/5.12.8/mingw73_64/include/QtWidgets/QWidget \
+		ui_mainwindow.h \
 		../../../opencv_install/include/opencv2/core/core.hpp \
 		../../../opencv_install/include/opencv2/core.hpp \
 		../../../opencv_install/include/opencv2/core/cvdef.h \
@@ -1488,14 +1496,7 @@ debug/imageprocess.o: ../manage_tool/imageprocess.cpp ../manage_tool/imageproces
 		../../../opencv_install/include/opencv2/imgcodecs.hpp \
 		../../../opencv_install/include/opencv2/videoio.hpp \
 		../../../opencv_install/include/opencv2/imgproc/imgproc.hpp \
-		../../../opencv_install/include/opencv2/imgproc.hpp \
-		../manage_tool/mainwindow.h \
-		D:/Software/Qt5/5.12.8/mingw73_64/include/QtWidgets/QMainWindow \
-		D:/Software/Qt5/5.12.8/mingw73_64/include/QtWidgets/qmainwindow.h \
-		D:/Software/Qt5/5.12.8/mingw73_64/include/QtWidgets/qtabwidget.h \
-		D:/Software/Qt5/5.12.8/mingw73_64/include/QtGui/qicon.h \
-		D:/Software/Qt5/5.12.8/mingw73_64/include/QtWidgets/QWidget \
-		ui_mainwindow.h
+		../../../opencv_install/include/opencv2/imgproc.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\imageprocess.o ..\manage_tool\imageprocess.cpp
 
 debug/main.o: ../manage_tool/main.cpp ../manage_tool/mainwindow.h \
