@@ -225,7 +225,7 @@ static int set_opt(int nFd, int nBaud, int nDataBits, std::string cParity, int n
 	newtio.c_cc[VMIN] = 0;
 
 	tcflush(nFd, TCIFLUSH);
-	if((tcsetattr(nFd, TCSANOW,&newtio))!=0)
+	if((tcsetattr(nFd, TCSANOW, &newtio))!=0)
 	{
 		USR_DEBUG("Serial Config Error\n");
 		return -1;
