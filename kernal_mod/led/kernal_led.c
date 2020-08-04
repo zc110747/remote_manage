@@ -53,7 +53,7 @@ struct led_info led_driver_info;
 #define LED_OFF                         0
 #define LED_ON                          1
 
-#define TREE_NODE_NAME                  "/led"
+#define TREE_NODE_NAME                  "/usr_gpios/led"
 #define TREE_GPIO_NAME                  "led-gpio"
 
 /*内部接口*/

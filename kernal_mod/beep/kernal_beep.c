@@ -46,7 +46,7 @@ struct beep_info
 
 struct beep_info beep_driver_info;
 
-#define TREE_NODE_NAME                  "/beep"    /*设备树名称*/
+#define TREE_NODE_NAME                  "/usr_gpios/beep"    /*设备树名称*/
 
 #define DEFAULT_MAJOR                   0          /*默认主设备号*/
 #define DEFAULT_MINOR                   0          /*默认从设备号*/

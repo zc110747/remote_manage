@@ -98,31 +98,36 @@
 		};
 	};
 
-	/*beep add by zc*/
-	beep {
-		compatible = "gpio-beep";
+	/*gpio application add by zc*/
+	usr_gpios {
+		compatible = "usr-gpios";
 		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_beep>;
-		beep-gpio = <&gpio5 1 GPIO_ACTIVE_LOW>;
-		status = "okay";
-	};
+		model = "usr-gpios";
 
-	/*led add by zc*/
-	led {
-		compatible = "gpio-led";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_gpio_leds>;
-		led-gpio = <&gpio1 3 GPIO_ACTIVE_LOW>;
-		status = "okay";
-	};
+		beep {
+			compatible = "gpio-beep";
+			pinctrl-0 = <&pinctrl_beep>;
+			beep-gpio = <&gpio5 1 GPIO_ACTIVE_LOW>;
+			status = "okay";
+		};
 
-	/*led add by zc*/
-	key {
-		compatible = "gpio-key";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_gpio_keys>;
-		key-gpio = <&gpio1 18 GPIO_ACTIVE_LOW>;
-		status = "okay";
+		led {
+			compatible = "gpio-led";
+			pinctrl-0 = <&pinctrl_gpio_leds>;
+			led-gpio = <&gpio1 3 GPIO_ACTIVE_LOW>;
+			status = "okay";
+		};
+
+		key {
+			compatible = "gpio-key";
+			#address-cells = <1>;
+			#size-cells = <1>; 
+			pinctrl-0 = <&pinctrl_gpio_keys>;
+			key-gpio = <&gpio1 18 GPIO_ACTIVE_LOW>;
+			interrupt-parent = <&gpio1>;
+			interrupts = <18 IRQ_TYPE_EDGE_BOTH>;
+			status = "okay";
+		};
 	};
 
 	gpio_keys: gpio_keys@0 {
@@ -135,8 +140,6 @@
 
 		key1@1 {
 			label = "USER-KEY1";
-			linux,code = <114>;
-			gpios = <&gpio1 18 GPIO_ACTIVE_LOW>;
 			gpio-key,wakeup;
 		};
 	};

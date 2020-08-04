@@ -22,9 +22,16 @@
 #include <linux/errno.h>
 #include <linux/gpio.h>
 #include <linux/cdev.h>
-#include <linux/of.h>
-#include <linux/of_address.h>
+#include <linux/device.h>
 #include <linux/of_gpio.h>
+#include <linux/semaphore.h>
+#include <linux/timer.h>
+#include <linux/irq.h>
+#include <linux/wait.h>
+#include <linux/poll.h>
+#include <linux/fs.h>
+#include <linux/fcntl.h>
+#include <linux/platform_device.h>
 #include <asm/mach/map.h>
 #include <asm/uaccess.h>
 #include <asm/io.h>
@@ -40,7 +47,7 @@ struct key_info
 	struct device *device;	    /*设备指针*/
     struct device_node *nd;     /*设备节点*/
     int key_gpio;               /*key对应的引脚接口*/
-    atomic_long_t lock;         /*不允许LED被其它应用访问的lock函数*/
+    atomic_long_t lock;         /*不允许按键被其它应用访问的lock函数*/
 };
 
 struct key_info key_driver_info;
@@ -52,7 +59,7 @@ struct key_info key_driver_info;
 #define key_OFF                         0
 #define key_ON                          1
 
-#define TREE_NODE_NAME                  "/key"
+#define TREE_NODE_NAME                  "/usr-gpios/key"
 #define TREE_GPIO_NAME                  "key-gpio"
 
 /*内部接口*/
@@ -177,14 +184,13 @@ static struct file_operations key_fops = {
     .release = key_release,
 };
 
-/**
- * 驱动加载时执行的初始化函数
- * 
- * @param NULL
- *
- * @return 驱动加载处理结果
+/*
+ * @description		: flatform驱动的probe函数，当驱动与
+ * 					  设备匹配以后此函数就会执行
+ * @param - dev 	: platform设备
+ * @return 			: 0，成功;其他负值,失败
  */
-static int __init key_module_init(void)
+static int key_probe(struct platform_device *dev)
 {
     int result;
 
@@ -255,6 +261,51 @@ static int __init key_module_init(void)
     return 0;
 }
 
+/*
+ * @description		: flatform驱动的probe函数，当驱动与
+ * 					  设备匹配以后此函数就会执行
+ * @param - dev 	: platform设备
+ * @return 			: 0，成功;其他负值,失败
+ */
+static int key_remove(struct platform_device *dev)
+{
+    /* 注销字符设备驱动 */
+    device_destroy(key_driver_info.class, key_driver_info.dev_id);
+	class_destroy(key_driver_info.class);
+
+	cdev_del(&key_driver_info.cdev);
+	unregister_chrdev_region(key_driver_info.dev_id, DEVICE_key_CNT);
+    
+    return 0;
+}
+
+/* 匹配列表 */
+static const struct of_device_id key_of_match[] = {
+	{ .compatible = "gpio-key" },
+	{ /* Sentinel */ }
+};
+
+static struct platform_driver key_driver = {
+    .driver = {
+        .name = "imx6ul-key",
+        .of_match_table = key_of_match,
+    },
+    .probe = key_probe,
+    .remove = key_remove,
+};
+
+/**
+ * 驱动加载时执行的初始化函数
+ * 
+ * @param NULL
+ *
+ * @return 驱动加载处理结果
+ */
+static int __init key_module_init(void)
+{
+    return platform_driver_register(&key_driver);
+}
+
 
 /**
  * 驱动释放时执行的退出函数
@@ -265,12 +316,7 @@ static int __init key_module_init(void)
  */
 static void __exit key_module_exit(void)
 {
-    /* 注销字符设备驱动 */
-    device_destroy(key_driver_info.class, key_driver_info.dev_id);
-	class_destroy(key_driver_info.class);
-
-	cdev_del(&key_driver_info.cdev);
-	unregister_chrdev_region(key_driver_info.dev_id, DEVICE_key_CNT);
+    platform_driver_unregister(&key_driver);
 }
 
 module_init(key_module_init);

@@ -14,9 +14,11 @@
                 "CONFIG_SPARSE_IRQ",
                 "CONFIG_GPIOLIB",
                 "CONFIG_OF",
-                "__USE_XOPEN"
+                "__USE_XOPEN",
+                "__USE_XOPEN2K",
+                "__GNUC__"
             ],
-            "compilerPath": "D:\\Software\\mingw64\\bin\\gcc.exe",
+            "compilerPath": "D:\\Software\\mingw64\\bin\\g++.exe",
             "cStandard": "c99",
             "cppStandard": "c++17",
             "intelliSenseMode": "gcc-x64"
