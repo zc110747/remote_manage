@@ -59,7 +59,7 @@ struct key_info key_driver_info;
 #define key_OFF                         0
 #define key_ON                          1
 
-#define TREE_NODE_NAME                  "/usr-gpios/key"
+#define TREE_NODE_NAME                  "/usr_gpios/key"
 #define TREE_GPIO_NAME                  "key-gpio"
 
 /*内部接口*/
@@ -202,6 +202,7 @@ static int key_probe(struct platform_device *dev)
 
     /*在总线上创建设备*/    
     /*1.申请字符设备号*/
+    printk(KERN_INFO"probe work start!\r\n");	
     if(key_driver_info.major){
         key_driver_info.dev_id = MKDEV(key_driver_info.major, key_driver_info.minor);
         result = register_chrdev_region(key_driver_info.dev_id, DEVICE_key_CNT, DEVICE_key_NAME);
@@ -257,7 +258,7 @@ static int key_probe(struct platform_device *dev)
 		printk(KERN_INFO"device create successed!\r\n");
 	}
 
-    printk(KERN_INFO"Led Driver Init Ok!\r\n");
+    printk(KERN_INFO"key driver init ok!\r\n");
     return 0;
 }
 
@@ -281,13 +282,15 @@ static int key_remove(struct platform_device *dev)
 
 /* 匹配列表 */
 static const struct of_device_id key_of_match[] = {
-	{ .compatible = "gpio-key" },
+	{ .compatible = "usr-gpios" },
 	{ /* Sentinel */ }
 };
 
+MODULE_DEVICE_TABLE(of, key_of_match);
+
 static struct platform_driver key_driver = {
     .driver = {
-        .name = "imx6ul-key",
+        .name = TREE_NODE_NAME,
         .of_match_table = key_of_match,
     },
     .probe = key_probe,
@@ -303,7 +306,11 @@ static struct platform_driver key_driver = {
  */
 static int __init key_module_init(void)
 {
-    return platform_driver_register(&key_driver);
+    int status;
+    status = platform_driver_register(&key_driver);
+    if(status != 0)
+        printk("%d\r\n", status);
+    return status;
 }
 
 

@@ -1,4 +1,5 @@
-
+#include<errno.h>
+#include<string.h>
 #include<unistd.h>
 #include<sys/types.h>
 #include<sys/stat.h>
@@ -14,8 +15,8 @@ int main(int argc, const char *argv[])
     int fd;
 
     fd = open(KEY_DEV_NAME, O_RDWR | O_NDELAY);
-    if(fd != -1){
-        printf("%s open error", KEY_DEV_NAME);
+    if(fd < 0){
+        printf("%s open failed, error:%s", KEY_DEV_NAME, strerror(errno));
         return -1;
     }
     else{
