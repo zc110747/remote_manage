@@ -13,12 +13,12 @@
                 "__ARM_PCS_VFP",
                 "CONFIG_SPARSE_IRQ",
                 "CONFIG_GPIOLIB",
-                "CONFIG_OF",
+                "CONFIG_OF=1",
                 "__USE_XOPEN",
                 "__USE_XOPEN2K",
                 "__GNUC__"
             ],
-            "compilerPath": "D:\\Software\\mingw64\\bin\\g++.exe",
+            "compilerPath": "D:\\Software\\mingw64\\bin\\x86_64-w64-mingw32-gcc-8.1.0.exe",
             "cStandard": "c99",
             "cppStandard": "c++17",
             "intelliSenseMode": "gcc-x64"

@@ -53,8 +53,8 @@ struct key_info
 struct key_info key_driver_info;
 #define DEFAULT_MAJOR                   0          /*默认主设备号*/
 #define DEFAULT_MINOR                   0          /*默认从设备号*/
-#define DEVICE_key_CNT			        1		   /* 设备号个数 */
-#define DEVICE_key_NAME			        "key"     /* 设备名 */
+#define DEVICE_KEY_CNT			        1		   /* 设备号个数 */
+#define DEVICE_KEY_NAME			        "key"     /* 设备名 */
 
 #define key_OFF                         0
 #define key_ON                          1
@@ -205,10 +205,10 @@ static int key_probe(struct platform_device *dev)
     printk(KERN_INFO"probe work start!\r\n");	
     if(key_driver_info.major){
         key_driver_info.dev_id = MKDEV(key_driver_info.major, key_driver_info.minor);
-        result = register_chrdev_region(key_driver_info.dev_id, DEVICE_key_CNT, DEVICE_key_NAME);
+        result = register_chrdev_region(key_driver_info.dev_id, DEVICE_KEY_CNT, DEVICE_KEY_NAME);
     }
     else{
-        result = alloc_chrdev_region(&key_driver_info.dev_id, 0, DEVICE_key_CNT, DEVICE_key_NAME);
+        result = alloc_chrdev_region(&key_driver_info.dev_id, 0, DEVICE_KEY_CNT, DEVICE_KEY_NAME);
         key_driver_info.major = MAJOR(key_driver_info.dev_id);
         key_driver_info.minor = MINOR(key_driver_info.dev_id);
     }
@@ -223,9 +223,9 @@ static int key_probe(struct platform_device *dev)
     /*2.初始化设备信息，将设备接口和设备号进行关联*/
     cdev_init(&key_driver_info.cdev, &key_fops);
     key_driver_info.cdev.owner = THIS_MODULE;
-    result = cdev_add(&key_driver_info.cdev, key_driver_info.dev_id, DEVICE_key_CNT);
+    result = cdev_add(&key_driver_info.cdev, key_driver_info.dev_id, DEVICE_KEY_CNT);
     if(result != 0){
-        unregister_chrdev_region(key_driver_info.dev_id, DEVICE_key_CNT);
+        unregister_chrdev_region(key_driver_info.dev_id, DEVICE_KEY_CNT);
         printk(KERN_INFO"cdev add failed\r\n");
         return result;
     }else{
@@ -233,10 +233,10 @@ static int key_probe(struct platform_device *dev)
     }
 
     /* 3、创建类 */
-	key_driver_info.class = class_create(THIS_MODULE, DEVICE_key_NAME);
+	key_driver_info.class = class_create(THIS_MODULE, DEVICE_KEY_NAME);
 	if (IS_ERR(key_driver_info.class)) {
 		printk(KERN_INFO"class create failed!\r\n");
-		unregister_chrdev_region(key_driver_info.dev_id, DEVICE_key_CNT);
+		unregister_chrdev_region(key_driver_info.dev_id, DEVICE_KEY_CNT);
 		cdev_del(&key_driver_info.cdev);	
 		return PTR_ERR(key_driver_info.class);
 	}
@@ -245,10 +245,10 @@ static int key_probe(struct platform_device *dev)
 	}
 
 	/* 4、创建设备 */
-	key_driver_info.device = device_create(key_driver_info.class, NULL, key_driver_info.dev_id, NULL, DEVICE_key_NAME);
+	key_driver_info.device = device_create(key_driver_info.class, NULL, key_driver_info.dev_id, NULL, DEVICE_KEY_NAME);
 	if (IS_ERR(key_driver_info.device)) {
 		printk(KERN_INFO"device create failed!\r\n");
-                unregister_chrdev_region(key_driver_info.dev_id, DEVICE_key_CNT);       
+                unregister_chrdev_region(key_driver_info.dev_id, DEVICE_KEY_CNT);       
                 cdev_del(&key_driver_info.cdev);
 		
 		class_destroy(key_driver_info.class);
@@ -275,7 +275,7 @@ static int key_remove(struct platform_device *dev)
 	class_destroy(key_driver_info.class);
 
 	cdev_del(&key_driver_info.cdev);
-	unregister_chrdev_region(key_driver_info.dev_id, DEVICE_key_CNT);
+	unregister_chrdev_region(key_driver_info.dev_id, DEVICE_KEY_CNT);
     
     return 0;
 }
@@ -290,7 +290,7 @@ MODULE_DEVICE_TABLE(of, key_of_match);
 
 static struct platform_driver key_driver = {
     .driver = {
-        .name = TREE_NODE_NAME,
+        .name = DEVICE_KEY_NAME,
         .of_match_table = key_of_match,
     },
     .probe = key_probe,
