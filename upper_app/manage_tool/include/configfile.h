@@ -5,17 +5,17 @@
 
 struct SSystemConfig
 {
-    //串口相关
+    //涓插彛鐩稿叧
     QString m_SCom{"COM1"};
     QString m_SBaud{"115200"};
     QString m_SDataBits{"8"};
     QString m_SStopBits{"1"};
     QString m_SParity{"N"};
 
-    //设备ID
+    //璁惧ID
     QString m_SDeviceID{"1"};
 
-    //网络Socket相关
+    //缃戠粶Socket鐩稿叧
     QString m_SProtocol{"TCP"};
     QString m_SIpAddr{"127.0.0.1"};
     QString m_SLocalIpAddr{"127.0.0.1"};

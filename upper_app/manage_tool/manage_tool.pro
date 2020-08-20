@@ -28,24 +28,27 @@ SOURCES += \
     protocol.cpp \
     tcpclient.cpp \
     uartclient.cpp \
-    udpclient.cpp
+    udpclient.cpp   \
+    screenshot/screenshot.cpp
 
 HEADERS += \
-    appthread.h \
-    commandinfo.h \
-    configfile.h \
-    imageprocess.h \
-    mainwindow.h \
-    protocol.h \
-    tcpclient.h \
-    typedef.h \
-    uartclient.h \
-    udpclient.h
+    include/appthread.h \
+    include/commandinfo.h \
+    include/configfile.h \
+    include/imageprocess.h \
+    include/mainwindow.h \
+    include/protocol.h \
+    include/tcpclient.h \
+    include/typedef.h \
+    include/uartclient.h \
+    include/udpclient.h \
+    screenshot/screenshot.h
 
 FORMS += \
     mainwindow.ui
 
 INCLUDEPATH += $$PWD\..\..\..\opencv_install\include
+INCLUDEPATH += $$PWD\include
 
 LIBS += $$PWD\..\..\..\opencv_install\x64\mingw\lib\libopencv_*.a
 

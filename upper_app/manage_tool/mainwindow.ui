@@ -176,8 +176,8 @@
       <rect>
        <x>10</x>
        <y>170</y>
-       <width>81</width>
-       <height>23</height>
+       <width>85</width>
+       <height>25</height>
       </rect>
      </property>
      <property name="text">
@@ -187,10 +187,10 @@
     <widget class="QPushButton" name="btn_uart_close">
      <property name="geometry">
       <rect>
-       <x>120</x>
+       <x>110</x>
        <y>170</y>
-       <width>81</width>
-       <height>23</height>
+       <width>85</width>
+       <height>25</height>
       </rect>
      </property>
      <property name="text">
@@ -318,8 +318,8 @@
       <rect>
        <x>10</x>
        <y>180</y>
-       <width>81</width>
-       <height>23</height>
+       <width>85</width>
+       <height>25</height>
       </rect>
      </property>
      <property name="text">
@@ -329,10 +329,10 @@
     <widget class="QPushButton" name="btn_socket_close">
      <property name="geometry">
       <rect>
-       <x>120</x>
+       <x>110</x>
        <y>180</y>
-       <width>81</width>
-       <height>23</height>
+       <width>85</width>
+       <height>25</height>
       </rect>
      </property>
      <property name="text">
@@ -812,8 +812,8 @@
         <rect>
          <x>10</x>
          <y>500</y>
-         <width>71</width>
-         <height>31</height>
+         <width>90</width>
+         <height>30</height>
         </rect>
        </property>
        <property name="text">
@@ -823,10 +823,10 @@
       <widget class="QPushButton" name="btn_img_blur">
        <property name="geometry">
         <rect>
-         <x>110</x>
+         <x>120</x>
          <y>500</y>
-         <width>71</width>
-         <height>31</height>
+         <width>90</width>
+         <height>30</height>
         </rect>
        </property>
        <property name="text">
@@ -836,10 +836,10 @@
       <widget class="QPushButton" name="btn_img_erode">
        <property name="geometry">
         <rect>
-         <x>210</x>
+         <x>230</x>
          <y>500</y>
-         <width>71</width>
-         <height>31</height>
+         <width>90</width>
+         <height>30</height>
         </rect>
        </property>
        <property name="text">
@@ -862,10 +862,10 @@
       <widget class="QPushButton" name="btn_img_dilate">
        <property name="geometry">
         <rect>
-         <x>320</x>
+         <x>340</x>
          <y>500</y>
-         <width>71</width>
-         <height>31</height>
+         <width>90</width>
+         <height>30</height>
         </rect>
        </property>
        <property name="text">
@@ -877,8 +877,8 @@
         <rect>
          <x>10</x>
          <y>540</y>
-         <width>71</width>
-         <height>31</height>
+         <width>90</width>
+         <height>30</height>
         </rect>
        </property>
        <property name="text">
@@ -901,10 +901,10 @@
       <widget class="QPushButton" name="btn_img_gray">
        <property name="geometry">
         <rect>
-         <x>110</x>
+         <x>120</x>
          <y>540</y>
-         <width>71</width>
-         <height>31</height>
+         <width>90</width>
+         <height>30</height>
         </rect>
        </property>
        <property name="text">
@@ -924,7 +924,7 @@
         <string>保存图像</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_img_cmd_2">
+      <widget class="QLabel" name="label_img_cmd_com">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -937,13 +937,13 @@
         <string>交互指令</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="btn_img_sync">
+      <widget class="QPushButton" name="btn_camera_open">
        <property name="geometry">
         <rect>
          <x>150</x>
          <y>640</y>
-         <width>71</width>
-         <height>31</height>
+         <width>90</width>
+         <height>30</height>
         </rect>
        </property>
        <property name="toolTipDuration">
@@ -953,13 +953,13 @@
         <string>视频采集</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="btn_img_trans">
+      <widget class="QPushButton" name="btn_camera_capture">
        <property name="geometry">
         <rect>
-         <x>330</x>
+         <x>370</x>
          <y>640</y>
-         <width>71</width>
-         <height>31</height>
+         <width>90</width>
+         <height>30</height>
         </rect>
        </property>
        <property name="text">
@@ -969,10 +969,10 @@
       <widget class="QPushButton" name="btn_img_line_scale">
        <property name="geometry">
         <rect>
-         <x>210</x>
+         <x>230</x>
          <y>540</y>
-         <width>71</width>
-         <height>31</height>
+         <width>90</width>
+         <height>30</height>
         </rect>
        </property>
        <property name="text">
@@ -982,10 +982,10 @@
       <widget class="QPushButton" name="btn_img_noline_scale">
        <property name="geometry">
         <rect>
-         <x>320</x>
+         <x>340</x>
          <y>540</y>
-         <width>91</width>
-         <height>31</height>
+         <width>90</width>
+         <height>30</height>
         </rect>
        </property>
        <property name="text">
@@ -995,10 +995,10 @@
       <widget class="QPushButton" name="btn_img_equalizeHist">
        <property name="geometry">
         <rect>
-         <x>320</x>
+         <x>340</x>
          <y>580</y>
-         <width>91</width>
-         <height>31</height>
+         <width>90</width>
+         <height>30</height>
         </rect>
        </property>
        <property name="text">
@@ -1010,8 +1010,8 @@
         <rect>
          <x>10</x>
          <y>580</y>
-         <width>71</width>
-         <height>31</height>
+         <width>90</width>
+         <height>30</height>
         </rect>
        </property>
        <property name="text">
@@ -1021,10 +1021,10 @@
       <widget class="QPushButton" name="btn_img_HoughLines">
        <property name="geometry">
         <rect>
-         <x>210</x>
+         <x>230</x>
          <y>580</y>
-         <width>81</width>
-         <height>31</height>
+         <width>90</width>
+         <height>30</height>
         </rect>
        </property>
        <property name="text">
@@ -1034,10 +1034,10 @@
       <widget class="QPushButton" name="btn_img_backProj">
        <property name="geometry">
         <rect>
-         <x>110</x>
+         <x>120</x>
          <y>580</y>
-         <width>81</width>
-         <height>28</height>
+         <width>90</width>
+         <height>30</height>
         </rect>
        </property>
        <property name="text">
@@ -1049,8 +1049,8 @@
         <rect>
          <x>10</x>
          <y>640</y>
-         <width>121</width>
-         <height>31</height>
+         <width>120</width>
+         <height>30</height>
         </rect>
        </property>
        <item>
@@ -1064,13 +1064,13 @@
         </property>
        </item>
       </widget>
-      <widget class="QPushButton" name="btn_img_sync_2">
+      <widget class="QPushButton" name="btn_camera_close">
        <property name="geometry">
         <rect>
-         <x>240</x>
+         <x>260</x>
          <y>640</y>
-         <width>71</width>
-         <height>31</height>
+         <width>90</width>
+         <height>30</height>
         </rect>
        </property>
        <property name="toolTipDuration">
@@ -1078,6 +1078,48 @@
        </property>
        <property name="text">
         <string>视频关闭</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_img_cmd_other">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>690</y>
+         <width>101</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>其它指令</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_img_capture">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>710</y>
+         <width>90</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="toolTipDuration">
+        <number>0</number>
+       </property>
+       <property name="text">
+        <string>图像截屏</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="checkBox_capture">
+       <property name="geometry">
+        <rect>
+         <x>110</x>
+         <y>720</y>
+         <width>111</width>
+         <height>19</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>是否隐藏窗体</string>
        </property>
       </widget>
      </widget>

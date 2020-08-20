@@ -10,9 +10,11 @@ debug/protocol.o
 debug/tcpclient.o
 debug/uartclient.o
 debug/udpclient.o
+debug/screenshot.o
 debug/qrc_main.o
 debug/moc_appthread.o
 debug/moc_mainwindow.o
 debug/moc_tcpclient.o
 debug/moc_uartclient.o
 debug/moc_udpclient.o
+debug/moc_screenshot.o

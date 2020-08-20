@@ -407,6 +407,8 @@ void QextSerialPortPrivate::updatePortSettings()
 			case STOP_2:
 				commConfig.dcb.StopBits = TWOSTOPBITS;
 				break;
+            default:
+                break;
 		}
 	}
 

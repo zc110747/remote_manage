@@ -11,6 +11,7 @@
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QLabel>
@@ -97,9 +98,9 @@ public:
     QLabel *label_img_log;
     QPushButton *btn_img_gray;
     QPushButton *btn_img_save;
-    QLabel *label_img_cmd_2;
-    QPushButton *btn_img_sync;
-    QPushButton *btn_img_trans;
+    QLabel *label_img_cmd_com;
+    QPushButton *btn_camera_open;
+    QPushButton *btn_camera_capture;
     QPushButton *btn_img_line_scale;
     QPushButton *btn_img_noline_scale;
     QPushButton *btn_img_equalizeHist;
@@ -107,7 +108,10 @@ public:
     QPushButton *btn_img_HoughLines;
     QPushButton *btn_img_backProj;
     QComboBox *comboBox;
-    QPushButton *btn_img_sync_2;
+    QPushButton *btn_camera_close;
+    QLabel *label_img_cmd_other;
+    QPushButton *btn_img_capture;
+    QCheckBox *checkBox_capture;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -161,10 +165,10 @@ public:
         combo_box_parity->setGeometry(QRect(100, 130, 111, 21));
         btn_uart_open = new QPushButton(frame_uart);
         btn_uart_open->setObjectName(QString::fromUtf8("btn_uart_open"));
-        btn_uart_open->setGeometry(QRect(10, 170, 81, 23));
+        btn_uart_open->setGeometry(QRect(10, 170, 85, 25));
         btn_uart_close = new QPushButton(frame_uart);
         btn_uart_close->setObjectName(QString::fromUtf8("btn_uart_close"));
-        btn_uart_close->setGeometry(QRect(120, 170, 81, 23));
+        btn_uart_close->setGeometry(QRect(110, 170, 85, 25));
         frame_dev = new QFrame(centralwidget);
         frame_dev->setObjectName(QString::fromUtf8("frame_dev"));
         frame_dev->setGeometry(QRect(500, 230, 221, 51));
@@ -197,10 +201,10 @@ public:
         line_edit_port->setGeometry(QRect(100, 100, 111, 21));
         btn_socket_open = new QPushButton(frame_socket);
         btn_socket_open->setObjectName(QString::fromUtf8("btn_socket_open"));
-        btn_socket_open->setGeometry(QRect(10, 180, 81, 23));
+        btn_socket_open->setGeometry(QRect(10, 180, 85, 25));
         btn_socket_close = new QPushButton(frame_socket);
         btn_socket_close->setObjectName(QString::fromUtf8("btn_socket_close"));
-        btn_socket_close->setGeometry(QRect(120, 180, 81, 23));
+        btn_socket_close->setGeometry(QRect(110, 180, 85, 25));
         label_socket_type = new QLabel(frame_socket);
         label_socket_type->setObjectName(QString::fromUtf8("label_socket_type"));
         label_socket_type->setGeometry(QRect(10, 20, 51, 20));
@@ -326,68 +330,78 @@ public:
         btn_img_show->setGeometry(QRect(391, 430, 71, 31));
         btn_img_base = new QPushButton(frame_image);
         btn_img_base->setObjectName(QString::fromUtf8("btn_img_base"));
-        btn_img_base->setGeometry(QRect(10, 500, 71, 31));
+        btn_img_base->setGeometry(QRect(10, 500, 90, 30));
         btn_img_blur = new QPushButton(frame_image);
         btn_img_blur->setObjectName(QString::fromUtf8("btn_img_blur"));
-        btn_img_blur->setGeometry(QRect(110, 500, 71, 31));
+        btn_img_blur->setGeometry(QRect(120, 500, 90, 30));
         btn_img_erode = new QPushButton(frame_image);
         btn_img_erode->setObjectName(QString::fromUtf8("btn_img_erode"));
-        btn_img_erode->setGeometry(QRect(210, 500, 71, 31));
+        btn_img_erode->setGeometry(QRect(230, 500, 90, 30));
         label_img_cmd = new QLabel(frame_image);
         label_img_cmd->setObjectName(QString::fromUtf8("label_img_cmd"));
         label_img_cmd->setGeometry(QRect(10, 470, 101, 16));
         btn_img_dilate = new QPushButton(frame_image);
         btn_img_dilate->setObjectName(QString::fromUtf8("btn_img_dilate"));
-        btn_img_dilate->setGeometry(QRect(320, 500, 71, 31));
+        btn_img_dilate->setGeometry(QRect(340, 500, 90, 30));
         btn_img_canny = new QPushButton(frame_image);
         btn_img_canny->setObjectName(QString::fromUtf8("btn_img_canny"));
-        btn_img_canny->setGeometry(QRect(10, 540, 71, 31));
+        btn_img_canny->setGeometry(QRect(10, 540, 90, 30));
         label_img_log = new QLabel(frame_image);
         label_img_log->setObjectName(QString::fromUtf8("label_img_log"));
         label_img_log->setGeometry(QRect(10, 430, 301, 31));
         btn_img_gray = new QPushButton(frame_image);
         btn_img_gray->setObjectName(QString::fromUtf8("btn_img_gray"));
-        btn_img_gray->setGeometry(QRect(110, 540, 71, 31));
+        btn_img_gray->setGeometry(QRect(120, 540, 90, 30));
         btn_img_save = new QPushButton(frame_image);
         btn_img_save->setObjectName(QString::fromUtf8("btn_img_save"));
         btn_img_save->setGeometry(QRect(310, 430, 71, 31));
-        label_img_cmd_2 = new QLabel(frame_image);
-        label_img_cmd_2->setObjectName(QString::fromUtf8("label_img_cmd_2"));
-        label_img_cmd_2->setGeometry(QRect(10, 620, 101, 16));
-        btn_img_sync = new QPushButton(frame_image);
-        btn_img_sync->setObjectName(QString::fromUtf8("btn_img_sync"));
-        btn_img_sync->setGeometry(QRect(150, 640, 71, 31));
-        btn_img_sync->setToolTipDuration(0);
-        btn_img_trans = new QPushButton(frame_image);
-        btn_img_trans->setObjectName(QString::fromUtf8("btn_img_trans"));
-        btn_img_trans->setGeometry(QRect(330, 640, 71, 31));
+        label_img_cmd_com = new QLabel(frame_image);
+        label_img_cmd_com->setObjectName(QString::fromUtf8("label_img_cmd_com"));
+        label_img_cmd_com->setGeometry(QRect(10, 620, 101, 16));
+        btn_camera_open = new QPushButton(frame_image);
+        btn_camera_open->setObjectName(QString::fromUtf8("btn_camera_open"));
+        btn_camera_open->setGeometry(QRect(150, 640, 90, 30));
+        btn_camera_open->setToolTipDuration(0);
+        btn_camera_capture = new QPushButton(frame_image);
+        btn_camera_capture->setObjectName(QString::fromUtf8("btn_camera_capture"));
+        btn_camera_capture->setGeometry(QRect(370, 640, 90, 30));
         btn_img_line_scale = new QPushButton(frame_image);
         btn_img_line_scale->setObjectName(QString::fromUtf8("btn_img_line_scale"));
-        btn_img_line_scale->setGeometry(QRect(210, 540, 71, 31));
+        btn_img_line_scale->setGeometry(QRect(230, 540, 90, 30));
         btn_img_noline_scale = new QPushButton(frame_image);
         btn_img_noline_scale->setObjectName(QString::fromUtf8("btn_img_noline_scale"));
-        btn_img_noline_scale->setGeometry(QRect(320, 540, 91, 31));
+        btn_img_noline_scale->setGeometry(QRect(340, 540, 90, 30));
         btn_img_equalizeHist = new QPushButton(frame_image);
         btn_img_equalizeHist->setObjectName(QString::fromUtf8("btn_img_equalizeHist"));
-        btn_img_equalizeHist->setGeometry(QRect(320, 580, 91, 31));
+        btn_img_equalizeHist->setGeometry(QRect(340, 580, 90, 30));
         btn_img_wrap = new QPushButton(frame_image);
         btn_img_wrap->setObjectName(QString::fromUtf8("btn_img_wrap"));
-        btn_img_wrap->setGeometry(QRect(10, 580, 71, 31));
+        btn_img_wrap->setGeometry(QRect(10, 580, 90, 30));
         btn_img_HoughLines = new QPushButton(frame_image);
         btn_img_HoughLines->setObjectName(QString::fromUtf8("btn_img_HoughLines"));
-        btn_img_HoughLines->setGeometry(QRect(210, 580, 81, 31));
+        btn_img_HoughLines->setGeometry(QRect(230, 580, 90, 30));
         btn_img_backProj = new QPushButton(frame_image);
         btn_img_backProj->setObjectName(QString::fromUtf8("btn_img_backProj"));
-        btn_img_backProj->setGeometry(QRect(110, 580, 81, 28));
+        btn_img_backProj->setGeometry(QRect(120, 580, 90, 30));
         comboBox = new QComboBox(frame_image);
         comboBox->addItem(QString());
         comboBox->addItem(QString());
         comboBox->setObjectName(QString::fromUtf8("comboBox"));
-        comboBox->setGeometry(QRect(10, 640, 121, 31));
-        btn_img_sync_2 = new QPushButton(frame_image);
-        btn_img_sync_2->setObjectName(QString::fromUtf8("btn_img_sync_2"));
-        btn_img_sync_2->setGeometry(QRect(240, 640, 71, 31));
-        btn_img_sync_2->setToolTipDuration(0);
+        comboBox->setGeometry(QRect(10, 640, 120, 30));
+        btn_camera_close = new QPushButton(frame_image);
+        btn_camera_close->setObjectName(QString::fromUtf8("btn_camera_close"));
+        btn_camera_close->setGeometry(QRect(260, 640, 90, 30));
+        btn_camera_close->setToolTipDuration(0);
+        label_img_cmd_other = new QLabel(frame_image);
+        label_img_cmd_other->setObjectName(QString::fromUtf8("label_img_cmd_other"));
+        label_img_cmd_other->setGeometry(QRect(10, 690, 101, 16));
+        btn_img_capture = new QPushButton(frame_image);
+        btn_img_capture->setObjectName(QString::fromUtf8("btn_img_capture"));
+        btn_img_capture->setGeometry(QRect(10, 710, 90, 30));
+        btn_img_capture->setToolTipDuration(0);
+        checkBox_capture = new QCheckBox(frame_image);
+        checkBox_capture->setObjectName(QString::fromUtf8("checkBox_capture"));
+        checkBox_capture->setGeometry(QRect(110, 720, 111, 19));
         tabWidget->addTab(ImageTable, QString());
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
@@ -457,9 +471,9 @@ public:
         label_img_log->setText(QApplication::translate("MainWindow", "log:\345\233\276\345\203\217\346\234\252\345\212\240\350\275\275", nullptr));
         btn_img_gray->setText(QApplication::translate("MainWindow", "\347\201\260\345\272\246\350\275\254\346\215\242", nullptr));
         btn_img_save->setText(QApplication::translate("MainWindow", "\344\277\235\345\255\230\345\233\276\345\203\217", nullptr));
-        label_img_cmd_2->setText(QApplication::translate("MainWindow", "\344\272\244\344\272\222\346\214\207\344\273\244", nullptr));
-        btn_img_sync->setText(QApplication::translate("MainWindow", "\350\247\206\351\242\221\351\207\207\351\233\206", nullptr));
-        btn_img_trans->setText(QApplication::translate("MainWindow", "\345\233\276\345\203\217\346\215\225\350\216\267", nullptr));
+        label_img_cmd_com->setText(QApplication::translate("MainWindow", "\344\272\244\344\272\222\346\214\207\344\273\244", nullptr));
+        btn_camera_open->setText(QApplication::translate("MainWindow", "\350\247\206\351\242\221\351\207\207\351\233\206", nullptr));
+        btn_camera_capture->setText(QApplication::translate("MainWindow", "\345\233\276\345\203\217\346\215\225\350\216\267", nullptr));
         btn_img_line_scale->setText(QApplication::translate("MainWindow", "\347\272\277\346\200\247\346\211\251\345\261\225", nullptr));
         btn_img_noline_scale->setText(QApplication::translate("MainWindow", "\351\235\236\347\272\277\346\200\247\346\211\251\345\261\225", nullptr));
         btn_img_equalizeHist->setText(QApplication::translate("MainWindow", "\347\233\264\346\226\271\345\233\276\345\235\207\350\241\241", nullptr));
@@ -469,7 +483,10 @@ public:
         comboBox->setItemText(0, QApplication::translate("MainWindow", "\346\234\254\345\234\260\346\221\204\345\203\217\345\244\264", nullptr));
         comboBox->setItemText(1, QApplication::translate("MainWindow", "\347\275\221\347\273\234\346\221\204\345\203\217\345\244\264", nullptr));
 
-        btn_img_sync_2->setText(QApplication::translate("MainWindow", "\350\247\206\351\242\221\345\205\263\351\227\255", nullptr));
+        btn_camera_close->setText(QApplication::translate("MainWindow", "\350\247\206\351\242\221\345\205\263\351\227\255", nullptr));
+        label_img_cmd_other->setText(QApplication::translate("MainWindow", "\345\205\266\345\256\203\346\214\207\344\273\244", nullptr));
+        btn_img_capture->setText(QApplication::translate("MainWindow", "\345\233\276\345\203\217\346\210\252\345\261\217", nullptr));
+        checkBox_capture->setText(QApplication::translate("MainWindow", "\346\230\257\345\220\246\351\232\220\350\227\217\347\252\227\344\275\223", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(ImageTable), QApplication::translate("MainWindow", "\345\233\276\345\203\217\345\244\204\347\220\206", nullptr));
     } // retranslateUi
 

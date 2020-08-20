@@ -47,7 +47,7 @@ QImage COpencvImgProcess::cvMattoQImage(const cv::Mat& mat)
 {
     switch(mat.type())
     {
-        //µ¥Í¨µÀµÄÊý¾Ý´¦Àí
+        //ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý´ï¿½ï¿½ï¿½
         case CV_8UC1:
         {
             static QVector<QRgb> sColorVector;
@@ -64,17 +64,17 @@ QImage COpencvImgProcess::cvMattoQImage(const cv::Mat& mat)
         }
         break;
 
-        //3Í¨µÀµÄÊý¾Ý´¦Àí
+        //3Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý´ï¿½ï¿½ï¿½
         case CV_8UC3:
         {
-            QImage image(mat.data, mat.cols, mat.rows, (int)mat.step, QImage::Format_RGB888);	// R, G, B ¶ÔÓ¦ 0,1,2
-            return image.rgbSwapped();                          //rgbSwappedÊÇÎªÁËÏÔÊ¾Ð§¹ûÉ«²ÊºÃÒ»Ð©¡£
+            QImage image(mat.data, mat.cols, mat.rows, (int)mat.step, QImage::Format_RGB888);	// R, G, B ï¿½ï¿½Ó¦ 0,1,2
+            return image.rgbSwapped();                          //rgbSwappedï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½Ê¾Ð§ï¿½ï¿½É«ï¿½Êºï¿½Ò»Ð©ï¿½ï¿½
         }
 
-        //4Í¨µÀµÄÊý¾Ý´¦Àí
+        //4Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý´ï¿½ï¿½ï¿½
         case CV_8UC4:
         {
-            QImage image(mat.data, mat.cols, mat.rows, (int)mat.step, QImage::Format_ARGB32);		// B,G,R,A ¶ÔÓ¦ 0,1,2,3
+            QImage image(mat.data, mat.cols, mat.rows, (int)mat.step, QImage::Format_ARGB32);		// B,G,R,A ï¿½ï¿½Ó¦ 0,1,2,3
             return image;
         }
         break;
@@ -98,7 +98,7 @@ cv::Mat QImagetocvMat(const QImage &image)
         case QImage::Format_ARGB32_Premultiplied:
             ImgMat = cv::Mat(image.height(), image.width(), CV_8UC4, (void*)image.constBits(), image.bytesPerLine());
             break;
-        //QImage Format_RGB888ÊÇ°´ÕÕR,G,BÅÅ²¼£¬  Mat°´ÕÕB,G,RÅÅ²¼£¬ Òò¶ø£¬ÐèÒª½øÐÐ»¥»»£»
+        //QImage Format_RGB888ï¿½Ç°ï¿½ï¿½ï¿½R,G,Bï¿½Å²ï¿½ï¿½ï¿½  Matï¿½ï¿½ï¿½ï¿½B,G,Rï¿½Å²ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½Ð»ï¿½ï¿½ï¿½ï¿½ï¿½
         case QImage::Format_RGB888:
         {
             ImgMat = cv::Mat(image.height(), image.width(), CV_8UC3, (void*)image.constBits(), image.bytesPerLine());
@@ -124,10 +124,10 @@ bool COpencvImgProcess::blur_image(QLabel *label, QString Path)
         return false;
     }
 
-    cv::blur(ImgMat, ImgMatOut, cv::Size(7, 7));                    //¾ùÖµÂË²¨
-    //cv::GaussianBlur(ImgMat, ImgMatOut, cv::Size(7, 7), 0, 0);    //¸ßË¹ÂË²¨
-    //cv::medianBlur(ImgMat, ImgMatOut, 3);                         //ÖÐÖµÂË²¨
-    //cv::bilateralFilter(ImgMat, ImgMatOut, 4, 4*2, 4/2);            //Ë«±ßÆ½»¬
+    cv::blur(ImgMat, ImgMatOut, cv::Size(7, 7));                    //ï¿½ï¿½Öµï¿½Ë²ï¿½
+    //cv::GaussianBlur(ImgMat, ImgMatOut, cv::Size(7, 7), 0, 0);    //ï¿½ï¿½Ë¹ï¿½Ë²ï¿½
+    //cv::medianBlur(ImgMat, ImgMatOut, 3);                         //ï¿½ï¿½Öµï¿½Ë²ï¿½
+    //cv::bilateralFilter(ImgMat, ImgMatOut, 4, 4*2, 4/2);            //Ë«ï¿½ï¿½Æ½ï¿½ï¿½
 
     load_image(label, ImgMatOut);
     return true;
@@ -177,13 +177,13 @@ bool COpencvImgProcess::canny_image(QLabel *label, QString Path)
         return false;
     }
 
-    //×ª»»Îª»Ò¶ÈÍ¼Ïñ
+    //×ªï¿½ï¿½Îªï¿½Ò¶ï¿½Í¼ï¿½ï¿½
     cv::cvtColor(ImgMat, GrayImgMat, cv::COLOR_BGR2GRAY);
 
-    //¾ùÖµÂË²¨
+    //ï¿½ï¿½Öµï¿½Ë²ï¿½
     cv::blur(GrayImgMat, BlurImgMat, cv::Size(7, 7));
 
-    //±ßÔµ¼ì²â-t1È·¶¨½ÓÊÕ±ßÔµµÄÌØÐÔ
+    //ï¿½ï¿½Ôµï¿½ï¿½ï¿½ï¿½-t1È·ï¿½ï¿½ï¿½ï¿½ï¿½Õ±ï¿½Ôµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     cv::Canny(BlurImgMat, CannyImgMat, 30, 60, 3, false);
 
     load_image(label, CannyImgMat);
@@ -201,10 +201,10 @@ bool COpencvImgProcess::gray_image(QLabel *label, QString Path)
         return false;
     }
 
-    //×ª»»Îª»Ò¶ÈÍ¼Ïñ
+    //×ªï¿½ï¿½Îªï¿½Ò¶ï¿½Í¼ï¿½ï¿½
     cv::cvtColor(ImgMat, GrayImgMat, cv::COLOR_BGR2GRAY);
 
-    //¾ùÖµÂË²¨
+    //ï¿½ï¿½Öµï¿½Ë²ï¿½
     cv::blur(GrayImgMat, BlurImgMat, cv::Size(7, 7));
 
     load_image(label, BlurImgMat);
@@ -224,11 +224,11 @@ bool COpencvImgProcess::line_scale_image(QLabel *label, QString Path)
         return false;
     }
 
-    //»Ò¶È×ª»»
+    //ï¿½Ò¶ï¿½×ªï¿½ï¿½
     cv::cvtColor(ImgMat, GrayImgMat, cv::COLOR_BGR2GRAY);
     lineScaleImageMat = GrayImgMat;
 
-    //ÏßÐÔÀ©Õ¹
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¹
     for (int y = 0; y < GrayImgMat.rows; y++)
     {
         for (int x = 0; x < GrayImgMat.cols; x++)
@@ -266,11 +266,11 @@ bool COpencvImgProcess::noline_scale_image(QLabel *label, QString Path)
         return false;
     }
 
-    //»Ò¶È×ª»»
+    //ï¿½Ò¶ï¿½×ªï¿½ï¿½
     cv::cvtColor(ImgMat, GrayImgMat, cv::COLOR_BGR2GRAY);
     nolineScaleImageMat = cv::Mat::zeros(GrayImgMat.rows, GrayImgMat.cols, GrayImgMat.type());
 
-    //·ÇÏßÐÔÀ©Õ¹
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¹
     for (int y = 0; y < GrayImgMat.rows; y++)
     {
         for (int x = 0; x < GrayImgMat.cols; x++)
@@ -295,10 +295,10 @@ bool COpencvImgProcess::equalizeHist_image(QLabel *label, QString Path)
         return false;
     }
 
-    //»Ò¶È×ª»»
+    //ï¿½Ò¶ï¿½×ªï¿½ï¿½
     cv::cvtColor(ImgMat, GrayImgMat, cv::COLOR_BGR2GRAY);
 
-    //Ö±·½Í¼¾ùºâ
+    //Ö±ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½
     cv::equalizeHist(GrayImgMat, EqualizeHistImageMat);
 
     load_image(label, EqualizeHistImageMat);
@@ -322,7 +322,7 @@ bool COpencvImgProcess::warpaffine_image(QLabel *label, QString Path)
 
     WrapImgMat = cv::Mat::zeros(ImgMat.rows, ImgMat.cols, ImgMat.type());
 
-    // ÉèÖÃÔ´Í¼ÏñºÍÄ¿±êÍ¼ÏñÉÏµÄÈý×éµãÒÔ¼ÆËã·ÂÉä±ä»»
+    // ï¿½ï¿½ï¿½ï¿½Ô´Í¼ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½Í¼ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ä»»
     srcTri[0] = cv::Point2f( 0,0 );
     srcTri[1] = cv::Point2f( ImgMat.cols - 1, 0 );
     srcTri[2] = cv::Point2f( 0, ImgMat.rows - 1 );
@@ -331,22 +331,22 @@ bool COpencvImgProcess::warpaffine_image(QLabel *label, QString Path)
     dstTri[1] = cv::Point2f( ImgMat.cols*0.85, ImgMat.rows*0.25 );
     dstTri[2] = cv::Point2f( ImgMat.cols*0.15, ImgMat.rows*0.7 );
 
-    // ÇóµÃ·ÂÉä±ä»»
+    // ï¿½ï¿½ï¿½Ã·ï¿½ï¿½ï¿½ï¿½ä»»
     warp_mat = cv::getAffineTransform( srcTri, dstTri );
 
-    // ¶ÔÔ´Í¼ÏñÓ¦ÓÃÉÏÃæÇóµÃµÄ·ÂÉä±ä»»
+    // ï¿½ï¿½Ô´Í¼ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÃµÄ·ï¿½ï¿½ï¿½ï¿½ä»»
     cv::warpAffine( ImgMat,  WrapImgMat, warp_mat, WrapImgMat.size() );
 
-    /* ¶ÔÍ¼ÏñÅ¤ÇúºóÔÙÐý×ª */
-    // ¼ÆËãÈÆÍ¼ÏñÖÐµãË³Ê±ÕëÐý×ª50¶ÈËõ·ÅÒò×ÓÎª0.6µÄÐý×ª¾ØÕó
+    /* ï¿½ï¿½Í¼ï¿½ï¿½Å¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ª */
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½Ðµï¿½Ë³Ê±ï¿½ï¿½ï¿½ï¿½×ª50ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îª0.6ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½
     cv::Point center = cv::Point( WrapImgMat.cols/2, WrapImgMat.rows/2 );
     double angle = -50.0;
     double scale = 0.6;
 
-    // Í¨¹ýÉÏÃæµÄÐý×ªÏ¸½ÚÐÅÏ¢ÇóµÃÐý×ª¾ØÕó
+    // Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ªÏ¸ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½
     rot_mat = getRotationMatrix2D( center, angle, scale );
 
-    // Ðý×ªÒÑÅ¤ÇúÍ¼Ïñ
+    // ï¿½ï¿½×ªï¿½ï¿½Å¤ï¿½ï¿½Í¼ï¿½ï¿½
     warpAffine(WrapImgMat, WrapRotateImgMat, rot_mat, WrapImgMat.size());
 
     load_image(label, WrapRotateImgMat);
@@ -391,7 +391,7 @@ bool COpencvImgProcess::hist_image(QLabel *label, QString Path)
 
     cvtColor(ImgMat, HsvImgMat, cv::COLOR_BGR2HSV);
 
-    //·ÖÀëHueÍ¨µÀ
+    //ï¿½ï¿½ï¿½ï¿½HueÍ¨ï¿½ï¿½
     HueImgMat.create(HsvImgMat.size(), HsvImgMat.depth());
     int ch[] = {0, 0};
     cv::mixChannels(&HsvImgMat, 1, &HueImgMat, 1, ch, 1);
@@ -402,11 +402,11 @@ bool COpencvImgProcess::hist_image(QLabel *label, QString Path)
     float hue_range[] = { 0, 180 };
     const float* ranges = { hue_range };
 
-    /// ¼ÆËãÖ±·½Í¼²¢¹éÒ»»¯
+    /// ï¿½ï¿½ï¿½ï¿½Ö±ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½
     cv::calcHist(&HueImgMat, 1, 0, cv::Mat(), hist, 1, &histSize, &ranges, true, false );
     cv::normalize( hist, hist, 0, 255, cv::NORM_MINMAX, -1, cv::Mat() );
 
-     /// ¼ÆËã·´ÏòÍ¶Ó°
+     /// ï¿½ï¿½ï¿½ã·´ï¿½ï¿½Í¶Ó°
     cv::MatND backproj;
     cv::calcBackProject(&HueImgMat, 1, 0, hist, backproj, &ranges, 1, true );
 

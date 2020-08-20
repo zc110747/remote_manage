@@ -8,6 +8,7 @@
 #include "appthread.h"
 #include "configfile.h"
 #include "imageprocess.h"
+#include "screenshot/screenshot.h"
 #include <QDir>
 #include <QFileDialog>
 
@@ -18,7 +19,7 @@ static CAppThreadInfo *pAppThreadInfo;
 static PROTOCOL_STATUS protocol_flag;
 static struct SSystemConfig *pSystemConfigInfo;
 static class COpencvImgProcess OpencvImgProcess;
-
+static CScreenShot *pCScreenShotInfo;
 
 #define FRAM_STYLE  "QFrame{border-radius:10px}"
 
@@ -152,6 +153,11 @@ void MainWindow::init()
     AppThreadInit();
     pAppThreadInfo = GetAppThreadInfo();
     pAppThreadInfo->start();
+
+    //初始化图像截取模块
+    ScreenShotInit();
+    pCScreenShotInfo = GetScrenShotInfo();
+    connect(pCScreenShotInfo, SIGNAL(send_release()), this, SLOT(process_capture()));
 }
 
 /*!
@@ -181,6 +187,11 @@ void MainWindow::append_text_edit_test(QString s)
     {
         ui->text_edit_test->append(s);
     }
+}
+
+void MainWindow::process_capture(void)
+{
+    this->show();
 }
 
 /*!
@@ -836,4 +847,20 @@ void MainWindow::on_btn_img_backProj_clicked()
     {
         ui->label_img_log->setText(QString::fromUtf8("log:图像加载失败"));
     }
+}
+
+void MainWindow::on_btn_img_capture_clicked()
+{
+    if(ui->checkBox_capture->checkState() == Qt::CheckState::Checked)
+    {
+        this->hide();
+        pCScreenShotInfo->SetMainWinStatus(true);
+    }
+    else
+    {
+        pCScreenShotInfo->SetMainWinStatus(false);
+    }
+    QPixmap pixmap = pCScreenShotInfo->getFullScreenPixmap();
+    pCScreenShotInfo->show();
+    pCScreenShotInfo->loadBackgroundPixmap(pixmap);
 }

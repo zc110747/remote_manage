@@ -22,6 +22,7 @@ public:
 public slots:
     void append_text_edit_recv(QString s);
     void append_text_edit_test(QString s);
+    void process_capture(void);
 
 private slots:
     void on_btn_clear_clicked();
@@ -81,6 +82,8 @@ private slots:
     void on_btn_img_HoughLines_clicked();
 
     void on_btn_img_backProj_clicked();
+
+    void on_btn_img_capture_clicked();
 
 private:
     Ui::MainWindow *ui;
