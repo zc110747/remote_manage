@@ -235,7 +235,7 @@ public:
         label_led->setGeometry(QRect(10, 10, 71, 16));
         btn_led_on = new QPushButton(frame_info);
         btn_led_on->setObjectName(QString::fromUtf8("btn_led_on"));
-        btn_led_on->setGeometry(QRect(90, 10, 91, 23));
+        btn_led_on->setGeometry(QRect(90, 10, 90, 23));
         btn_led_off = new QPushButton(frame_info);
         btn_led_off->setObjectName(QString::fromUtf8("btn_led_off"));
         btn_led_off->setGeometry(QRect(200, 10, 91, 23));
@@ -414,7 +414,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        tabWidget->setCurrentIndex(1);
+        tabWidget->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(MainWindow);

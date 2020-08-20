@@ -17,7 +17,11 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void init();
+    void init_btn_disable();
+    void init_btn_enable();
     void update_system_config(void);
+    void initStyle();
+    void QFrame_Init();
 
 public slots:
     void append_text_edit_recv(QString s);

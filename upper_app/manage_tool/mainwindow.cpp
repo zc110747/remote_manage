@@ -23,11 +23,6 @@ static CScreenShot *pCScreenShotInfo;
 
 #define FRAM_STYLE  "QFrame{border-radius:10px}"
 
-//函数声明
-void init_btn_disable(Ui::MainWindow *ui);
-void init_btn_enable(Ui::MainWindow *ui);
-void QFrame_Init(Ui::MainWindow *ui);
-
 //类的实现
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -35,9 +30,11 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    QFrame_Init(ui);
+    QFrame_Init();
     init();
+    initStyle();
     CommandInfoInit();
+
 }
 
 MainWindow::~MainWindow()
@@ -45,15 +42,44 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void QFrame_Init(Ui::MainWindow *ui)
+void MainWindow::initStyle()
+{
+    //加载样式表
+    QString qss;
+
+    //QFile file(":/qss/psblack.css");
+    QFile file(":/qss/flatwhite.css");
+    //QFile file(":/qss/lightblue.css");
+
+    if (file.open(QFile::ReadOnly)) {
+        //用QTextStream读取样式文件不用区分文件编码 带bom也行
+        QStringList list;
+        QTextStream in(&file);
+        //in.setCodec("utf-8");
+        while (!in.atEnd()) {
+            QString line;
+            in >> line;
+            list << line;
+        }
+
+        qss = list.join("\n");
+
+        QString paletteColor = qss.mid(20, 7);
+        qApp->setPalette(QPalette(QColor(paletteColor)));
+        qApp->setStyleSheet(qss);
+        file.close();
+    }
+}
+
+void MainWindow::QFrame_Init()
 {
     ui->centralwidget->setMinimumSize(QSize(740, 780));
-    ui->frame_uart->setFrameShape(QFrame::Shape::Box);
-    ui->frame_uart->setFrameShadow(QFrame::Shadow::Sunken);
-    ui->frame_dev->setFrameShape(QFrame::Shape::Box);
-    ui->frame_dev->setFrameShadow(QFrame::Shadow::Sunken);
-    ui->frame_socket->setFrameShape(QFrame::Shape::Box);
-    ui->frame_socket->setFrameShadow(QFrame::Shadow::Sunken);
+//    ui->frame_uart->setFrameShape(QFrame::Shape::Box);
+//    ui->frame_uart->setFrameShadow(QFrame::Shadow::Sunken);
+//    ui->frame_dev->setFrameShape(QFrame::Shape::Box);
+//    ui->frame_dev->setFrameShadow(QFrame::Shadow::Sunken);
+//    ui->frame_socket->setFrameShape(QFrame::Shape::Box);
+//    ui->frame_socket->setFrameShadow(QFrame::Shadow::Sunken);
     //ui->label_image->setStyleSheet("border-image:url(:/image/test.jpg);");
 
     if(OpencvImgProcess.load_image(ui->label_image, QString(QDir::currentPath()+"/image/test.jpg")))
@@ -126,7 +152,7 @@ void MainWindow::init()
 //    ui->line_edit_dev_id->setValidator( validator_id );
 
     //默认按键配置不可操作
-    init_btn_disable(ui);
+    init_btn_disable();
     ui->btn_uart_close->setDisabled(true);
     ui->btn_socket_close->setDisabled(true);
 
@@ -197,7 +223,7 @@ void MainWindow::process_capture(void)
 /*!
     关闭按钮(包含串口和网络)执行的界面状态管理函数
 */
-void init_btn_disable(Ui::MainWindow *ui)
+void MainWindow::init_btn_disable()
 {
     ui->btn_led_on->setDisabled(true);
     ui->btn_led_off->setDisabled(true);
@@ -213,7 +239,7 @@ void init_btn_disable(Ui::MainWindow *ui)
 /*!
     开启按钮(包含串口和网络)执行的界面状态管理函数
 */
-void init_btn_enable(Ui::MainWindow *ui)
+void MainWindow::init_btn_enable()
 {
     ui->btn_led_on->setEnabled(true);
     ui->btn_led_off->setEnabled(true);
@@ -324,7 +350,7 @@ void MainWindow::on_btn_send_cmd_clicked()
 */
 void MainWindow::on_btn_uart_close_clicked()
 {
-    init_btn_disable(ui);
+    init_btn_disable();
     pMainUartProtocolInfo->m_pQueue->clear();      //清空队列
     pMainUartProtocolInfo->m_bComStatus = false;
     pMainUartProtocolInfo->m_pSerialPortCom->close();
@@ -386,7 +412,7 @@ void MainWindow::on_btn_uart_open_clicked()
         pMainUartProtocolInfo->m_pSerialPortCom->setStopBits((StopBitsType)ui->combo_box_stop->currentText().toInt());
         pMainUartProtocolInfo->m_pSerialPortCom->setFlowControl(FLOW_OFF);
         pMainUartProtocolInfo->m_pSerialPortCom ->setTimeout(10);
-        init_btn_enable(ui);
+        init_btn_enable();
         pMainUartProtocolInfo->SetId(ui->line_edit_dev_id->text().toShort());
         ui->btn_uart_close->setEnabled(true);
         ui->btn_uart_open->setDisabled(true);
@@ -446,7 +472,7 @@ QString byteArrayToHexString(QString head, const uint8_t* str, uint16_t size, QS
 */
 void MainWindow::on_btn_socket_open_clicked()
 {
-    init_btn_enable(ui);
+    init_btn_enable();
     ui->btn_uart_close->setDisabled(true);
     ui->btn_uart_open->setDisabled(true);
     ui->btn_socket_open->setDisabled(true);
@@ -477,7 +503,7 @@ void MainWindow::on_btn_socket_open_clicked()
 */
 void MainWindow::on_btn_socket_close_clicked()
 {
-    init_btn_disable(ui);
+    init_btn_disable();
     pMainTcpSocketThreadInfo->m_pQueue->clear();
     ui->btn_uart_close->setEnabled(true);
     ui->btn_uart_open->setEnabled(true);

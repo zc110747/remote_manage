@@ -12,6 +12,7 @@ release/uartclient.o
 release/udpclient.o
 release/screenshot.o
 release/qrc_main.o
+release/qrc_qss.o
 release/moc_appthread.o
 release/moc_mainwindow.o
 release/moc_tcpclient.o

@@ -19,7 +19,7 @@ public:
     COpencvImgProcess(){};
     ~COpencvImgProcess(){};
 
-    //¸ù¾İµØÖ·¼ÓÔØÍ¼Ïñ
+    //æ ¹æ®åœ°å€åŠ è½½å›¾åƒ
     bool load_image(QLabel *label, QString Path);
     void load_image(QLabel *label, const QImage &image);
 
@@ -36,91 +36,91 @@ public:
 #if USE_OPENCV == 1
     void load_image(QLabel *label, const cv::Mat &mat);
 
-    //Í¼Ïñ¾ùÖµÂË²¨
+    //å›¾åƒå‡å€¼æ»¤æ³¢
     bool blur_image(QLabel *label, QString Path);
 
-    //Í¼Ïñ»Ò¶È×ª»»
+    //å›¾åƒç°åº¦è½¬æ¢
     bool gray_image(QLabel *label, QString Path);
 
-    //Í¼Ïñ¸¯Ê´ -- ¸ßÁÁ²¿·ÖËõĞ¡
+    //å›¾åƒè…èš€ -- é«˜äº®éƒ¨åˆ†ç¼©å°
     bool erode_image(QLabel *label, QString Path);
 
-    //Í¼ÏñÅòÕÍ -- ¸ßÁÁ²¿·ÖÀ©´ó
+    //å›¾åƒè†¨èƒ€ -- é«˜äº®éƒ¨åˆ†æ‰©å¤§
     bool dilate_image(QLabel *label, QString Path);
 
-    //±ßÔµ¼ì²â
+    //è¾¹ç¼˜æ£€æµ‹
     bool canny_image(QLabel *label, QString Path);
 
-    //ÏßĞÔÀ©Õ¹
+    //çº¿æ€§æ‰©å±•
     bool line_scale_image(QLabel *label, QString Path);
 
-    //·ÇÏßĞÔÀ©Õ¹
+    //éçº¿æ€§æ‰©å±•
     bool noline_scale_image(QLabel *label, QString Path);
 
-    //Ö±·½Í¼¾ùºâ
+    //ç›´æ–¹å›¾å‡è¡¡
     bool equalizeHist_image(QLabel *label, QString Path);
 
-    //·ÂÉä±ä»»
+    //ä»¿å°„å˜æ¢
     bool warpaffine_image(QLabel *label, QString Path);
 
-    //»ô·òÏß±ä»»
+    //éœå¤«çº¿å˜æ¢
     bool houghlines_image(QLabel *label, QString Path);
 
-    //Ö±·½Í¼
+    //ç›´æ–¹å›¾
     bool hist_image(QLabel *label, QString Path);
 #else
-    //Í¼Ïñ¾ùÖµÂË²¨
+    //å›¾åƒå‡å€¼æ»¤æ³¢
     bool blur_image(QLabel *label, QString Path){
         return load_image(label, Path);
     };
 
-    //Í¼Ïñ»Ò¶È×ª»»
+    //å›¾åƒç°åº¦è½¬æ¢
     bool gray_image(QLabel *label, QString Path){
         return load_image(label, Path);
     };
 
-    //Í¼Ïñ¸¯Ê´ -- ¸ßÁÁ²¿·ÖËõĞ¡
+    //å›¾åƒè…èš€ -- é«˜äº®éƒ¨åˆ†ç¼©å°
     bool erode_image(QLabel *label, QString Path){
         return load_image(label, Path);
     };
 
-    //Í¼ÏñÅòÕÍ -- ¸ßÁÁ²¿·ÖÀ©´ó
+    //å›¾åƒè†¨èƒ€ -- é«˜äº®éƒ¨åˆ†æ‰©å¤§
     bool dilate_image(QLabel *label, QString Path){
        return load_image(label, Path);
     };
 
-    //±ßÔµ¼ì²â
+    //è¾¹ç¼˜æ£€æµ‹
     bool canny_image(QLabel *label, QString Path){
         return load_image(label, Path);
     };
 
 
-    //ÏßĞÔÀ©Õ¹
+    //çº¿æ€§æ‰©å±•
     bool line_scale_image(QLabel *label, QString Path){
         return load_image(label, Path);
     };
 
-    //·ÇÏßĞÔÀ©Õ¹
+    //éçº¿æ€§æ‰©å±•
     bool noline_scale_image(QLabel *label, QString Path){
         return load_image(label, Path);
     };
 
-    //Ö±·½Í¼¾ùºâ
+    //ç›´æ–¹å›¾å‡è¡¡
     bool equalizeHist_image(QLabel *label, QString Path){
         return load_image(label, Path);
     };
 
-    //·ÂÉä±ä»»
+    //ä»¿å°„å˜æ¢
     bool warpaffine_image(QLabel *label, QString Path){
         return load_image(label, Path);
     };
 
-    //»ô·òÏß±ä»»
+    //éœå¤«çº¿å˜æ¢
     bool houghlines_image(QLabel *label, QString Path){
         return load_image(label, Path);
     }
 
-    //Ö±·½Í¼
+    //ç›´æ–¹å›¾
     bool hist_image(QLabel *label, QString Path){
         return load_image(label, Path);
     }
@@ -133,9 +133,9 @@ private:
 
     cv::Mat m_cvBasicMat;
 
-    //½«OpencvÄÚ²¿Í¼Ïñ×ª±äÎªQImage¶ÔÏó
+    //å°†Opencvå†…éƒ¨å›¾åƒè½¬å˜ä¸ºQImageå¯¹è±¡
     QImage cvMattoQImage(const cv::Mat& mat);
-    cv::Mat QImagetocvMat(const QImage &image);			// QImage ¸Ä³É Mat
+    cv::Mat QImagetocvMat(const QImage &image);			// QImage æ”¹æˆ Mat
 #endif
 };
 

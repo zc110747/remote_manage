@@ -62,4 +62,5 @@ DISTFILES += \
 
 RC_FILE = icon.rc
 
-RESOURCES += main.qrc
+RESOURCES += main.qrc \
+            other/qss.qrc

@@ -59,7 +59,6 @@ public slots:
   void SetMainWinStatus(bool Status);
 
 signals:
-  void finishPixmap(const QPixmap &finishPixmap); //完成切图后的图片,发送信号给连接者
   void send_release(void);
 
 private:
