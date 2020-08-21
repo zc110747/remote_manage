@@ -8,7 +8,6 @@
             ],
             "defines": [
                 "_DEBUG",
-                "UNICODE",
                 "_UNICODE",
                 "__ARM_PCS_VFP",
                 "CONFIG_SPARSE_IRQ",
@@ -16,9 +15,10 @@
                 "CONFIG_OF=1",
                 "__USE_XOPEN",
                 "__USE_XOPEN2K",
-                "__GNUC__"
+                "__GNUC__",
+                "_SIGNAL_H"
             ],
-            "compilerPath": "D:\\Software\\mingw64\\bin\\x86_64-w64-mingw32-gcc-8.1.0.exe",
+            "compilerPath": "F:\\arm-gcc\\bin\\arm-linux-gnueabihf-gcc",
             "cStandard": "c99",
             "cppStandard": "c++17",
             "intelliSenseMode": "gcc-x64"

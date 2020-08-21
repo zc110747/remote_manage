@@ -25,12 +25,16 @@
 #include <linux/device.h>
 #include <linux/of_gpio.h>
 #include <linux/semaphore.h>
+//中断和定时器相关
 #include <linux/timer.h>
+#include <linux/of_irq.h>
 #include <linux/irq.h>
-#include <linux/wait.h>
+//异步事件相关
+#include <linux/wait.h> 
 #include <linux/poll.h>
-#include <linux/fs.h>
 #include <linux/fcntl.h>
+#include <linux/fs.h>
+//总线和硬件相关接口
 #include <linux/platform_device.h>
 #include <asm/mach/map.h>
 #include <asm/uaccess.h>
@@ -47,14 +51,25 @@ struct key_info
 	struct device *device;	    /*设备指针*/
     struct device_node *nd;     /*设备节点*/
     int key_gpio;               /*key对应的引脚接口*/
+    int key_irq_num;            /*key对应的中断参数*/
+    atomic_t key_interrupt;     /*key的中断状态*/
+    atomic_t key_value;         /*读取的按键值*/
     atomic_long_t lock;         /*不允许按键被其它应用访问的lock函数*/
+    
+    struct timer_list key_timer;                /* 定义定时器*/
+    wait_queue_head_t key_wait;				    /* 读等待队列头 */
+    struct fasync_struct *key_async_queue;		/* 异步相关结构体 */
 };
 
 struct key_info key_driver_info;
+
 #define DEFAULT_MAJOR                   0          /*默认主设备号*/
 #define DEFAULT_MINOR                   0          /*默认从设备号*/
 #define DEVICE_KEY_CNT			        1		   /* 设备号个数 */
 #define DEVICE_KEY_NAME			        "key"     /* 设备名 */
+
+#define KEY0_VALUE                      0x01
+#define KEYINVALD_VALUE                 0xFF
 
 #define key_OFF                         0
 #define key_ON                          1
@@ -65,40 +80,44 @@ struct key_info key_driver_info;
 /*内部接口*/
 static int key_gpio_init(void);
 static void key_gpio_release(void);
+static int key_fasync(int fd, struct file *filp, int on);
 
 /**
- * 打开LED，获取LED资源
- * 
- * @param inode  驱动内的节点信息
- * @param filp   要处理的设备文件(文件描述符)
- *
- * @return 设备打开处理结果，0表示正常
- */
-int key_open(struct inode *inode, struct file *filp)
-{
-    if(!atomic_dec_and_test(&key_driver_info.lock))
-    {
-        atomic_inc(&key_driver_info.lock); //atomic_dec_and_test会执行减操作，此处恢复
-        return -EBUSY;
-    }
-    key_gpio_init();
-    filp->private_data = &key_driver_info;
-    return 0;
-}
-
-/**
- * 释放LED设备资源
+ *按键触发中断函数
  * 
  * @param inode  驱动内的节点信息
  * @param filp   要处理的设备文件(文件描述符)
  * 
  * @return 设备关闭处理结果，0表示正常
  */
-int key_release(struct inode *inode, struct file *filp)
+static irqreturn_t key0_handler(int irq, void *dev_id)
 {
-    key_gpio_release();
-    atomic_inc(&key_driver_info.lock);
-    return 0;
+    mod_timer(&key_driver_info.key_timer, jiffies + msecs_to_jiffies(10));	/* 10ms定时 */
+	return IRQ_RETVAL(IRQ_HANDLED);
+}
+
+/**
+ *用于去抖动的定时器回调函数
+ * 
+ * @param arg  定时器传递的参数
+ *
+ * @return NULL
+ */
+void key_timer_func(unsigned long arg)
+{
+    unsigned char value;
+
+    value = gpio_get_value(key_driver_info.key_gpio);
+    if(value == 0){
+        atomic_set(&key_driver_info.key_value, KEY0_VALUE);
+        atomic_set(&key_driver_info.key_interrupt, 1);
+        printk(KERN_INFO"key interrupt!\r\n");
+    }
+
+    if(atomic_read(&key_driver_info.key_interrupt)){
+        if(key_driver_info.key_async_queue)
+            kill_fasync(&key_driver_info.key_async_queue, SIGIO, POLL_IN);
+    }
 }
 
 /**
@@ -134,6 +153,26 @@ static int key_gpio_init(void)
         return -EINVAL;
     }
     
+    /*4.获取当前的中断向量号,并配置中断向量*/
+    //cat /proc/interrupts可以查看是否增加中断向量
+    key_driver_info.key_irq_num = irq_of_parse_and_map(key_driver_info.nd, 0);
+    ret = request_irq(key_driver_info.key_irq_num, key0_handler, 
+                    IRQF_TRIGGER_FALLING,
+                    "key0", &key_driver_info);
+    if(ret<0){
+        printk(KERN_INFO"key interrupt config error\n");
+        return -EINVAL;
+    }
+    
+    atomic_set(&key_driver_info.key_interrupt, 0);
+    atomic_set(&key_driver_info.key_value, KEYINVALD_VALUE);
+
+    /*5.创建用于去抖动判断的定时器*/
+    init_timer(&key_driver_info.key_timer);
+    key_driver_info.key_timer.function = key_timer_func;
+
+    /*6.初始化队列*/
+    init_waitqueue_head(&key_driver_info.key_wait);
     return 0;
 }
 
@@ -146,7 +185,49 @@ static int key_gpio_init(void)
  */
 static void key_gpio_release(void)
 {
+    /*释放GPIO资源*/
     gpio_free(key_driver_info.key_gpio);
+
+    /*释放中断资源*/
+    if(key_driver_info.key_irq_num > 0)
+    {
+        free_irq(key_driver_info.key_irq_num, &key_driver_info);
+        key_driver_info.key_irq_num = -1;
+    }
+}
+
+/**
+ * 打开LED，获取LED资源
+ * 
+ * @param inode  驱动内的节点信息
+ * @param filp   要处理的设备文件(文件描述符)
+ *
+ * @return 设备打开处理结果，0表示正常
+ */
+int key_open(struct inode *inode, struct file *filp)
+{
+    if(!atomic_dec_and_test(&key_driver_info.lock))
+    {
+        atomic_inc(&key_driver_info.lock); //atomic_dec_and_test会执行减操作，此处恢复
+        return -EBUSY;
+    }
+    filp->private_data = &key_driver_info;
+    return 0;
+}
+
+/**
+ * 释放key设备资源
+ * 
+ * @param inode  驱动内的节点信息
+ * @param filp   要处理的设备文件(文件描述符)
+ * 
+ * @return 设备关闭处理结果，0表示正常
+ */
+int key_release(struct inode *inode, struct file *filp)
+{
+    atomic_inc(&key_driver_info.lock);
+    key_fasync(-1, filp, 0);
+    return 0;
 }
 
 /**
@@ -163,17 +244,49 @@ ssize_t key_read(struct file *filp, char __user *buf, size_t count, loff_t *f_po
 {
     int result;
     u8 databuf;
-    struct key_info* p_key_info = (struct key_info*)filp->private_data;
+    int ret;
+    struct key_info *dev = (struct key_info*)filp->private_data;
+
+    if (filp->f_flags & O_NONBLOCK)	{ /* 非阻塞访问 */
+        /* 没有按键按下，返回-EAGAIN */
+		if(atomic_read(&dev->key_interrupt) == 0)	
+			return -EAGAIN;
+	} 
+    else 
+    {						
+		/* 加入等待队列，等待被唤醒,也就是有按键按下 */
+ 		ret = wait_event_interruptible(dev->key_wait, atomic_read(&dev->key_interrupt)); 
+		if (ret) 
+        {
+			return -EAGAIN;
+		}
+	}
 
     //读取引脚的状态
-    databuf = gpio_get_value(p_key_info->key_gpio);
-
+    databuf = atomic_read(&dev->key_value);
+    atomic_set(&dev->key_value, KEYINVALD_VALUE);
+    atomic_set(&dev->key_interrupt, 0);
     result = copy_to_user(buf, &databuf, 1);
     if(result < 0) {
 		printk(KERN_INFO"kernel read failed!\r\n");
 		return -EFAULT;
 	}
+    
     return 1;
+}
+
+/*
+ * fasync函数，用于处理异步通知
+ * 
+ * @param - fd		: 文件描述符
+ * @param - filp    : 要打开的设备文件(文件描述符)
+ * @param - on      : 模式
+ * @return          : 负数表示函数执行失败
+ * 
+ */
+static int key_fasync(int fd, struct file *filp, int on)
+{
+	return fasync_helper(fd, filp, on, &key_driver_info.key_async_queue);
 }
 
 /* 设备操作函数 */
@@ -182,6 +295,7 @@ static struct file_operations key_fops = {
     .open = key_open,
     .read = key_read,
     .release = key_release,
+    .fasync = key_fasync,
 };
 
 /*
@@ -245,7 +359,8 @@ static int key_probe(struct platform_device *dev)
 	}
 
 	/* 4、创建设备 */
-	key_driver_info.device = device_create(key_driver_info.class, NULL, key_driver_info.dev_id, NULL, DEVICE_KEY_NAME);
+	key_driver_info.device = device_create(key_driver_info.class, NULL, key_driver_info.dev_id, 
+                                        NULL, DEVICE_KEY_NAME);
 	if (IS_ERR(key_driver_info.device)) {
 		printk(KERN_INFO"device create failed!\r\n");
                 unregister_chrdev_region(key_driver_info.dev_id, DEVICE_KEY_CNT);       
@@ -258,6 +373,8 @@ static int key_probe(struct platform_device *dev)
 		printk(KERN_INFO"device create successed!\r\n");
 	}
 
+    //key按键相关初始化(带中断)
+    key_gpio_init();
     printk(KERN_INFO"key driver init ok!\r\n");
     return 0;
 }
@@ -277,6 +394,7 @@ static int key_remove(struct platform_device *dev)
 	cdev_del(&key_driver_info.cdev);
 	unregister_chrdev_region(key_driver_info.dev_id, DEVICE_KEY_CNT);
     
+    key_gpio_release();
     return 0;
 }
 
@@ -312,7 +430,6 @@ static int __init key_module_init(void)
         printk("%d\r\n", status);
     return status;
 }
-
 
 /**
  * 驱动释放时执行的退出函数
