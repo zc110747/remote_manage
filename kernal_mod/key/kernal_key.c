@@ -81,6 +81,20 @@ struct key_info key_driver_info;
 static int key_gpio_init(void);
 static void key_gpio_release(void);
 static int key_fasync(int fd, struct file *filp, int on);
+static void tasklet_do_func(unsigned long data);
+
+/**
+ *事件触发的执行函数
+ * 
+ * @param data  事件触发传递的信息
+ * 
+ * @return NULL
+ */
+static void tasklet_do_func(unsigned long data)
+{
+   printk(KERN_INFO"key interrupt tasklet do:%ld!\r\n", data);
+}
+DECLARE_TASKLET(tasklet_func, tasklet_do_func, 0);
 
 /**
  *按键触发中断函数
@@ -93,6 +107,9 @@ static int key_fasync(int fd, struct file *filp, int on);
 static irqreturn_t key0_handler(int irq, void *dev_id)
 {
     mod_timer(&key_driver_info.key_timer, jiffies + msecs_to_jiffies(10));	/* 10ms定时 */
+    
+    /*触发事件*/
+    //tasklet_schedule(&tasklet_func);
 	return IRQ_RETVAL(IRQ_HANDLED);
 }
 
@@ -163,7 +180,8 @@ static int key_gpio_init(void)
         printk(KERN_INFO"key interrupt config error\n");
         return -EINVAL;
     }
-    
+    printk(KERN_INFO"key interrupt num:%d\n", key_driver_info.key_irq_num);
+
     atomic_set(&key_driver_info.key_interrupt, 0);
     atomic_set(&key_driver_info.key_value, KEYINVALD_VALUE);
 
