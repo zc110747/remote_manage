@@ -40,6 +40,14 @@
 #include <asm/uaccess.h>
 #include <asm/io.h>
 
+
+#define _DBEUG  1
+#if _DBEUG == 1
+#define DRIVE_DEBUG printk
+#else
+#define DRIVE_DEBUG(...)
+#endif
+
 /*设备相关参数*/
 struct key_info
 {
@@ -151,31 +159,32 @@ static int key_gpio_init(void)
     /*1.获取设备节点*/
     key_driver_info.nd = of_find_node_by_path(TREE_NODE_NAME);
     if(key_driver_info.nd == NULL){
-        printk(KERN_INFO"%s node no find\n", TREE_NODE_NAME);
+        printk(KERN_INFO"Node %s no find!\n", TREE_NODE_NAME);
         return -EINVAL;
     }
 
     /*2.获取设备树中的gpio属性编号*/
     key_driver_info.key_gpio = of_get_named_gpio(key_driver_info.nd, TREE_GPIO_NAME, 0);
     if(key_driver_info.key_gpio < 0){
-        printk(KERN_INFO"%s no find\n", TREE_GPIO_NAME);
+        printk(KERN_INFO"Gpio %s no find\n", TREE_GPIO_NAME);
         return -EINVAL;
     }
 
     /*3.设置key对应GPIO为输入状态*/
-    gpio_request(key_driver_info.key_gpio, "key0");
+    devm_gpio_request(key_driver_info.device, key_driver_info.key_gpio, "key0");
     ret = gpio_direction_input(key_driver_info.key_gpio);
-    if(ret<0){
-        printk(KERN_INFO"key gpio config error\n");
+    if(ret < 0){
+        printk(KERN_INFO"Key gpio request and config error\n");
         return -EINVAL;
     }
     
     /*4.获取当前的中断向量号,并配置中断向量*/
     //cat /proc/interrupts可以查看是否增加中断向量
     key_driver_info.key_irq_num = irq_of_parse_and_map(key_driver_info.nd, 0);
-    ret = request_irq(key_driver_info.key_irq_num, key0_handler, 
-                    IRQF_TRIGGER_FALLING,
-                    "key0", &key_driver_info);
+    ret = devm_request_irq(key_driver_info.device,
+                            key_driver_info.key_irq_num, key0_handler, 
+                            IRQF_TRIGGER_FALLING,       "key0", 
+                            &key_driver_info);
     if(ret<0){
         printk(KERN_INFO"key interrupt config error\n");
         return -EINVAL;
@@ -204,12 +213,12 @@ static int key_gpio_init(void)
 static void key_gpio_release(void)
 {
     /*释放GPIO资源*/
-    gpio_free(key_driver_info.key_gpio);
+    devm_gpio_free(key_driver_info.device, key_driver_info.key_gpio);
 
     /*释放中断资源*/
     if(key_driver_info.key_irq_num > 0)
     {
-        free_irq(key_driver_info.key_irq_num, &key_driver_info);
+        devm_free_irq(key_driver_info.device, key_driver_info.key_irq_num, &key_driver_info);
         key_driver_info.key_irq_num = -1;
     }
 }
@@ -326,15 +335,15 @@ static int key_probe(struct platform_device *dev)
 {
     int result;
 
+    printk(KERN_INFO"Device and driver match, Do probe!\r\n");
+
     /*设置原子的保护操作*/
     atomic_set(&key_driver_info.lock, 1);
 
     key_driver_info.major = DEFAULT_MAJOR;
     key_driver_info.minor = DEFAULT_MINOR;
 
-    /*在总线上创建设备*/    
     /*1.申请字符设备号*/
-    printk(KERN_INFO"probe work start!\r\n");	
     if(key_driver_info.major){
         key_driver_info.dev_id = MKDEV(key_driver_info.major, key_driver_info.minor);
         result = register_chrdev_region(key_driver_info.dev_id, DEVICE_KEY_CNT, DEVICE_KEY_NAME);
@@ -345,56 +354,62 @@ static int key_probe(struct platform_device *dev)
         key_driver_info.minor = MINOR(key_driver_info.dev_id);
     }
     if(result < 0){
-        printk(KERN_INFO"dev alloc or set failed\r\n");	
-        return result;
+        DRIVE_DEBUG(KERN_INFO"Device alloc or set failed!\r\n");	
+        goto exit;
     }
-    else{
-        printk(KERN_INFO"dev alloc or set ok, major:%d, minor:%d\r\n", key_driver_info.major,  key_driver_info.minor);	
-    }
+    DRIVE_DEBUG(KERN_INFO"Device init ok, Major:%d, Minor:%d!\r\n", 
+                key_driver_info.major, key_driver_info.minor);	
+
     
     /*2.初始化设备信息，将设备接口和设备号进行关联*/
     cdev_init(&key_driver_info.cdev, &key_fops);
     key_driver_info.cdev.owner = THIS_MODULE;
     result = cdev_add(&key_driver_info.cdev, key_driver_info.dev_id, DEVICE_KEY_CNT);
     if(result != 0){
-        unregister_chrdev_region(key_driver_info.dev_id, DEVICE_KEY_CNT);
-        printk(KERN_INFO"cdev add failed\r\n");
-        return result;
-    }else{
-	    printk(KERN_INFO"device add Success!\r\n");	
+        DRIVE_DEBUG(KERN_INFO"Device cdev_add failed!\r\n");
+        goto exit_cdev_add;
     }
-
+	DRIVE_DEBUG(KERN_INFO"Device cdev_add success!\r\n");	
+    
     /* 3、创建类 */
 	key_driver_info.class = class_create(THIS_MODULE, DEVICE_KEY_NAME);
 	if (IS_ERR(key_driver_info.class)) {
-		printk(KERN_INFO"class create failed!\r\n");
-		unregister_chrdev_region(key_driver_info.dev_id, DEVICE_KEY_CNT);
-		cdev_del(&key_driver_info.cdev);	
-		return PTR_ERR(key_driver_info.class);
+		DRIVE_DEBUG(KERN_INFO"class create failed!\r\n");
+        result = PTR_ERR(key_driver_info.class);
+		goto exit_class_create;
 	}
-	else{
-		printk(KERN_INFO"class create successed!\r\n");
-	}
+	DRIVE_DEBUG(KERN_INFO"class create successed!\r\n");
 
 	/* 4、创建设备 */
 	key_driver_info.device = device_create(key_driver_info.class, NULL, key_driver_info.dev_id, 
                                         NULL, DEVICE_KEY_NAME);
 	if (IS_ERR(key_driver_info.device)) {
-		printk(KERN_INFO"device create failed!\r\n");
-                unregister_chrdev_region(key_driver_info.dev_id, DEVICE_KEY_CNT);       
-                cdev_del(&key_driver_info.cdev);
-		
-		class_destroy(key_driver_info.class);
-		return PTR_ERR(key_driver_info.device);
+		DRIVE_DEBUG(KERN_INFO"device create failed!\r\n");
+        result = PTR_ERR(key_driver_info.device);
+		goto exit_device_create;
 	}
-	else{
-		printk(KERN_INFO"device create successed!\r\n");
-	}
+	DRIVE_DEBUG(KERN_INFO"device create successed!\r\n");
 
     //key按键相关初始化(带中断)
-    key_gpio_init();
+    result = key_gpio_init();
+    if(result != 0){
+        printk(KERN_INFO"Key gpio init failed!\r\n");
+        goto exit_key_gpio_init;
+    }
+    
     printk(KERN_INFO"key driver init ok!\r\n");
     return 0;
+
+exit_key_gpio_init:
+    device_destroy(key_driver_info.class, key_driver_info.dev_id);
+exit_device_create:
+	class_destroy(key_driver_info.class);
+exit_class_create:
+    cdev_del(&key_driver_info.cdev);
+exit_cdev_add:
+    unregister_chrdev_region(key_driver_info.dev_id, DEVICE_KEY_CNT);
+exit:
+    return result;
 }
 
 /*

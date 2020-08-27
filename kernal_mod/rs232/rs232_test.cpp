@@ -1,6 +1,5 @@
 /*
- * File      : UartThread.cpp
- * Uart通讯线程处理
+ * File      : 
  * COPYRIGHT (C) 2020, zc
  *
  * Change Logs:
