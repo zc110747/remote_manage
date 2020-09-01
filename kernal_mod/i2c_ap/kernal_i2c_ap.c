@@ -134,14 +134,14 @@ void ap3216_readdata(struct ap3216_info *p_info)
         buf[i] = ap3216_read_reg(&p_info->dev, AP3216C_IRDATALOW + i);	
     }
 
-    if(buf[0] & 0X80) 	/* IR_OF位为1,则数据无效 */
+    if(buf[0]&(1<<7)) 	/* IR_OF位为1,则数据无效 */
 		p_info->ir = 0;					
 	else 				/* 读取IR传感器的数据   		*/
 		p_info->ir = ((unsigned short)buf[1] << 2) | (buf[0] & 0X03); 			
 	
 	p_info->als = ((unsigned short)buf[3] << 8) | buf[2];	/* 读取ALS传感器的数据 			 */  
 	
-    if(buf[4] & 0x40)	/* IR_OF位为1,则数据无效 			*/
+    if(buf[4]&(1<<6))	/* IR_OF位为1,则数据无效 			*/
 		p_info->ps = 0;    													
 	else 				/* 读取PS传感器的数据    */
 		p_info->ps = ((unsigned short)(buf[5] & 0X3F) << 4) | (buf[4] & 0X0F); 
@@ -204,9 +204,9 @@ static int ap3216_open(struct inode *inode, struct file *filp)
 {
 	filp->private_data = &ap_info; /* 设置私有数据 */
 
-		/* 初始化AP3216C */
+	/* 初始化AP3216C */
 	ap3216_write_onereg(&ap_info.dev, AP3216C_SYSTEMCONG, 0x04);		/* 复位AP3216C 			*/
-	mdelay(50);													/* AP3216C复位最少10ms 	*/
+	mdelay(50);															/* AP3216C复位最少10ms 	*/
 	ap3216_write_onereg(&ap_info.dev, AP3216C_SYSTEMCONG, 0X03);		/* 开启ALS、PS+IR 		*/
 	return 0;
 }
@@ -319,19 +319,19 @@ static int ap3216_remove(struct i2c_client *client)
 	return 0;
 }
 
-/* 传统匹配方式ID列表 */
+/* 传统匹配方式ID列表 -- name不重要，但必须存在 */
 static const struct i2c_device_id ap3216_id[] = {
-	{"alientek,ap3216c", 0},  
+	{"ap3216", 0},  
 	{}
 };
 
 /* 设备树匹配列表 */
 static const struct of_device_id ap3216_of_match[] = {
-	{ .compatible = "alientek,ap3216c" },
+	{ .compatible = "usr,ap3216" },
 	{ /* Sentinel */ }
 };
 
-/* SPI驱动结构体 */	
+/* I2C驱动结构体 */	
 static struct i2c_driver ap3216_driver = {
 	.probe = ap3216_probe,
 	.remove = ap3216_remove,

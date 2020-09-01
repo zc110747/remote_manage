@@ -19,7 +19,7 @@ https://www.cnblogs.com/zc110747/p/12747213.html
 ![image](https://github.com/zc110747/remote_manage/blob/master/document/Image/system.png)  
 
 项目结构  
-demo/           编译好可执行的云平台代码  
+demo/           编译好可执行的平台代码  
 document/       设计文档资料说明  
 kernal_mod/     内核驱动模块实现  
 lower_app/      嵌入式Linux平台下位机代码实现  
@@ -27,6 +27,7 @@ lower_app/      嵌入式Linux平台下位机代码实现
 ---qt_gui/         基于QT的界面实现  
 ---system/         涉及UDP，TCP和UART的局域网通讯实现，同时外设的访问和管理  
 support/        用于支持平台代运行的库  
+test_app/       用于实现单个功能的代码，后续添加到lower_app和upper_app下  
 upper_app/      上位机的代码实现  
 ---qt_manage/      基于QT实现的上位机管理界面    
 
