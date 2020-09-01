@@ -6,7 +6,7 @@
  * Change Logs:
  * Date           Author       Notes
  * 2020-5-12      zc           the first version
- * 2020-5-20     zc           Code standardization 
+ * 2020-5-20      zc           Code standardization 
  */
 
 /**
