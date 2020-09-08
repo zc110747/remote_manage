@@ -24,7 +24,7 @@ document/       设计文档资料说明
 kernal_mod/     内核驱动模块实现  
 lower_app/      嵌入式Linux平台下位机代码实现  
 ---node_server/    基于node的服务器实现, 用于浏览器的局域网访问  
----qt_gui/         基于QT的界面实现  
+---qt_gui/         基于QT界面的下位机实现  
 ---system/         涉及UDP，TCP和UART的局域网通讯实现，同时外设的访问和管理  
 support/        用于支持平台代运行的库  
 test_app/       用于实现单个功能的代码，后续添加到lower_app和upper_app下  
