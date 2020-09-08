@@ -47,7 +47,6 @@ QImage COpencvImgProcess::cvMattoQImage(const cv::Mat& mat)
 {
     switch(mat.type())
     {
-        //��ͨ�������ݴ���
         case CV_8UC1:
         {
             static QVector<QRgb> sColorVector;
@@ -64,17 +63,15 @@ QImage COpencvImgProcess::cvMattoQImage(const cv::Mat& mat)
         }
         break;
 
-        //3ͨ�������ݴ���
         case CV_8UC3:
         {
-            QImage image(mat.data, mat.cols, mat.rows, (int)mat.step, QImage::Format_RGB888);	// R, G, B ��Ӧ 0,1,2
-            return image.rgbSwapped();                          //rgbSwapped��Ϊ����ʾЧ��ɫ�ʺ�һЩ��
+            QImage image(mat.data, mat.cols, mat.rows, (int)mat.step, QImage::Format_RGB888);
+            return image.rgbSwapped();
         }
 
-        //4ͨ�������ݴ���
         case CV_8UC4:
         {
-            QImage image(mat.data, mat.cols, mat.rows, (int)mat.step, QImage::Format_ARGB32);		// B,G,R,A ��Ӧ 0,1,2,3
+            QImage image(mat.data, mat.cols, mat.rows, (int)mat.step, QImage::Format_ARGB32);
             return image;
         }
         break;
@@ -98,7 +95,6 @@ cv::Mat QImagetocvMat(const QImage &image)
         case QImage::Format_ARGB32_Premultiplied:
             ImgMat = cv::Mat(image.height(), image.width(), CV_8UC4, (void*)image.constBits(), image.bytesPerLine());
             break;
-        //QImage Format_RGB888�ǰ���R,G,B�Ų���  Mat����B,G,R�Ų��� ��������Ҫ���л�����
         case QImage::Format_RGB888:
         {
             ImgMat = cv::Mat(image.height(), image.width(), CV_8UC3, (void*)image.constBits(), image.bytesPerLine());
@@ -124,10 +120,10 @@ bool COpencvImgProcess::blur_image(QLabel *label, QString Path)
         return false;
     }
 
-    cv::blur(ImgMat, ImgMatOut, cv::Size(7, 7));                    //��ֵ�˲�
-    //cv::GaussianBlur(ImgMat, ImgMatOut, cv::Size(7, 7), 0, 0);    //��˹�˲�
-    //cv::medianBlur(ImgMat, ImgMatOut, 3);                         //��ֵ�˲�
-    //cv::bilateralFilter(ImgMat, ImgMatOut, 4, 4*2, 4/2);            //˫��ƽ��
+    cv::blur(ImgMat, ImgMatOut, cv::Size(7, 7));
+    //cv::GaussianBlur(ImgMat, ImgMatOut, cv::Size(7, 7), 0, 0);
+    //cv::medianBlur(ImgMat, ImgMatOut, 3);
+    //cv::bilateralFilter(ImgMat, ImgMatOut, 4, 4*2, 4/2);
 
     load_image(label, ImgMatOut);
     return true;
@@ -177,13 +173,8 @@ bool COpencvImgProcess::canny_image(QLabel *label, QString Path)
         return false;
     }
 
-    //ת��Ϊ�Ҷ�ͼ��
     cv::cvtColor(ImgMat, GrayImgMat, cv::COLOR_BGR2GRAY);
-
-    //��ֵ�˲�
     cv::blur(GrayImgMat, BlurImgMat, cv::Size(7, 7));
-
-    //��Ե����-t1ȷ�����ձ�Ե������
     cv::Canny(BlurImgMat, CannyImgMat, 30, 60, 3, false);
 
     load_image(label, CannyImgMat);
@@ -201,10 +192,7 @@ bool COpencvImgProcess::gray_image(QLabel *label, QString Path)
         return false;
     }
 
-    //ת��Ϊ�Ҷ�ͼ��
     cv::cvtColor(ImgMat, GrayImgMat, cv::COLOR_BGR2GRAY);
-
-    //��ֵ�˲�
     cv::blur(GrayImgMat, BlurImgMat, cv::Size(7, 7));
 
     load_image(label, BlurImgMat);
@@ -224,11 +212,8 @@ bool COpencvImgProcess::line_scale_image(QLabel *label, QString Path)
         return false;
     }
 
-    //�Ҷ�ת��
     cv::cvtColor(ImgMat, GrayImgMat, cv::COLOR_BGR2GRAY);
     lineScaleImageMat = GrayImgMat;
-
-    //������չ
     for (int y = 0; y < GrayImgMat.rows; y++)
     {
         for (int x = 0; x < GrayImgMat.cols; x++)
@@ -266,11 +251,9 @@ bool COpencvImgProcess::noline_scale_image(QLabel *label, QString Path)
         return false;
     }
 
-    //�Ҷ�ת��
     cv::cvtColor(ImgMat, GrayImgMat, cv::COLOR_BGR2GRAY);
     nolineScaleImageMat = cv::Mat::zeros(GrayImgMat.rows, GrayImgMat.cols, GrayImgMat.type());
 
-    //��������չ
     for (int y = 0; y < GrayImgMat.rows; y++)
     {
         for (int x = 0; x < GrayImgMat.cols; x++)
@@ -295,10 +278,7 @@ bool COpencvImgProcess::equalizeHist_image(QLabel *label, QString Path)
         return false;
     }
 
-    //�Ҷ�ת��
     cv::cvtColor(ImgMat, GrayImgMat, cv::COLOR_BGR2GRAY);
-
-    //ֱ��ͼ����
     cv::equalizeHist(GrayImgMat, EqualizeHistImageMat);
 
     load_image(label, EqualizeHistImageMat);
@@ -322,7 +302,6 @@ bool COpencvImgProcess::warpaffine_image(QLabel *label, QString Path)
 
     WrapImgMat = cv::Mat::zeros(ImgMat.rows, ImgMat.cols, ImgMat.type());
 
-    // ����Դͼ����Ŀ��ͼ���ϵ��������Լ��������任
     srcTri[0] = cv::Point2f( 0,0 );
     srcTri[1] = cv::Point2f( ImgMat.cols - 1, 0 );
     srcTri[2] = cv::Point2f( 0, ImgMat.rows - 1 );
@@ -330,23 +309,15 @@ bool COpencvImgProcess::warpaffine_image(QLabel *label, QString Path)
     dstTri[0] = cv::Point2f( ImgMat.cols*0.0, ImgMat.rows*0.33 );
     dstTri[1] = cv::Point2f( ImgMat.cols*0.85, ImgMat.rows*0.25 );
     dstTri[2] = cv::Point2f( ImgMat.cols*0.15, ImgMat.rows*0.7 );
-
-    // ���÷����任
     warp_mat = cv::getAffineTransform( srcTri, dstTri );
-
-    // ��Դͼ��Ӧ���������õķ����任
     cv::warpAffine( ImgMat,  WrapImgMat, warp_mat, WrapImgMat.size() );
 
-    /* ��ͼ��Ť��������ת */
-    // ������ͼ���е�˳ʱ����ת50����������Ϊ0.6����ת����
     cv::Point center = cv::Point( WrapImgMat.cols/2, WrapImgMat.rows/2 );
     double angle = -50.0;
     double scale = 0.6;
 
-    // ͨ����������תϸ����Ϣ������ת����
     rot_mat = getRotationMatrix2D( center, angle, scale );
 
-    // ��ת��Ť��ͼ��
     warpAffine(WrapImgMat, WrapRotateImgMat, rot_mat, WrapImgMat.size());
 
     load_image(label, WrapRotateImgMat);
@@ -391,7 +362,6 @@ bool COpencvImgProcess::hist_image(QLabel *label, QString Path)
 
     cvtColor(ImgMat, HsvImgMat, cv::COLOR_BGR2HSV);
 
-    //����Hueͨ��
     HueImgMat.create(HsvImgMat.size(), HsvImgMat.depth());
     int ch[] = {0, 0};
     cv::mixChannels(&HsvImgMat, 1, &HueImgMat, 1, ch, 1);
@@ -402,11 +372,9 @@ bool COpencvImgProcess::hist_image(QLabel *label, QString Path)
     float hue_range[] = { 0, 180 };
     const float* ranges = { hue_range };
 
-    /// ����ֱ��ͼ����һ��
     cv::calcHist(&HueImgMat, 1, 0, cv::Mat(), hist, 1, &histSize, &ranges, true, false );
     cv::normalize( hist, hist, 0, 255, cv::NORM_MINMAX, -1, cv::Mat() );
 
-     /// ���㷴��ͶӰ
     cv::MatND backproj;
     cv::calcBackProject(&HueImgMat, 1, 0, hist, backproj, &ranges, 1, true );
 

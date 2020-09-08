@@ -82,6 +82,7 @@ void MainWindow::QFrame_Init()
 //    ui->frame_socket->setFrameShadow(QFrame::Shadow::Sunken);
     //ui->label_image->setStyleSheet("border-image:url(:/image/test.jpg);");
 
+    qDebug()<<QDir::currentPath();
     if(OpencvImgProcess.load_image(ui->label_image, QString(QDir::currentPath()+"/image/test.jpg")))
     {
         ui->label_img_log->setText(QString::fromUtf8("log:图像加载成功"));

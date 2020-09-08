@@ -289,13 +289,7 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c1>;
 	status = "okay";
-
-	ap3216c@1e {
-		compatible = "alientek,ap3216c";
-		reg = <0x1e>;
-		status = "disabled";
-	};
-
+	
 	ap3216@1e {
 		compatible = "usr,ap3216";
 		reg = <0x1e>;
@@ -314,11 +308,19 @@
 		clocks = <&clks IMX6UL_CLK_SAI2>;
 		clock-names = "mclk";
 		wlf,shared-lrclk;
+		status = "disabled";
+	};
+
+	//增加oled节点
+	oled: oled@3c {
+		compatible = "oled,sh1106";
+		reg = <0x3c>;
 	};
 
 	ov5640: ov5640@3c {
 		compatible = "ovti,ov5640";
 		reg = <0x3c>;
+		status = "disabled";
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_csi1
 			     &csi_pwn_rst>;
@@ -329,7 +331,6 @@
 		csi_id = <0>;
 		mclk = <24000000>;
 		mclk_source = <0>;
-		status = "okay";
 		port {
 			ov5640_ep: endpoint {
 				remote-endpoint = <&csi1_ep>;
@@ -337,11 +338,11 @@
 		};
 	};
 
-        edt-ft5x06@38 {
+	edt-ft5x06@38 {
 		compatible = "edt,edt-ft5306", "edt,edt-ft5x06";
 		pinctrl-names = "default";
 		pinctrl-0 = <&ts_int_pin
-			     &ts_reset_pin>;
+		&ts_reset_pin>;
 
 		reg = <0x38>;
 		interrupt-parent = <&gpio1>;
@@ -351,14 +352,14 @@
 		status = "disabled";
 	};
 
-        goodix_ts@5d {
-                compatible = "goodix,gt9xx";
-                reg = <0x5d>;
-                status = "disabled";
-                interrupt-parent = <&gpio1>;
-                interrupts = <9 0>;
-                pinctrl-0 = <&ts_int_pin
-			     &ts_reset_pin>;
+	goodix_ts@5d {
+		compatible = "goodix,gt9xx";
+		reg = <0x5d>;
+		status = "disabled";
+		interrupt-parent = <&gpio1>;
+		interrupts = <9 0>;
+		pinctrl-0 = <&ts_int_pin
+		&ts_reset_pin>;
 		goodix,rst-gpio = <&gpio5 9  GPIO_ACTIVE_LOW>;
 		goodix,irq-gpio = <&gpio1 9  GPIO_ACTIVE_LOW>;
 	};
