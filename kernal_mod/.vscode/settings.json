@@ -10,5 +10,6 @@
         "type_traits": "c",
         "utility": "c",
         "*.tcc": "c"
-    }
+    },
+    "C_Cpp.dimInactiveRegions": true
 }

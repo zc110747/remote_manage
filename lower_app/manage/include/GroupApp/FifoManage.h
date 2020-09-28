@@ -39,16 +39,16 @@ public:
         ~CFifoManageInfo(){};
 
     /*创建并打开FIFO*/
-    int CreateInfomation(void);                        
+    int CreateInfomation(void) override;                        
 
     /*关闭FIFO并释放资源*/
-    int CloseInformation(uint8_t info);         
+    int CloseInformation(uint8_t info) override;         
     
     /*等待FIFO数据接收*/
-    int WaitInformation(uint8_t info, char *buf, int bufsize);              
+    int WaitInformation(uint8_t info, char *buf, int bufsize) override;              
 
     /*向FIFO中投递数据*/
-    int SendInformation(uint8_t info, char *buf, int bufsize, int prio);  
+    int SendInformation(uint8_t info, char *buf, int bufsize, int prio) override;  
 
 private:
 

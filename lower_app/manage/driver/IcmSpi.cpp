@@ -84,7 +84,6 @@ void SpiDriverRelease(void)
  */
 int SpiDevInfoRead(SSpiInfo *pSpiInfo)
 {
-    uint8_t nValue = 0;
     ssize_t nSize;
     uint32_t databuf[7];
 
@@ -109,7 +108,7 @@ int SpiDevInfoRead(SSpiInfo *pSpiInfo)
         }
         else
         {
-            USR_DEBUG("read spi device failed, error:%s\n", strerror(errno));
+            USR_DEBUG("read spi device failed, error:%s, nSize:%d\n", strerror(errno), (int)nSize);
             return RT_INVALID;
         }    
     }

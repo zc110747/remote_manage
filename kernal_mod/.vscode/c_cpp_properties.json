@@ -13,15 +13,20 @@
                 "CONFIG_SPARSE_IRQ",
                 "CONFIG_GPIOLIB",
                 "CONFIG_OF=1",
-                "__USE_XOPEN",
-                "__USE_XOPEN2K",
+                "_GNU_SOURCE",
                 "__GNUC__",
-                "_SIGNAL_H"
+                "_SIGNAL_H",
+                "MODULE",
+                "CONFIG_I2C",
+                "__KERNEL__"
             ],
-            "compilerPath": "F:\\arm-gcc\\bin\\arm-linux-gnueabihf-gcc",
-            "cStandard": "c99",
-            "cppStandard": "c++17",
-            "intelliSenseMode": "gcc-x64"
+            "compilerPath": "C:\\Keil_v5\\ARM\\ARMCC\\bin\\armcc.exe",
+            "cStandard": "c11",
+            "cppStandard": "c++20",
+            "intelliSenseMode": "gcc-x86",
+            "compilerArgs": [
+                "-m32"
+            ]
         }
     ],
     "version": 4

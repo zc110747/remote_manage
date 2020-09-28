@@ -84,7 +84,6 @@ void I2cDriverRelease(void)
  */
 int I2cDevInfoRead(SApInfo *pI2cInfo)
 {
-    uint8_t nValue = 0;
     ssize_t nSize;
     uint16_t databuf[3];
 
@@ -102,7 +101,7 @@ int I2cDevInfoRead(SApInfo *pI2cInfo)
         }
         else
         {
-            USR_DEBUG("read i2c device failed, error:%s\n", strerror(errno));
+            USR_DEBUG("read i2c device failed, error:%s, size:%d\n", strerror(errno), (int)nSize);
             return RT_INVALID;
         }    
     }
