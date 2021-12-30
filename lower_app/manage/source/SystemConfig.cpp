@@ -120,6 +120,7 @@ int SystemConfigInfo(std::string &sConfigfile)
 
     //下载路径
     SSysConifg.m_file_path = std::string(root["FilePath"].asString());
+    ifs.close();
     return EXIT_SUCCESS;
 }
 

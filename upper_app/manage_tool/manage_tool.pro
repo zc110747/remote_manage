@@ -50,7 +50,7 @@ FORMS += \
 INCLUDEPATH += $$PWD\..\..\..\opencv_install\include
 INCLUDEPATH += $$PWD\include
 
-LIBS += $$PWD\..\..\..\opencv_install\x64\mingw\lib\libopencv_*.a
+#LIBS += $$PWD\..\..\..\opencv_install\x64\mingw\lib\libopencv_*.a
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

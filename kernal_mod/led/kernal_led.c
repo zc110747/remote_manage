@@ -63,7 +63,7 @@ static void led_switch(u8 status);
 
 /**
  * 打开LED，获取LED资源
- * 
+ *
  * @param inode  驱动内的节点信息
  * @param filp   要处理的设备文件(文件描述符)
  *
@@ -82,10 +82,10 @@ int led_open(struct inode *inode, struct file *filp)
 
 /**
  * 释放LED设备资源
- * 
+ *
  * @param inode  驱动内的节点信息
  * @param filp   要处理的设备文件(文件描述符)
- * 
+ *
  * @return 设备关闭处理结果，0表示正常
  */
 int led_release(struct inode *inode, struct file *filp)
@@ -96,7 +96,7 @@ int led_release(struct inode *inode, struct file *filp)
 
 /**
  * 从LED设备读取数据
- * 
+ *
  * @param filp  要打开的设备文件(文件描述符)
  * @param buf   待读取数据缓冲的首地址
  * @param count 待读取数据的长度
@@ -122,7 +122,7 @@ ssize_t led_read(struct file *filp, char __user *buf, size_t count, loff_t *f_po
 
 /**
  * 向LED设备写入数据
- * 
+ *
  * @param filp  要打开的设备文件(文件描述符)
  * @param buf   待写入数据缓冲的首地址
  * @param count 待写入数据的长度
@@ -140,7 +140,7 @@ ssize_t led_write(struct file *filp, const char __user *buf, size_t count,  loff
 		printk(KERN_INFO"kernel write failed!\r\n");
 		return -EFAULT;
 	}
-	
+
     /*利用数据操作LED*/
 	led_switch(databuf[0]);
 	return 0;
@@ -148,11 +148,11 @@ ssize_t led_write(struct file *filp, const char __user *buf, size_t count,  loff
 
 /**
  * 执行控制指令的接口
- * 
+ *
  * @param filp 要打开的设备文件(文件描述符)
  * @param cmd  操作执行的指令
  * @param arg  操作处理的值
- *  
+ *
  * @return 返回控制指令的执行结果，0表示执行正常
  */
 long led_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
@@ -184,7 +184,7 @@ static struct file_operations led_fops = {
 
 /**
  * 驱动加载时执行的初始化函数
- * 
+ *
  * @param NULL
  *
  * @return 驱动加载处理结果
@@ -207,7 +207,7 @@ static int __init led_module_init(void)
         return result;
     }
 
-    /*在总线上创建设备*/    
+    /*在总线上创建设备*/
     /*1.申请字符设备号*/
     if(led_driver_info.major){
         led_driver_info.dev_id = MKDEV(led_driver_info.major, led_driver_info.minor);
@@ -219,13 +219,13 @@ static int __init led_module_init(void)
         led_driver_info.minor = MINOR(led_driver_info.dev_id);
     }
     if(result < 0){
-        printk(KERN_INFO"dev alloc or set failed\r\n");	
+        printk(KERN_INFO"dev alloc or set failed\r\n");
         return result;
     }
     else{
-        printk(KERN_INFO"dev alloc or set ok, major:%d, minor:%d\r\n", led_driver_info.major,  led_driver_info.minor);	
+        printk(KERN_INFO"dev alloc or set ok, major:%d, minor:%d\r\n", led_driver_info.major,  led_driver_info.minor);
     }
-    
+
     /*2.初始化设备信息，将设备接口和设备号进行关联*/
     cdev_init(&led_driver_info.cdev, &led_fops);
     led_driver_info.cdev.owner = THIS_MODULE;
@@ -235,7 +235,7 @@ static int __init led_module_init(void)
         printk(KERN_INFO"cdev add failed\r\n");
         return result;
     }else{
-	    printk(KERN_INFO"device add Success!\r\n");	
+	    printk(KERN_INFO"device add Success!\r\n");
     }
 
     /* 3、创建类 */
@@ -243,7 +243,7 @@ static int __init led_module_init(void)
 	if (IS_ERR(led_driver_info.class)) {
 		printk(KERN_INFO"class create failed!\r\n");
 		unregister_chrdev_region(led_driver_info.dev_id, DEVICE_LED_CNT);
-		cdev_del(&led_driver_info.cdev);	
+		cdev_del(&led_driver_info.cdev);
 		return PTR_ERR(led_driver_info.class);
 	}
 	else{
@@ -254,9 +254,9 @@ static int __init led_module_init(void)
 	led_driver_info.device = device_create(led_driver_info.class, NULL, led_driver_info.dev_id, NULL, DEVICE_LED_NAME);
 	if (IS_ERR(led_driver_info.device)) {
 		printk(KERN_INFO"device create failed!\r\n");
-                unregister_chrdev_region(led_driver_info.dev_id, DEVICE_LED_CNT);       
+                unregister_chrdev_region(led_driver_info.dev_id, DEVICE_LED_CNT);
                 cdev_del(&led_driver_info.cdev);
-		
+
 		class_destroy(led_driver_info.class);
 		return PTR_ERR(led_driver_info.device);
 	}
@@ -272,8 +272,8 @@ static int __init led_module_init(void)
 
 /**
  * 驱动释放时执行的退出函数
- * 
- * @param NULL    
+ *
+ * @param NULL
  *
  * @return 驱动退出执行结果
  */
@@ -292,7 +292,7 @@ static void __exit led_module_exit(void)
 
 /**
  * LED硬件初始化，引脚GPIO1_IO03
- * 
+ *
  * @param NULL
  *
  * @return NULL
@@ -325,13 +325,13 @@ static int led_gpio_init(void)
     led_switch(LED_OFF);
 
     printk(KERN_INFO"led tree hardware init ok\r\n");
-    
+
     return 0;
 }
 
 /**
  * 释放硬件资源
- * 
+ *
  * @param NULL
  *
  * @return NULL
@@ -342,7 +342,7 @@ static void led_gpio_release(void)
 
 /**
  *LED灯开关切换
- * 
+ *
  * @param status  LED开关状态，1开启，0关闭
  *
  * @return NULL
