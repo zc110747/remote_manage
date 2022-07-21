@@ -21,7 +21,7 @@
 #include "include/GroupApp/FifoManage.h"
 #include "include/GroupApp/MqManage.h"
 #include "driver/Beep.h"
-#include "driver/Led.h"
+#include "driver/led.hpp"
 #include "driver/Rtc.h"
 #include "driver/IcmSpi.h"
 #include "driver/ApI2c.h"
@@ -180,7 +180,8 @@ int main(int argc, char* argv[])
  */
 static void HardwareDriveInit(void)
 {
-	LedDriveInit();
+	led::getInstance()->open(O_RDWR | O_NDELAY);
+
 	BeepDriveInit();	
 	RtcDriveInit();
 	SpiDriverInit();
@@ -196,7 +197,7 @@ static void HardwareDriveInit(void)
  */
 static void HardwareDriverRelease(void)
 {
-	LedDriverRelease();
+	led::getInstance()->close();
 	BeepDriverRelease();
 	RtcDriverRelease();
 	SpiDriverRelease();

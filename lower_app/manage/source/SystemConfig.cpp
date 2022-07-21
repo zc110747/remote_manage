@@ -15,7 +15,6 @@
 #include <fstream>
 #include <iostream>
 #include "../include/SystemConfig.h"
-#include "../driver/Led.h"
 #include "../driver/Beep.h"
 
 /**************************************************************************

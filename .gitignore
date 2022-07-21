@@ -1,0 +1,5 @@
+
+#this shows not include by git
+
+*.o
+lower_app/manage/app_demo
