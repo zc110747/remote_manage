@@ -19,18 +19,14 @@
 /***************************************************************************
 * Include Header Files
 ***************************************************************************/
-#include "UsrTypeDef.h"
+#include "productConfig.hpp"
 #include "ApplicationThread.h"
 #include "GroupApp/MqManage.h"
 #include "GroupApp/FifoManage.h"
 #include "GroupApp/CalcCrc16.h"
 #include "SystemConfig.h"
-#include <iostream>
-#include <fstream>
-#include <dirent.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <memory>
+
+
 
 /**************************************************************************
 * Global Macro Definition

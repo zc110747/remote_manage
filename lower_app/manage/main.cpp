@@ -20,8 +20,7 @@
 #include "include/SystemConfig.h"
 #include "include/GroupApp/FifoManage.h"
 #include "include/GroupApp/MqManage.h"
-#include "driver/Beep.h"
-#include "driver/led.hpp"
+#include "driver/driver.hpp"
 #include "driver/Rtc.h"
 #include "driver/IcmSpi.h"
 #include "driver/ApI2c.h"
@@ -132,7 +131,8 @@ int main(int argc, char* argv[])
 
 #if __SYSTEM_DEBUG == 0
 	/*硬件相关初始化*/
-	HardwareDriveInit();
+	//HardwareDriveInit();
+	hardware_driver_init();
 
 	/*任务创建*/
 	ApplicationThreadInit();
@@ -162,7 +162,8 @@ int main(int argc, char* argv[])
 			sleep(100);
 		}
 	}
-	HardwareDriverRelease();
+	hardware_driver_release();
+	//HardwareDriverRelease();
 #else
 	SystemTest();
 #endif	
@@ -180,9 +181,6 @@ int main(int argc, char* argv[])
  */
 static void HardwareDriveInit(void)
 {
-	led::getInstance()->open(O_RDWR | O_NDELAY);
-
-	BeepDriveInit();	
 	RtcDriveInit();
 	SpiDriverInit();
 	I2cDriverInit();
@@ -197,8 +195,6 @@ static void HardwareDriveInit(void)
  */
 static void HardwareDriverRelease(void)
 {
-	led::getInstance()->close();
-	BeepDriverRelease();
 	RtcDriverRelease();
 	SpiDriverRelease();
 	I2cDriverRelease();

@@ -13,122 +13,28 @@
  */
 /*@{*/
 
-#include "Beep.h"
+#include "beep.hpp"
 #include "../include/SystemConfig.h"
 
-/**************************************************************************
-* Local Macro Definition
-***************************************************************************/
-
-/**************************************************************************
-* Local Type Definition
-***************************************************************************/
-
-/**************************************************************************
-* Local static Variable Declaration
-***************************************************************************/
-static int beep_fd;
-
-/**************************************************************************
-* Global Variable Declaration
-***************************************************************************/
-
-/**************************************************************************
-* Local Function Declaration
-***************************************************************************/
-
-/**************************************************************************
-* Function
-***************************************************************************/
-/**
- * 配置蜂鸣器的驱动
- * 
- * @param NULL
- *  
- * @return NULL
- */
-void BeepDriveInit(void)
+beepTheOne* beepTheOne::pInstance = nullptr;
+beepTheOne* beepTheOne::getInstance()
 {
-    struct SSystemConfig *pSystemConfigInfo;
-    pSystemConfigInfo = GetSSytemConfigInfo();
-
-    beep_fd = open(pSystemConfigInfo->m_dev_beep.c_str(), O_RDWR | O_NDELAY);
-    if(beep_fd != -1)
+    if(pInstance == nullptr)
     {
-        BeepStatusConvert((uint8_t)(pSystemConfigInfo->m_beep0_status));
-    }
-    else
-    {
-        DRIVER_DEBUG("Beep Open %s Failed, Error:%s\n", 
-                    pSystemConfigInfo->m_dev_beep.c_str(), strerror(errno));
-    }   
-}
-
-/**
- * 释放蜂鸣器应用资源
- * 
- * @param NULL
- *  
- * @return NULL
- */
-void BeepDriverRelease(void)
-{
-    close(beep_fd);
-}
-
-/**
- * 修改蜂鸣器的当前状态
- * 
- * @param nBeepStatus 配置蜂鸣器的开关状态
- *  
- * @return NULL
- */
-void BeepStatusConvert(uint8_t nBeepStatus)
-{
-    uint8_t nVal;
-    ssize_t nSize;
-
-    if(beep_fd != -1)
-    {
-        DRIVER_DEBUG("Beep Write:%d\n", nBeepStatus);
-        nVal = nBeepStatus;
-        nSize = write(beep_fd, &nVal, 1);  //将数据写入LED
-        if(nSize < 0)
+        pInstance = new(std::nothrow) beepTheOne(static_cast<SSystemConfig *>(GetSSytemConfigInfo())->m_dev_beep);
+        if(pInstance == NULL)
         {
-            DRIVER_DEBUG("Write Failed, nSize:%d\n", (int)nSize);
+            //To Do something(may logger)
         }
     }
-    else
-    {
-        DRIVER_DEBUG("Beep Open Failed, Write Val:%d!\n", nBeepStatus);
-    }
+    return pInstance;
 }
 
-/**
- * 获取蜂鸣器当前的状态
- * 
- * @param nBeepStatus NULL
- *  
- * @return 蜂鸣器的当前工作状态
- */
-uint8_t BeepStatusRead(void)
+void beepTheOne::release()
 {
-    uint8_t nValue = 0;
-    ssize_t nSize;
-
-    if(beep_fd != -1)
+    if(pInstance != nullptr)
     {
-        nSize = read(beep_fd, &nValue, 1);  //读取Beep的值
-        if(nSize < 0)
-        {
-            DRIVER_DEBUG("Beep Read Failed, Error:%s, nSize:%d\n", strerror(errno), (int)nSize);
-        }
+        delete pInstance;
+        pInstance = nullptr;
     }
-    else
-    {
-        //DRIVER_DEBUG("Beep Open Failed, Read Error!\n");
-    }
-    
-    return nValue;
 }
-

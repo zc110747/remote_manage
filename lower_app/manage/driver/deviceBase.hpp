@@ -6,8 +6,10 @@
  * COPYRIGHT (C) 2022, zc
  */
 
-#include <string>
-#include "../include/UsrTypeDef.h"
+#ifndef __DEVICEBASE_HPP
+#define __DEVICEBASE_HPP
+
+#include "../include/productConfig.hpp"
 
 class deviceBase
 {
@@ -18,10 +20,26 @@ protected:
     int DeviceFdM;
 
 public:
+    deviceBase();
     deviceBase(const std::string &DevicePath);
         ~deviceBase();
     bool open(int flags);
     void close();
+
+public:
     int getfd() { return DeviceFdM; }
     const std::string &getDevicePath() {return devicePathM;}
 };
+
+class IoBase:public deviceBase
+{
+public:
+    //constructor
+    using deviceBase::deviceBase;
+
+    //io read/write
+    int readIoStatus();
+    bool writeIoStatus(uint8_t status);
+};
+
+#endif

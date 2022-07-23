@@ -18,7 +18,7 @@
 /***************************************************************************
 * Include Header Files
 ***************************************************************************/
-#include "../include/UsrTypeDef.h"
+#include "../include/productConfig.hpp"
 #include "../include/SystemConfig.h"
 #include <sys/time.h>
 #include <sys/ioctl.h>

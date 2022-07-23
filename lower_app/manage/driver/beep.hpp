@@ -18,7 +18,7 @@
 /***************************************************************************
 * Include Header Files
 ***************************************************************************/
-#include "../include/UsrTypeDef.h"
+#include "deviceBase.hpp"
 
 /**************************************************************************
 * Global Macro Definition
@@ -35,16 +35,17 @@
 /**************************************************************************
 * Global Functon Declaration
 ***************************************************************************/
+class beepTheOne:public IoBase
+{
+private:
+    static beepTheOne* pInstance;
 
-/*配置蜂鸣器的驱动*/
-void BeepDriveInit(void);
+public:
+    //consturctor
+    using IoBase::IoBase;
 
-/*释放蜂鸣器应用资源*/
-void BeepDriverRelease(void);
+    static beepTheOne* getInstance();
+    void release();
+};
 
-/*获取蜂鸣器当前的状态*/
-uint8_t BeepStatusRead(void);
-
-/*修改蜂鸣器的当前状态*/
-void BeepStatusConvert(uint8_t nBeepStatus);
 #endif

@@ -15,7 +15,6 @@
 /*@{*/
 #include <signal.h>
 #include "../driver/driver.hpp"
-#include "../driver/Beep.h"
 #include "../driver/Rtc.h"
 #include "../driver/IcmSpi.h"
 #include "../driver/ApI2c.h"
@@ -204,23 +203,29 @@ void CApplicationReg::ReadDeviceStatus(void)
     struct rtc_time rtc_tm;
     struct SApInfo ApInfo;
     int readflag;
-    int ledStatus;
+    int Status;
 
     GetMultipleReg(REG_CONFIG_NUM, REG_INFO_NUM, nRegInfoArray);
     memcpy(nRegCacheArray, nRegInfoArray, REG_INFO_NUM);
     pRegInfoList = (struct SRegInfoList *)nRegInfoArray;
 
     //更新led的状态
-    ledStatus = led::getInstance()->readIoStatus();
-    if(ledStatus >= 0){
-        pRegInfoList->s_base_status.b.led = ledStatus&0x01;
+    Status = ledTheOne::getInstance()->readIoStatus();
+    if(Status >= 0){
+        pRegInfoList->s_base_status.b.led = Status&0x01;
     }
     else{
         pRegInfoList->s_base_status.b.led = 0; //if read failed, show 0
     }
 
     //更新beep的状态
-    pRegInfoList->s_base_status.b.beep = BeepStatusRead()&0x01;
+    Status = beepTheOne::getInstance()->readIoStatus();
+    if(Status >= 0){
+        pRegInfoList->s_base_status.b.beep = Status&0x01;
+    }else{
+        pRegInfoList->s_base_status.b.beep = 0;
+    }
+        
     
     //读取SPI设备的状态
     readflag = SpiDevInfoRead(&SpiInfo);
@@ -285,10 +290,10 @@ void CApplicationReg::WriteDeviceConfig(uint8_t cmd, uint8_t *pConfig, int size)
     switch(cmd)
     {
         case DEVICE_LED0:
-            led::getInstance()->writeIoStatus(pConfig[2]&0x01);
+            ledTheOne::getInstance()->writeIoStatus(pConfig[2]&0x01);
             break;
         case DEVICE_BEEP:
-            BeepStatusConvert((pConfig[2]>>1)&0x01);
+            beepTheOne::getInstance()->writeIoStatus((pConfig[2]>>1)&0x01);
             break;
         case DEVICE_REBOOT:
             {

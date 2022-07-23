@@ -1,44 +1,17 @@
-﻿/*
- * File      : typedef.h
- * 系统宏定义相关的实现
- * COPYRIGHT (C) 2020, zc
- *
- * Change Logs:
- * Date           Author       Notes
- * 2020-5-4      zc           the first version
- * 2020-5-20     zc           Code standardization 
- */
+/**********************************************************************
+* File:     productConfig.hpp
+* Author:   zhang chao
+* Function: global include for product Config
+* History:
+*   07/22/22 - original
+**********************************************************************/
+#ifndef _PRODUCTCONFIG_H
+#define _PRODUCTCONFIG_H
 
-/**
- * @addtogroup IMX6ULL
- */
-/*@{*/
-#ifndef _INCLUDE_TYPEDEF_H
-#define _INCLUDE_TYPEDEF_H
+#include "includes.hpp"
 
-/***************************************************************************
-* Include Header Files
-***************************************************************************/
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <termios.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <memory>
-#include <sys/types.h>
-#include <sys/stat.h>
-
-//#define NDEBUG  //用于控制是否开启单元测试的宏
-#include <assert.h>
-
-#include <new>
-
-/**************************************************************************
-* Global Macro Definition
-***************************************************************************/
-#define DEVICE_VERSION          "version 0.0.7 20200724"
+//------------------------- Global Defined --------------------------
+#define DEVICE_VERSION          "0.0.0.0"
 
 #define UART_MODULE_ON          1
 #define SOCKET_TCP_MODULE_ON    1

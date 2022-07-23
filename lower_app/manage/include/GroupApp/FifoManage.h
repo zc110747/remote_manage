@@ -18,7 +18,7 @@
 /***************************************************************************
 * Include Header Files
 ***************************************************************************/
-#include "../UsrTypeDef.h"
+#include "../productConfig.hpp"
 #include "BaseMessage.h"
 #include <mqueue.h>
 

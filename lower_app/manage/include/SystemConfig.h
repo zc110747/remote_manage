@@ -20,7 +20,7 @@
 ***************************************************************************/
 #include "json/json.h"
 #include <string>
-#include "UsrTypeDef.h"
+#include "productConfig.hpp"
 
 /**************************************************************************
 * Global Macro Definition

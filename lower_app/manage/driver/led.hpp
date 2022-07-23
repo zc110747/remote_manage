@@ -16,19 +16,16 @@
 #define _INCLUDE_LED_HPP
 
 #include "deviceBase.hpp"
-#include "../include/SystemConfig.h"
 
-class led:public deviceBase
+class ledTheOne: public IoBase
 {
 private:
+    static ledTheOne *pInstance;
 
 public:
-    led(const std::string &path);
+    using IoBase::IoBase;
 
-    static led *pInstance;
-    static led *getInstance();
-
-    int readIoStatus();
-    bool writeIoStatus(uint8_t status);
+    static ledTheOne* getInstance();
+    void release();
 };
 #endif

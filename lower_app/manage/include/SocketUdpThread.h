@@ -18,7 +18,7 @@
 /***************************************************************************
 * Include Header Files
 ***************************************************************************/
-#include "UsrTypeDef.h"
+#include "productConfig.hpp"
 #include "ApplicationThread.h"
 #include <sys/socket.h>
 #include <netinet/in.h>

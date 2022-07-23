@@ -19,7 +19,7 @@
 /***************************************************************************
 * Include Header Files
 ***************************************************************************/
-#include "UsrTypeDef.h"
+#include "productConfig.hpp"
 #include "ApplicationThread.h"
 #include "UsrProtocol.hpp"
 
