@@ -1,11 +1,21 @@
-/*
- * File      : device.cpp
- * 
- * device interface for all
- * 
- * COPYRIGHT (C) 2022, zc
- */
-
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2022-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      deviceBase.cpp
+//
+//  Purpose:
+//      Device Base Class.
+//
+// Author:
+//      ZhangChao
+//
+//  Assumptions:
+//
+//  Revision History:
+//      7/24/2022   Create New Version
+/////////////////////////////////////////////////////////////////////////////
 #include "deviceBase.hpp"
 
 using std::string;
@@ -48,20 +58,20 @@ void deviceBase::close()
     }
 }
 
-int IoBase::readIoStatus()
+bool IoBase::readIoStatus()
 {
-    uint8_t nValue = -1;
+    bool ret = false;
     ssize_t nSize;
 
     if(DeviceFdM >= 0)
     {
-        nSize = read(DeviceFdM, &nValue, 1);  //将数据写入ledBase
-        if(nSize <= 0)
+        nSize = ::read(DeviceFdM, &IoStatus, 1);  //将数据写入ledBase
+        if(nSize > 0)
         {
-            //do read error process
+            ret = true;
         }
     }
-    return nValue;
+    return ret;
 }
 
 bool IoBase::writeIoStatus(uint8_t status)
@@ -71,7 +81,7 @@ bool IoBase::writeIoStatus(uint8_t status)
 
     if(DeviceFdM >= 0)
     {
-        nSize = write(DeviceFdM, &status, 1);  //将数据写入ledBase
+        nSize = ::write(DeviceFdM, &status, 1);  //将数据写入ledBase
         if(nSize > 0)
         {
             ret = true;

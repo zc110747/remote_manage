@@ -15,9 +15,6 @@
 /*@{*/
 #include <signal.h>
 #include "../driver/driver.hpp"
-#include "../driver/Rtc.h"
-#include "../driver/IcmSpi.h"
-#include "../driver/ApI2c.h"
 #include "../include/ApplicationThread.h"
 #include "../include/GroupApp/MqManage.h"
 #include "../include/GroupApp/FifoManage.h"
@@ -199,73 +196,74 @@ void CApplicationReg::ReadDeviceStatus(void)
     static uint8_t nRegInfoArray[REG_INFO_NUM];
     static uint8_t nRegCacheArray[REG_INFO_NUM];
     struct SRegInfoList *pRegInfoList;
-    struct SSpiInfo SpiInfo;
-    struct rtc_time rtc_tm;
-    struct SApInfo ApInfo;
-    int readflag;
-    int Status;
 
     GetMultipleReg(REG_CONFIG_NUM, REG_INFO_NUM, nRegInfoArray);
     memcpy(nRegCacheArray, nRegInfoArray, REG_INFO_NUM);
     pRegInfoList = (struct SRegInfoList *)nRegInfoArray;
 
     //更新led的状态
-    Status = ledTheOne::getInstance()->readIoStatus();
-    if(Status >= 0){
-        pRegInfoList->s_base_status.b.led = Status&0x01;
+    if(ledTheOne::getInstance()->readIoStatus())
+    {
+        pRegInfoList->s_base_status.b.led = ledTheOne::getInstance()->getIoStatus();
     }
-    else{
-        pRegInfoList->s_base_status.b.led = 0; //if read failed, show 0
+    else
+    {
+        USR_DEBUG("read ledTheOne failed, error:%s\n", strerror(errno));
     }
 
     //更新beep的状态
-    Status = beepTheOne::getInstance()->readIoStatus();
-    if(Status >= 0){
-        pRegInfoList->s_base_status.b.beep = Status&0x01;
-    }else{
-        pRegInfoList->s_base_status.b.beep = 0;
-    }
-        
-    
-    //读取SPI设备的状态
-    readflag = SpiDevInfoRead(&SpiInfo);
-    if(readflag == RT_OK)
+    if(beepTheOne::getInstance()->readIoStatus())
     {
-        pRegInfoList->sensor_gyro_x = SpiInfo.gyro_x_adc;
-        pRegInfoList->sensor_gyro_y =SpiInfo.gyro_y_adc;
-        pRegInfoList->sensor_gyro_z =SpiInfo.gyro_z_adc;
-        pRegInfoList->sensor_accel_x =SpiInfo.accel_x_adc;
-        pRegInfoList->sensor_accel_y =SpiInfo.accel_y_adc;
-        pRegInfoList->sensor_accel_z =SpiInfo.accel_z_adc;
-        pRegInfoList->sensor_temp =SpiInfo.temp_adc;
+        pRegInfoList->s_base_status.b.beep = beepTheOne::getInstance()->getIoStatus();
+    }
+    else
+    {
+        USR_DEBUG("read beepTheOne failed, error:%s\n", strerror(errno));
     }
 
     //读取RTC时钟
-    readflag = RtcDevRead(&rtc_tm);
-    if(readflag == RT_OK)
+    if(RTCDevice::getInstance()->updateTime())
     {
-        pRegInfoList->rtc_sec = rtc_tm.tm_sec;
-        pRegInfoList->rtc_minute = rtc_tm.tm_min;
-        pRegInfoList->rtc_hour = rtc_tm.tm_hour;
+        struct rtc_time *pRtcTime;
+
+        pRtcTime = RTCDevice::getInstance()->getRtcTime();
+        pRegInfoList->rtc_sec = pRtcTime->tm_sec;
+        pRegInfoList->rtc_minute = pRtcTime->tm_min;
+        pRegInfoList->rtc_hour = pRtcTime->tm_hour;
     }
     else
     {
         USR_DEBUG("read rtc failed, error:%s\n", strerror(errno));
     }
-    
-    //读取I2c设备状态
-    readflag = I2cDevInfoRead(&ApInfo);
-    if(readflag == RT_OK)
+
+    if(ICMDevice::getInstance()->readInfo())
     {
-        pRegInfoList->sensor_ir = ApInfo.ir;
-        pRegInfoList->sensor_ps = ApInfo.ps;
-        pRegInfoList->sensor_als = ApInfo.als;
+        ICM_INFO *pIcmInfo;
+        pIcmInfo = ICMDevice::getInstance()->getInfo();
+        
+        pRegInfoList->sensor_gyro_x = pIcmInfo->gyro_x_adc;
+        pRegInfoList->sensor_gyro_y = pIcmInfo->gyro_y_adc;
+        pRegInfoList->sensor_gyro_z = pIcmInfo->gyro_z_adc;
+        pRegInfoList->sensor_accel_x = pIcmInfo->accel_x_adc;
+        pRegInfoList->sensor_accel_y = pIcmInfo->accel_y_adc;
+        pRegInfoList->sensor_accel_z = pIcmInfo->accel_z_adc;
+        pRegInfoList->sensor_temp = pIcmInfo->temp_adc;
+    }
+
+    if(APDevice::getInstance()->readInfo())
+    {
+        //读取I2c设备状态
+        AP_INFO *pApInfo;
+        pApInfo = APDevice::getInstance()->getInfo();
+        pRegInfoList->sensor_ir = pApInfo->ir;
+        pRegInfoList->sensor_ps = pApInfo->ps;
+        pRegInfoList->sensor_als = pApInfo->als;
     }
     else
     {
-        USR_DEBUG("read ap3216-i2c failed, error:%s\n", strerror(errno));
+        USR_DEBUG("read rtc failed, error:%s\n", strerror(errno));
     }
-    
+
     if(memcmp(nRegCacheArray, nRegInfoArray, REG_INFO_NUM) != 0)
     {
         //printf("Update HardWare, led:%d, beep:%d!\r\n", pRegInfoList->s_base_status.b.led, pRegInfoList->s_base_status.b.beep);

@@ -14,7 +14,7 @@ LIB = lib/$(CPU)libjsoncpp.a #链接的库
 OBJS = 	main.o source/SystemConfig.o \
 		source/ApplicationThread.o source/SocketTcpThread.o source/SocketUdpThread.o source/UartThread.o \
 		source/GroupApp/CalcCRC16.o source/GroupApp/MqManage.o source/GroupApp/FifoManage.o \
-		driver/Rtc.o driver/beep.o driver/led.o driver/IcmSpi.o driver/ApI2c.o \
+		driver/rtc.o driver/beep.o driver/led.o driver/spi_icm.o driver/i2c_ap.o \
 		driver/deviceBase.o driver/driver.o
 
 APP = app_demo

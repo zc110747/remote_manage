@@ -1,17 +1,21 @@
-/*
- * File      : beep.cpp
- * beep应用层驱动实现
- * COPYRIGHT (C) 2020, zc
- *
- * Change Logs:
- * Date           Author       Notes
- * 2020-5-4      zc           the first version
- */
-
-/**
- * @addtogroup IMX6ULL
- */
-/*@{*/
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2022-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      beep.cpp
+//
+//  Purpose:
+//      Device Beep.
+//
+// Author:
+//      ZhangChao
+//
+//  Assumptions:
+//
+//  Revision History:
+//      7/24/2022   Create New Version
+/////////////////////////////////////////////////////////////////////////////
 
 #include "beep.hpp"
 #include "../include/SystemConfig.h"

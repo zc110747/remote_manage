@@ -3,10 +3,10 @@
 //  All Rights Reserved
 //
 //  Name:
-//      led.hpp
+//      i2c_ap.cpp
 //
 //  Purpose:
-//      led device interface.
+//      i2c read ap interface.
 //
 // Author:
 //      ZhangChao
@@ -16,20 +16,28 @@
 //  Revision History:
 //      7/24/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
-#ifndef _INCLUDE_LED_HPP
-#define _INCLUDE_LED_HPP
+#ifndef _I2C_AP_HPP
+#define _I2C_AP_HPP
 
 #include "deviceBase.hpp"
 
-class ledTheOne: public IoBase
+typedef struct _SApInfo
+{
+    uint16_t ir;     /*红外线强度*/
+    uint16_t als;    /*环境光强度*/
+    uint16_t ps;     /*接近距离*/
+}AP_INFO;
+
+class APDevice:public InfoBase<AP_INFO>
 {
 private:
-    static ledTheOne *pInstance;
+    static APDevice *pInstance;
 
 public:
-    using IoBase::IoBase;
+    //constructor
+    using InfoBase::InfoBase;
 
-    static ledTheOne* getInstance();
+    static APDevice *getInstance();
     void release();
 };
 #endif

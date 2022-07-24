@@ -21,9 +21,6 @@
 #include "include/GroupApp/FifoManage.h"
 #include "include/GroupApp/MqManage.h"
 #include "driver/driver.hpp"
-#include "driver/Rtc.h"
-#include "driver/IcmSpi.h"
-#include "driver/ApI2c.h"
 
 /**************************************************************************
 * Local Macro Definition
@@ -48,12 +45,6 @@ static int pipe_fd[2];
 #if __SYSTEM_DEBUG == 1
 static void SystemTest(void);
 #endif
-
-/*硬件驱动初始化配置*/
-static void HardwareDriveInit(void);
-
-/*硬件驱动资源释放*/
-static void HardwareDriverRelease(void);
 
 /**************************************************************************
 * Function
@@ -131,7 +122,6 @@ int main(int argc, char* argv[])
 
 #if __SYSTEM_DEBUG == 0
 	/*硬件相关初始化*/
-	//HardwareDriveInit();
 	hardware_driver_init();
 
 	/*任务创建*/
@@ -163,41 +153,12 @@ int main(int argc, char* argv[])
 		}
 	}
 	hardware_driver_release();
-	//HardwareDriverRelease();
 #else
 	SystemTest();
 #endif	
 
 	USR_DEBUG("Process app_demo stop, error:%s\n", strerror(errno));
 	return result;
-}
-
-/**
- * 硬件驱动初始化配置
- * 
- * @param NULL
- *  
- * @return NULL
- */
-static void HardwareDriveInit(void)
-{
-	RtcDriveInit();
-	SpiDriverInit();
-	I2cDriverInit();
-}
-
-/**
- * 硬件驱动资源释放
- * 
- * @param NULL
- *  
- * @return NULL
- */
-static void HardwareDriverRelease(void)
-{
-	RtcDriverRelease();
-	SpiDriverRelease();
-	I2cDriverRelease();
 }
 
 /**

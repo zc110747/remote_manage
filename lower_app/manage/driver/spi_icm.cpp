@@ -3,10 +3,10 @@
 //  All Rights Reserved
 //
 //  Name:
-//      led.cpp
+//      spi_icm.cpp
 //
 //  Purpose:
-//      led device.
+//      spi read icm application.
 //
 // Author:
 //      ZhangChao
@@ -16,24 +16,20 @@
 //  Revision History:
 //      7/24/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
-#include "led.hpp"
+#include "spi_icm.hpp"
 #include "../include/SystemConfig.h"
 
-ledTheOne* ledTheOne::pInstance = nullptr;
-ledTheOne* ledTheOne::getInstance()
+ICMDevice* ICMDevice::pInstance = nullptr;
+ICMDevice* ICMDevice::getInstance()
 {
     if(pInstance == nullptr)
     {
-        pInstance = new(std::nothrow) ledTheOne(static_cast<SSystemConfig *>(GetSSytemConfigInfo())->m_dev_led);
-        if(pInstance == NULL)
-        {
-            //To Do something(may logger)
-        }
+       pInstance = new(std::nothrow) ICMDevice(static_cast<SSystemConfig *>(GetSSytemConfigInfo())->m_dev_icm_spi); 
     }
     return pInstance;
 }
 
-void ledTheOne::release()
+void ICMDevice::release()
 {
     if(pInstance != nullptr)
     {

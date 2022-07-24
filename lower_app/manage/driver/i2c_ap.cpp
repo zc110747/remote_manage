@@ -3,10 +3,10 @@
 //  All Rights Reserved
 //
 //  Name:
-//      led.cpp
+//      i2c_ap.cpp
 //
 //  Purpose:
-//      led device.
+//      i2c read ap application.
 //
 // Author:
 //      ZhangChao
@@ -16,15 +16,15 @@
 //  Revision History:
 //      7/24/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
-#include "led.hpp"
+#include "i2c_ap.hpp"
 #include "../include/SystemConfig.h"
 
-ledTheOne* ledTheOne::pInstance = nullptr;
-ledTheOne* ledTheOne::getInstance()
+APDevice* APDevice::pInstance = nullptr;
+APDevice* APDevice::getInstance()
 {
     if(pInstance == nullptr)
     {
-        pInstance = new(std::nothrow) ledTheOne(static_cast<SSystemConfig *>(GetSSytemConfigInfo())->m_dev_led);
+        pInstance = new(std::nothrow) APDevice(static_cast<SSystemConfig *>(GetSSytemConfigInfo())->m_dev_ap_i2c);
         if(pInstance == NULL)
         {
             //To Do something(may logger)
@@ -33,7 +33,7 @@ ledTheOne* ledTheOne::getInstance()
     return pInstance;
 }
 
-void ledTheOne::release()
+void APDevice::release()
 {
     if(pInstance != nullptr)
     {

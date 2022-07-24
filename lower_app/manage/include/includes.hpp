@@ -14,14 +14,15 @@
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <termios.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <dirent.h>
 #include <assert.h>
 #include <pthread.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/termios.h>
+#include <sys/time.h>
 
 //c++ interface
 #include <new>
