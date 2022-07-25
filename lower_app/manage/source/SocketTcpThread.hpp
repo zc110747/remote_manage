@@ -1,51 +1,53 @@
 /*
- * File      : BaseMessage.h
- * 基础消息队列说明
+ * File      : SocketThread.h
+ * Socket Comm
  * COPYRIGHT (C) 2020, zc
  *
  * Change Logs:
  * Date           Author       Notes
- * 2020-5-4      zc           the first version
+ * 2020-5-4       zc           the first version
  */
 
 /**
  * @addtogroup IMX6ULL
  */
 /*@{*/
-#ifndef _INCLUDE_BASE_MESSAGE_H
-#define _INCLUDE_BASE_MESSAGE_H
+#ifndef _INCLUDE_SOCKET_THREAD_H
+#define _INCLUDE_SOCKET_THREAD_H
 
 /***************************************************************************
 * Include Header Files
 ***************************************************************************/
-#include "../productConfig.hpp"
+#include <sys/socket.h>
+#include "UsrProtocol.hpp"
 
 /**************************************************************************
 * Global Macro Definition
 ***************************************************************************/
-#define MAIN_BASE_MESSAGE                   1    
-#define APP_BASE_MESSAGE                    2
+#define SOCKET_BUFFER_SIZE		1200
 
 /**************************************************************************
 * Global Type Definition
 ***************************************************************************/
-class CBaseMessageInfo
+template<typename T>
+class CTcpProtocolInfo:public CProtocolInfo<T>
 {
 public:
-    CBaseMessageInfo(){};
-        ~CBaseMessageInfo(){};
+	using CProtocolInfo<T>::CProtocolInfo;
 
-    /*通讯队列的创建*/
-    virtual int CreateInfomation(void) = 0;     
+	/*TCP Socket数据读取接口*/
+	int DeviceRead(int nFd, uint8_t *pDataStart, uint16_t nDataSize, T ExtraInfo)
+	{
+		*ExtraInfo = recv(nFd, pDataStart, nDataSize, 0);
+		return *ExtraInfo;
+	}
 
-    /*通讯队列的资源释放*/                            
-    virtual int CloseInformation(uint8_t info) = 0;       
-
-    /*等待通讯队列的数据接收*/                    
-    virtual int WaitInformation(uint8_t info, char *buf, int bufsize) = 0;  
-    
-    /*向通讯队列投递数据*/    
-    virtual int SendInformation(uint8_t info, char *buf, int bufsize, int prio) = 0;    
+	/*TCP Socket数据写入接口*/
+	int DeviceWrite(int nFd, uint8_t *pDataStart, uint16_t nDataSize, T ExtraInfo)
+	{
+		*ExtraInfo = send(nFd, pDataStart, nDataSize, 0);
+		return *ExtraInfo;
+	}
 };
 
 /**************************************************************************
@@ -55,4 +57,12 @@ public:
 /**************************************************************************
 * Global Functon Declaration
 ***************************************************************************/
+
+#if SOCKET_TCP_MODULE_ON == 1
+/*TCP网络通讯任务和数据初始化*/
+void SocketTcpThreadInit(void);
+#else
+#define SocketTcpThreadInit() {}
+#endif
+
 #endif

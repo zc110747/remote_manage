@@ -14,7 +14,7 @@
 /*@{*/
 #include <fstream>
 #include <iostream>
-#include "../include/SystemConfig.h"
+#include "SystemConfig.hpp"
 
 /**************************************************************************
 * Local Macro Definition

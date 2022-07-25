@@ -19,14 +19,12 @@
 /***************************************************************************
 * Include Header Files
 ***************************************************************************/
-#include "productConfig.hpp"
-#include "ApplicationThread.h"
-#include "GroupApp/MqManage.h"
-#include "GroupApp/FifoManage.h"
-#include "GroupApp/CalcCrc16.h"
-#include "SystemConfig.h"
-
-
+#include "../include/productConfig.hpp"
+#include "GroupApp/MqManage.hpp"
+#include "GroupApp/FifoManage.hpp"
+#include "GroupApp/CalcCrc16.hpp"
+#include "SystemConfig.hpp"
+#include "ApplicationThread.hpp"
 
 /**************************************************************************
 * Global Macro Definition

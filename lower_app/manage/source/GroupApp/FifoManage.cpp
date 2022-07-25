@@ -12,7 +12,7 @@
  */
 /*@{*/
 
-#include "../../include/GroupApp/FifoManage.h"
+#include "FifoManage.hpp"
 
 #if __WORK_IN_WSL == 1
 /**************************************************************************

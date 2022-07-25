@@ -13,8 +13,7 @@
  */
 /*@{*/
 
-#include "../include/SystemConfig.h"
-#include "../include/SocketUdpThread.h"
+#include "SocketUdpThread.hpp"
 
 #if SOCKET_UDP_MODULE_ON == 1
 /**************************************************************************

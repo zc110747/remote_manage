@@ -17,7 +17,6 @@
 //      7/24/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
 #include "spi_icm.hpp"
-#include "../include/SystemConfig.h"
 
 ICMDevice* ICMDevice::pInstance = nullptr;
 ICMDevice* ICMDevice::getInstance()

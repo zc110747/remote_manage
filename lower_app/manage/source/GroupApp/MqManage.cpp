@@ -12,7 +12,7 @@
  */
 /*@{*/
 
-#include "../../include/GroupApp/MqManage.h"
+#include "MqManage.hpp"
 #include <memory>
 
 #if __WORK_IN_WSL == 0

@@ -13,13 +13,7 @@
  * @addtogroup IMX6ULL
  */
 /*@{*/
-#include "include/UartThread.h"
-#include "include/ApplicationThread.h"
-#include "include/SocketTcpThread.h"
-#include "include/SocketUdpThread.h"
-#include "include/SystemConfig.h"
-#include "include/GroupApp/FifoManage.h"
-#include "include/GroupApp/MqManage.h"
+#include "source/UnityMain.hpp"
 #include "driver/driver.hpp"
 
 /**************************************************************************

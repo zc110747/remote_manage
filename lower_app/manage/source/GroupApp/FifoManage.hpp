@@ -1,55 +1,67 @@
 /*
- * File      : uart_task.h
- * uart task interface
+ * File      : FifoManage.h
+ * 命名管道管理接口
  * COPYRIGHT (C) 2020, zc
  *
  * Change Logs:
  * Date           Author       Notes
  * 2020-5-4      zc           the first version
- * 2020-5-20     zc           Code standardization 
  */
 
 /**
  * @addtogroup IMX6ULL
  */
 /*@{*/
-#ifndef _INCLUDE_UART_TASK_H
-#define _INCLUDE_UART_TASK_H
+#ifndef _INCLUDE_FIFO_MANAGE_H
+#define _INCLUDE_FIFO_MANAGE_H
 
 /***************************************************************************
 * Include Header Files
 ***************************************************************************/
-#include "productConfig.hpp"
-#include "ApplicationThread.h"
-#include "UsrProtocol.hpp"
+#include "BaseMessage.hpp"
+#include <mqueue.h>
 
+#if __WORK_IN_WSL == 1
 /**************************************************************************
 * Global Macro Definition
 ***************************************************************************/
-#define UART_BUFFER_SIZE     		1200
+#define MAIN_FIFO        MAIN_BASE_MESSAGE
+#define APP_FIFO         APP_BASE_MESSAGE
 
 /**************************************************************************
 * Global Type Definition
 ***************************************************************************/
-template<class T>
-class CUartProtocolInfo:public CProtocolInfo<T>
+class CFifoManageInfo:public CBaseMessageInfo
 {
 public:
-	using CProtocolInfo<T>::CProtocolInfo;
+    CFifoManageInfo(){};
+        ~CFifoManageInfo(){};
 
-	/*串口的通讯读接口*/
-	int DeviceRead(int nFd, uint8_t *pDataStart, uint16_t nDataSize, T ExtraInfo)
-	{
-		*ExtraInfo = read(nFd, pDataStart, nDataSize);
-		return *ExtraInfo;
-	}
+    /*创建并打开FIFO*/
+    int CreateInfomation(void) override;                        
 
-	/*串口的通讯写接口*/
-	int DeviceWrite(int nFd, uint8_t *pDataStart, uint16_t nDataSize, T ExtraInfo)
-	{
-		*ExtraInfo = write(nFd, pDataStart, nDataSize);
-		return *ExtraInfo;
-	}
+    /*关闭FIFO并释放资源*/
+    int CloseInformation(uint8_t info) override;         
+    
+    /*等待FIFO数据接收*/
+    int WaitInformation(uint8_t info, char *buf, int bufsize) override;              
+
+    /*向FIFO中投递数据*/
+    int SendInformation(uint8_t info, char *buf, int bufsize, int prio) override;  
+
+private:
+
+    /*主FIFO读描述符*/
+    int m_rfd_main{-1};
+
+    /*主FIFO写描述符*/
+    int m_wfd_main{-1};
+
+    /*应用FIFO读描述符*/
+    int m_rfd_app{-1};
+
+    /*应用FIFO写描述符*/
+    int m_wfd_app{-1};
 };
 
 /**************************************************************************
@@ -59,12 +71,6 @@ public:
 /**************************************************************************
 * Global Functon Declaration
 ***************************************************************************/
-
-/*Uart通讯相关的线程初始化*/
-#if UART_MODULE_ON == 1
-void UartThreadInit(void);
-#else
-#define UartThreadInit()
+CFifoManageInfo *GetFifoMessageInfo(void);
 #endif
-
 #endif

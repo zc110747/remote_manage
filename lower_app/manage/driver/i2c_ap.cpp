@@ -17,7 +17,6 @@
 //      7/24/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
 #include "i2c_ap.hpp"
-#include "../include/SystemConfig.h"
 
 APDevice* APDevice::pInstance = nullptr;
 APDevice* APDevice::getInstance()

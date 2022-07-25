@@ -13,11 +13,10 @@
  * @addtogroup IMX6ULL
  */
 /*@{*/
-#include <signal.h>
+#include "ApplicationThread.hpp"
+#include "GroupApp/FifoManage.hpp"
+#include "GroupApp/MqManage.hpp"
 #include "../driver/driver.hpp"
-#include "../include/ApplicationThread.h"
-#include "../include/GroupApp/MqManage.h"
-#include "../include/GroupApp/FifoManage.h"
 
 /**************************************************************************
 * Local Macro Definition

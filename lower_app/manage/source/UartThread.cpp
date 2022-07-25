@@ -14,8 +14,7 @@
  */
 /*@{*/
 
-#include "../include/SystemConfig.h"
-#include "../include/UartThread.h"
+#include "UartThread.hpp"
 
 #if UART_MODULE_ON == 1
 /**************************************************************************

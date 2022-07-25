@@ -3,10 +3,10 @@
 //  All Rights Reserved
 //
 //  Name:
-//      beep.cpp
+//      led.cpp
 //
 //  Purpose:
-//      Device Beep.
+//      led device.
 //
 // Author:
 //      ZhangChao
@@ -16,16 +16,14 @@
 //  Revision History:
 //      7/24/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
+#include "led.hpp"
 
-#include "beep.hpp"
-#include "../include/SystemConfig.h"
-
-beepTheOne* beepTheOne::pInstance = nullptr;
-beepTheOne* beepTheOne::getInstance()
+ledTheOne* ledTheOne::pInstance = nullptr;
+ledTheOne* ledTheOne::getInstance()
 {
     if(pInstance == nullptr)
     {
-        pInstance = new(std::nothrow) beepTheOne(static_cast<SSystemConfig *>(GetSSytemConfigInfo())->m_dev_beep);
+        pInstance = new(std::nothrow) ledTheOne(static_cast<SSystemConfig *>(GetSSytemConfigInfo())->m_dev_led);
         if(pInstance == NULL)
         {
             //To Do something(may logger)
@@ -34,7 +32,7 @@ beepTheOne* beepTheOne::getInstance()
     return pInstance;
 }
 
-void beepTheOne::release()
+void ledTheOne::release()
 {
     if(pInstance != nullptr)
     {

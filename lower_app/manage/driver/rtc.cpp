@@ -18,7 +18,6 @@
 /////////////////////////////////////////////////////////////////////////////
 #include "rtc.hpp"
 #include <sys/ioctl.h>
-#include "../include/SystemConfig.h"
 
 RTCDevice* RTCDevice::pInstance = nullptr;
 RTCDevice* RTCDevice::getInstance()

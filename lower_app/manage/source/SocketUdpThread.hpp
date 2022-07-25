@@ -18,8 +18,6 @@
 /***************************************************************************
 * Include Header Files
 ***************************************************************************/
-#include "productConfig.hpp"
-#include "ApplicationThread.h"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <sys/types.h>

@@ -1,6 +1,6 @@
 /*
- * File      : FifoManage.h
- * 命名管道管理接口
+ * File      : MqManage.h
+ * Posix消息队列处理接口
  * COPYRIGHT (C) 2020, zc
  *
  * Change Logs:
@@ -12,57 +12,50 @@
  * @addtogroup IMX6ULL
  */
 /*@{*/
-#ifndef _INCLUDE_FIFO_MANAGE_H
-#define _INCLUDE_FIFO_MANAGE_H
+#ifndef _INCLUDE_MQ_MANAGE_H
+#define _INCLUDE_MQ_MANAGE_H
 
 /***************************************************************************
 * Include Header Files
 ***************************************************************************/
-#include "../productConfig.hpp"
-#include "BaseMessage.h"
+#include "BaseMessage.hpp"
 #include <mqueue.h>
 
-#if __WORK_IN_WSL == 1
+#if __WORK_IN_WSL == 0
 /**************************************************************************
 * Global Macro Definition
 ***************************************************************************/
-#define MAIN_FIFO        MAIN_BASE_MESSAGE
-#define APP_FIFO         APP_BASE_MESSAGE
+#define MAIN_MQ       MAIN_BASE_MESSAGE
+#define APP_MQ        APP_BASE_MESSAGE
 
 /**************************************************************************
 * Global Type Definition
 ***************************************************************************/
-class CFifoManageInfo:public CBaseMessageInfo
+class CMqMessageInfo:public CBaseMessageInfo
 {
 public:
-    CFifoManageInfo(){};
-        ~CFifoManageInfo(){};
+    CMqMessageInfo(){};
+        ~CMqMessageInfo(){};
 
-    /*创建并打开FIFO*/
-    int CreateInfomation(void) override;                        
+    /*创建并打开消息队列*/
+    int CreateInfomation(void);                                     
 
-    /*关闭FIFO并释放资源*/
-    int CloseInformation(uint8_t info) override;         
-    
-    /*等待FIFO数据接收*/
-    int WaitInformation(uint8_t info, char *buf, int bufsize) override;              
+    /*释放消息队列*/
+    int CloseInformation(uint8_t info);                            
 
-    /*向FIFO中投递数据*/
-    int SendInformation(uint8_t info, char *buf, int bufsize, int prio) override;  
+    /*向消息队列投递消息*/
+    int WaitInformation(uint8_t info, char *buf, int bufsize);       
+
+    /*发送数据给消息队列*/
+    int SendInformation(uint8_t info, char *buf, int bufsize, int prio); 
 
 private:
+    
+    /*主消息队列描述符*/
+    mqd_t m_MainMqd{-1};
 
-    /*主FIFO读描述符*/
-    int m_rfd_main{-1};
-
-    /*主FIFO写描述符*/
-    int m_wfd_main{-1};
-
-    /*应用FIFO读描述符*/
-    int m_rfd_app{-1};
-
-    /*应用FIFO写描述符*/
-    int m_wfd_app{-1};
+    /*应用消息队列描述符*/
+    mqd_t m_AppMqd{-1};
 };
 
 /**************************************************************************
@@ -72,6 +65,8 @@ private:
 /**************************************************************************
 * Global Functon Declaration
 ***************************************************************************/
-CFifoManageInfo *GetFifoMessageInfo(void);
+
+/*获取线程间通讯信息*/
+CMqMessageInfo *GetMqMessageInfo(void);
 #endif
 #endif

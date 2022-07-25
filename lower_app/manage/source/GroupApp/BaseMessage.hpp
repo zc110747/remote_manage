@@ -1,6 +1,6 @@
 /*
- * File      : MqManage.h
- * Posix消息队列处理接口
+ * File      : BaseMessage.h
+ * 基础消息队列说明
  * COPYRIGHT (C) 2020, zc
  *
  * Change Logs:
@@ -12,51 +12,40 @@
  * @addtogroup IMX6ULL
  */
 /*@{*/
-#ifndef _INCLUDE_MQ_MANAGE_H
-#define _INCLUDE_MQ_MANAGE_H
+#ifndef _INCLUDE_BASE_MESSAGE_H
+#define _INCLUDE_BASE_MESSAGE_H
 
 /***************************************************************************
 * Include Header Files
 ***************************************************************************/
-#include "../productConfig.hpp"
-#include "BaseMessage.h"
-#include <mqueue.h>
+#include "../../include/productConfig.hpp"
 
-#if __WORK_IN_WSL == 0
 /**************************************************************************
 * Global Macro Definition
 ***************************************************************************/
-#define MAIN_MQ       MAIN_BASE_MESSAGE
-#define APP_MQ        APP_BASE_MESSAGE
+#define MAIN_BASE_MESSAGE                   1    
+#define APP_BASE_MESSAGE                    2
 
 /**************************************************************************
 * Global Type Definition
 ***************************************************************************/
-class CMqMessageInfo:public CBaseMessageInfo
+class CBaseMessageInfo
 {
 public:
-    CMqMessageInfo(){};
-        ~CMqMessageInfo(){};
+    CBaseMessageInfo(){};
+        ~CBaseMessageInfo(){};
 
-    /*创建并打开消息队列*/
-    int CreateInfomation(void);                                     
+    /*通讯队列的创建*/
+    virtual int CreateInfomation(void) = 0;     
 
-    /*释放消息队列*/
-    int CloseInformation(uint8_t info);                            
+    /*通讯队列的资源释放*/                            
+    virtual int CloseInformation(uint8_t info) = 0;       
 
-    /*向消息队列投递消息*/
-    int WaitInformation(uint8_t info, char *buf, int bufsize);       
-
-    /*发送数据给消息队列*/
-    int SendInformation(uint8_t info, char *buf, int bufsize, int prio); 
-
-private:
+    /*等待通讯队列的数据接收*/                    
+    virtual int WaitInformation(uint8_t info, char *buf, int bufsize) = 0;  
     
-    /*主消息队列描述符*/
-    mqd_t m_MainMqd{-1};
-
-    /*应用消息队列描述符*/
-    mqd_t m_AppMqd{-1};
+    /*向通讯队列投递数据*/    
+    virtual int SendInformation(uint8_t info, char *buf, int bufsize, int prio) = 0;    
 };
 
 /**************************************************************************
@@ -66,8 +55,4 @@ private:
 /**************************************************************************
 * Global Functon Declaration
 ***************************************************************************/
-
-/*获取线程间通讯信息*/
-CMqMessageInfo *GetMqMessageInfo(void);
-#endif
 #endif

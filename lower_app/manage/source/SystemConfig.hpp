@@ -12,15 +12,14 @@
  * @addtogroup IMX6ULL
  */
 /*@{*/
-#ifndef _INCLUDE_SYSTEM_CONFIG_H
-#define _INCLUDE_SYSTEM_CONFIG_H
+#ifndef _INCLUDE_SYSTEM_CONFIG_HPP
+#define _INCLUDE_SYSTEM_CONFIG_HPP
 
 /***************************************************************************
 * Include Header Files
 ***************************************************************************/
 #include "json/json.h"
-#include <string>
-#include "productConfig.hpp"
+#include "../include/productConfig.hpp"
 
 /**************************************************************************
 * Global Macro Definition

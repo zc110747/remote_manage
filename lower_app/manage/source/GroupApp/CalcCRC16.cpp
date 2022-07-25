@@ -13,7 +13,7 @@
  */
 /*@{*/
 
-#include "../../include/GroupApp/CalcCrc16.h"
+#include "CalcCrc16.hpp"
 
 /**************************************************************************
 * Local Macro Definition
