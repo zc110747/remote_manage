@@ -61,6 +61,21 @@
 //默认设备ID
 #define DEVICE_ID               0x01
 
+//default system config set
+#define SYSTM_CONFIG_ON             1
+#define SYSTM_CONFIG_OFF            0
+
+#define DEFAULT_LED_INIT            SYSTM_CONFIG_ON
+#define DEFALUT_LED_DEV             "/dev/led"        
+
+#define DEFAULT_BEEP_INIT           SYSTM_CONFIG_ON
+#define DEFALUT_BEEP_DEV            "/dev/beep"   
+
+#define DEFAULT_SERIAL_BAUD         115200
+#define DEFAULT_SERIAL_DATABITS     8
+#define DEFAULT_SERIAL_STOPBITS     1
+#define DEFAULT_SERIAL_PARITY       "n"
+
 /**************************************************************************
 * Global Type Definition
 ***************************************************************************/

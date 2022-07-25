@@ -16,17 +16,54 @@
 #include <iostream>
 #include "SystemConfig.hpp"
 
-/**************************************************************************
-* Local Macro Definition
-***************************************************************************/
 
-/**************************************************************************
-* Local Type Definition
-***************************************************************************/
+// SystemConfig::SystemConfig()
+// {
 
-/**************************************************************************
-* Local static Variable Declaration
-***************************************************************************/
+// }
+
+// SystemConfig::~SystemConfig()
+// {
+
+// }
+
+// SystemConfig* SystemConfig::pInstance = nullptr;
+// SystemConfig* SystemConfig::getInstance()
+// {
+//     if(pInstance == nullptr)
+//     {
+//         pInstance = new(std::nothrow) SystemConfig();
+//         if(pInstance == nullptr)
+//         {
+//             //to do error process
+//         }
+//     }
+//     return pInstance;
+// }
+
+// bool SystemConfig::init(const char* path)
+// {
+
+// }
+
+// void SystemConfig::default_init()
+// {
+//     parameter.led.init = DEFAULT_LED_INIT;
+//     parameter.led.dev = DEFALUT_LED_DEV;
+
+// }
+
+// /**************************************************************************
+// * Local Macro Definition
+// ***************************************************************************/
+
+// /**************************************************************************
+// * Local Type Definition
+// ***************************************************************************/
+
+// /**************************************************************************
+// * Local static Variable Declaration
+// ***************************************************************************/
 static SSystemConfig SSysConifg = {
     //串口配置
     BAUD,
@@ -57,9 +94,9 @@ static SSystemConfig SSysConifg = {
     //下载文件的路径
     std::string(UPDATE_FILE_PATH),
 };
-/**************************************************************************
-* Global Variable Declaration
-***************************************************************************/
+// /**************************************************************************
+// * Global Variable Declaration
+// ***************************************************************************/
 
 /**************************************************************************
 * Local Function Declaration
