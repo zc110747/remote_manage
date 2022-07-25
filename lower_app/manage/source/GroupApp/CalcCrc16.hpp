@@ -1,41 +1,25 @@
-/*
- * File      : CalcCrc16.h
- * Calculate CRC16 value
- * COPYRIGHT (C) 2020, zc
- *
- * Change Logs:
- * Date           Author       Notes
- * 2020-6-10      zc           the first version
- */
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2022-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      CalcCrc16.cpp
+//
+//  Purpose:
+//      Calculate crc16 interface.
+//
+// Author:
+//      ZhangChao
+//
+//  Assumptions:
+//
+//  Revision History:
+//      7/24/2022   Create New Version
+/////////////////////////////////////////////////////////////////////////////
+#ifndef _INCLUDE_CALC_CRC16_HPP
+#define _INCLUDE_CALC_CRC16_HPP
 
-/**
- * @addtogroup IMX6ULL
- */
-/*@{*/
-#ifndef _INCLUDE_CALC_CRC16_H
-#define _INCLUDE_CALC_CRC16_H
-
-/***************************************************************************
-* Include Header Files
-***************************************************************************/
 #include "../../include/productConfig.hpp"
 
-/**************************************************************************
-* Global Macro Definition
-***************************************************************************/
-
-/**************************************************************************
-* Global Type Definition
-***************************************************************************/
-
-/**************************************************************************
-* Global Variable Declaration
-***************************************************************************/
-
-/**************************************************************************
-* Global Functon Declaration
-***************************************************************************/
-
-/*crc16校验运算*/
 uint16_t crc16(uint16_t crc, uint8_t const *buffer, uint16_t len);
 #endif

@@ -62,22 +62,21 @@ void UartThreadInit(void)
 {
 	int nErr;
 	pthread_t tid1;
-	struct SSystemConfig *pSystemConfigInfo;
+	const SerialSysConfig* pSerialConfig = SystemConfig::getInstance()->getserial();
 	
-	pSystemConfigInfo = GetSSytemConfigInfo();
-	if((nComFd = open(pSystemConfigInfo->m_dev_serial.c_str(), O_RDWR|O_NOCTTY|O_NDELAY))<0)
+	if((nComFd = open(pSerialConfig->dev.c_str(), O_RDWR|O_NOCTTY|O_NDELAY))<0)
 	{	
-		USR_DEBUG("Open %s Failed\n", pSystemConfigInfo->m_dev_serial.c_str());
+		USR_DEBUG("Open %s Failed\n", pSerialConfig->dev.c_str());
 		return;
 	}
 	else
 	{
-		if(set_opt(nComFd, pSystemConfigInfo->m_baud, pSystemConfigInfo->m_data_bits, pSystemConfigInfo->m_parity, pSystemConfigInfo->m_stop_bits) != 0)
+		if(set_opt(nComFd, pSerialConfig->baud, pSerialConfig->dataBits, pSerialConfig->parity, pSerialConfig->stopBits) != 0)
 		{
 			USR_DEBUG("uart config failed\n");
 			return;
 		}
-		USR_DEBUG("Open %s Success!\t\n", pSystemConfigInfo->m_dev_serial.c_str());
+		USR_DEBUG("Open %s Success!\t\n", pSerialConfig->dev.c_str());
 	}
 
 	//创建UART协议管理对象

@@ -1,23 +1,23 @@
-/*
- * File      : CalcCRC16.cpp
- * CRC十六的计算实现
- * COPYRIGHT (C) 2020, zc
- *
- * Change Logs:
- * Date           Author       Notes
- * 2020-5-4      zc           the first version
- */
-
-/**
- * @addtogroup IMX6ULL
- */
-/*@{*/
-
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2022-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      CalcCrc16.cpp
+//
+//  Purpose:
+//      Calculate crc16 value.
+//
+// Author:
+//      ZhangChao
+//
+//  Assumptions:
+//
+//  Revision History:
+//      7/24/2022   Create New Version
+/////////////////////////////////////////////////////////////////////////////
 #include "CalcCrc16.hpp"
 
-/**************************************************************************
-* Local Macro Definition
-***************************************************************************/
 /** CRC table for the CRC-16. The poly is 0x8005 (x^16 + x^15 + x^2 + 1) */
 static uint16_t const crc16_table[256] = {
 	0x0000, 0xC0C1, 0xC181, 0x0140, 0xC301, 0x03C0, 0x0280, 0xC241,
@@ -54,47 +54,11 @@ static uint16_t const crc16_table[256] = {
 	0x8201, 0x42C0, 0x4380, 0x8341, 0x4100, 0x81C1, 0x8081, 0x4040
 };
 
-/**************************************************************************
-* Local Type Definition
-***************************************************************************/
-
-/**************************************************************************
-* Local static Variable Declaration
-***************************************************************************/
-
-/**************************************************************************
-* Global Variable Declaration
-***************************************************************************/
-
-/**************************************************************************
-* Local Function Declaration
-***************************************************************************/
-
-/**************************************************************************
-* Function
-***************************************************************************/
-/**
- * crc16校验内部位处理
- * 
- * @param   crc:	previous CRC value
- * @param   data:	data
- *  
- * @return NULL
- */
 static inline uint16_t crc16_byte(uint16_t crc, const uint8_t data)
 {
 	return (crc >> 8) ^ crc16_table[(crc ^ data) & 0xff];
 }
 
-/**
- * crc16校验运算
- * 
- * @param   crc:	previous CRC value
- * @param   buffer:	data pointer
- * @param   len:	number of bytes in the buffer
- *  
- * @return NULL
- */
 uint16_t crc16(uint16_t crc, uint8_t const *buffer, uint16_t len)
 {
 	while (len--)

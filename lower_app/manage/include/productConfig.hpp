@@ -1,10 +1,21 @@
-/**********************************************************************
-* File:     productConfig.hpp
-* Author:   zhang chao
-* Function: global include for product Config
-* History:
-*   07/22/22 - original
-**********************************************************************/
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2022-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      productConfig.hpp
+//
+//  Purpose:
+//      product default config.
+//
+// Author:
+//      ZhangChao
+//
+//  Assumptions:
+//
+//  Revision History:
+//      7/24/2022   Create New Version
+/////////////////////////////////////////////////////////////////////////////
 #ifndef _PRODUCTCONFIG_H
 #define _PRODUCTCONFIG_H
 
@@ -36,34 +47,14 @@
 #define RT_TIMEOUT              3
 #define RT_INVALID              4
 
-//默认设备信息
-#define TTY_DEVICE              "/dev/ttymxc2"
-#define LED_DEVICE              "/dev/led"
-#define BEEP_DEVICE             "/dev/beep"
-#define ICM_SPI_DEVICE          "/dev/icm20608"
-#define RTC_DEVICE              "/dev/rtc0"
-#define AP_I2C_DEVICE           "/dev/ap3216"
-
-//默认下载路径
-#define UPDATE_FILE_PATH        "/usr/download/"
-
-//默认IP地址和端口
-#define IP_ADDR                 "127.0.0.1"
-#define TCP_PORT                8000
-#define UDP_PORT                8001
-
-//默认串口配置信息
-#define BAUD                    115200
-#define DATABITS                8
-#define STOPBITS                1
-#define PARITY                  "n"
-
 //默认设备ID
-#define DEVICE_ID               0x01
+#define DEVICE_ID                   0x01
 
 //default system config set
 #define SYSTM_CONFIG_ON             1
 #define SYSTM_CONFIG_OFF            0
+
+#define DEFAULT_CONFIG_FILE         "config.json"
 
 #define DEFAULT_LED_INIT            SYSTM_CONFIG_ON
 #define DEFALUT_LED_DEV             "/dev/led"        
@@ -75,24 +66,21 @@
 #define DEFAULT_SERIAL_DATABITS     8
 #define DEFAULT_SERIAL_STOPBITS     1
 #define DEFAULT_SERIAL_PARITY       "n"
+#define DEFAULT_SERIAL_DEV          "/dev/ttymxc2"
 
-/**************************************************************************
-* Global Type Definition
-***************************************************************************/
-typedef signed char int8_t;
-typedef signed short int16_t;
-typedef signed int int32_t;
-typedef unsigned char uint8_t;
-typedef unsigned short uint16_t;
-typedef unsigned int uint32_t;
+#define DEFAULT_RTC_DEV             "/dev/rtc0"
+#define DEFAULT_ICMSPI_DEV          "/dev/icm20608"
+#define DEFAULT_API2C_DEV           "/dev/ap3216"
 
-/**************************************************************************
-* Global Variable Declaration
-***************************************************************************/
+#define DEFAULT_IPADDRESS           "127.0.0.1"
 
-/**************************************************************************
-* Global Functon Declaration
-***************************************************************************/
+#define DEFAULT_TCP_IPADDR          DEFAULT_IPADDRESS
+#define DEFAULT_TCP_PORT            8000
+#define DEFAULT_UDP_IPADDR          DEFAULT_IPADDRESS
+#define DEFAULT_UDP_PORT            8001
+
+#define DEFAULT_DOWNLOAD_PATH       "/home/manage/download/"
+
 /*调试接口*/
 #if __DEBUG_PRINTF	== 1
 #define USR_DEBUG		printf

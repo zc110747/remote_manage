@@ -23,7 +23,7 @@ APDevice* APDevice::getInstance()
 {
     if(pInstance == nullptr)
     {
-        pInstance = new(std::nothrow) APDevice(static_cast<SSystemConfig *>(GetSSytemConfigInfo())->m_dev_ap_i2c);
+        pInstance = new(std::nothrow) APDevice(SystemConfig::getInstance()->getapI2c()->dev);
         if(pInstance == NULL)
         {
             //To Do something(may logger)

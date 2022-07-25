@@ -78,12 +78,11 @@ static void *SocketUdpLoopThread(void *arg)
     char recvbuf[1024] = {0};  
     struct sockaddr_in servaddr, clientaddr;  
     socklen_t client_sock_len;      
-    struct SSystemConfig *pSystemConfigInfo;
 	int is_bind_fail = 0;
     UdpInfo sUdpInfo;
+    const SocketSysConfig *pSocketConfig = SystemConfig::getInstance()->getudp();
 
     USR_DEBUG("Socket Udp Thread Start!\n");
-	pSystemConfigInfo = GetSSytemConfigInfo();
     /*创建socket接口, SOCK_DGRAM表示无连接的udp接口*/
     socket_fd = socket(PF_INET, SOCK_DGRAM, 0);
     if(socket_fd != -1)
@@ -91,8 +90,8 @@ static void *SocketUdpLoopThread(void *arg)
         /*绑定到指定端口*/
         memset(&servaddr, 0, sizeof(servaddr));    
         servaddr.sin_family = AF_INET;     
-        servaddr.sin_addr.s_addr = inet_addr(pSystemConfigInfo->m_udp_ipaddr.c_str());  
-        servaddr.sin_port = htons(pSystemConfigInfo->m_udp_net_port); 
+        servaddr.sin_addr.s_addr = inet_addr(pSocketConfig->ipaddr.c_str());  
+        servaddr.sin_port = htons(pSocketConfig->port); 
 
         do 
         {
@@ -102,8 +101,9 @@ static void *SocketUdpLoopThread(void *arg)
                 if(is_bind_fail == 0)
                 {
                     is_bind_fail = 1;
-                    SOCKET_DEBUG("Udp Bind Failed!ServerIp:%s, NetPort:%d\n", pSystemConfigInfo->m_udp_ipaddr.c_str(), 
-                    pSystemConfigInfo->m_udp_net_port);
+                    SOCKET_DEBUG("Udp Bind Failed!ServerIp:%s, NetPort:%d\n", 
+                        pSocketConfig->ipaddr.c_str(), 
+                        pSocketConfig->port);
                 }
                 sleep(1);
             }
@@ -113,8 +113,9 @@ static void *SocketUdpLoopThread(void *arg)
             }
         } while (1); //网络等待socket绑定完成后执行后续
 
-        SOCKET_DEBUG("Udp Bind ok, ServerIp:%s, NetPort:%d\n", pSystemConfigInfo->m_udp_ipaddr.c_str(), 
-                pSystemConfigInfo->m_udp_net_port);  
+        SOCKET_DEBUG("Udp Bind ok, ServerIp:%s, NetPort:%d\n", 
+                pSocketConfig->ipaddr.c_str(), 
+                pSocketConfig->port);  
 
         for(;;)
         {	   

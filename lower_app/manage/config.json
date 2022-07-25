@@ -1,27 +1,35 @@
-{       
-        "Uart":{
-                "Baud":115200,
-                "DataBits":8,
+{
+        "led":{
+                "init":1,
+                "dev":"/dev/led"
+        },
+        "beep":{
+                "init":1,
+                "dev":"dev/beep"
+        },
+        "Serial":{
+                "baud":115200,
+                "dataBits":8,  
                 "StopBits":1,
-                "Parity":"n"
+                "parity":"n",
+                "dev":"/dev/ttymxc2"
         },
-        "SocketTcp":{
+        "tcp":{
                 "ipaddr":"127.0.0.1",
-                "net_port":8000
+                "port":8000
         },
-        "SocketUdp":{
+        "udp":{
                 "ipaddr":"127.0.0.1",
-                "net_port":8001
+                "port":8001
         },
-        "Device":{
-                "Serial":"/dev/ttymxc2",
-                "Led":"/dev/led",
-                "Beep":"/dev/beep",
-                "IcmSpi":"/dev/icm20608",
-                "Rtc":"/dev/rtc0",
-                "ApI2c":"/dev/ap3216"
+        "rtc":{
+                "dev":"/dev/rtc0"
         },
-        "Led0":0,
-        "Beep0":0,
-	"FilePath":"/usr/download/"
+        "icmSpi":{
+                "dev":"/dev/icm20608"
+        },
+        "apI2c":{
+                "dev":"/dev/ap3216"
+        },
+        "downloadpath":"/home/manage/download/"
 }

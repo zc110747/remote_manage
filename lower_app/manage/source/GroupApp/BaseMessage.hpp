@@ -1,34 +1,30 @@
-/*
- * File      : BaseMessage.h
- * 基础消息队列说明
- * COPYRIGHT (C) 2020, zc
- *
- * Change Logs:
- * Date           Author       Notes
- * 2020-5-4      zc           the first version
- */
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2022-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      BaseMessage.hpp
+//
+//  Purpose:
+//      thread communication message interface.
+//
+// Author:
+//      ZhangChao
+//
+//  Assumptions:
+//
+//  Revision History:
+//      7/24/2022   Create New Version
+/////////////////////////////////////////////////////////////////////////////
+#ifndef _INCLUDE_BASE_MESSAGE_HPP
+#define _INCLUDE_BASE_MESSAGE_HPP
 
-/**
- * @addtogroup IMX6ULL
- */
-/*@{*/
-#ifndef _INCLUDE_BASE_MESSAGE_H
-#define _INCLUDE_BASE_MESSAGE_H
-
-/***************************************************************************
-* Include Header Files
-***************************************************************************/
 #include "../../include/productConfig.hpp"
 
-/**************************************************************************
-* Global Macro Definition
-***************************************************************************/
+
 #define MAIN_BASE_MESSAGE                   1    
 #define APP_BASE_MESSAGE                    2
 
-/**************************************************************************
-* Global Type Definition
-***************************************************************************/
 class CBaseMessageInfo
 {
 public:
@@ -47,12 +43,4 @@ public:
     /*向通讯队列投递数据*/    
     virtual int SendInformation(uint8_t info, char *buf, int bufsize, int prio) = 0;    
 };
-
-/**************************************************************************
-* Global Variable Declaration
-***************************************************************************/
-
-/**************************************************************************
-* Global Functon Declaration
-***************************************************************************/
 #endif

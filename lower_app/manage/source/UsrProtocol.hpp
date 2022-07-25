@@ -134,7 +134,6 @@ public:
 	{
 		uint8_t nCommand;
 		uint16_t nRegIndex, nRxDataSize;
-		SSystemConfig *pSystemConfig;
 		CApplicationReg  *pApplicationReg;
 		static CBaseMessageInfo *pBaseMessageInfo;
 		char buf = 1;
@@ -142,7 +141,6 @@ public:
 		nCommand = m_RxCacheDataPtr[0];
 		m_TxBufSize = 0;
 		pApplicationReg = GetApplicationReg();
-		pSystemConfig = GetSSytemConfigInfo();
 		#if __WORK_IN_WSL == 1
 		pBaseMessageInfo = static_cast<CBaseMessageInfo *>(GetFifoMessageInfo());
 		#else
@@ -173,17 +171,20 @@ public:
 				m_TxBufSize = CreateTxBuffer(ACK_OK, 0, NULL);
 				break;
 			case CMD_UPLOAD_CMD:
-				char *pName;
-				m_FileSize = ((uint32_t)m_RxCacheDataPtr[1]<<24) | ((uint32_t)m_RxCacheDataPtr[2]<<16) | 
-				((uint32_t)m_RxCacheDataPtr[3]<<8) | ((uint32_t)m_RxCacheDataPtr[4]);
-				m_FileBlock = ((uint16_t)m_RxCacheDataPtr[5]<<8) | m_RxCacheDataPtr[6];
-				pName = (char *)&m_RxCacheDataPtr[7];
-				dir_process(pSystemConfig->m_file_path.c_str());
-				m_FileName = pSystemConfig->m_file_path + std::string(pName);
-				//USR_DEBUG("filesize:%d, name:%s, block:%d\n", m_FileSize, m_FileName.c_str(), m_FileBlock);
-				m_FileStream.open(m_FileName);
-				m_isUploadStatus = true;
-				m_TxBufSize = CreateTxBuffer(ACK_OK, 0, NULL);
+				{	
+					char *pName;
+					std::string path = SystemConfig::getInstance()->getdownloadpath();
+					m_FileSize = ((uint32_t)m_RxCacheDataPtr[1]<<24) | ((uint32_t)m_RxCacheDataPtr[2]<<16) | 
+					((uint32_t)m_RxCacheDataPtr[3]<<8) | ((uint32_t)m_RxCacheDataPtr[4]);
+					m_FileBlock = ((uint16_t)m_RxCacheDataPtr[5]<<8) | m_RxCacheDataPtr[6];
+					pName = (char *)&m_RxCacheDataPtr[7];
+					dir_process(path.c_str());
+					m_FileName = path + std::string(pName);
+					//USR_DEBUG("filesize:%d, name:%s, block:%d\n", m_FileSize, m_FileName.c_str(), m_FileBlock);
+					m_FileStream.open(m_FileName);
+					m_isUploadStatus = true;
+					m_TxBufSize = CreateTxBuffer(ACK_OK, 0, NULL);
+				}
 				break;
 			case CMD_UPLOAD_DATA:
 				try

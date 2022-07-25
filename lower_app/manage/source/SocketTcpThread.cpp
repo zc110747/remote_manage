@@ -84,15 +84,13 @@ static void *SocketTcpLoopThread(void *arg)
     int result;
     struct sockaddr_in serverip, clientip;
     int is_bind_fail = 0;
-    struct SSystemConfig *pSystemConfigInfo;
-	
-    USR_DEBUG("Socket Tcp Thread Start!\n");
+	const SocketSysConfig *pSocketConfig = SystemConfig::getInstance()->gettcp();
 
-	pSystemConfigInfo = GetSSytemConfigInfo();
+    USR_DEBUG("Socket Tcp Thread Start!\n");
     memset((char *)&serverip, 0, sizeof(serverip));
     serverip.sin_family = AF_INET;
-    serverip.sin_port = htons(pSystemConfigInfo->m_tcp_net_port);
-    serverip.sin_addr.s_addr = inet_addr(pSystemConfigInfo->m_tcp_ipaddr.c_str());
+    serverip.sin_port = htons(pSocketConfig->port);
+    serverip.sin_addr.s_addr = inet_addr(pSocketConfig->ipaddr.c_str());
 
     server_fd = socket(AF_INET, SOCK_STREAM, 0);
     if(server_fd != -1)
@@ -113,7 +111,7 @@ static void *SocketTcpLoopThread(void *arg)
                 if(is_bind_fail == 0)
                 {
                     is_bind_fail = 1;
-                    SOCKET_DEBUG("Tcp Bind %s Failed!, error:%s\r\n",  pSystemConfigInfo->m_tcp_ipaddr.c_str(), strerror(errno));
+                    SOCKET_DEBUG("Tcp Bind %s Failed!, error:%s\r\n",  pSocketConfig->ipaddr.c_str(), strerror(errno));
                     if(errno == EADDRINUSE)
                     {
                         server_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -127,8 +125,9 @@ static void *SocketTcpLoopThread(void *arg)
             }
         } while (1); //网络等待socket绑定完成后执行后续
         
-        SOCKET_DEBUG("Tcp Bind ok, ServerIp:%s, NetPort:%d\n", pSystemConfigInfo->m_tcp_ipaddr.c_str(), 
-                pSystemConfigInfo->m_tcp_net_port);  
+        SOCKET_DEBUG("Tcp Bind ok, IpAddr:%s, Port:%d\n", 
+                pSocketConfig->ipaddr.c_str(), 
+                pSocketConfig->port);  
         listen(server_fd, 32);
         while(1)
         {

@@ -35,6 +35,7 @@ public:
 #if __WORK_IN_WSL
     bool open(int flag){
         //do nothing
+        return true;
     }
 #endif
 

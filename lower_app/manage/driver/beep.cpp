@@ -23,7 +23,7 @@ beepTheOne* beepTheOne::getInstance()
 {
     if(pInstance == nullptr)
     {
-        pInstance = new(std::nothrow) beepTheOne(static_cast<SSystemConfig *>(GetSSytemConfigInfo())->m_dev_beep);
+        pInstance = new(std::nothrow) beepTheOne(SystemConfig::getInstance()->getled()->dev);
         if(pInstance == NULL)
         {
             //To Do something(may logger)

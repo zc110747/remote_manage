@@ -1,54 +1,31 @@
-/*
- * File      : FifoMessage.cpp
- * 基于Fifo的进程间通讯方案
- * COPYRIGHT (C) 2020, zc
- * 
- * Change Logs:
- * Date           Author       Notes
- * 2020-5-4      zc           the first version
- */
-/**
- * @addtogroup IMX6ULL
- */
-/*@{*/
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2022-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      FifoManage.cpp
+//
+//  Purpose:
+//      Communication by fifo.
+//
+// Author:
+//      ZhangChao
+//
+//  Assumptions:
+//
+//  Revision History:
+//      7/24/2022   Create New Version
+/////////////////////////////////////////////////////////////////////////////
 
 #include "FifoManage.hpp"
 
 #if __WORK_IN_WSL == 1
-/**************************************************************************
-* Local Macro Definition
-***************************************************************************/
 #define FIFO_MODE           (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)  
 #define MAIN_FIFO_NAME      "/tmp/main.fifo"
 #define APP_FIFO_NAME       "/tmp/app.fifo"
   
-/**************************************************************************
-* Local Type Definition
-***************************************************************************/
-
-/**************************************************************************
-* Local static Variable Declaration
-***************************************************************************/
 static CFifoManageInfo FifoMessageInfo;
 
-/**************************************************************************
-* Global Variable Declaration
-***************************************************************************/
-
-/**************************************************************************
-* Local Function Declaration
-***************************************************************************/
-
-/**************************************************************************
-* Function
-***************************************************************************/
-/**
- * 创建FIFO命名管道
- * 
- * @param NULL
- *  
- * @return 命名管道的创建结果
- */
 int CFifoManageInfo::CreateInfomation(void)
 {
     //删除当前已存在的fifo
@@ -88,16 +65,6 @@ int CFifoManageInfo::CreateInfomation(void)
     return RT_OK;
 }
 
-/**
- * 等待消息队列的信息返回
- * 
- * @param info 选择发送的消息队列
- * @param buf 发送的消息队列的首地址
- * @param bufsize 发送的消息队列长度
- * @param prio 发送的消息队列优先级
- * 
- * @return 返回消息队列的关闭状态
- */
 int CFifoManageInfo::WaitInformation(uint8_t info, char *buf, int bufsize)
 {
     int readbytes;
@@ -134,16 +101,6 @@ int CFifoManageInfo::WaitInformation(uint8_t info, char *buf, int bufsize)
     return readbytes;
 }
 
-/**
- * 发送消息队列
- * 
- * @param info 选择发送的消息队列
- * @param buf 发送的消息队列的首地址
- * @param bufsize 发送的消息队列长度
- * @param prio 发送的消息队列优先级
- * 
- * @return 返回消息队列的关闭状态
- */
 int CFifoManageInfo::SendInformation(uint8_t info, char *buf, int bufsize, int prio)
 {
     int writebytes;
@@ -179,13 +136,6 @@ int CFifoManageInfo::SendInformation(uint8_t info, char *buf, int bufsize, int p
     return RT_OK;
 }
 
-/**
- * 关闭消息队列
- * 
- * @param NULL
- *  
- * @return 返回消息队列的关闭状态
- */
 int CFifoManageInfo::CloseInformation(uint8_t info)
 {
     if(m_rfd_main > 0)
@@ -207,14 +157,6 @@ int CFifoManageInfo::CloseInformation(uint8_t info)
     return RT_OK;
 }
 
-
-/**
- * 获取线程间通讯接口
- * 
- * @param NULL
- *  
- * @return 返回线程间通讯的信息
- */
 CFifoManageInfo *GetFifoMessageInfo(void)
 {   
     return &FifoMessageInfo;

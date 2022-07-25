@@ -1,52 +1,28 @@
-/*
- * File      : MqManage.cpp
- * 基于Posix MessageQueue的进程间通讯方案
- * COPYRIGHT (C) 2020, zc
- * 
- * Change Logs:
- * Date           Author       Notes
- * 2020-5-4      zc           the first version
- */
-/**
- * @addtogroup IMX6ULL
- */
-/*@{*/
-
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2022-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      MqManage.cpp
+//
+//  Purpose:
+//      Communication by message queue.
+//
+// Author:
+//      ZhangChao
+//
+//  Assumptions:
+//
+//  Revision History:
+//      7/24/2022   Create New Version
+/////////////////////////////////////////////////////////////////////////////
 #include "MqManage.hpp"
 #include <memory>
 
 #if __WORK_IN_WSL == 0
-/**************************************************************************
-* Local Macro Definition
-***************************************************************************/
 
-/**************************************************************************
-* Local Type Definition
-***************************************************************************/
-
-/**************************************************************************
-* Local static Variable Declaration
-***************************************************************************/
 static CMqMessageInfo MqMessageInfo;
 
-/**************************************************************************
-* Global Variable Declaration
-***************************************************************************/
-
-/**************************************************************************
-* Local Function Declaration
-***************************************************************************/
-
-/**************************************************************************
-* Function
-***************************************************************************/
-/**
- * 创建POSIX消息队列
- * 
- * @param NULL
- *  
- * @return 消息队列创建的结果
- */
 int CMqMessageInfo::CreateInfomation(void)
 {
     struct mq_attr attr;
@@ -78,16 +54,6 @@ int CMqMessageInfo::CreateInfomation(void)
     return RT_OK;
 }
 
-/**
- * 等待消息队列的信息返回
- * 
- * @param info 选择发送的消息队列
- * @param buf 发送的消息队列的首地址
- * @param bufsize 发送的消息队列长度
- * @param prio 发送的消息队列优先级
- * 
- * @return 返回消息队列的关闭状态
- */
 int CMqMessageInfo::WaitInformation(uint8_t info, char *buf, int bufsize)
 {
     int nReadSize = -1;
@@ -151,16 +117,6 @@ int CMqMessageInfo::WaitInformation(uint8_t info, char *buf, int bufsize)
     return nReadSize;
 }
 
-/**
- * 发送消息队列
- * 
- * @param info 选择发送的消息队列
- * @param buf 发送的消息队列的首地址
- * @param bufsize 发送的消息队列长度
- * @param prio 发送的消息队列优先级
- * 
- * @return 返回消息队列的关闭状态
- */
 int CMqMessageInfo::SendInformation(uint8_t info, char *buf, int bufsize, int prio)
 {
     int nWriteSize = -1;
@@ -196,13 +152,6 @@ int CMqMessageInfo::SendInformation(uint8_t info, char *buf, int bufsize, int pr
     return nWriteSize;
 }
 
-/**
- * 关闭消息队列
- * 
- * @param NULL
- *  
- * @return 返回消息队列的关闭状态
- */
 int CMqMessageInfo::CloseInformation(uint8_t info)
 {
     switch(info)
@@ -229,13 +178,6 @@ int CMqMessageInfo::CloseInformation(uint8_t info)
     return RT_OK;
 }
 
-/**
- * 获取线程间通讯接口
- * 
- * @param NULL
- *  
- * @return 返回线程间通讯的信息
- */
 CMqMessageInfo *GetMqMessageInfo(void)
 {
     return &MqMessageInfo;

@@ -20,11 +20,21 @@
 
 bool hardware_driver_init()
 {
-    ledTheOne::getInstance()->open(O_RDWR | O_NDELAY);
-    beepTheOne::getInstance()->open(O_RDWR | O_NDELAY);
-    APDevice::getInstance()->open(O_RDONLY);
-    ICMDevice::getInstance()->open(O_RDONLY);
-    RTCDevice::getInstance()->open(O_RDONLY);
+    bool ret = true;
+
+    ret &= ledTheOne::getInstance()->open(O_RDWR | O_NDELAY);
+    ret &= beepTheOne::getInstance()->open(O_RDWR | O_NDELAY);
+    ret &= APDevice::getInstance()->open(O_RDONLY);
+    ret &= ICMDevice::getInstance()->open(O_RDONLY);
+    ret &= RTCDevice::getInstance()->open(O_RDONLY);
+
+    if(ret)
+    {
+        ledTheOne::getInstance()->writeIoStatus(SystemConfig::getInstance()->getled()->init);
+        beepTheOne::getInstance()->writeIoStatus(SystemConfig::getInstance()->getbeep()->init);
+    }
+
+    return ret;
 }
 
 void hardware_driver_release()

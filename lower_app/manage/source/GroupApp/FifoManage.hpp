@@ -1,19 +1,23 @@
-/*
- * File      : FifoManage.h
- * 命名管道管理接口
- * COPYRIGHT (C) 2020, zc
- *
- * Change Logs:
- * Date           Author       Notes
- * 2020-5-4      zc           the first version
- */
-
-/**
- * @addtogroup IMX6ULL
- */
-/*@{*/
-#ifndef _INCLUDE_FIFO_MANAGE_H
-#define _INCLUDE_FIFO_MANAGE_H
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2022-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      FifoManage.hpp
+//
+//  Purpose:
+//      Communication by fifo interface.
+//
+// Author:
+//      ZhangChao
+//
+//  Assumptions:
+//
+//  Revision History:
+//      7/24/2022   Create New Version
+/////////////////////////////////////////////////////////////////////////////
+#ifndef _INCLUDE_FIFO_MANAGE_HPP
+#define _INCLUDE_FIFO_MANAGE_HPP
 
 /***************************************************************************
 * Include Header Files

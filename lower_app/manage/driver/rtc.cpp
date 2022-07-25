@@ -24,7 +24,7 @@ RTCDevice* RTCDevice::getInstance()
 {
     if(pInstance == nullptr)
     {
-        pInstance = new(std::nothrow) RTCDevice(static_cast<SSystemConfig *>(GetSSytemConfigInfo())->m_dev_rtc);
+        pInstance = new(std::nothrow) RTCDevice(SystemConfig::getInstance()->getrtc()->dev);
         if(pInstance == NULL)
         {
             //To Do something(may logger)

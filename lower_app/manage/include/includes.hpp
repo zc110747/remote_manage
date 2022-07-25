@@ -1,13 +1,23 @@
-/**********************************************************************
-* File:     includes.h
-* Author:   zhang chao
-* Function: global include for program
-* History:
-*   07/22/22 - original
-**********************************************************************/
-
-#ifndef __INCLUDES_H
-#define __INCLUDES_H
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2022-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      includes.hpp
+//
+//  Purpose:
+//      system include.
+//
+// Author:
+//      ZhangChao
+//
+//  Assumptions:
+//
+//  Revision History:
+//      7/24/2022   Create New Version
+/////////////////////////////////////////////////////////////////////////////
+#ifndef __INCLUDES_HPP
+#define __INCLUDES_HPP
 
 //c interface
 #include <stdio.h>
@@ -31,4 +41,12 @@
 #include <memory>
 #include <iostream>
 #include <fstream>
+
+typedef signed char int8_t;
+typedef signed short int16_t;
+typedef signed int int32_t;
+typedef unsigned char uint8_t;
+typedef unsigned short uint16_t;
+typedef unsigned int uint32_t;
+
 #endif

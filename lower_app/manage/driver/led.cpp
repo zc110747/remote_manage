@@ -23,7 +23,7 @@ ledTheOne* ledTheOne::getInstance()
 {
     if(pInstance == nullptr)
     {
-        pInstance = new(std::nothrow) ledTheOne(static_cast<SSystemConfig *>(GetSSytemConfigInfo())->m_dev_led);
+        pInstance = new(std::nothrow) ledTheOne(SystemConfig::getInstance()->getled()->dev);
         if(pInstance == NULL)
         {
             //To Do something(may logger)

@@ -23,7 +23,7 @@ ICMDevice* ICMDevice::getInstance()
 {
     if(pInstance == nullptr)
     {
-       pInstance = new(std::nothrow) ICMDevice(static_cast<SSystemConfig *>(GetSSytemConfigInfo())->m_dev_icm_spi); 
+       pInstance = new(std::nothrow) ICMDevice(SystemConfig::getInstance()->geticmSpi()->dev); 
     }
     return pInstance;
 }

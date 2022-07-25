@@ -56,10 +56,8 @@ int main(int argc, char* argv[])
 	int c;
     int result = 0;
 	int nConfigDefault = 0;
-	std::string sConfigFile;
+	std::string sConfigFile(DEFAULT_CONFIG_FILE);
 
-	sConfigFile = std::string("config.json");
-	
 	//命令行输入说明
 	while ((c = getopt(argc, argv, "v:d:f:h::")) != -1)
 	{
@@ -103,10 +101,13 @@ int main(int argc, char* argv[])
 	//选中配置文件
 	if(nConfigDefault == 0)
 	{
-		USR_DEBUG("config file:%s\n", sConfigFile.c_str());
-		if(SystemConfigInfo(sConfigFile) != EXIT_SUCCESS)
+		if(!SystemConfig::getInstance()->init(sConfigFile.c_str()))
 		{
 			USR_DEBUG("system config read fail, use default\n");
+		}
+		else
+		{
+			
 		}
 	}
 	else
