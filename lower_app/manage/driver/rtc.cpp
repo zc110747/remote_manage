@@ -73,99 +73,15 @@ bool RTCDevice::updateTime()
     return ret;
 }
 
+int RTCDevice::getCurrentSecond()
+{
+    int second;
 
+    updateTime();
+    
+    second += rtcTimeM.tm_hour*3600;
+    second += rtcTimeM.tm_min*60;
+    second += rtcTimeM.tm_sec;
+    return second;
+}
 
-
-// /**************************************************************************
-// * Local Macro Definition
-// ***************************************************************************/
-
-// /**************************************************************************
-// * Local Type Definition
-// ***************************************************************************/
-
-// /**************************************************************************
-// * Local static Variable Declaration
-// ***************************************************************************/
-// static struct SSystemConfig *pSystemConfigInfo;
-// static int rtc_fd;
-
-// /**************************************************************************
-// * Global Variable Declaration
-// ***************************************************************************/
-
-// /**************************************************************************
-// * Local Function Declaration
-// ***************************************************************************/
-
-// /**************************************************************************
-// * Local Function
-// ***************************************************************************/
-
-// /**************************************************************************
-// * Function
-// ***************************************************************************/
-// /**
-//  * 配置RTC的驱动初始化
-//  * 
-//  * @param NULL
-//  *  
-//  * @return NULL
-//  */
-// void RtcDriveInit(void)
-// {
-//     pSystemConfigInfo = GetSSytemConfigInfo();
-
-// #if __WORK_IN_WSL == 0
-//     rtc_fd = open(pSystemConfigInfo->m_dev_rtc.c_str(), O_RDONLY);
-//     if(rtc_fd == -1)
-//     {
-//         DRIVER_DEBUG("rtc open %s failed!\n", pSystemConfigInfo->m_dev_rtc.c_str());
-//     }
-// #endif
-// }
-
-// /**
-//  * 释放RTC应用资源
-//  * 
-//  * @param NULL
-//  *  
-//  * @return NULL
-//  */
-// void RtcDriverRelease(void)
-// {
-//     close(rtc_fd);
-// }
-
-// /**
-//  * 读取系统当前的时钟状态信息
-//  * 
-//  * @param pRtcTime 获取的RTC结果值
-//  *  
-//  * @return 返回RTC读取结果的处理状态
-//  */
-// int RtcDevRead(struct rtc_time *pRtcTime)
-// {
-// //桌面端测试不包含rtc,使用系统时钟替代
-// #if __WORK_IN_WSL == 0
-//     int retval;
-
-//     if(rtc_fd != -1)
-//     {
-//         retval = ioctl(rtc_fd, RTC_RD_TIME, pRtcTime);
-//         if(retval == -1)
-//         {
-//             USR_DEBUG("Read %s Failed, error:%s\n", pSystemConfigInfo->m_dev_rtc.c_str(), strerror(errno));
-//             return RT_INVALID;
-//         }
-//     }
-//     else
-//     {
-//         return RT_INVALID;
-//     }
-// #else
-
-// #endif
-
-//     return RT_OK;
-// }

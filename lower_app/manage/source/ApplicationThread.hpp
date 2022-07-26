@@ -85,15 +85,6 @@ struct SRegInfoList
 
     /*温度采样*/
     uint32_t sensor_temp;
-
-    /*rtc时钟秒计数*/
-    uint32_t rtc_sec;
-
-    /*rtc时钟分钟计数*/
-    uint32_t rtc_minute;
-
-    /*rtc时钟小时计数*/
-    uint32_t rtc_hour;
 };
 #pragma pack(pop)
 
@@ -113,7 +104,7 @@ public:
     void WriteDeviceConfig(uint8_t cmd, uint8_t *pRegConfig, int size);
 
     /*读取硬件状态并更新到寄存器中*/
-    void ReadDeviceStatus(void);
+    bool ReadDeviceStatus(void);
 
     /*将数据写入内部共享的数据寄存器*/
     void SetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize, uint8_t *pDataStart);

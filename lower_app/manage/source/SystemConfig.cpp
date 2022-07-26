@@ -55,7 +55,7 @@ bool SystemConfig::init(const char* path)
         default_init();
         return false;
     }
-    std::cout << root << std::endl;
+    //std::cout << root << std::endl;
 
     try
     {

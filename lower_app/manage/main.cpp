@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
     result = daemon(1, 1);
 	if(result < 0)
 	{
-		USR_DEBUG("daemon\n");
+		PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "daemon error!");
 		return result;
 	}
 	
@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
 	{
 		if(!SystemConfig::getInstance()->init(sConfigFile.c_str()))
 		{
-			PRINT_LOG(LOG_ERROR, 0, "Config Read Error!");
+			PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Config Read Error!");
 		}
 		else
 		{
@@ -112,9 +112,10 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
-		USR_DEBUG("system config use default\n");
+		PRINT_LOG(LOG_INFO, xGetCurrentTime(), "System Config use default!");
 	}
 
+	PRINT_LOG(LOG_INFO, xGetCurrentTime(), "System Start!");
 #if __SYSTEM_DEBUG == 0
 	/*硬件相关初始化*/
 	hardware_driver_init();

@@ -43,6 +43,9 @@ public:
     static RTCDevice* getInstance();
     void release();
 
+    int getCurrentSecond();
     struct rtc_time* getRtcTime() {return &rtcTimeM;}
 };
+
+#define xGetCurrentTime()   RTCDevice::getInstance()->getCurrentSecond()
 #endif

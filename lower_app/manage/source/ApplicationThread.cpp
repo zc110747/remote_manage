@@ -190,11 +190,12 @@ int CApplicationReg::DiffSetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize,
  *  
  * @return NULL
  */
-void CApplicationReg::ReadDeviceStatus(void)
+bool CApplicationReg::ReadDeviceStatus(void)
 {
     static uint8_t nRegInfoArray[REG_INFO_NUM];
     static uint8_t nRegCacheArray[REG_INFO_NUM];
     struct SRegInfoList *pRegInfoList;
+    bool isError = false;
 
     GetMultipleReg(REG_CONFIG_NUM, REG_INFO_NUM, nRegInfoArray);
     memcpy(nRegCacheArray, nRegInfoArray, REG_INFO_NUM);
@@ -207,7 +208,7 @@ void CApplicationReg::ReadDeviceStatus(void)
     }
     else
     {
-        USR_DEBUG("read ledTheOne failed!\n");
+        isError = true;
     }
 
     //更新beep的状态
@@ -216,24 +217,7 @@ void CApplicationReg::ReadDeviceStatus(void)
         pRegInfoList->s_base_status.b.beep = beepTheOne::getInstance()->getIoStatus();
     }
     else
-    {
-        USR_DEBUG("read beepTheOne failed!\n");
-    }
-
-    //读取RTC时钟
-    if(RTCDevice::getInstance()->updateTime())
-    {
-        struct rtc_time *pRtcTime;
-
-        pRtcTime = RTCDevice::getInstance()->getRtcTime();
-        pRegInfoList->rtc_sec = pRtcTime->tm_sec;
-        pRegInfoList->rtc_minute = pRtcTime->tm_min;
-        pRegInfoList->rtc_hour = pRtcTime->tm_hour;
-    }
-    else
-    {
-        USR_DEBUG("read rtc failed!\n");
-    }
+        isError = true;
 
     if(ICMDevice::getInstance()->readInfo())
     {
@@ -249,9 +233,7 @@ void CApplicationReg::ReadDeviceStatus(void)
         pRegInfoList->sensor_temp = pIcmInfo->temp_adc;
     }
     else
-    {
-        USR_DEBUG("read ICMDevice failed!\n");
-    }
+        isError = true;
 
     if(APDevice::getInstance()->readInfo())
     {
@@ -263,16 +245,21 @@ void CApplicationReg::ReadDeviceStatus(void)
         pRegInfoList->sensor_als = pApInfo->als;
     }
     else
+        isError = true;
+
+    if(isError)
     {
-        USR_DEBUG("read APDevice failed!\n");
+        PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "[%s]ReadDeviceStatus error!", __FILE__);
+        return false;
     }
 
+    //if read not error and convert, write.
     if(memcmp(nRegCacheArray, nRegInfoArray, REG_INFO_NUM) != 0)
     {
-        //printf("Update HardWare, led:%d, beep:%d!\r\n", pRegInfoList->s_base_status.b.led, pRegInfoList->s_base_status.b.beep);
-        //printf("time:%d, %d, %d\n", pRegInfoList->rtc_hour, pRegInfoList->rtc_minute, pRegInfoList->rtc_sec);
         SetMultipleReg(REG_CONFIG_NUM, REG_INFO_NUM, nRegInfoArray);
     }
+
+    return true;
 }
 
 /**
