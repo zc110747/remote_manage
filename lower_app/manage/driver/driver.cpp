@@ -32,8 +32,9 @@ bool hardware_driver_init()
     {
         ledTheOne::getInstance()->writeIoStatus(SystemConfig::getInstance()->getled()->init);
         beepTheOne::getInstance()->writeIoStatus(SystemConfig::getInstance()->getbeep()->init);
+        PRINT_LOG(LOG_ERROR, 0, "Device Driver Init Success!");
     }
-
+    
     return ret;
 }
 

@@ -7,7 +7,7 @@
                 "init":1,
                 "dev":"dev/beep"
         },
-        "Serial":{
+        "serial":{
                 "baud":115200,
                 "dataBits":8,  
                 "StopBits":1,

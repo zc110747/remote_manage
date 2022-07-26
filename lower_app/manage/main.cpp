@@ -103,11 +103,11 @@ int main(int argc, char* argv[])
 	{
 		if(!SystemConfig::getInstance()->init(sConfigFile.c_str()))
 		{
-			USR_DEBUG("system config read fail, use default\n");
+			PRINT_LOG(LOG_ERROR, 0, "Config Read Error!");
 		}
 		else
 		{
-			
+			std::cout<<*(SystemConfig::getInstance())<<std::endl;
 		}
 	}
 	else

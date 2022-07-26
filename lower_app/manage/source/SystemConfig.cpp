@@ -120,7 +120,7 @@ void SystemConfig::default_init()
     parameter.downloadpath = DEFAULT_DOWNLOAD_PATH;
 }
 
-std::ostream& operator<<(std::ostream &os, const SystemConfig& config)
+std::ostream& operator<<(std::ostream& os, const SystemConfig& config)
 {
     const SystemParamter* parameter = &(config.parameter);
 

@@ -22,6 +22,7 @@
 #include "json/json.h"
 #include "../include/productConfig.hpp"
 #include <iostream>
+#include "../logger/logger.hpp"
 
 using JString = Json::String;
 
@@ -74,7 +75,7 @@ typedef struct
 
 class SystemConfig
 {
-    friend std::ostream& operator<<(std::ostream &, const SystemConfig &);
+    friend std::ostream& operator<<(std::ostream&, const SystemConfig&);
 
 private:
     static SystemConfig *pInstance;

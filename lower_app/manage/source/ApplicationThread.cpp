@@ -183,7 +183,7 @@ int CApplicationReg::DiffSetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize,
     return RT_OK;
 }
 
-/**
+/**\n
  * 读取硬件状态并更新到寄存器中
  * 
  * @param NULL
@@ -207,7 +207,7 @@ void CApplicationReg::ReadDeviceStatus(void)
     }
     else
     {
-        USR_DEBUG("read ledTheOne failed, error:%s\n", strerror(errno));
+        USR_DEBUG("read ledTheOne failed!\n");
     }
 
     //更新beep的状态
@@ -217,7 +217,7 @@ void CApplicationReg::ReadDeviceStatus(void)
     }
     else
     {
-        USR_DEBUG("read beepTheOne failed, error:%s\n", strerror(errno));
+        USR_DEBUG("read beepTheOne failed!\n");
     }
 
     //读取RTC时钟
@@ -232,7 +232,7 @@ void CApplicationReg::ReadDeviceStatus(void)
     }
     else
     {
-        USR_DEBUG("read rtc failed, error:%s\n", strerror(errno));
+        USR_DEBUG("read rtc failed!\n");
     }
 
     if(ICMDevice::getInstance()->readInfo())
@@ -248,6 +248,10 @@ void CApplicationReg::ReadDeviceStatus(void)
         pRegInfoList->sensor_accel_z = pIcmInfo->accel_z_adc;
         pRegInfoList->sensor_temp = pIcmInfo->temp_adc;
     }
+    else
+    {
+        USR_DEBUG("read ICMDevice failed!\n");
+    }
 
     if(APDevice::getInstance()->readInfo())
     {
@@ -260,7 +264,7 @@ void CApplicationReg::ReadDeviceStatus(void)
     }
     else
     {
-        USR_DEBUG("read rtc failed, error:%s\n", strerror(errno));
+        USR_DEBUG("read APDevice failed!\n");
     }
 
     if(memcmp(nRegCacheArray, nRegInfoArray, REG_INFO_NUM) != 0)

@@ -83,7 +83,7 @@
 
 /*调试接口*/
 #if __DEBUG_PRINTF	== 1
-#define USR_DEBUG		printf
+#define USR_DEBUG(...)		do{ printf(__VA_ARGS__); fflush(stdout); }while(0);
 #else
 static int USR_DEBUG(const char *format, ...){}
 #endif
