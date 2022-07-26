@@ -39,12 +39,17 @@ typedef enum
 class LoggerManage
 {
 private:
+    int fd[2];
+
     LOG_LEVEL log_level;
-    bool is_thread_work;
-    pthread_mutex_t mutex;
+
     char *pNextMemoryBuffer;
     char *pEndMemoryBuffer;
     
+    volatile bool is_thread_work;
+    pthread_mutex_t mutex;
+    pthread_t tid;
+
     static LoggerManage *pInstance;
 
 private:
@@ -58,6 +63,11 @@ public:
 
     int print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...);
     static LoggerManage *getInstance();
+    bool init();
+
+    int read_fd()   {return fd[0];}
+    int write_fd()  {return fd[1];}
+    void setThreadWork()    {is_thread_work = true;}
 };
 
 #define PRINT_LOG(level, time, fmt, ...) do{ LoggerManage::getInstance()->print_log(level, time, fmt, ##__VA_ARGS__); }while(0);

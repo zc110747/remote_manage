@@ -116,11 +116,13 @@ int main(int argc, char* argv[])
 	}
 
 	PRINT_LOG(LOG_INFO, xGetCurrentTime(), "System Start!");
+	
 #if __SYSTEM_DEBUG == 0
 	/*硬件相关初始化*/
 	hardware_driver_init();
 
 	/*任务创建*/
+	LoggerManage::getInstance()->init();
 	ApplicationThreadInit();
 	UartThreadInit();
 	SocketTcpThreadInit();

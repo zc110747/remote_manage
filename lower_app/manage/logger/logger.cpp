@@ -41,13 +41,60 @@ LoggerManage::LoggerManage()
     is_thread_work = false;
     pNextMemoryBuffer = memoryBuffer;
     pEndMemoryBuffer = &memoryBuffer[LOGGER_MESSAGE_BUFFER_SIZE];
-
-    pthread_mutex_init(&mutex, NULL);
 }
 
 LoggerManage::~LoggerManage()
 {
+    is_thread_work = false;
     pthread_mutex_destroy(&mutex); 
+    close(fd[0]);
+    close(fd[1]);   
+}
+
+static void *loggerThread(void *arg)
+{
+    int len;
+    char buffer[LOGGER_MAX_BUFFER_SIZE];
+    LoggerManage *plogger = static_cast<LoggerManage *>(arg);
+
+    plogger->setThreadWork();
+    fflush(stdout);
+
+    while(1)
+    {
+        len = ::read(plogger->read_fd(), buffer, LOGGER_MAX_BUFFER_SIZE);
+        if(len > 0)
+        {
+            printf("loggerThread start:%d\n", len);
+            // buffer[len] = '\0';
+            // printf("%s", buffer);
+            fflush(stdout);
+        }
+    }
+
+    pthread_detach(pthread_self()); 
+    pthread_exit((void *)0);
+}
+
+bool LoggerManage::init()
+{
+    bool ret = true;
+    int nErr;
+
+    pthread_mutex_init(&mutex, NULL);
+    
+    if(pipe(fd) == -1)
+    {
+        ret = false;
+    }
+
+    nErr = pthread_create(&tid, NULL, loggerThread, this);
+    if(nErr != 0)
+    {
+        ret = false;
+    }
+
+    return ret;
 }
 
 char *LoggerManage::getMemoryBuffer(uint16_t size)
@@ -112,5 +159,14 @@ int LoggerManage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...
         printf("%s", pstart);
         fflush(stdout);
     }
+    else
+    {
+        ssize_t len = ::write(write_fd(), pstart, strlen(pbuf));
+        if(len<0)
+        {
+            //do something
+        }
+    }
     return (pbuf-pstart);
 }
+
