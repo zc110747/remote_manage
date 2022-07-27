@@ -76,7 +76,7 @@ static void *SocketUdpLoopThread(void *arg)
 {
     int socket_fd, result, recv_len;   
     char recvbuf[1024] = {0};  
-    struct sockaddr_in servaddr, clientaddr;  
+    struct sockaddr_in servaddr;  
     socklen_t client_sock_len;      
 	int is_bind_fail = 0;
     UdpInfo sUdpInfo;

@@ -78,6 +78,8 @@
 #define DEFAULT_TCP_PORT            8000
 #define DEFAULT_UDP_IPADDR          DEFAULT_IPADDRESS
 #define DEFAULT_UDP_PORT            8001
+#define DEFAULT_LOGGER_IPADDR       DEFAULT_IPADDRESS
+#define DEFAULT_LOGGER_PORT         8002
 
 #define DEFAULT_DOWNLOAD_PATH       "/home/manage/download/"
 

@@ -20,7 +20,11 @@
 #define _INCLUDE_LOGGER_HPP
 
 #include "../include/productConfig.hpp"
-
+#include <atomic>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
 
 #define LOGGER_MAX_BUFFER_SIZE      256
 #define LOGGER_MESSAGE_BUFFER_SIZE  16384
@@ -42,19 +46,27 @@ typedef struct
     int length;
 }LOG_MESSAGE;
 
+typedef struct 
+{
+    int fd;
+    std::atomic<bool> islink;
+}LOG_SOCKET;
+
 class LoggerManage
 {
 private:
     LOG_LEVEL log_level;
+    LOG_SOCKET socket;
 
     char *pNextMemoryBuffer;
     char *pEndMemoryBuffer;
     
     //thread
-    bool set_thread_work;
+    std::atomic<bool> set_thread_work;
     bool is_thread_work;
     pthread_mutex_t mutex;
     pthread_t tid;
+    pthread_t tid_socket;
 
     //fd
     LOG_MESSAGE message;
@@ -80,8 +92,10 @@ public:
     void setThreadWork()            {set_thread_work = true;}
     int read_fd()                   {return readfd;}
     void setlevel(LOG_LEVEL level)  {log_level = level;}
-    LOG_LEVEL getlevel()            {return log_level;}
+    LOG_LEVEL getlevel()            {return log_level;} 
+    LOG_SOCKET *getsocket()          {return &socket;}
 };
 
+#define PRINT_NOW(...)    { printf(__VA_ARGS__); fflush(stdout);}
 #define PRINT_LOG(level, time, fmt, ...) do{ LoggerManage::getInstance()->print_log(level, time, fmt, ##__VA_ARGS__); }while(0);
 #endif

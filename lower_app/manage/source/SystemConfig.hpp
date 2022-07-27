@@ -54,22 +54,24 @@ typedef struct
 
 typedef struct 
 {
+    //io config
     IoSysConfig led; 
-
     IoSysConfig beep;   
 
+    //serial config
     SerialSysConfig serial;
 
+    //socket config
     SocketSysConfig tcp;
-
     SocketSysConfig udp;
+    SocketSysConfig logger;
 
+    //deivce config
     DeviceSysConfig rtc;
-
     DeviceSysConfig icmSpi;
-
     DeviceSysConfig apI2c; 
 
+    //path
     JString downloadpath;
 }SystemParamter;
 
@@ -95,6 +97,7 @@ public:
     const SerialSysConfig *getserial()  {return &(parameter.serial);}
     const SocketSysConfig *gettcp()     {return &(parameter.tcp);}
     const SocketSysConfig *getudp()     {return &(parameter.udp);}
+    const SocketSysConfig *getlogger()  {return &(parameter.logger);}
     const DeviceSysConfig *getrtc()     {return &(parameter.rtc);}
     const DeviceSysConfig *geticmSpi()  {return &(parameter.icmSpi);}
     const DeviceSysConfig *getapI2c()   {return &(parameter.apI2c);}
