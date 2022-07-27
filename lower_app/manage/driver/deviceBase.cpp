@@ -43,7 +43,6 @@ bool deviceBase::open(int flags)
     DeviceFdM = ::open(devicePathM.c_str(), flags);
     if(DeviceFdM == -1)
     {
-        //do error process
         return false;
     }
     return true;

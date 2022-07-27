@@ -60,7 +60,7 @@ public:
 
 /*Uart通讯相关的线程初始化*/
 #if UART_MODULE_ON == 1
-void UartThreadInit(void);
+bool UartThreadInit(void);
 #else
 #define UartThreadInit()
 #endif

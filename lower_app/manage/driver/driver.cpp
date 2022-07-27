@@ -3,10 +3,10 @@
 //  All Rights Reserved
 //
 //  Name:
-//      driver.cpp
+//      DriverManage.cpp
 //
 //  Purpose:
-//      driver init and release.
+//      DriverManage init and release.
 //
 // Author:
 //      ZhangChao
@@ -18,7 +18,7 @@
 /////////////////////////////////////////////////////////////////////////////
 #include "driver.hpp"
 
-bool hardware_driver_init()
+bool DriverManage::init()
 {
     bool ret = true;
 
@@ -32,18 +32,32 @@ bool hardware_driver_init()
     {
         ledTheOne::getInstance()->writeIoStatus(SystemConfig::getInstance()->getled()->init);
         beepTheOne::getInstance()->writeIoStatus(SystemConfig::getInstance()->getbeep()->init);
-        PRINT_LOG(LOG_ERROR, 0, "Device Driver Init Success!");
+        PRINT_LOG(LOG_ERROR, 0, "Device DriverManage Init Success!");
     }
     
     return ret;
 }
 
-void hardware_driver_release()
+void DriverManage::release()
 {
     ledTheOne::getInstance()->release();
     beepTheOne::getInstance()->release();
     APDevice::getInstance()->release();
     ICMDevice::getInstance()->release();
     RTCDevice::getInstance()->release();
+}
+
+DriverManage* DriverManage::pInstance = nullptr;
+DriverManage* DriverManage::getInstance()
+{
+    if(pInstance == nullptr)
+    {
+        pInstance = new(std::nothrow) DriverManage;
+        if(pInstance == nullptr)
+        {
+            //do something
+        }
+    }
+    return pInstance;
 }
 	

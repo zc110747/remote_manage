@@ -25,6 +25,15 @@
 #include "spi_icm.hpp"
 #include "rtc.hpp"
 
-bool hardware_driver_init();
-void hardware_driver_release();
+class DriverManage
+{
+private:
+    static DriverManage* pInstance;
+
+public:
+    bool init();
+    void release();
+    static DriverManage* getInstance();
+};
+
 #endif

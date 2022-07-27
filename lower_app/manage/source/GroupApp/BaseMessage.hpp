@@ -19,7 +19,8 @@
 #ifndef _INCLUDE_BASE_MESSAGE_HPP
 #define _INCLUDE_BASE_MESSAGE_HPP
 
-#include "../../include/productConfig.hpp"
+#include "../../logger/logger.hpp"
+#include "../../driver/driver.hpp"
 
 
 #define MAIN_BASE_MESSAGE                   1    

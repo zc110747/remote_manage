@@ -58,7 +58,7 @@ static int set_opt(int, int, int, std::string, int);
  *  
  * @return NULL
  */
-void UartThreadInit(void)
+bool UartThreadInit(void)
 {
 	int nErr;
 	pthread_t tid1;
@@ -66,27 +66,26 @@ void UartThreadInit(void)
 	
 	if((nComFd = open(pSerialConfig->dev.c_str(), O_RDWR|O_NOCTTY|O_NDELAY))<0)
 	{	
-		USR_DEBUG("Open %s Failed\n", pSerialConfig->dev.c_str());
-		return;
+		PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Open Device %s failed!", pSerialConfig->dev.c_str());
+		return false;
 	}
 	else
 	{
 		if(set_opt(nComFd, pSerialConfig->baud, pSerialConfig->dataBits, pSerialConfig->parity, pSerialConfig->stopBits) != 0)
 		{
-			USR_DEBUG("uart config failed\n");
-			return;
+			PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Serial Option failed!");
+			return false;
 		}
-		USR_DEBUG("Open %s Success!\t\n", pSerialConfig->dev.c_str());
 	}
 
 	//创建UART协议管理对象
 	pUartProtocolInfo = new CUartProtocolInfo<int *>(nRxCacheBuffer, nTxCacheBuffer, UART_BUFFER_SIZE);
-
-	nErr = pthread_create(&tid1, NULL, UartLoopThread, NULL);
-	if(nErr != 0)
+	if(pthread_create(&tid1, NULL, UartLoopThread, NULL) != 0)
 	{
-		USR_DEBUG("Uart Task Thread Create Err:%d\n", nErr);
+		PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Uart Thread Create failed!");
+		return false;
 	}
+	return true;
 }
 
 /**
@@ -140,7 +139,7 @@ static int set_opt(int nFd, int nBaud, int nDataBits, std::string cParity, int n
 
 	if(tcgetattr(nFd, &oldtio)  !=  0) 
 	{ 
-		USR_DEBUG("Get Serial Attribute Failed\n");
+		PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Get serial attribute failed!");
 		return -1;
 	}
 	bzero(&newtio, sizeof(newtio));

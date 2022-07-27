@@ -114,15 +114,11 @@ int main(int argc, char* argv[])
 	{
 		PRINT_LOG(LOG_INFO, xGetCurrentTime(), "System Config use default!");
 	}
-
-	PRINT_LOG(LOG_INFO, xGetCurrentTime(), "System Start!");
-	
+		
 #if __SYSTEM_DEBUG == 0
-	/*硬件相关初始化*/
-	hardware_driver_init();
-
-	/*任务创建*/
+	DriverManage::getInstance()->init();
 	LoggerManage::getInstance()->init();
+
 	ApplicationThreadInit();
 	UartThreadInit();
 	SocketTcpThreadInit();
@@ -150,7 +146,7 @@ int main(int argc, char* argv[])
 			sleep(100);
 		}
 	}
-	hardware_driver_release();
+	DriverManage::getInstance()->release();
 #else
 	SystemTest();
 #endif	

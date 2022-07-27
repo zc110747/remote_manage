@@ -290,19 +290,19 @@ void CApplicationReg::WriteDeviceConfig(uint8_t cmd, uint8_t *pConfig, int size)
                 status = system("reboot");
                 if(WIFEXITED(status) && (WEXITSTATUS(status) == 0))
                 {
-                    USR_DEBUG("Wait For System Reboot:%d\r\n", status);
+                    PRINT_LOG(LOG_INFO, xGetCurrentTime(), "wait for system reboot!");
                     while(1){
                         sleep(1);
                     }
                 }
                 else
                 {
-                    USR_DEBUG("System Reboot failed, %d\r\n", status);
+                    PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "system reboot failed!");
                 }
             }
             break;
         default:
-            USR_DEBUG("Invalid Cmd!\r\n");
+            PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Invalid Command!");
             break;
     }
 }
@@ -344,9 +344,9 @@ void CApplicationReg::TimerSingalStart(void)
 
     if(setitimer(ITIMER_REAL, &tick, NULL) < 0)
     {
-        USR_DEBUG("Set timer failed!\n");
+        PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Timer Signal failed!");
     }
-    USR_DEBUG("Set timer Start!\n");
+    PRINT_LOG(LOG_INFO, xGetCurrentTime(), "Timer Signal Successed!");
 }
 
 /**
@@ -404,7 +404,7 @@ int CApplicationReg::RefreshAllDevice(void)
         }
         else
         {
-            USR_DEBUG("Modify By Other Application\n");
+            PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "No write, Changed by others!");
             return RT_FAIL;
         }
     }

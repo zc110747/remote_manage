@@ -61,7 +61,7 @@ void SocketUdpThreadInit(void)
     nErr = pthread_create(&tid1, NULL, SocketUdpLoopThread, NULL);
 	if(nErr != 0)
     {
-		USR_DEBUG("udp task thread create nErr, %d\n", nErr);
+		PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Socket udp thread init failed!");
 	}
 }
 
@@ -82,7 +82,7 @@ static void *SocketUdpLoopThread(void *arg)
     UdpInfo sUdpInfo;
     const SocketSysConfig *pSocketConfig = SystemConfig::getInstance()->getudp();
 
-    USR_DEBUG("Socket Udp Thread Start!\n");
+    PRINT_LOG(LOG_INFO, xGetCurrentTime(), "Socket udp thread start!");
     /*创建socket接口, SOCK_DGRAM表示无连接的udp接口*/
     socket_fd = socket(PF_INET, SOCK_DGRAM, 0);
     if(socket_fd != -1)
@@ -101,9 +101,7 @@ static void *SocketUdpLoopThread(void *arg)
                 if(is_bind_fail == 0)
                 {
                     is_bind_fail = 1;
-                    SOCKET_DEBUG("Udp Bind Failed!ServerIp:%s, NetPort:%d\n", 
-                        pSocketConfig->ipaddr.c_str(), 
-                        pSocketConfig->port);
+                    PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Socket udp bind %s:%d failed!", pSocketConfig->ipaddr.c_str(), pSocketConfig->port); 
                 }
                 sleep(1);
             }
@@ -113,9 +111,7 @@ static void *SocketUdpLoopThread(void *arg)
             }
         } while (1); //网络等待socket绑定完成后执行后续
 
-        SOCKET_DEBUG("Udp Bind ok, ServerIp:%s, NetPort:%d\n", 
-                pSocketConfig->ipaddr.c_str(), 
-                pSocketConfig->port);  
+        PRINT_LOG(LOG_INFO, xGetCurrentTime(), "Socket udp bind %s:%d success!", pSocketConfig->ipaddr.c_str(), pSocketConfig->port); 
 
         for(;;)
         {	   
@@ -125,7 +121,6 @@ static void *SocketUdpLoopThread(void *arg)
             {
                 pUdpProtocolInfo->ExecuteCommand(socket_fd);
                 pUdpProtocolInfo->SendTxBuffer(socket_fd, &sUdpInfo);
-                SOCKET_DEBUG("Udp Process Success\r\n");
 		    }
             else
             {
@@ -135,7 +130,7 @@ static void *SocketUdpLoopThread(void *arg)
 	}
     else
     {
-        SOCKET_DEBUG("Udp Socket Init Failed\n");
+        PRINT_LOG(LOG_INFO, xGetCurrentTime(), "Socket udp create failed!");
     }
     
     close(socket_fd);

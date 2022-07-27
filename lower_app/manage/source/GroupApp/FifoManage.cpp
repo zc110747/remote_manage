@@ -16,7 +16,6 @@
 //  Revision History:
 //      7/24/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
-
 #include "FifoManage.hpp"
 
 #if __WORK_IN_WSL == 1
@@ -34,22 +33,17 @@ int CFifoManageInfo::CreateInfomation(void)
 
     //重新创建FIFO
     if(mkfifo(MAIN_FIFO_NAME, FIFO_MODE) < 0){
-        USR_DEBUG("Create %s Error:%s\n", MAIN_FIFO_NAME, strerror(errno));
         return RT_INVALID_MQ;
     }
     if(mkfifo(APP_FIFO_NAME, FIFO_MODE) < 0){
-        USR_DEBUG("Create %s Error:%s\n", APP_FIFO_NAME, strerror(errno));
         return RT_INVALID_MQ;
     }
 
-    USR_DEBUG("start create fifo\n");
     m_rfd_main = open(MAIN_FIFO_NAME, O_RDWR, 0);
     m_rfd_app = open(APP_FIFO_NAME, O_RDWR, 0);
     m_wfd_main = open(MAIN_FIFO_NAME, O_RDWR, 0);
     m_wfd_app = open(APP_FIFO_NAME, O_RDWR, 0);
     if(m_rfd_main < 0 || m_rfd_app < 0 || m_wfd_main<0 || m_wfd_app<0){
-        USR_DEBUG("Open Fifo Failed， val:%d, %d, %d, %d\n", m_rfd_main, m_rfd_app,
-                m_wfd_main, m_wfd_app);
         close(m_rfd_main);
         close(m_rfd_app);
         close(m_wfd_main);
@@ -61,7 +55,7 @@ int CFifoManageInfo::CreateInfomation(void)
         return RT_INVALID_MQ;
     }
 
-    USR_DEBUG("Fifo %s and %s Create Ok\n", MAIN_FIFO_NAME, APP_FIFO_NAME);
+    PRINT_LOG(LOG_INFO, xGetCurrentTime(), "System Fifo %s and %s Create Ok", MAIN_FIFO_NAME, APP_FIFO_NAME);
     return RT_OK;
 }
 
