@@ -140,7 +140,8 @@ public:
 
 		nCommand = m_RxCacheDataPtr[0];
 		m_TxBufSize = 0;
-		pApplicationReg = GetApplicationReg();
+		pApplicationReg = ApplicationThread::getInstance()->GetApplicationReg();
+		
 		#if __WORK_IN_WSL == 1
 		pBaseMessageInfo = static_cast<CBaseMessageInfo *>(GetFifoMessageInfo());
 		#else

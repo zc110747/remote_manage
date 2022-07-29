@@ -29,7 +29,6 @@
 /**************************************************************************
 * Local static Variable Declaration
 ***************************************************************************/
-static CApplicationReg *pApplicationReg;
 static CBaseMessageInfo *pBaseMessageInfo;
 
 /**************************************************************************
@@ -415,42 +414,52 @@ int CApplicationReg::RefreshAllDevice(void)
     return RT_OK;
 }
 
-/**
- * 获取共享寄存器数据结构体指针
- * 
- * @param NULL
- *  
- * @return 返回寄存器的信息
- */
-CApplicationReg *GetApplicationReg(void)
+
+ApplicationThread::ApplicationThread()
 {
-    return pApplicationReg;
+    pApplicationReg = new(std::nothrow) CApplicationReg();
+    if(pApplicationReg == nullptr)
+    {
+        PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "CApplicationReg new error!");
+    }
 }
 
-/**
- * 设置共享寄存器结构体指针
- * 
- * @param NULL
- *  
- * @return 返回寄存器的信息
- */
-void SetApplicationReg(CApplicationReg *pAppReg)
+ApplicationThread::ApplicationThread(CApplicationReg *pReg)
 {
-   pApplicationReg = pAppReg;
+    pApplicationReg = pReg;
+    if(pApplicationReg != nullptr)
+    {
+        PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "CApplicationReg init error!");
+    }
 }
 
-/**
- * 硬件和状态相关应用处理线程初始化执行
- * 
- * @param NULL
- *  
- * @return NULL
- */
-void ApplicationThreadInit(void)
+ApplicationThread::~ApplicationThread()
 {
-    pthread_t tid1;
+    if(pApplicationReg != nullptr)
+    {
+        delete pApplicationReg;
+        pApplicationReg = nullptr;
+    }
+}
+
+ApplicationThread* ApplicationThread::pInstance = nullptr;
+ApplicationThread* ApplicationThread::getInstance()
+{
+    if(pInstance == nullptr)
+    {
+        pInstance = new(std::nothrow) ApplicationThread();
+        if(pInstance == nullptr)
+        {
+            PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "ApplicationThread new error!");
+        }
+    }
+    return pInstance;
+}
+
+bool ApplicationThread::init()
+{
     int nErr;
-    pApplicationReg = new CApplicationReg();
+
     #if __WORK_IN_WSL == 1
     pBaseMessageInfo = static_cast<CBaseMessageInfo *>(GetFifoMessageInfo());
     #else
@@ -460,15 +469,19 @@ void ApplicationThreadInit(void)
     //创建消息队列
     if(pBaseMessageInfo->CreateInfomation() == RT_INVALID_MQ)
     {
-        return;
+        return false;
     }
 
     //创建应用线程
-    nErr = pthread_create(&tid1, NULL, ApplicationLoopThread, NULL);	
+    nErr = pthread_create(&tid, NULL, ApplicationLoopThread, this);	
     if(nErr != 0){
-        USR_DEBUG("App Task Thread Create Err:%d\n", nErr);
+        PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "ApplicationThread create error!");
+        return false;
     }
+    return true;
 }
+
+
 
 /**
  * 硬件和状态相关应用处理执行函数
@@ -481,20 +494,22 @@ void *ApplicationLoopThread(void *arg)
 {
     int Flag;
     char InfoData;  
-    
-    USR_DEBUG("App Thread Start\n");
-    pApplicationReg->TimerSingalStart();
+    ApplicationThread *pAppThread = static_cast<ApplicationThread *>(arg);
+    CApplicationReg* pAppReg = pAppThread->getInstance()->GetApplicationReg();
+
+    PRINT_LOG(LOG_INFO, xGetCurrentTime(), "ApplicationLoopThread start!");
+    pAppReg->TimerSingalStart();
 
     for(;;)
     {
         Flag = pBaseMessageInfo->WaitInformation(APP_BASE_MESSAGE, &InfoData, sizeof(InfoData));
         if(Flag > 0)
         {
-            pApplicationReg->RefreshAllDevice();
+            pAppReg->RefreshAllDevice();
         }
         else
         {
-            USR_DEBUG("App Information Error, Application Tread Stop!\n");
+            PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Application Information error!");
             break;
         }     
     }

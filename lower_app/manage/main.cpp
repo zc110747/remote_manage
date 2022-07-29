@@ -118,8 +118,8 @@ int main(int argc, char* argv[])
 #if __SYSTEM_DEBUG == 0
 	DriverManage::getInstance()->init();
 	LoggerManage::getInstance()->init();
+	ApplicationThread::getInstance()->init();
 
-	ApplicationThreadInit();
 	UartThreadInit();
 	SocketTcpThreadInit();
 	SocketUdpThreadInit();

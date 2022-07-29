@@ -33,9 +33,6 @@
 #define DEVICE_BEEP             2
 #define DEVICE_REBOOT           3
 
-/**************************************************************************
-* Global Type Definition
-***************************************************************************/
 union UBaseStatus
 {
     uint32_t d32;
@@ -114,25 +111,26 @@ public:
     
     /*带判断是否修改的写入寄存器实现*/
     int DiffSetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize, uint8_t *pDataStart, uint8_t *pDataCompare);
+
 private:
     uint8_t m_RegVal[REG_NUM];
     pthread_mutex_t m_RegMutex; /*数据读取都要执行该锁*/
 };
 
-/**************************************************************************
-* Global Variable Declaration
-***************************************************************************/
+class ApplicationThread
+{
+private:
+    static ApplicationThread *pInstance;
+    CApplicationReg *pApplicationReg{nullptr};
+    pthread_t tid;
 
-/**************************************************************************
-* Global Functon Declaration
-***************************************************************************/
+public:
+    ApplicationThread();
+    ApplicationThread(CApplicationReg *pReg);
+        ~ApplicationThread();
 
-/*硬件和状态相关应用处理线程初始化执行*/
-void ApplicationThreadInit(void);
-
-/*获取寄存器数据结构体指针*/
-CApplicationReg *GetApplicationReg(void);
-
-/*设置共享寄存器结构体指针*/
-void SetApplicationReg(CApplicationReg *pAppReg);
+    bool init();
+    static ApplicationThread *getInstance();
+    CApplicationReg *GetApplicationReg() {return pApplicationReg;}
+};
 #endif
