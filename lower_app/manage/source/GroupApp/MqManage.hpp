@@ -22,7 +22,7 @@
 /***************************************************************************
 * Include Header Files
 ***************************************************************************/
-#include "BaseMessage.hpp"
+#include "MessageBase.hpp"
 #include <mqueue.h>
 
 #if __WORK_IN_WSL == 0
@@ -35,7 +35,7 @@
 /**************************************************************************
 * Global Type Definition
 ***************************************************************************/
-class CMqMessageInfo:public CBaseMessageInfo
+class CMqMessageInfo:public MessageBase
 {
 public:
     CMqMessageInfo(){};

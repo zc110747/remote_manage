@@ -1,57 +1,28 @@
-/*
- * File      : ApplicationThread.cpp
- * 硬件相关的状态配置和读取的线程处理
- * COPYRIGHT (C) 2020, zc
- *
- * Change Logs:
- * Date           Author       Notes
- * 2020-5-12      zc           the first version
- * 2020-5-20      zc           Code standardization 
- */
-
-/**
- * @addtogroup IMX6ULL
- */
-/*@{*/
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2022-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      ApplicationThread.cpp
+//
+//  Purpose:
+//      Deivce Application Process.
+//
+// Author:
+//     	ZhangChao
+//
+//  Assumptions:
+//
+//  Revision History:
+//      7/30/2022   Create New Version
+/////////////////////////////////////////////////////////////////////////////
 #include "ApplicationThread.hpp"
-#include "GroupApp/FifoManage.hpp"
-#include "GroupApp/MqManage.hpp"
 #include "../driver/driver.hpp"
 
-/**************************************************************************
-* Local Macro Definition
-***************************************************************************/
-
-/**************************************************************************
-* Local Type Definition
-***************************************************************************/
-
-/**************************************************************************
-* Local static Variable Declaration
-***************************************************************************/
-static CBaseMessageInfo *pBaseMessageInfo;
-
-/**************************************************************************
-* Global Variable Declaration
-***************************************************************************/
-
-/**************************************************************************
-* Local Function Declaration
-***************************************************************************/
 
 /*硬件状态相关应用处理接口*/
 void *ApplicationLoopThread(void *arg);
 
-/**************************************************************************
-* Function
-***************************************************************************/
-/**
- * 构造函数
- * 
- * @param NULL
- *  
- * @return NULL
- */
 CApplicationReg::CApplicationReg(void)
 {
     /*清除内部寄存状态*/
@@ -62,27 +33,11 @@ CApplicationReg::CApplicationReg(void)
     }
 }
 
-/**
- * 析构函数
- * 
- * @param NULL
- *  
- * @return NULL
- */
 CApplicationReg::~CApplicationReg()
 {
     pthread_mutex_destroy(&m_RegMutex);
 }
 
-/**
- * 从内部共享数据寄存器中读取数据
- * 
- * @param nRegIndex  待读取寄存器的起始地址
- * @param nRegSize   读取的寄存器的数量
- * @param pDataStart 放置读取数据的首地址
- *  
- * @return 读取寄存器的数量
- */
 uint16_t CApplicationReg::GetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize, uint8_t *pDataStart)
 {
     uint16_t nIndex;
@@ -105,15 +60,6 @@ uint16_t CApplicationReg::GetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize, 
     return nRegSize;
 }
 
-/**
- * 将数据写入内部共享的数据寄存器
- * 
- * @param nRegIndex 设置寄存器的起始地址
- * @param nRegSize  设置的寄存器的数量
- * @param pDataStart 放置设置数据的首地址
- *  
- * @return NULL
- */
 void CApplicationReg::SetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize, uint8_t *pDataStart)
 {
     uint16_t nIndex, nEndRegIndex, modifySize;
@@ -141,16 +87,6 @@ void CApplicationReg::SetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize, uint
     #endif
 }
 
-/**
- * 带判断是否修改的写入寄存器实现，变化了表明了其它线程修改了指令
- * 
- * @param nRegIndex 寄存器的起始地址
- * @param nRegSize 读取的寄存器的数量
- * @param pDataStart 设置数据的地址
- * @param psrc   缓存的原始寄存器数据
- *  
- * @return 寄存器的比较写入处理结果
- */
 int CApplicationReg::DiffSetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize, 
                                         uint8_t *pDataStart, uint8_t *pDataCompare)
 {
@@ -182,13 +118,6 @@ int CApplicationReg::DiffSetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize,
     return RT_OK;
 }
 
-/**\n
- * 读取硬件状态并更新到寄存器中
- * 
- * @param NULL
- *  
- * @return NULL
- */
 bool CApplicationReg::ReadDeviceStatus(void)
 {
     static uint8_t nRegInfoArray[REG_INFO_NUM];
@@ -261,15 +190,6 @@ bool CApplicationReg::ReadDeviceStatus(void)
     return true;
 }
 
-/**
- * 根据寄存器配置更新硬件状态
- * 
- * @param cmd 执行的读写指令
- * @param pConfig 配置的数据首地址
- * @param size 配置的数据长度
- *  
- * @return NULL
- */
 void CApplicationReg::WriteDeviceConfig(uint8_t cmd, uint8_t *pConfig, int size)
 {
     assert(pConfig != nullptr);
@@ -306,28 +226,16 @@ void CApplicationReg::WriteDeviceConfig(uint8_t cmd, uint8_t *pConfig, int size)
     }
 }
 
-/**
- * 状态更新定时触发的执行函数
- * 
- * @param signo 触发传入的数据
- *  
- * @return NULL
- */
 static void TimerSignalHandler(int signo)
 {
     char buf = 1;
 
-    pBaseMessageInfo->SendInformation(APP_BASE_MESSAGE, &buf, sizeof(buf), 1);
+
+    ApplicationThread::getInstance()->getAppMessage()->write(&buf, sizeof(buf));
 }
 
-/**
- * 状态更新定时触发源启动
- * 
- * @param NULL
- *  
- * @return NULL
- */
-void CApplicationReg::TimerSingalStart(void)
+
+void ApplicationThread::TimerSingalStart(void)
 {
     static struct itimerval tick = {0};
 
@@ -348,13 +256,6 @@ void CApplicationReg::TimerSingalStart(void)
     PRINT_LOG(LOG_INFO, xGetCurrentTime(), "Timer Signal Successed!");
 }
 
-/**
- * 进行所有硬件的处理, 包含硬件配置和状态读取
- * 
- * @param NULL
- *  
- * @return 硬件处理的执行结果
- */
 int CApplicationReg::RefreshAllDevice(void)
 {
     static uint8_t nRegCacheArray[REG_CONFIG_NUM];
@@ -414,7 +315,6 @@ int CApplicationReg::RefreshAllDevice(void)
     return RT_OK;
 }
 
-
 ApplicationThread::ApplicationThread()
 {
     pApplicationReg = new(std::nothrow) CApplicationReg();
@@ -460,17 +360,7 @@ bool ApplicationThread::init()
 {
     int nErr;
 
-    #if __WORK_IN_WSL == 1
-    pBaseMessageInfo = static_cast<CBaseMessageInfo *>(GetFifoMessageInfo());
-    #else
-    pBaseMessageInfo = static_cast<CBaseMessageInfo *>(GetMqMessageInfo());
-    #endif
-
-    //创建消息队列
-    if(pBaseMessageInfo->CreateInfomation() == RT_INVALID_MQ)
-    {
-        return false;
-    }
+    pAppMessageInfo = getMessageInfo(APPLICATION_MESS_INDEX);
 
     //创建应用线程
     nErr = pthread_create(&tid, NULL, ApplicationLoopThread, this);	
@@ -480,8 +370,6 @@ bool ApplicationThread::init()
     }
     return true;
 }
-
-
 
 /**
  * 硬件和状态相关应用处理执行函数
@@ -495,14 +383,14 @@ void *ApplicationLoopThread(void *arg)
     int Flag;
     char InfoData;  
     ApplicationThread *pAppThread = static_cast<ApplicationThread *>(arg);
-    CApplicationReg* pAppReg = pAppThread->getInstance()->GetApplicationReg();
+    CApplicationReg* pAppReg = pAppThread->GetApplicationReg();
 
     PRINT_LOG(LOG_INFO, xGetCurrentTime(), "ApplicationLoopThread start!");
-    pAppReg->TimerSingalStart();
+    pAppThread->TimerSingalStart();
 
     for(;;)
     {
-        Flag = pBaseMessageInfo->WaitInformation(APP_BASE_MESSAGE, &InfoData, sizeof(InfoData));
+        Flag = pAppThread->getAppMessage()->read(&InfoData, sizeof(InfoData));
         if(Flag > 0)
         {
             pAppReg->RefreshAllDevice();
@@ -510,12 +398,10 @@ void *ApplicationLoopThread(void *arg)
         else
         {
             PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Application Information error!");
-            break;
+            sleep(10);
         }     
     }
 
-    pBaseMessageInfo->CloseInformation(APP_BASE_MESSAGE);
-    
     //将线程和进程脱离,释放线程
     pthread_detach(pthread_self());
 

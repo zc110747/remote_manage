@@ -27,10 +27,11 @@ class RTCDevice:public deviceBase
 private:
     struct rtc_time rtcTimeM{0};
     static RTCDevice* pInstance;
+    uint64_t TimeStart{0};
 
 public:
-    //constructor
-    using deviceBase::deviceBase;
+    RTCDevice(const std::string &DevicePath);
+    ~RTCDevice();
 
 #if __WORK_IN_WSL
     bool open(int flag){
@@ -45,6 +46,7 @@ public:
 
     int getCurrentSecond();
     struct rtc_time* getRtcTime() {return &rtcTimeM;}
+    uint64_t getStartTime() {return TimeStart;}
 };
 
 #define xGetCurrentTime()   RTCDevice::getInstance()->getCurrentSecond()

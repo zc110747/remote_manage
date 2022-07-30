@@ -3,7 +3,7 @@
 //  All Rights Reserved
 //
 //  Name:
-//      FifoManage.hpp
+//      FIFOMessage.hpp
 //
 //  Purpose:
 //      Communication by fifo interface.
@@ -19,62 +19,117 @@
 #ifndef _INCLUDE_FIFO_MANAGE_HPP
 #define _INCLUDE_FIFO_MANAGE_HPP
 
-/***************************************************************************
-* Include Header Files
-***************************************************************************/
-#include "BaseMessage.hpp"
+#include "MessageBase.hpp"
+#include "../../logger/logger.hpp"
 #include <mqueue.h>
 
-#if __WORK_IN_WSL == 1
-/**************************************************************************
-* Global Macro Definition
-***************************************************************************/
-#define MAIN_FIFO        MAIN_BASE_MESSAGE
-#define APP_FIFO         APP_BASE_MESSAGE
+#define FIFO_MODE               (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)  
 
-/**************************************************************************
-* Global Type Definition
-***************************************************************************/
-class CFifoManageInfo:public CBaseMessageInfo
+#define SYSTEM_FIFO             "/tmp/sys.fifo"
+#define APPLICATION_FIFO        "/tmp/app.fifo"  
+
+
+class FIFOMessage:public MessageBase
 {
+private:
+    std::string  fifoM;
+    int modeM;
+    int readfdM;
+    int writefdM;
+
 public:
-    CFifoManageInfo(){};
-        ~CFifoManageInfo(){};
+    FIFOMessage(const std::string& fstr, int mode){
+        fifoM = std::move(fstr);
+        modeM = mode;
+        readfdM = -1;
+        writefdM = -1;
+    }
+    ~FIFOMessage(){
+        Release();
+        fifoM.clear();
+    }
 
     /*创建并打开FIFO*/
-    int CreateInfomation(void) override;                        
+    bool Create(void) override{
+        
+        //delete fifo
+        unlink(fifoM.c_str());
+
+        if(mkfifo(fifoM.c_str(), modeM) < 0)
+        {
+            PRINT_LOG(LOG_ERROR, xGetCurrentTime(),  "fifo %s make error!", fifoM.c_str());
+            return false;
+        }
+
+        writefdM = open(fifoM.c_str(), O_RDWR);
+        readfdM = open(fifoM.c_str(), O_RDWR);
+
+        if(writefdM < 0 || readfdM < 0)
+        {
+            Release();
+            PRINT_LOG(LOG_ERROR, xGetCurrentTime(),  "fifo open error:%d, %d!", writefdM, readfdM);
+            return false;
+        }
+        PRINT_LOG(LOG_INFO, xGetCurrentTime(), "fifo %s open success, fd:%d, %d", fifoM.c_str(), writefdM, readfdM);
+        return true;
+    }                      
 
     /*关闭FIFO并释放资源*/
-    int CloseInformation(uint8_t info) override;         
+    void Release() override{
+
+        if(writefdM >= 0)
+        {
+            close(writefdM);
+            writefdM = -1;
+        }
+
+        if(readfdM >= 0)
+        {
+            close(readfdM);
+            readfdM = -1;
+        }
+    }       
     
     /*等待FIFO数据接收*/
-    int WaitInformation(uint8_t info, char *buf, int bufsize) override;              
+    int read(char *buf, int bufsize) override{
+        int readbytes = -1;
+        if(readfdM >= 0)
+        {
+            readbytes = ::read(readfdM, buf, bufsize);
+        }
+        else
+        {
+
+        }
+
+        return readbytes;
+    }              
 
     /*向FIFO中投递数据*/
-    int SendInformation(uint8_t info, char *buf, int bufsize, int prio) override;  
-
-private:
-
-    /*主FIFO读描述符*/
-    int m_rfd_main{-1};
-
-    /*主FIFO写描述符*/
-    int m_wfd_main{-1};
-
-    /*应用FIFO读描述符*/
-    int m_rfd_app{-1};
-
-    /*应用FIFO写描述符*/
-    int m_wfd_app{-1};
+    int write(char *buf, int bufsize) override{
+        int writebytes = -1;
+        if(writefdM >= 0)
+        {
+            writebytes = ::write(writefdM, buf, bufsize);
+        }
+        return writebytes;
+    }  
 };
 
-/**************************************************************************
-* Global Variable Declaration
-***************************************************************************/
+class FIFOManage
+{
+private:
+    static FIFOManage* pInstance;
+    std::vector<FIFOMessage *> messageM;
 
-/**************************************************************************
-* Global Functon Declaration
-***************************************************************************/
-CFifoManageInfo *GetFifoMessageInfo(void);
-#endif
+public:
+    FIFOManage();
+        ~FIFOManage();
+    static FIFOManage* getInstance();
+    bool init();
+
+    MessageBase* getFIFOMessage(uint8_t index){
+        return static_cast<MessageBase*>(messageM[index]);
+    }
+};
 #endif

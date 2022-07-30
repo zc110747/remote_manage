@@ -22,7 +22,7 @@
 #include "includes.hpp"
 
 //------------------------- Global Defined --------------------------
-#define DEVICE_VERSION          "0.0.0.0"
+#define DEVICE_VERSION          "0.0.0.3"
 
 #define UART_MODULE_ON          1
 #define SOCKET_TCP_MODULE_ON    1
@@ -30,7 +30,7 @@
 
 /*自定义协议应用测试*/
 #define __SYSTEM_DEBUG          0
-#define __WORK_IN_WSL           1  //在WSL中，Posix Mq不支持，改为FIFO方案
+
 
 /*调试打印口显示*/
 #define __DEBUG_PRINTF			1
@@ -47,10 +47,18 @@
 #define RT_TIMEOUT              3
 #define RT_INVALID              4
 
+
+#define __WORK_IN_WSL           1  //在WSL中，Posix Mq不支持，改为FIFO方案
+
+#define MESSAGE_USE_FIFO            0
+#define MESSAGE_USE_MESSAGEQ        1
+
+#define MESSAGE_USE_INTERFACE       MESSAGE_USE_FIFO
+
 //默认设备ID
 #define DEVICE_ID                   0x01
 
-//default system config set
+//Default System Config
 #define SYSTM_CONFIG_ON             1
 #define SYSTM_CONFIG_OFF            0
 

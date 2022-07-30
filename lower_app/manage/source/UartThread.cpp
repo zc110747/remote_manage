@@ -1,115 +1,38 @@
-/*
- * File      : UartThread.cpp
- * Uart通讯线程处理
- * COPYRIGHT (C) 2020, zc
- *
- * Change Logs:
- * Date           Author       Notes
- * 2020-5-4      zc           the first version
- * 2020-5-20     zc           Code standardization 
- */
-
-/**
- * @addtogroup IMX6ULL
- */
-/*@{*/
-
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2022-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      UartThrad.cpp
+//
+//  Purpose:
+//      Uart Thread process workflow.
+//
+// Author:
+//      ZhangChao
+//
+//  Assumptions:
+//
+//  Revision History:
+//      7/30/2022   Create New Version
+/////////////////////////////////////////////////////////////////////////////
 #include "UartThread.hpp"
 
-#if UART_MODULE_ON == 1
-/**************************************************************************
-* Local Macro Definition
-***************************************************************************/
-
-/**************************************************************************
-* Local Type Definition
-***************************************************************************/
-
-/**************************************************************************
-* Local static Variable Declaration
-***************************************************************************/
-static CUartProtocolInfo<int *> *pUartProtocolInfo; //uart模块管理信息指针
-
-static uint8_t 	nRxCacheBuffer[UART_BUFFER_SIZE];
-static uint8_t  nTxCacheBuffer[UART_BUFFER_SIZE];
-static uint8_t 	nComFd;
-
-/**************************************************************************
-* Global Variable Declaration
-***************************************************************************/
-
-/**************************************************************************
-* Local Function Declaration
-***************************************************************************/
-
-/*Uart通讯主循环执行线程*/
-static void *UartLoopThread(void *arg);
-
-/*Uart串口通讯配置接口*/
-static int set_opt(int, int, int, std::string, int);
-
-/**************************************************************************
-* Function
-***************************************************************************/
-/**
- * Uart通讯相关的线程初始化
- * 
- * @param NULL
- *  
- * @return NULL
- */
-bool UartThreadInit(void)
-{
-	int nErr;
-	pthread_t tid1;
-	const SerialSysConfig* pSerialConfig = SystemConfig::getInstance()->getserial();
-	
-	if((nComFd = open(pSerialConfig->dev.c_str(), O_RDWR|O_NOCTTY|O_NDELAY))<0)
-	{	
-		PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Open Device %s failed!", pSerialConfig->dev.c_str());
-		return false;
-	}
-	else
-	{
-		if(set_opt(nComFd, pSerialConfig->baud, pSerialConfig->dataBits, pSerialConfig->parity, pSerialConfig->stopBits) != 0)
-		{
-			PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Serial Option failed!");
-			return false;
-		}
-	}
-
-	//创建UART协议管理对象
-	pUartProtocolInfo = new CUartProtocolInfo<int *>(nRxCacheBuffer, nTxCacheBuffer, UART_BUFFER_SIZE);
-	if(pthread_create(&tid1, NULL, UartLoopThread, NULL) != 0)
-	{
-		PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Uart Thread Create failed!");
-		return false;
-	}
-	return true;
-}
-
-/**
- * uart主任务执行流程
- * 
- * @param arg 线程传递的参数
- *  
- * @return NULL
- */
 static void *UartLoopThread(void *arg)
 {
 	int nFlag;
 	int size;
+	auto pThreadInfo = static_cast<UartThreadManage *>(arg);
+	auto *pProtocolInfo = pThreadInfo->getProtocolInfo();
 
-	USR_DEBUG("Uart Main Task Start\n");
-	//write(nComFd, "Uart Start OK!\n", strlen("Uart Start OK!\n"));
-
+	PRINT_LOG(LOG_INFO, xGetCurrentTime(), "UART Thread start!");
 	for(;;)
 	{	   
-		nFlag = pUartProtocolInfo->CheckRxBuffer(nComFd, false, &size);
+		nFlag = pProtocolInfo->CheckRxBuffer(pThreadInfo->getComfd(), false, &size);
 		if(nFlag == RT_OK)
 		{
-			pUartProtocolInfo->ExecuteCommand(nComFd);
-			pUartProtocolInfo->SendTxBuffer(nComFd, &size);
+			pProtocolInfo->ExecuteCommand(pThreadInfo->getComfd());
+			pProtocolInfo->SendTxBuffer(pThreadInfo->getComfd(), &size);
 		}
 		else
 		{
@@ -121,23 +44,55 @@ static void *UartLoopThread(void *arg)
     pthread_exit((void *)0);
 }
 
-/**
- * 配置Uart硬件的功能
- * 
- * @param fd 	 设置的串口设备ID
- * @param nBaud 波特率
- * @param nDataBits  数据位
- * @param cParity 奇偶校验位
- * @param nStopBits  停止位
- *  
- * @return NULL
- */
-static int set_opt(int nFd, int nBaud, int nDataBits, std::string cParity, int nStopBits)
+UartThreadManage* UartThreadManage::pInstance = nullptr;
+UartThreadManage* UartThreadManage::getInstance()
+{
+	if(pInstance == nullptr)
+	{
+		pInstance = new(std::nothrow) UartThreadManage();
+		if(pInstance == nullptr)
+		{
+			PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "UartThreadManage new failed!");
+		}
+	}
+	return pInstance;
+}
+
+bool UartThreadManage::init()
+{
+#if UART_MODULE_ON == 1
+	const SerialSysConfig* pSerialConfig = SystemConfig::getInstance()->getserial();
+	if((nComFd = open(pSerialConfig->dev.c_str(), O_RDWR|O_NOCTTY|O_NDELAY))<0)
+	{	
+		PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Open Device %s failed!", pSerialConfig->dev.c_str());
+		return false;
+	}
+	else
+	{
+		if(set_opt(pSerialConfig->baud, pSerialConfig->dataBits, pSerialConfig->parity, pSerialConfig->stopBits) != 0)
+		{
+			PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Serial Option failed!");
+			return false;
+		}
+	}
+
+	//创建UART协议管理对象
+	pProtocolInfo = new CUartProtocolInfo<int *>(nRxCacheBuffer, nTxCacheBuffer, UART_MAX_BUFFER_SIZE);
+	if(pthread_create(&tid, NULL, UartLoopThread, this) != 0)
+	{
+		PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Uart Thread Create failed!");
+		return false;
+	}
+#endif
+	return true;
+}
+
+int UartThreadManage::set_opt(int nBaud, int nDataBits, std::string cParity, int nStopBits)
 {
 	struct termios newtio;
 	struct termios oldtio;
 
-	if(tcgetattr(nFd, &oldtio)  !=  0) 
+	if(tcgetattr(nComFd, &oldtio)  !=  0) 
 	{ 
 		PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Get serial attribute failed!");
 		return -1;
@@ -221,8 +176,8 @@ static int set_opt(int nFd, int nBaud, int nDataBits, std::string cParity, int n
 	newtio.c_cc[VTIME]  = 0;
 	newtio.c_cc[VMIN] = 0;
 
-	tcflush(nFd, TCIFLUSH);
-	if((tcsetattr(nFd, TCSANOW, &newtio))!=0)
+	tcflush(nComFd, TCIFLUSH);
+	if((tcsetattr(nComFd, TCSANOW, &newtio))!=0)
 	{
 		USR_DEBUG("Serial Config Error\n");
 		return -1;
@@ -231,4 +186,18 @@ static int set_opt(int nFd, int nBaud, int nDataBits, std::string cParity, int n
 	USR_DEBUG("Serial Config Done Success!\n\r");
 	return 0;
 }
-#endif
+
+void UartThreadManage::release()
+{
+	if(pProtocolInfo != nullptr)
+	{
+		delete pProtocolInfo;
+		pProtocolInfo = nullptr;
+	}
+
+	if(nComFd >= 0)
+	{
+		close(nComFd);
+		nComFd = -1;
+	}
+}

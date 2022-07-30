@@ -6,7 +6,7 @@
 //      BaseMessage.hpp
 //
 //  Purpose:
-//      thread communication message interface.
+//      Base Message Interface defined.
 //
 // Author:
 //      ZhangChao
@@ -22,26 +22,24 @@
 #include "../../logger/logger.hpp"
 #include "../../driver/driver.hpp"
 
+#define SYSTEM_MESS_INDEX       0
+#define APPLICATION_MESS_INDEX  1
 
-#define MAIN_BASE_MESSAGE                   1    
-#define APP_BASE_MESSAGE                    2
-
-class CBaseMessageInfo
+class MessageBase
 {
 public:
-    CBaseMessageInfo(){};
-        ~CBaseMessageInfo(){};
-
     /*通讯队列的创建*/
-    virtual int CreateInfomation(void) = 0;     
+    virtual bool Create() = 0;     
 
     /*通讯队列的资源释放*/                            
-    virtual int CloseInformation(uint8_t info) = 0;       
+    virtual void Release() = 0;       
 
     /*等待通讯队列的数据接收*/                    
-    virtual int WaitInformation(uint8_t info, char *buf, int bufsize) = 0;  
+    virtual int read(char *buf, int bufsize) = 0;  
     
     /*向通讯队列投递数据*/    
-    virtual int SendInformation(uint8_t info, char *buf, int bufsize, int prio) = 0;    
+    virtual int write(char *buf, int bufsize) = 0;    
 };
+
+MessageBase *getMessageInfo(uint8_t index);
 #endif

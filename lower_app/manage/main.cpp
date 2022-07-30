@@ -1,56 +1,30 @@
-﻿/*
- * File      : main.cpp
- * main frame process
- * COPYRIGHT (C) 2020, zc
- *
- * Change Logs:
- * Date           Author       Notes
- * 2020-5-4      zc           the first version
- * 2020-5-20     zc           Code standardization 
- */
-
-/**
- * @addtogroup IMX6ULL
- */
-/*@{*/
+﻿//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2022-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      main.cpp
+//
+//  Purpose:
+//      main entry for the manage system.
+//
+// Author:
+//      ZhangChao
+//
+//  Assumptions:
+//
+//  Revision History:
+//      7/30/2022   Create New Version
+/////////////////////////////////////////////////////////////////////////////
 #include "source/UnityMain.hpp"
 #include "driver/driver.hpp"
 
-/**************************************************************************
-* Local Macro Definition
-***************************************************************************/
-
-/**************************************************************************
-* Local Type Definition
-***************************************************************************/
-
-/**************************************************************************
-* Local static Variable Declaration
-***************************************************************************/
 static int pipe_fd[2];
 
-/**************************************************************************
-* Global Variable Declaration
-***************************************************************************/
-
-/**************************************************************************
-* Local Function Declaration
-***************************************************************************/
 #if __SYSTEM_DEBUG == 1
 static void SystemTest(void);
 #endif
 
-/**************************************************************************
-* Function
-***************************************************************************/
-/**
- * 进程执行入口函数
- * 
- * @param argc 输入命令行的参数数目
- * @param argv 输入命令行的参数指针数组
- *  
- * @return 进程执行的返回状态(非异常状态下不返回)
- */
 int main(int argc, char* argv[])
 {
 	int c;
@@ -59,7 +33,10 @@ int main(int argc, char* argv[])
 	std::string sConfigFile(DEFAULT_CONFIG_FILE);
 
 	//命令行输入说明
-	while ((c = getopt(argc, argv, "v:d:f:h::")) != -1)
+	//if no parameter follow, no ":"
+	//must one paramter follow, one ":"
+	//can be no or one parameter, without space
+	while ((c = getopt(argc, argv, "vdf:h::")) != -1)
 	{
 		switch (c)
 		{
@@ -70,19 +47,21 @@ int main(int argc, char* argv[])
 				if(optarg != nullptr)
 				{
 					sConfigFile = std::string(optarg);
+					printf("set file:%s!\n", sConfigFile.c_str());
 				}
 				break;
 			case '?':
 			case 'h':
 				printf("Usage: app [options] [file]\n");
-				printf("-v       显示版本信息\n");
-				printf("-d       使用默认配置\n");
-				printf("-h       显示帮组选项\n");
-				printf("-f       指定选择的配置文件\n");
+				printf("-v       	显示版本信息\n");
+				printf("-d       	使用默认配置\n");
+				printf("-h       	显示帮组选项\n");
+				printf("-f [file]	指定选择的配置文件\n");
 				exit(0);
 				break;
 			case 'v':
-				printf("%s\n", DEVICE_VERSION);
+			case 'V':
+				printf("app_demo %s\n", DEVICE_VERSION);
 				exit(0);	
 			default:
 				exit(1);
@@ -103,41 +82,37 @@ int main(int argc, char* argv[])
 	{
 		if(!SystemConfig::getInstance()->init(sConfigFile.c_str()))
 		{
+			SystemConfig::getInstance()->default_init();
 			PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Config Read Error!");
-		}
-		else
-		{
-			std::cout<<*(SystemConfig::getInstance())<<std::endl;
 		}
 	}
 	else
 	{
+		SystemConfig::getInstance()->default_init();
 		PRINT_LOG(LOG_INFO, xGetCurrentTime(), "System Config use default!");
 	}
-		
-#if __SYSTEM_DEBUG == 0
-	DriverManage::getInstance()->init();
-	LoggerManage::getInstance()->init();
-	ApplicationThread::getInstance()->init();
+	std::cout<<*(SystemConfig::getInstance())<<std::endl;	
 
-	UartThreadInit();
+#if __SYSTEM_DEBUG == 0
+	FIFOManage::getInstance()->init();
+	LoggerManage::getInstance()->init();
+	DriverManage::getInstance()->init();
+	ApplicationThread::getInstance()->init();
+	UartThreadManage::getInstance()->init();
+
 	SocketTcpThreadInit();
 	SocketUdpThreadInit();
 
 	for(;;)
 	{
-		static char MainMqFlag;
-		int flag;
-		CBaseMessageInfo *pBaseMessageInfo;
-		#if __WORK_IN_WSL == 1
-		pBaseMessageInfo = static_cast<CBaseMessageInfo *>(GetFifoMessageInfo());
-		#else
-		pBaseMessageInfo = static_cast<CBaseMessageInfo *>(GetMqMessageInfo());
-		#endif
-		flag = pBaseMessageInfo->WaitInformation(MAIN_BASE_MESSAGE, &MainMqFlag, sizeof(MainMqFlag));
-		if(flag != -1)
+		char buf[5];
+		int ret;
+		MessageBase *pSysMessageInfo;
+		pSysMessageInfo = getMessageInfo(SYSTEM_MESS_INDEX);
+		ret = pSysMessageInfo->read(buf, sizeof(buf)/sizeof(char));
+		if(ret != -1)
 		{
-			pBaseMessageInfo->CloseInformation(MAIN_BASE_MESSAGE);
+			pSysMessageInfo->Release();
 			break;
 		}
 		else
@@ -146,11 +121,12 @@ int main(int argc, char* argv[])
 			sleep(100);
 		}
 	}
-	DriverManage::getInstance()->release();
 #else
 	SystemTest();
 #endif	
 
+	DriverManage::getInstance()->release();
+	UartThreadManage::getInstance()->release();
 	USR_DEBUG("Process app_demo stop, error:%s\n", strerror(errno));
 	return result;
 }

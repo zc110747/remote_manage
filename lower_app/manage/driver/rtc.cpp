@@ -19,6 +19,17 @@
 #include "rtc.hpp"
 #include <sys/ioctl.h>
 
+RTCDevice::RTCDevice(const std::string &DevicePath)
+:deviceBase(DevicePath)
+{
+    TimeStart = getCurrentSecond();
+}
+
+RTCDevice::~RTCDevice()
+{
+
+}
+
 RTCDevice* RTCDevice::pInstance = nullptr;
 RTCDevice* RTCDevice::getInstance()
 {
@@ -75,13 +86,13 @@ bool RTCDevice::updateTime()
 
 int RTCDevice::getCurrentSecond()
 {
-    int second;
+    uint64_t second;
 
     updateTime();
     
     second += rtcTimeM.tm_hour*3600;
     second += rtcTimeM.tm_min*60;
     second += rtcTimeM.tm_sec;
-    return second;
+    return second-TimeStart;
 }
 

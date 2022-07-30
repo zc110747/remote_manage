@@ -86,7 +86,7 @@ static void *SocketTcpLoopThread(void *arg)
     int is_bind_fail = 0;
 	const SocketSysConfig *pSocketConfig = SystemConfig::getInstance()->gettcp();
 
-    USR_DEBUG("Socket Tcp Thread Start!\n");
+    PRINT_LOG(LOG_INFO, xGetCurrentTime(), "Socket Tcp Thread Start!");
     memset((char *)&serverip, 0, sizeof(serverip));
     serverip.sin_family = AF_INET;
     serverip.sin_port = htons(pSocketConfig->port);

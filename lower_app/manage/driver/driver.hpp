@@ -31,6 +31,8 @@ private:
     static DriverManage* pInstance;
 
 public:
+    DriverManage();
+    ~DriverManage();
     bool init();
     void release();
     static DriverManage* getInstance();

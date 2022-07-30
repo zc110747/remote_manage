@@ -18,6 +18,29 @@
 /////////////////////////////////////////////////////////////////////////////
 #include "driver.hpp"
 
+DriverManage::DriverManage()
+{
+
+}
+
+DriverManage::~DriverManage()
+{
+}
+
+DriverManage* DriverManage::pInstance = nullptr;
+DriverManage* DriverManage::getInstance()
+{
+    if(pInstance == nullptr)
+    {
+        pInstance = new(std::nothrow) DriverManage;
+        if(pInstance == nullptr)
+        {
+            //do something
+        }
+    }
+    return pInstance;
+}
+
 bool DriverManage::init()
 {
     bool ret = true;
@@ -47,17 +70,5 @@ void DriverManage::release()
     RTCDevice::getInstance()->release();
 }
 
-DriverManage* DriverManage::pInstance = nullptr;
-DriverManage* DriverManage::getInstance()
-{
-    if(pInstance == nullptr)
-    {
-        pInstance = new(std::nothrow) DriverManage;
-        if(pInstance == nullptr)
-        {
-            //do something
-        }
-    }
-    return pInstance;
-}
+
 	

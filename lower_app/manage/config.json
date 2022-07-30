@@ -35,5 +35,5 @@
         "apI2c":{
                 "dev":"/dev/ap3216"
         },
-        "downloadpath":"/home/manage/download/"
+        "downloadpath":"/home/manage/download/",
 }

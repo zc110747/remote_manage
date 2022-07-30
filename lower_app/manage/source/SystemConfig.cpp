@@ -47,12 +47,16 @@ bool SystemConfig::init(const char* path)
     std::ifstream ifs;
     ifs.open(path);
 
+    if(!ifs.is_open())
+    {
+        return false;
+    }
+
     Json::CharReaderBuilder builder;
     builder["collectComments"] = true;
     JSONCPP_STRING errs;
     if (!parseFromStream(builder, ifs, &root, &errs)) {
         std::cout << errs << std::endl;
-        default_init();
         return false;
     }
     //std::cout << root << std::endl;
@@ -86,7 +90,6 @@ bool SystemConfig::init(const char* path)
     }
     catch(const std::exception& e)
     {
-        default_init();
         ifs.close();
         std::cerr << e.what() << '\n';
         return false;

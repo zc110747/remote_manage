@@ -13,8 +13,8 @@ LIB = lib/$(CPU)libjsoncpp.a #链接的库
 
 OBJS = 	main.o source/SystemConfig.o \
 		source/ApplicationThread.o source/SocketTcpThread.o source/SocketUdpThread.o source/UartThread.o \
-		source/GroupApp/CalcCrc16.o source/GroupApp/MqManage.o source/GroupApp/FifoManage.o \
-		driver/rtc.o driver/beep.o driver/led.o driver/spi_icm.o driver/i2c_ap.o \
+		source/GroupApp/CalcCrc16.o source/GroupApp/MqManage.o source/GroupApp/FIFOManage.o \
+		source/GroupApp/MessageBase.o driver/rtc.o driver/beep.o driver/led.o driver/spi_icm.o driver/i2c_ap.o \
 		driver/deviceBase.o driver/driver.o logger/logger.o
 
 APP = app_demo

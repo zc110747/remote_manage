@@ -1,27 +1,26 @@
-/*
- * File      : protocol.h
- * 协议层的通讯执行接口
- * COPYRIGHT (C) 2020, zc
- *
- * Change Logs:
- * Date           Author       Notes
- * 2020-5-4      zc           the first version
- * 2020-5-20     zc           Code standardization 
- */
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2022-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      UsrProtocol.hpp
+//
+//  Purpose:
+//     	protocol Process interface.
+//
+// Author:
+//     	ZhangChao
+//
+//  Assumptions:
+//
+//  Revision History:
+//      7/30/2022   Create New Version
+/////////////////////////////////////////////////////////////////////////////
+#ifndef _INCLUDE_USRPROTOCOL_HPP
+#define	_INCLUDE_USRPROTOCOL_HPP
 
-/**
- * @addtogroup IMX6ULL
- */
-/*@{*/
-#ifndef _INCLUDE_PROTOCOL_H
-#define _INCLUDE_PROTOCOL_H
-
-/***************************************************************************
-* Include Header Files
-***************************************************************************/
 #include "../include/productConfig.hpp"
-#include "GroupApp/MqManage.hpp"
-#include "GroupApp/FifoManage.hpp"
+#include "GroupApp/MessageBase.hpp"
 #include "GroupApp/CalcCrc16.hpp"
 #include "SystemConfig.hpp"
 #include "ApplicationThread.hpp"
@@ -135,18 +134,13 @@ public:
 		uint8_t nCommand;
 		uint16_t nRegIndex, nRxDataSize;
 		CApplicationReg  *pApplicationReg;
-		static CBaseMessageInfo *pBaseMessageInfo;
+	 	MessageBase *pAppMessageInfo;
 		char buf = 1;
 
 		nCommand = m_RxCacheDataPtr[0];
 		m_TxBufSize = 0;
 		pApplicationReg = ApplicationThread::getInstance()->GetApplicationReg();
-		
-		#if __WORK_IN_WSL == 1
-		pBaseMessageInfo = static_cast<CBaseMessageInfo *>(GetFifoMessageInfo());
-		#else
-		pBaseMessageInfo = static_cast<CBaseMessageInfo *>(GetMqMessageInfo());
-		#endif
+		pAppMessageInfo = getMessageInfo(APPLICATION_MESS_INDEX);
 
 		switch (nCommand)
 		{
@@ -158,7 +152,7 @@ public:
 					pApplicationReg->GetMultipleReg(nRegIndex, nRxDataSize, uq_reg.get());
 					//printf("nRegIndex:%d, size:%d\n", nRegIndex, nRxDataSize);
 					//SystemLogArray(uq_reg.get(), nRxDataSize);
-					pBaseMessageInfo->SendInformation(APP_BASE_MESSAGE, &buf, sizeof(buf), 0);
+					pAppMessageInfo->write(&buf, sizeof(buf));
 					m_isUploadStatus = false;
 					m_TxBufSize = CreateTxBuffer(ACK_OK, nRxDataSize, uq_reg.get());
 				}
@@ -167,7 +161,7 @@ public:
 				nRegIndex = m_RxCacheDataPtr[1]<<8 | m_RxCacheDataPtr[2];
 				nRxDataSize = m_RxCacheDataPtr[3]<<8 | m_RxCacheDataPtr[4];
 				pApplicationReg->SetMultipleReg(nRegIndex, nRxDataSize, &m_RxCacheDataPtr[5]);	
-				pBaseMessageInfo->SendInformation(APP_BASE_MESSAGE, &buf, sizeof(buf), 0);
+				pAppMessageInfo->write(&buf, sizeof(buf));
 				m_isUploadStatus = false;
 				m_TxBufSize = CreateTxBuffer(ACK_OK, 0, NULL);
 				break;

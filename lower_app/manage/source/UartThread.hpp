@@ -1,34 +1,28 @@
-/*
- * File      : uart_task.h
- * uart task interface
- * COPYRIGHT (C) 2020, zc
- *
- * Change Logs:
- * Date           Author       Notes
- * 2020-5-4      zc           the first version
- * 2020-5-20     zc           Code standardization 
- */
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2022-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      UartThread.hpp
+//
+//  Purpose:
+//      UartThread module interface.
+//
+// Author:
+//      ZhangChao
+//
+//  Assumptions:
+//
+//  Revision History:
+//      7/30/2022   Create New Version
+/////////////////////////////////////////////////////////////////////////////
+#ifndef _INCLUDE_UART_THREAD_H
+#define _INCLUDE_UART_THREAD_H
 
-/**
- * @addtogroup IMX6ULL
- */
-/*@{*/
-#ifndef _INCLUDE_UART_TASK_H
-#define _INCLUDE_UART_TASK_H
-
-/***************************************************************************
-* Include Header Files
-***************************************************************************/
 #include "UsrProtocol.hpp"
 
-/**************************************************************************
-* Global Macro Definition
-***************************************************************************/
-#define UART_BUFFER_SIZE     		1200
+#define UART_MAX_BUFFER_SIZE     		512
 
-/**************************************************************************
-* Global Type Definition
-***************************************************************************/
 template<class T>
 class CUartProtocolInfo:public CProtocolInfo<T>
 {
@@ -50,19 +44,30 @@ public:
 	}
 };
 
-/**************************************************************************
-* Global Variable Declaration
-***************************************************************************/
+class UartThreadManage
+{
+private:
+	//device info
+	int nComFd{-1};
+	pthread_t tid;
+	CUartProtocolInfo<int *> *pProtocolInfo;
 
-/**************************************************************************
-* Global Functon Declaration
-***************************************************************************/
+	//message buffer
+	uint8_t nRxCacheBuffer[UART_MAX_BUFFER_SIZE];
+	uint8_t nTxCacheBuffer[UART_MAX_BUFFER_SIZE];
 
-/*Uart通讯相关的线程初始化*/
-#if UART_MODULE_ON == 1
-bool UartThreadInit(void);
-#else
-#define UartThreadInit()
-#endif
+	static UartThreadManage* pInstance;
 
+public:
+	UartThreadManage() = default;
+	~UartThreadManage(){}
+	
+	bool init();
+	int set_opt(int, int, std::string, int);
+	void release();
+
+	static UartThreadManage* getInstance();
+	CUartProtocolInfo<int *>* getProtocolInfo() {return pProtocolInfo;}
+	int getComfd()	{return nComFd;}
+};
 #endif
