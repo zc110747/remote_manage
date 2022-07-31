@@ -1,86 +1,75 @@
-/*
- * File      : SocketUdpThread.cpp
- * Udp Socket通讯的线程处理
- * COPYRIGHT (C) 2020, zc
- *
- * Change Logs:
- * Date           Author       Notes
- * 2020-5-4      zc           the first version
- */
-
-/**
- * @addtogroup IMX6ULL
- */
-/*@{*/
-
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2022-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      SocketTcpThread.cpp
+//
+//  Purpose:
+//      Socket Tcp Thread process workflow.
+//
+// Author:
+//      ZhangChao
+//
+//  Assumptions:
+//
+//  Revision History:
+//      7/31/2022   Create New Version
+/////////////////////////////////////////////////////////////////////////////
 #include "SocketUdpThread.hpp"
 
-#if SOCKET_UDP_MODULE_ON == 1
-/**************************************************************************
-* Local Macro Definition
-***************************************************************************/
-
-/**************************************************************************
-* Local Type Definition
-***************************************************************************/
-
-/**************************************************************************
-* Local static Variable Declaration
-***************************************************************************/
-static CUdpProtocolInfo<UdpInfo *> *pUdpProtocolInfo;
-static uint8_t 	nRxCacheBuffer[UDP_BUFFER_SIZE];
-static uint8_t  nTxCacheBuffer[UDP_BUFFER_SIZE];
-
-/**************************************************************************
-* Global Variable Declaration
-***************************************************************************/
-
-/**************************************************************************
-* Local Function Declaration
-***************************************************************************/
-
-/*Udp Socket通讯处理线程*/
 static void *SocketUdpLoopThread(void *arg);
 
-/**************************************************************************
-* Function
-***************************************************************************/
-/**
- * UDP Socket线程初始化实现
- * 
- * @param NULL
- *  
- * @return NULL
- */
-void SocketUdpThreadInit(void)
+UdpThreadManage::UdpThreadManage()
 {
-    int nErr;
-	pthread_t tid1;
 
-    pUdpProtocolInfo = new CUdpProtocolInfo<UdpInfo *>(nRxCacheBuffer, nTxCacheBuffer, UDP_BUFFER_SIZE);
-    nErr = pthread_create(&tid1, NULL, SocketUdpLoopThread, NULL);
-	if(nErr != 0)
-    {
-		PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Socket udp thread init failed!");
-	}
 }
 
-/**
- * Udp绑定和数据处理的接口实现
- * 
- * @param arg:通过pthread传递的参数
- *  
- * @return NULL
- */
+UdpThreadManage::~UdpThreadManage()
+{
+
+}
+
+UdpThreadManage *UdpThreadManage::pInstance = nullptr;
+UdpThreadManage *UdpThreadManage::getInstance()
+{
+    if(pInstance == nullptr)
+    {
+        pInstance = new(std::nothrow) UdpThreadManage;
+        if(pInstance == nullptr)
+        {
+            PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "UdpThreadManage new failed!");
+        }
+    }
+    return pInstance;
+}
+
+bool UdpThreadManage::init()
+{
+    bool ret = true;
+
+#if SOCKET_UDP_MODULE_ON == 1
+    int nRet;
+    pProtocolInfo = new(std::nothrow) CUdpProtocolInfo(RxCacheBuffer, TxCacheBuffer, UDP_BUFFER_SIZE);
+
+    nRet = pthread_create(&tid, NULL, SocketUdpLoopThread, this);
+    if(nRet < 0 || pProtocolInfo == nullptr)
+    {
+        PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Socket udp thread init failed!");
+        ret = false;
+    }
+#endif
+    return ret;
+}
+
 static void *SocketUdpLoopThread(void *arg)
 {
-    int socket_fd, result, recv_len;   
-    char recvbuf[1024] = {0};  
-    struct sockaddr_in servaddr;  
-    socklen_t client_sock_len;      
-	int is_bind_fail = 0;
-    UdpInfo sUdpInfo;
-    const SocketSysConfig *pSocketConfig = SystemConfig::getInstance()->getudp();
+    int socket_fd(-1), is_bind_fail(0);   
+    struct sockaddr_in servaddr;       
+    const auto pSocketConfig = SystemConfig::getInstance()->getudp();
+    auto pUdpThreadInfo = static_cast<UdpThreadManage *>(arg);
+    UDP_CLIENT *pClient = pUdpThreadInfo->getClient();
+    auto pProtocolInfo = pUdpThreadInfo->getProtocolInfo();
 
     PRINT_LOG(LOG_INFO, xGetCurrentTime(), "Socket udp thread start!");
     /*创建socket接口, SOCK_DGRAM表示无连接的udp接口*/
@@ -95,6 +84,8 @@ static void *SocketUdpLoopThread(void *arg)
 
         do 
         {
+            int result;
+
             result = bind(socket_fd, (struct sockaddr *)&servaddr, sizeof(servaddr));
             if(result == -1)
             {
@@ -116,11 +107,11 @@ static void *SocketUdpLoopThread(void *arg)
         for(;;)
         {	   
             int nFlag;
-		    nFlag = pUdpProtocolInfo->CheckRxBuffer(socket_fd, true, &sUdpInfo);
+		    nFlag = pProtocolInfo->CheckRxBuffer(socket_fd, true, pClient);
 		    if(nFlag == RT_OK)
             {
-                pUdpProtocolInfo->ExecuteCommand(socket_fd);
-                pUdpProtocolInfo->SendTxBuffer(socket_fd, &sUdpInfo);
+                pProtocolInfo->ExecuteCommand(socket_fd);
+                pProtocolInfo->SendTxBuffer(socket_fd, pClient);
 		    }
             else
             {
@@ -137,4 +128,3 @@ static void *SocketUdpLoopThread(void *arg)
     pthread_detach(pthread_self()); //分离线程, 此时线程与创建的进程无关，后续执行join返回值22
     pthread_exit((void *)0);
 }
-#endif

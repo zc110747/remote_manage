@@ -4,7 +4,10 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "C:/Users/Administrator/AppData/Local/Packages/CanonicalGroupLimited.Ubuntu20.04onWindows_79rhkp1fndgsc/LocalState/rootfs/usr/software/install/arm-gcc-4.9.4/arm-linux-gnueabihf/libc/usr/include"
+                "F:/arm-gcc/include",
+                "F:/arm-gcc/arm-linux-gnueabihf/libc/usr/include",
+                "F:/arm-gcc/arm-linux-gnueabihf/libc/usr/include/linux",
+                "C:/Program Files (x86)/Windows Kits/10/Include/10.0.10150.0/ucrt"
             ],
             "defines": [
                 "_DEBUG",

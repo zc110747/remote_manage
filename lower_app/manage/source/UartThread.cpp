@@ -28,11 +28,11 @@ static void *UartLoopThread(void *arg)
 	PRINT_LOG(LOG_INFO, xGetCurrentTime(), "UART Thread start!");
 	for(;;)
 	{	   
-		nFlag = pProtocolInfo->CheckRxBuffer(pThreadInfo->getComfd(), false, &size);
+		nFlag = pProtocolInfo->CheckRxBuffer(pThreadInfo->getComfd(), false);
 		if(nFlag == RT_OK)
 		{
 			pProtocolInfo->ExecuteCommand(pThreadInfo->getComfd());
-			pProtocolInfo->SendTxBuffer(pThreadInfo->getComfd(), &size);
+			pProtocolInfo->SendTxBuffer(pThreadInfo->getComfd());
 		}
 		else
 		{
@@ -77,7 +77,7 @@ bool UartThreadManage::init()
 	}
 
 	//创建UART协议管理对象
-	pProtocolInfo = new CUartProtocolInfo<int *>(nRxCacheBuffer, nTxCacheBuffer, UART_MAX_BUFFER_SIZE);
+	pProtocolInfo = new CUartProtocolInfo(nRxCacheBuffer, nTxCacheBuffer, UART_MAX_BUFFER_SIZE);
 	if(pthread_create(&tid, NULL, UartLoopThread, this) != 0)
 	{
 		PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Uart Thread Create failed!");

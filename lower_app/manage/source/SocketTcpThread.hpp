@@ -1,68 +1,62 @@
-/*
- * File      : SocketThread.h
- * Socket Comm
- * COPYRIGHT (C) 2020, zc
- *
- * Change Logs:
- * Date           Author       Notes
- * 2020-5-4       zc           the first version
- */
-
-/**
- * @addtogroup IMX6ULL
- */
-/*@{*/
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2022-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      SocketTcpThread.hpp
+//
+//  Purpose:
+//      Socket Tcp Thread process interface.
+//
+// Author:
+//      ZhangChao
+//
+//  Assumptions:
+//
+//  Revision History:
+//      7/31/2022   Create New Version
+/////////////////////////////////////////////////////////////////////////////
 #ifndef _INCLUDE_SOCKET_THREAD_H
 #define _INCLUDE_SOCKET_THREAD_H
 
-/***************************************************************************
-* Include Header Files
-***************************************************************************/
 #include <sys/socket.h>
 #include "UsrProtocol.hpp"
 
-/**************************************************************************
-* Global Macro Definition
-***************************************************************************/
 #define SOCKET_BUFFER_SIZE		1200
 
-/**************************************************************************
-* Global Type Definition
-***************************************************************************/
-template<typename T>
-class CTcpProtocolInfo:public CProtocolInfo<T>
+class CTcpProtocolInfo:public CProtocolInfo<void>
 {
 public:
-	using CProtocolInfo<T>::CProtocolInfo;
+	using CProtocolInfo<void>::CProtocolInfo;
 
 	/*TCP Socket数据读取接口*/
-	int DeviceRead(int nFd, uint8_t *pDataStart, uint16_t nDataSize, T ExtraInfo)
+	int DeviceRead(int nFd, uint8_t *pDataStart, uint16_t nDataSize, void* output = nullptr)
 	{
-		*ExtraInfo = recv(nFd, pDataStart, nDataSize, 0);
-		return *ExtraInfo;
+		int ret;
+		ret = recv(nFd, pDataStart, nDataSize, 0);
+		return ret;
 	}
 
 	/*TCP Socket数据写入接口*/
-	int DeviceWrite(int nFd, uint8_t *pDataStart, uint16_t nDataSize, T ExtraInfo)
+	int DeviceWrite(int nFd, uint8_t *pDataStart, uint16_t nDataSize, void* input = nullptr)
 	{
-		*ExtraInfo = send(nFd, pDataStart, nDataSize, 0);
-		return *ExtraInfo;
+		int ret;
+		ret = send(nFd, pDataStart, nDataSize, 0);
+		return ret;
 	}
 };
 
-/**************************************************************************
-* Global Variable Declaration
-***************************************************************************/
+class TcpThreadManage
+{
+private:
+	pthread_t	tid;
+	static TcpThreadManage* pInstance;
 
-/**************************************************************************
-* Global Functon Declaration
-***************************************************************************/
+public:
+	TcpThreadManage();
+	~TcpThreadManage();
 
-#if SOCKET_TCP_MODULE_ON == 1
-/*TCP网络通讯任务和数据初始化*/
-void SocketTcpThreadInit(void);
-#else
-#define SocketTcpThreadInit() {}
-#endif
-
+	bool init();
+	static TcpThreadManage* getInstance();
+};
 #endif

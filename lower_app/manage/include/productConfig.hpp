@@ -22,11 +22,11 @@
 #include "includes.hpp"
 
 //------------------------- Global Defined --------------------------
-#define DEVICE_VERSION          "0.0.0.3"
+#define DEVICE_VERSION                  "0.0.0.3"
 
-#define UART_MODULE_ON          1
-#define SOCKET_TCP_MODULE_ON    1
-#define SOCKET_UDP_MODULE_ON    1
+#define UART_MODULE_ON                  1
+#define SOCKET_TCP_MODULE_ON            1
+#define SOCKET_UDP_MODULE_ON            1
 
 /*自定义协议应用测试*/
 #define __SYSTEM_DEBUG          0

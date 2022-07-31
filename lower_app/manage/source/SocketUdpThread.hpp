@@ -1,81 +1,80 @@
-/*
- * File      : SocketUdpThread.h
- * This file is socket-udp interface
- * COPYRIGHT (C) 2020, zc
- *
- * Change Logs:
- * Date           Author       Notes
- * 2020-5-4      zc           the first version
- */
-
-/**
- * @addtogroup IMX6ULL
- */
-/*@{*/
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2022-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      SocketTcpThread.cpp
+//
+//  Purpose:
+//      Socket Tcp Thread process workflow.
+//
+// Author:
+//      ZhangChao
+//
+//  Assumptions:
+//
+//  Revision History:
+//      7/31/2022   Create New Version
+/////////////////////////////////////////////////////////////////////////////
 #ifndef _INCLUDE_SOCKET_UDP_THREAD_H
 #define _INCLUDE_SOCKET_UDP_THREAD_H
 
-/***************************************************************************
-* Include Header Files
-***************************************************************************/
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <sys/types.h>
 #include <arpa/inet.h>
 #include "UsrProtocol.hpp"
 
-/**************************************************************************
-* Global Macro Definition
-***************************************************************************/
 #define UDP_BUFFER_SIZE		1200
 
-/**************************************************************************
-* Global Type Definition
-***************************************************************************/
-struct UdpInfo
+typedef struct 
 {
     struct sockaddr_in clientaddr;
     socklen_t client_sock_len;   
-};
+}UDP_CLIENT;
 
-template<class T>
-class CUdpProtocolInfo:public CProtocolInfo<T>
+class CUdpProtocolInfo:public CProtocolInfo<UDP_CLIENT>
 {
 public:
-	using CProtocolInfo<T>::CProtocolInfo;
+	using CProtocolInfo<UDP_CLIENT>::CProtocolInfo;
 
 	/*UDP Socket数据读取接口*/
-	int DeviceRead(int nFd, uint8_t *pDataStart, uint16_t nDataSize, T extra_info)
+	int DeviceRead(int nFd, uint8_t *pDataStart, uint16_t nDataSize, UDP_CLIENT* out) override
 	{
 		int nLen;
-		struct UdpInfo *pUdpInfo = (struct UdpInfo *)extra_info;
-		nLen = recvfrom(nFd, pDataStart, nDataSize, 0, (struct sockaddr *)&(pUdpInfo->clientaddr), 
-					&(pUdpInfo->client_sock_len));
+		nLen = recvfrom(nFd, pDataStart, nDataSize, 0, (struct sockaddr *)&(out->clientaddr), 
+					&(out->client_sock_len));
 
 		return nLen;
 	}
 
 	/*UDP Socket数据写入接口*/
-	int DeviceWrite(int nFd, uint8_t *pDataStart, uint16_t nDataSize, T extra_info)
+	int DeviceWrite(int nFd, uint8_t *pDataStart, uint16_t nDataSize, UDP_CLIENT* input) override
 	{
-		struct UdpInfo *pUdpInfo = (struct UdpInfo *)extra_info;
-		return sendto(nFd, pDataStart, nDataSize, 0, (struct sockaddr *)&(pUdpInfo->clientaddr), 
-					pUdpInfo->client_sock_len);
+		return sendto(nFd, pDataStart, nDataSize, 0, (struct sockaddr *)&(input->clientaddr), 
+					input->client_sock_len);
 	}
 };
 
-/**************************************************************************
-* Global Variable Declaration
-***************************************************************************/
+class UdpThreadManage
+{
+private:
+	pthread_t tid;
 
-/**************************************************************************
-* Global Functon Declaration
-***************************************************************************/
+	UDP_CLIENT client;
+	CUdpProtocolInfo *pProtocolInfo;
+	static UdpThreadManage *pInstance;
 
-#if SOCKET_UDP_MODULE_ON == 1
-/*UDP Socket线程初始化实现*/
-void SocketUdpThreadInit(void);
-#else
-#define SocketUdpThreadInit() 
-#endif
+	uint8_t RxCacheBuffer[UDP_BUFFER_SIZE];
+	uint8_t  TxCacheBuffer[UDP_BUFFER_SIZE];
+
+public:
+	UdpThreadManage();
+		~UdpThreadManage();
+	
+	static UdpThreadManage *getInstance();
+	bool init();
+	UDP_CLIENT *getClient()	{return &client;}
+	CUdpProtocolInfo *getProtocolInfo() {return pProtocolInfo;}
+};
+
 #endif

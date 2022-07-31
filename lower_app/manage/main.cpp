@@ -99,9 +99,8 @@ int main(int argc, char* argv[])
 	DriverManage::getInstance()->init();
 	ApplicationThread::getInstance()->init();
 	UartThreadManage::getInstance()->init();
-
-	SocketTcpThreadInit();
-	SocketUdpThreadInit();
+	TcpThreadManage::getInstance()->init();
+	UdpThreadManage::getInstance()->init();
 
 	for(;;)
 	{

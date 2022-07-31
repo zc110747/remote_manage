@@ -23,24 +23,25 @@
 
 #define UART_MAX_BUFFER_SIZE     		512
 
-template<class T>
-class CUartProtocolInfo:public CProtocolInfo<T>
+class CUartProtocolInfo:public CProtocolInfo<void>
 {
 public:
-	using CProtocolInfo<T>::CProtocolInfo;
+	using CProtocolInfo<void>::CProtocolInfo;
 
 	/*串口的通讯读接口*/
-	int DeviceRead(int nFd, uint8_t *pDataStart, uint16_t nDataSize, T ExtraInfo)
+	int DeviceRead(int nFd, uint8_t *pDataStart, uint16_t nDataSize, void *output = nullptr)
 	{
-		*ExtraInfo = read(nFd, pDataStart, nDataSize);
-		return *ExtraInfo;
+		int ret;
+		ret= read(nFd, pDataStart, nDataSize);
+		return ret;
 	}
 
 	/*串口的通讯写接口*/
-	int DeviceWrite(int nFd, uint8_t *pDataStart, uint16_t nDataSize, T ExtraInfo)
+	int DeviceWrite(int nFd, uint8_t *pDataStart, uint16_t nDataSize, void *input = nullptr)
 	{
-		*ExtraInfo = write(nFd, pDataStart, nDataSize);
-		return *ExtraInfo;
+		int ret;
+		ret = write(nFd, pDataStart, nDataSize);
+		return ret;
 	}
 };
 
@@ -50,7 +51,7 @@ private:
 	//device info
 	int nComFd{-1};
 	pthread_t tid;
-	CUartProtocolInfo<int *> *pProtocolInfo;
+	CUartProtocolInfo *pProtocolInfo;
 
 	//message buffer
 	uint8_t nRxCacheBuffer[UART_MAX_BUFFER_SIZE];
@@ -67,7 +68,7 @@ public:
 	void release();
 
 	static UartThreadManage* getInstance();
-	CUartProtocolInfo<int *>* getProtocolInfo() {return pProtocolInfo;}
+	CUartProtocolInfo* getProtocolInfo() {return pProtocolInfo;}
 	int getComfd()	{return nComFd;}
 };
 #endif

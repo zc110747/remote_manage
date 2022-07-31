@@ -122,13 +122,7 @@ public:
 		return 0;
 	}
 
-	/**
-	 * 执行具体的指令
-	 * 
-	 * @param fd 执行的设备ID号
-	 *  
-	 * @return 执行执行的结果
-	 */
+
 	int ExecuteCommand(int nFd)                               	
 	{
 		uint8_t nCommand;
@@ -219,16 +213,8 @@ public:
 		return RT_OK;
 	}
 
-	/**
-	 * 接收数据以及校验
-	 * 
-	 * @param nFd 访问设备的ID
-	 * @param IsSignalCheckHead bool型，兼容UDP的接收实现，UDP协议不支持分片的数据接收
-	 * @param ExtraInfo 兼容UDP的接收实现，需要额外的信息处理
-	 *  
-	 * @return 接收数据和校验的结果
-	 */
-	int CheckRxBuffer(int nFd, bool IsSignalCheckHead, T ExtraInfo){
+
+	int CheckRxBuffer(int nFd, bool IsSignalCheckHead, T* output = nullptr){
 		int nread;
 		int CrcRecv, CrcCacl;
 		struct req_frame *frame_ptr; 
@@ -237,7 +223,7 @@ public:
 		//数据包头的处理
 		if(m_RxBufSize == 0 && IsSignalCheckHead == false)
 		{
-			nread = DeviceRead(nFd, &m_RxCachePtr[m_RxBufSize], 1, ExtraInfo);
+			nread = DeviceRead(nFd, &m_RxCachePtr[m_RxBufSize], 1, output);
 			if(nread > 0 &&frame_ptr->head == PROTOCOL_REQ_HEAD)
 			{
 				m_RxBufSize++;
@@ -261,7 +247,7 @@ public:
 		{
 			/*从设备中读取数据*/
 			//printf("Udp Thread Recv, %d, %d\n", m_RxBufSize, m_RxCachePtr[0]);
-			nread = DeviceRead(nFd, &m_RxCachePtr[m_RxBufSize], (m_MaxCacheBufSize-m_RxBufSize), ExtraInfo);
+			nread = DeviceRead(nFd, &m_RxCachePtr[m_RxBufSize], (m_MaxCacheBufSize-m_RxBufSize), output);
 
 			if(nread > 0)
 			{        
@@ -330,10 +316,10 @@ public:
 	 *  
 	 * @return 执行执行的结果
 	 */
-	int SendTxBuffer(int nFd, T ExtraInfo)
+	int SendTxBuffer(int nFd, T* input = nullptr)
 	{
 		SystemLogArray(m_TxCachePtr, m_TxBufSize);
-		return DeviceWrite(nFd, m_TxCachePtr, m_TxBufSize, ExtraInfo);
+		return DeviceWrite(nFd, m_TxCachePtr, m_TxBufSize, input);
 	}
 	
 	/**
@@ -406,8 +392,8 @@ public:
 	}
 
 	/*设备读写函数，因为不同设备的实现可能不同，用纯虚函数*/
-	virtual int DeviceRead(int nFd, uint8_t *pDataStart, uint16_t nDataSize, T ExtraInfo)=0;  
-	virtual int DeviceWrite(int nFd, uint8_t *pDataStart, uint16_t nDataSize, T ExtraInfo)=0;
+	virtual int DeviceRead(int nFd, uint8_t *pDataStart, uint16_t nDataSize, T* output)=0;  
+	virtual int DeviceWrite(int nFd, uint8_t *pDataStart, uint16_t nDataSize, T* input)=0;
 
 private:
 	uint8_t *m_RxCachePtr;       	//接收数据首指针

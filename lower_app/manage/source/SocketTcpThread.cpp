@@ -1,75 +1,67 @@
-﻿/*
- * File      : SocketTcpThread.cpp
- * Tcp Socket通讯线程处理
- * COPYRIGHT (C) 2020, zc
- *
- * Change Logs:
- * Date           Author       Notes
- * 2020-5-23      zc           the first version
- */
-
-/**
- * @addtogroup IMX6ULL
- */
-/*@{*/
+﻿//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2022-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      SocketTcpThread.cpp
+//
+//  Purpose:
+//      Socket Tcp Thread process workflow.
+//
+// Author:
+//      ZhangChao
+//
+//  Assumptions:
+//
+//  Revision History:
+//      7/31/2022   Create New Version
+/////////////////////////////////////////////////////////////////////////////
 #include <netinet/in.h>
 #include <sys/types.h>
 #include <arpa/inet.h>
 #include "SocketTcpThread.hpp"
 
-#if SOCKET_TCP_MODULE_ON == 1
-/**************************************************************************
-* Local Macro Definition
-***************************************************************************/
-
-/**************************************************************************
-* Local Type Definition
-***************************************************************************/
-struct client_udp
-{
-    struct sockaddr_in clientip;
-    uint32_t client_size;
-};
-
-/**************************************************************************
-* Local static Variable Declaration
-***************************************************************************/
-
-/**************************************************************************
-* Global Variable Declaration
-***************************************************************************/
-
-/**************************************************************************
-* Local Function Declaration
-***************************************************************************/
-
-/*TCP通讯应用处理主线程*/
 static void *SocketTcpLoopThread(void *arg);
-
-/*TCP通讯数据处理线程*/
 static void *SocketTcpDataProcessThread(void *arg);
 
-/**************************************************************************
-* Function
-***************************************************************************/
-/**
- * TCP网络通讯任务和数据初始化
- * 
- * @param NULL
- *  
- * @return NULL
- */
-void SocketTcpThreadInit(void)
+TcpThreadManage::TcpThreadManage()
 {
-	int nErr;
-	pthread_t tid1;
 
-    nErr = pthread_create(&tid1, NULL, SocketTcpLoopThread, NULL);
-	if(nErr != 0)
-    {
-		USR_DEBUG("Tcp Task Thread Create Err:%d\n", nErr);
-	}
 }
+
+TcpThreadManage::~TcpThreadManage()
+{
+    
+}
+
+bool TcpThreadManage::init()
+{
+    bool ret = true;
+
+#if SOCKET_TCP_MODULE_ON == 1
+    if(pthread_create(&tid, NULL, SocketTcpLoopThread, this) < 0)
+    {
+        PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Tcp Thread Create failed!");
+        ret = false;
+    }
+#endif
+    return ret;
+}
+
+TcpThreadManage* TcpThreadManage::pInstance = nullptr;
+TcpThreadManage* TcpThreadManage::getInstance()
+{
+    if(pInstance == nullptr)
+    {
+        pInstance = new(std::nothrow) TcpThreadManage;
+        if(pInstance == nullptr)
+        {
+            PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Tcp thread manage new failed!");
+        }
+    }
+    return pInstance;
+}
+
 
 /**
  * Socket绑定和等待接收的接口实现
@@ -80,10 +72,8 @@ void SocketTcpThreadInit(void)
  */
 static void *SocketTcpLoopThread(void *arg)
 {
-    int server_fd;
-    int result;
+    int server_fd(-1), is_bind_fail(0);
     struct sockaddr_in serverip, clientip;
-    int is_bind_fail = 0;
 	const SocketSysConfig *pSocketConfig = SystemConfig::getInstance()->gettcp();
 
     PRINT_LOG(LOG_INFO, xGetCurrentTime(), "Socket Tcp Thread Start!");
@@ -104,6 +94,8 @@ static void *SocketTcpLoopThread(void *arg)
 
         do 
         {
+            int result;
+
             result = bind(server_fd, (struct sockaddr *)&serverip, sizeof(serverip));
             if(result == -1)
             {
@@ -174,10 +166,10 @@ static void *SocketTcpDataProcessThread(void *arg)
     int client_fd = *static_cast<int *>(arg);
     uint8_t is_loop = 0;
     fd_set read_set;
-    CTcpProtocolInfo<int *> *pTcpProtocolInfo;
     std::unique_ptr<uint8_t[]> nRxCacheBuffer(new uint8_t[SOCKET_BUFFER_SIZE]);
     std::unique_ptr<uint8_t[]> nTxCacheBuffer(new uint8_t[SOCKET_BUFFER_SIZE]);
-    pTcpProtocolInfo = new CTcpProtocolInfo<int *>(nRxCacheBuffer.get(), 
+
+    auto pTcpProtocolInfo = new CTcpProtocolInfo(nRxCacheBuffer.get(), 
                             nTxCacheBuffer.get(), SOCKET_BUFFER_SIZE);
 
     FD_ZERO(&read_set);
@@ -213,4 +205,3 @@ static void *SocketTcpDataProcessThread(void *arg)
     pthread_detach(pthread_self());
     pthread_exit((void *)0);
 }
-#endif
