@@ -1,8 +1,8 @@
 #编译工具和编译选项
-#HOST = arm-linux-gnueabihf-
-#CPU = arm-
-HOST=
-CPU=x86-
+HOST = arm-linux-gnueabihf-
+CPU = arm-
+#HOST=
+#CPU=x86-
 CC = $(HOST)g++
 CFLAGS  := -O3 -std=c++11 -lpthread -fno-strict-aliasing -lrt
 
@@ -32,6 +32,7 @@ all : $(APP)
 $(APP) : $(OBJS)
 	$(CC) -o $(APP) $(OBJS) $(LIB) $(CFLAGS)
 	rm -f $(OBJS)
+	chmod 777 $(APP)
 
 tags :
 	ctags -R *

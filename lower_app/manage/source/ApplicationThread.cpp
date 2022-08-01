@@ -159,6 +159,10 @@ bool CApplicationReg::ReadDeviceStatus(void)
         pRegInfoList->sensor_accel_y = pIcmInfo->accel_y_adc;
         pRegInfoList->sensor_accel_z = pIcmInfo->accel_z_adc;
         pRegInfoList->sensor_temp = pIcmInfo->temp_adc;
+        PRINT_LOG(LOG_INFO, xGetCurrentTime(), "senosr_gyro:%d, %d, %d, sensor_accel:%d, %d, %d, tmp:%d",
+            pRegInfoList->sensor_gyro_x,  pRegInfoList->sensor_gyro_y,  pRegInfoList->sensor_gyro_z,
+            pRegInfoList->sensor_accel_x, pRegInfoList->sensor_accel_y, pRegInfoList->sensor_accel_z,
+            pRegInfoList->sensor_temp);
     }
     else
         isError = true;
@@ -171,6 +175,8 @@ bool CApplicationReg::ReadDeviceStatus(void)
         pRegInfoList->sensor_ir = pApInfo->ir;
         pRegInfoList->sensor_ps = pApInfo->ps;
         pRegInfoList->sensor_als = pApInfo->als;
+        PRINT_LOG(LOG_INFO, xGetCurrentTime(), "senosr_i2c:%d, %d, %d",
+            pRegInfoList->sensor_ir, pRegInfoList->sensor_ps, pRegInfoList->sensor_als);
     }
     else
         isError = true;

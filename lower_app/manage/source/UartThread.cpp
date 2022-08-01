@@ -179,11 +179,11 @@ int UartThreadManage::set_opt(int nBaud, int nDataBits, std::string cParity, int
 	tcflush(nComFd, TCIFLUSH);
 	if((tcsetattr(nComFd, TCSANOW, &newtio))!=0)
 	{
-		USR_DEBUG("Serial Config Error\n");
+		PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Serial Config Error!");
 		return -1;
 	}
 
-	USR_DEBUG("Serial Config Done Success!\n\r");
+	PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Serial Config Done Success!");
 	return 0;
 }
 

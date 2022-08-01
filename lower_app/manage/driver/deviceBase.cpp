@@ -43,8 +43,11 @@ bool deviceBase::open(int flags)
     DeviceFdM = ::open(devicePathM.c_str(), flags);
     if(DeviceFdM == -1)
     {
+        PRINT_LOG(LOG_INFO, 0, "open %s device failed!", devicePathM.c_str());
         return false;
     }
+
+    PRINT_LOG(LOG_INFO, 0, "open %s device success, fd:%d!", devicePathM.c_str(), DeviceFdM);
     return true;
 }
 

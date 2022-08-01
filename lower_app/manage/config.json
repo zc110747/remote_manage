@@ -5,7 +5,7 @@
         },
         "beep":{
                 "init":1,
-                "dev":"dev/beep"
+                "dev":"/dev/beep"
         },
         "serial":{
                 "baud":115200,

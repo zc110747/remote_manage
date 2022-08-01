@@ -301,12 +301,13 @@ int LoggerManage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...
     pbuf = &pbuf[len];
     bufferlen -= len;
 
-    if(bufferlen < 2)
+    if(bufferlen < 3)
         return 0;
     
-    pbuf[0] = '\n';
-    pbuf[1] = 0;
-    message.length += 2;
+    pbuf[0] = '\r';
+    pbuf[1] = '\n';
+    pbuf[2] = 0;
+    message.length += 3;
 
     if(!is_thread_work)
     {
