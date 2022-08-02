@@ -1,48 +1,54 @@
-# remote_manage
-基于嵌入式Linux的局域网和云平台管理方案开发  
+# 基于嵌入式Linux的局域网和云平台管理应用
 
-设计思路和文档:  
-https://www.cnblogs.com/zc110747/p/12747213.html  
+## 项目框架
 
-具体实现功能需求  
-1.对嵌入式Linux中字符型驱动设备，I2C, SPI等进行访问,支持设备树  
-2.支持配置管理，允许通过文件管理设备启动状态(配置文件使用JSON格式)  
-3.对Linux应用层API接口和多线程的应用,支持线程同步  
-4.串口的远程管理，基于自定义协议  
-5.socket(UDP, TCP)的局域网远程管理，兼容自定义协议  
-6.支持基于QT技术的上位机界面化设备管理  
-7.通讯的安全机制处理  
-8.支持云平台方案开发  
-9.支持与云平台方案对接的手机端系统开发  
- 
-项目框架  
-![image](https://github.com/zc110747/remote_manage/blob/master/document/Image/system.png)  
+![image](https://github.com/zc110747/remote_manage/blob/master/document/Image/firmware.jpg)
 
-项目结构  
-demo/           编译好可执行的平台代码  
-document/       设计文档资料说明  
-kernal_mod/     内核驱动模块实现  
-lower_app/      嵌入式Linux平台下位机代码实现  
----node_server/    基于node的服务器实现, 用于浏览器的局域网访问  
----qt_gui/         基于QT界面的下位机实现  
----system/         涉及UDP，TCP和UART的局域网通讯实现，同时外设的访问和管理  
-support/        用于支持平台代运行的库  
-test_app/       用于实现单个功能的代码，后续添加到lower_app和upper_app下  
-upper_app/      上位机的代码实现  
----qt_manage/      基于QT实现的上位机管理界面    
+## 项目结构
 
-硬件适配和兼容性:  
-涉及内核取代模块部分因与平台和硬件绑定，只支持imx6ull内核，使用正点原子阿尔法开发板  
-下位机只支持Linux平台，通过修改编译选项和宏定义支持Linux和嵌入式Linux平台，涉及硬件的部分在非嵌入式Linu平台会执行失败  
-上位机基于windows平台开发，后续扩展支持其它平台  
+demo/           		测试代码
+document/       	设计文档资料说明
+kernael_mod/     	内核驱动模块
+lower_app/              嵌入式Linux设备应用实现
+	-manage/     	主工作流应用，驱动模块处理，logger实现，外设和其它设备接口访问
+	-gui/        	下位机图形界面，支持状态显示和基本操作(QT)
+	-server/           支持桌面访问得web服务器(node)
+support/        	        用于支持应用执行的lib库或者环境
+upper_app/             PC客户端应用实现
+	-manage/       用于访问嵌入式设备的桌面客户端(暂定QT)
 
-编译环境  
-下位机软件交叉编译工具 
-内核模块使用编译工具:arm-linux-gnueabihf-gcc  
-下位机应用层编编译工具和实现环境:  
-qt_gui和system使用arm-linux-gnueabihf-g++或g++  
-node_server使用node作为运行环境，执行语言为js    
-上位机编译工具  
-QT5.12.8  
+## 设计文档
 
-本项目是结合自身职业开发经历，总结经验实现的嵌入式Linux综合性项目，在设计上会考虑实际产品开发中的各种细节问题，对于下位机的代码开发中，也会尽量考虑按照实际量产项目的标准开发和调试软件实现，作为入门的项目会过于复杂，但是基本包含到大部分嵌入式开发所需要的思想，目前进一步深入开发。  
+参考文档(见document目录下说明), 初步设计包含:
+
+嵌入式Linux端设计
+
+1. 嵌入式驱动设备的访问，包含字符型设备，I2C, SPI，串口等访问，包含设备树支持
+2. 支持配置管理，允许通过文件管理设备启动状态(配置文件使用JSON格式)
+3. 基于linux系统API的线程创建，管理，线程间通讯支持
+4. 本地端的通讯处理(Serial, Socket)等，基于自定义协议进行通讯(特殊指令的安全机制)
+5. 内部状态读取更新显示，远端和本地的设置修改
+6. 支持本地和网络的logger打印接口，调试等级显示可调
+7. 访问外部设备的模块接口
+
+PC应用端设计
+
+1. 访问Linux端接口，获取内部数据
+2. 操作Linux端设备外设
+3. 控制访问linux管理的远端信息
+4. 其它功能组件
+
+## 硬件适配和兼容性
+
+涉及内核取代模块部分因与平台和硬件绑定，只支持imx6ull内核，使用正点原子阿尔法开发板
+下位机只支持Linux平台，通过修改编译选项和宏定义支持Linux和嵌入式Linux平台，涉及硬件的部分在非嵌入式Linu平台会执行失败
+上位机基于windows平台开发，后续扩展支持其它平台
+
+## 编译环境
+
+嵌入式软件交叉编译工具
+	内核模块使用编译工具 - arm-linux-gnueabihf-gcc
+	manage，gui编译工具 - arm-linux-gnueabihf-g++
+	server使用node作为运行环境，网页则使用前端技术
+上位机编译工具
+	QT(the newest stable version)
