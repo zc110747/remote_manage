@@ -15,32 +15,49 @@ let contentType = {
     "asp":"text/asp",
     "jpg":"image/jpeg",
     "png":"image/png",
+    "ico":"image/icon",
     "js":"application/x-javascript",
 };
 
-server.on('request', (request, response)=>{
-    //request do
-    let pathname = request.url;
-    pathname = pathname==='/'? 'index.html':pathname;
-    let filepath = join(__dirname, pathname);
-    if(fs.existsSync(filepath))
-    {
-        const ext = extname(filepath).slice(1);
-        console.log(`content-type:${ext}`);
-        response.setHeader('content-type', contentType[ext]);
+let localpath = `${__dirname}\\web\\`;
 
-        let html;
-        html = fs.readFileSync(filepath);
-        response.end(html);
-    }
-    else
-    {
-        console.log(`invalid pathname ${pathname}`);
-        response.statusCode = 404;
-        response.end("not found");
-    }
-});
+function hasOwnKey(obj, key)
+{
+    return (key in obj);
+}
+console.log(hasOwnKey(contentType, "ico"));
 
-server.listen(netInfo.port, netInfo.ipaddr, ()=>{
-    console.log(`server listen ip:${netInfo.ipaddr}, port ${netInfo.port}`)
-});
+function main()
+{
+    server.on('request', (request, response)=>{
+        //request do
+        let pathname = request.url;
+        pathname = pathname==='/'? 'index.html':pathname;
+        let filepath = join(localpath, pathname);
+        if(fs.existsSync(filepath))
+        {
+            const ext = extname(filepath).slice(1);
+    
+            if(hasOwnKey(contentType, ext))
+                response.setHeader('content-type', contentType[ext]);
+            else
+                console.log(`content-type:${ext}`);
+    
+            let html;
+            html = fs.readFileSync(filepath);
+            response.end(html);
+        }
+        else
+        {
+            console.log(`invalid pathname ${pathname}`);
+            response.statusCode = 404;
+            response.end("not found");
+        }
+    });
+
+    server.listen(netInfo.port, netInfo.ipaddr, ()=>{
+        console.log(`server listen ip:${netInfo.ipaddr}, port ${netInfo.port}`)
+    });
+}
+
+main()
