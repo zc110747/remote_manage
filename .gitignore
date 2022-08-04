@@ -3,3 +3,4 @@
 
 *.o
 lower_app/manage/app_demo
+lower_app/server/node/node_modules
