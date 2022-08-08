@@ -22,6 +22,7 @@
 
 #include "../include/productConfig.hpp"
 #include "../source/SystemConfig.hpp"
+#include <atomic>
 
 class deviceBase
 {
@@ -46,7 +47,7 @@ public:
 class IoBase:public deviceBase
 {
 private:
-    uint8_t IoStatus{0};
+    std::atomic<uint8_t> IoStatus{0};
 
 public:
     //constructor

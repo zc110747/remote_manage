@@ -19,6 +19,7 @@
 #include <stdarg.h>
 #include "logger.hpp"
 #include "../driver/driver.hpp"
+#include "cmdProcess.hpp"
 
 char memoryBuffer[LOGGER_MESSAGE_BUFFER_SIZE+1];
 
@@ -102,7 +103,10 @@ static void *loggerSocketThread(void *arg)
                 }
                 else
                 {
-                    //can do something
+                    if(cmdProcess::getInstance()->parseData(recvbuf, recvlen))
+                    {
+                        cmdProcess::getInstance()->ProcessData();
+                    }
                 }
             }
         }

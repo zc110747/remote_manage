@@ -106,8 +106,7 @@ int main(int argc, char* argv[])
 	{
 		char buf[5];
 		int ret;
-		MessageBase *pSysMessageInfo;
-		pSysMessageInfo = getMessageInfo(SYSTEM_MESS_INDEX);
+		MessageBase *pSysMessageInfo = getMessageInfo(SYSTEM_MESS_INDEX);
 		ret = pSysMessageInfo->read(buf, sizeof(buf)/sizeof(char));
 		if(ret != -1)
 		{
