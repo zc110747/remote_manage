@@ -25,6 +25,7 @@
 #include <netinet/in.h>
 #include <sys/types.h>
 #include <arpa/inet.h>
+#include "cmdProcess.hpp"
 
 #define LOGGER_MAX_BUFFER_SIZE      256
 #define LOGGER_MESSAGE_BUFFER_SIZE  16384

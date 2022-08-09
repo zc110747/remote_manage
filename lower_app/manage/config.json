@@ -15,16 +15,16 @@
                 "dev":"/dev/ttymxc2"
         },
         "tcp":{
-                "ipaddr":"127.0.0.1",
-                "port":8000
+                "ipaddr":"192.168.113.1",
+                "port":5057
         },
         "udp":{
-                "ipaddr":"127.0.0.1",
-                "port":8001
+                "ipaddr":"192.168.113.1",
+                "port":5058
         },
         "logger":{
-                "ipaddr":"127.0.0.1",
-                "port":8002
+                "ipaddr":"192.168.113.1",
+                "port":5059
         },
         "rtc":{
                 "dev":"/dev/rtc0"

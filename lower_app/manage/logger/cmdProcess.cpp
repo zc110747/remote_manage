@@ -73,7 +73,10 @@ bool cmdProcess::init()
 bool cmdProcess::parseData(char *ptr, int size)
 {
     if(ptr[0] != '!')
+    {
+        PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "error command:%s", ptr);
         return false;
+    }
 
     ptr[size] = '\0';
 
@@ -85,11 +88,15 @@ bool cmdProcess::parseData(char *ptr, int size)
     
     auto strVal = std::string(ptr);
     if(mapM.count(strVal) == 0)
+    {
+        PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "error command:%s", ptr);
         return false;
+    }
 
     formatM = mapM[strVal];
     pDataM = pStart+1;
-
+    
+    PRINT_LOG(LOG_INFO, xGetCurrentTime(), "right command:%d, data:%s", formatM, pDataM);
     return true;
 }
 
@@ -101,15 +108,15 @@ bool cmdProcess::ProcessData()
         case CmReadDev:
             { 
                 char dev = pDataM[0];
-                if(dev == 0)
+                if(dev == '0')
                 {
-                    PRINT_LOG(LOG_FATAL, xGetCurrentTime(), "LedStatue:%d!",ledTheOne::getInstance()->getIoStatus());
+                    PRINT_LOG(LOG_FATAL, xGetCurrentTime(), "LedStatus:%d!",ledTheOne::getInstance()->getIoStatus());
                 }
-                else if(dev == 1)
+                else if(dev == '1')
                 {
-                    PRINT_LOG(LOG_FATAL, xGetCurrentTime(), "beepStatue:%d!",beepTheOne::getInstance()->getIoStatus());
+                    PRINT_LOG(LOG_FATAL, xGetCurrentTime(), "beepStatus:%d!",beepTheOne::getInstance()->getIoStatus());
                 }
-                else if(dev == 2)
+                else if(dev == '2')
                 {
                     AP_INFO *pInfo = APDevice::getInstance()->getInfo();
                     PRINT_LOG(LOG_FATAL, xGetCurrentTime(), "ApInfo, ir:%d, als:%d, ps:%d!",
@@ -117,7 +124,7 @@ bool cmdProcess::ProcessData()
                         pInfo->als,
                         pInfo->ps);
                 }
-                else if(dev == 3)
+                else if(dev == '3')
                 {
                     ICM_INFO *pInfo = ICMDevice::getInstance()->getInfo();
                     PRINT_LOG(LOG_FATAL, xGetCurrentTime(), "ICMInfo, gx,gy,gz:%d,%d,%d;ax,ay,az:%d,%d,%d;temp:%d!",
@@ -131,6 +138,7 @@ bool cmdProcess::ProcessData()
                 }
                 else
                 {
+                    PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Command Invalid Device:%c", dev);
                     ret = false;
                 }
             }  

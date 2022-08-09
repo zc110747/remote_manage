@@ -183,7 +183,7 @@ bool CApplicationReg::ReadDeviceStatus(void)
 
     if(isError)
     {
-        PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "[%s]ReadDeviceStatus error!", __FILE__);
+        //PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "[%s]ReadDeviceStatus error!", __FILE__);
         return false;
     }
 

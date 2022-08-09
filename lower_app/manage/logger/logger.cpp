@@ -19,7 +19,6 @@
 #include <stdarg.h>
 #include "logger.hpp"
 #include "../driver/driver.hpp"
-#include "cmdProcess.hpp"
 
 char memoryBuffer[LOGGER_MESSAGE_BUFFER_SIZE+1];
 
@@ -38,6 +37,7 @@ static void *loggerSocketThread(void *arg)
     servaddr.sin_addr.s_addr = inet_addr(pSocketConfig->ipaddr.c_str());  
     servaddr.sin_port = htons(pSocketConfig->port); 
 
+    PRINT_LOG(LOG_INFO, xGetCurrentTime(), "%s start!", __func__);
     server_fd = socket(PF_INET, SOCK_STREAM, 0);
     if(server_fd != -1)
     {
@@ -105,6 +105,7 @@ static void *loggerSocketThread(void *arg)
                 {
                     if(cmdProcess::getInstance()->parseData(recvbuf, recvlen))
                     {
+                        //PRINT_NOW("Socket logger command Process!");
                         cmdProcess::getInstance()->ProcessData();
                     }
                 }
@@ -140,6 +141,11 @@ static void *loggerTxThread(void *arg)
                 if(len < 0)
                 {
                     //do something
+                    PRINT_NOW("%s send failed:%d\n", __func__, len);
+                }
+                else
+                {
+                    usleep(100);
                 }
             }
             else
@@ -151,6 +157,10 @@ static void *loggerTxThread(void *arg)
                     //do something
                 }
             }
+        }
+        else
+        {
+            PRINT_NOW("%s read failed:%d\n", __func__, len);
         }
     }
 
@@ -239,12 +249,14 @@ bool LoggerManage::init()
     if(nErr != 0)
     {
         ret = false;
+        PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "%s failed, err:%d!", __func__, nErr);
     }
 
     nErr = pthread_create(&tid_socket, NULL, loggerSocketThread, this);
     if(nErr != 0)
     {
         ret = false;
+        PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "%s failed, err:%d!", __func__, nErr);
     }
     return ret;
 }
@@ -284,6 +296,7 @@ int LoggerManage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...
     len = snprintf(pbuf, bufferlen, "LogLevel:%d time:%d info:",level, time);
     if((len<=0) || (len>=bufferlen))
     {
+        PRINT_NOW("%s label0 error\n", __func__);
         mutex_unlock();
         return 0;
     }
@@ -299,14 +312,20 @@ int LoggerManage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...
     mutex_unlock();
 
     if((len<=0) || (len>=bufferlen))
+    {
+        PRINT_NOW("%s label1 error\n", __func__);
         return 0;
+    }
     
     message.length += len;
     pbuf = &pbuf[len];
     bufferlen -= len;
 
     if(bufferlen < 3)
+    {
+        PRINT_NOW("%s label2 error\n", __func__);
         return 0;
+    }
     
     pbuf[0] = '\r';
     pbuf[1] = '\n';
@@ -325,11 +344,16 @@ int LoggerManage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...
     else
     {
         len = ::write(writefd, &message, sizeof(message));
-        if(len<0)
+        if(len<=0)
         {
-            //do something error
+            PRINT_NOW("%s label3 error\n", __func__);
+        }
+        else
+        {
+            //PRINT_NOW("%s writefd\n", __func__);
         }
     }
+    
     return  message.length;
 }
 

@@ -17,6 +17,9 @@
 //      8/8/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
 
+#ifndef _INCLUDE_CMD_PROCESS_HPP
+#define _INCLUDE_CMD_PROCESS_HPP
+
 #include "../include/includes.hpp"
 #include <map>
 
@@ -46,3 +49,4 @@ public:
     bool ProcessData();
 };
 
+#endif

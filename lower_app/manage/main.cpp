@@ -95,6 +95,7 @@ int main(int argc, char* argv[])
 
 #if __SYSTEM_DEBUG == 0
 	FIFOManage::getInstance()->init();
+	cmdProcess::getInstance()->init();
 	LoggerManage::getInstance()->init();
 	DriverManage::getInstance()->init();
 	ApplicationThread::getInstance()->init();
