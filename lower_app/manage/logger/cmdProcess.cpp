@@ -20,29 +20,31 @@
 #include "cmdProcess.hpp"
 #include "logger.hpp"
 #include "../driver/driver.hpp"
+#include "../source/SystemConfig.hpp"
+#include <algorithm>
 
 /*
-command need sequrate with space
-!readDev [index]        #index=[0, led], [1, beep], [2, i2c_ap], [3, spi_icm]
-!setDev [index],[data]  #index=[0, led], [1, beep]   
-!getNet x               #x can be any
-!getSerial x            #...
+!readdev    [index] #index=[0~3 led,beep,ap,icm]
+!setdev     [index],[data] #index=[0~1 led,beep]  
+!getNet     [index] #index=[0~2 udp,tcp,logger]       
+!getSerial  
+!? or !help
 */
-const char *cmdProcessPtr[] = {
-    "!readDev",
-    "!setDev",
-    "!getNet",
-    "!getSerial",
+const static std::map<std::string, CmdFormat_t> CmdMapM = {
+    {"!readdev",    CmReadDev},
+    {"!setdev",     CmSetDev},
+    {"!getnet",     CmGetNet},
+    {"!getserial",  CmGetSer},
+    {"!?",          CmGetHelp},
+    {"!help",       CmGetHelp},
 };
 
 cmdProcess::cmdProcess()
 {
-
 }
 
 cmdProcess::~cmdProcess()
 {
-
 }
 
 cmdProcess *cmdProcess::pInstance = nullptr;
@@ -61,12 +63,6 @@ cmdProcess* cmdProcess::getInstance()
 
 bool cmdProcess::init()
 {
-    static_assert((sizeof(cmdProcessPtr)/sizeof(char *)) == COMMAND_MAX_SIZE, "Invalid cmdProcessPtr list");
-
-    for(int index=0; index<COMMAND_MAX_SIZE; index++)
-    {
-        mapM.insert(std::pair<std::string, CmdFormat_t>(std::string(cmdProcessPtr[index]), (CmdFormat_t)index));
-    }
     return true;
 }
 
@@ -82,18 +78,23 @@ bool cmdProcess::parseData(char *ptr, int size)
 
     //replace first ' ' by '\0'
     char *pStart = ptr;
-    while((*pStart) != ' ')
+    while((*pStart != ' ') && (*pStart != '\0'))
         pStart++;
     pStart[0] = '\0';
     
+    //将数据lower,解决数据不符合问题
     auto strVal = std::string(ptr);
-    if(mapM.count(strVal) == 0)
+    std::string strDst;
+    strDst.resize(strVal.size());
+    std::transform(strVal.begin(), strVal.end(), strDst.begin(), ::tolower);
+
+    if(CmdMapM.count(strDst) == 0)
     {
         PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "error command:%s", ptr);
         return false;
     }
 
-    formatM = mapM[strVal];
+    formatM = CmdMapM.find(strDst)->second;
     pDataM = pStart+1;
     
     PRINT_LOG(LOG_INFO, xGetCurrentTime(), "right command:%d, data:%s", formatM, pDataM);
@@ -138,7 +139,6 @@ bool cmdProcess::ProcessData()
                 }
                 else
                 {
-                    PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Command Invalid Device:%c", dev);
                     ret = false;
                 }
             }  
@@ -146,12 +146,44 @@ bool cmdProcess::ProcessData()
         case CmSetDev:
             break;
         case CmGetNet:
+            {
+                char net = pDataM[0];
+                if(net == '0')
+                {
+                    auto pSocket = SystemConfig::getInstance()->getudp();
+                    PRINT_LOG(LOG_FATAL, xGetCurrentTime(), 
+                        "UDP Sokcet, Ipaddress:%s, port:%d", pSocket->ipaddr.c_str(), pSocket->port);
+                }
+                else if(net == '1')
+                {
+                    auto pSocket = SystemConfig::getInstance()->gettcp();
+                    PRINT_LOG(LOG_FATAL, xGetCurrentTime(), 
+                        "TCP Sokcet, Ipaddress:%s, port:%d", pSocket->ipaddr.c_str(), pSocket->port);
+                }
+                else if(net == '2')
+                {
+                    auto pSocket = SystemConfig::getInstance()->getlogger();
+                    PRINT_LOG(LOG_FATAL, xGetCurrentTime(), 
+                        "Logger Sokcet, Ipaddress:%s, port:%d", pSocket->ipaddr.c_str(), pSocket->port);
+                }
+                else
+                {
+                    ret = false;
+                }
+            }
             break;
         case CmGetSer:
+            break;
+        case CmGetHelp:
             break;
         default:
             ret = false;
             break;
+    }
+
+    if(!ret)
+    {
+        PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Invalid Formate:%d, data:%s", formatM, pDataM);
     }
     return ret;
 }

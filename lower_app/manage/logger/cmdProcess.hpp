@@ -29,14 +29,14 @@ typedef enum
     CmReadDev = 0,
     CmSetDev,
     CmGetNet,
-    CmGetSer
+    CmGetSer,
+    CmGetHelp,
 }CmdFormat_t;
 
 class cmdProcess
 {
 private:
     static cmdProcess* pInstance;    
-    std::map<std::string, CmdFormat_t> mapM;
     char *pDataM;
     CmdFormat_t formatM;
 
