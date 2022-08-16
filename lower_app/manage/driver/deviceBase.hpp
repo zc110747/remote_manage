@@ -56,7 +56,10 @@ public:
     //io read/write
     bool readIoStatus();
     bool writeIoStatus(uint8_t status);
-
+    bool on();
+    bool off();
+    bool trigger();
+    
     uint8_t getIoStatus()  {return IoStatus;}
 };
 

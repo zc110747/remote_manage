@@ -31,5 +31,7 @@ public:
 
     static ledTheOne* getInstance();
     void release();
+
+    void test();
 };
 #endif

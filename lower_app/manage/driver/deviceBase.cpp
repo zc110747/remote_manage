@@ -91,3 +91,27 @@ bool IoBase::writeIoStatus(uint8_t status)
     }
     return ret;
 }
+
+bool IoBase::on()
+{
+    return writeIoStatus(1);
+}
+
+bool IoBase::off()
+{
+    return writeIoStatus(0);
+}
+
+bool IoBase::trigger()
+{
+    bool ret = false;
+    
+    if(readIoStatus())
+    {
+        if(IoStatus)
+            ret = off();
+        else
+            ret = on();
+    }
+    return ret;
+}

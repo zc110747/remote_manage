@@ -30,6 +30,7 @@ typedef enum
     CmSetDev,
     CmGetNet,
     CmGetSer,
+    cmTestDev,
     CmGetHelp,
 }CmdFormat_t;
 
