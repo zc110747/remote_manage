@@ -145,7 +145,9 @@ static void *loggerTxThread(void *arg)
                 }
                 else
                 {
-                    usleep(100);
+                    printf("%s", message.ptr);
+                    fflush(stdout);
+                    usleep(300);
                 }
             }
             else

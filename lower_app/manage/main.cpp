@@ -19,11 +19,11 @@
 #include "source/UnityMain.hpp"
 #include "driver/driver.hpp"
 
-static int pipe_fd[2];
-
 #if __SYSTEM_DEBUG == 1
 static void SystemTest(void);
 #endif
+
+static bool system_init(int is_default, const char* path);
 
 int main(int argc, char* argv[])
 {
@@ -77,32 +77,9 @@ int main(int argc, char* argv[])
 		return result;
 	}
 	
-	//选中配置文件
-	if(nConfigDefault == 0)
-	{
-		if(!SystemConfig::getInstance()->init(sConfigFile.c_str()))
-		{
-			SystemConfig::getInstance()->default_init();
-			PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Config Read Error!");
-		}
-	}
-	else
-	{
-		SystemConfig::getInstance()->default_init();
-		PRINT_LOG(LOG_INFO, xGetCurrentTime(), "System Config use default!");
-	}
-	std::cout<<*(SystemConfig::getInstance())<<std::endl;	
+	system_init(nConfigDefault, sConfigFile.c_str());
 
 #if __SYSTEM_DEBUG == 0
-	FIFOManage::getInstance()->init();
-	cmdProcess::getInstance()->init();
-	LoggerManage::getInstance()->init();
-	DriverManage::getInstance()->init();
-	ApplicationThread::getInstance()->init();
-	UartThreadManage::getInstance()->init();
-	TcpThreadManage::getInstance()->init();
-	UdpThreadManage::getInstance()->init();
-
 	for(;;)
 	{
 		char buf[5];
@@ -128,6 +105,38 @@ int main(int argc, char* argv[])
 	UartThreadManage::getInstance()->release();
 	USR_DEBUG("Process app_demo stop, error:%s\n", strerror(errno));
 	return result;
+}
+
+static bool system_init(int is_default, const char* path)
+{
+	bool ret = true;
+
+	//选中配置文件
+	if(is_default == 0)
+	{
+		if(!SystemConfig::getInstance()->init(path))
+		{
+			SystemConfig::getInstance()->default_init();
+			PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Config Read Error!");
+		}
+	}
+	else
+	{
+		SystemConfig::getInstance()->default_init();
+		PRINT_LOG(LOG_INFO, xGetCurrentTime(), "System Config use default!");
+	}
+	std::cout<<*(SystemConfig::getInstance())<<std::endl;
+
+	ret &= FIFOManage::getInstance()->init();
+	ret &= cmdProcess::getInstance()->init();
+	ret &= LoggerManage::getInstance()->init();
+	ret &= DriverManage::getInstance()->init();
+	ret &= ApplicationThread::getInstance()->init();
+	ret &= UartThreadManage::getInstance()->init();
+	ret &= TcpThreadManage::getInstance()->init();
+	ret &= UdpThreadManage::getInstance()->init();
+
+	return ret;
 }
 
 /**

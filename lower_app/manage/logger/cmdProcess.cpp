@@ -39,6 +39,14 @@ const static std::map<std::string, CmdFormat_t> CmdMapM = {
     {"!help",       CmGetHelp},
 };
 
+const static std::map<CmdFormat_t, std::string> CmdHelpMapM = {
+    {CmReadDev, "!readdev [index]"},
+    {CmSetDev,  "!setdev [index],[data]"},
+    {CmGetNet,  "!getNet [index]"},
+    {CmGetSer,  "!getSerial"},
+    {CmGetHelp, "!? ## !help"},
+};
+
 cmdProcess::cmdProcess()
 {
 }
@@ -175,6 +183,17 @@ bool cmdProcess::ProcessData()
         case CmGetSer:
             break;
         case CmGetHelp:
+            {
+                // std::for_each(CmdHelpMapM.begin(), CmdHelpMapM.end(), [](auto &ref_value){
+                //     PRINT_LOG(LOG_INFO, xGetCurrentTime(), ref_value.second.c_str());
+                // });
+                
+                for(auto &ref : CmdHelpMapM)
+                {
+                    PRINT_LOG(LOG_INFO, xGetCurrentTime(), ref.second.c_str());
+                    usleep(1000);
+                }
+            }
             break;
         default:
             ret = false;

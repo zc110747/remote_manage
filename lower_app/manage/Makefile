@@ -4,7 +4,7 @@
 HOST=
 CPU=x86-
 CC = $(HOST)g++
-CFLAGS  := -O3 -std=c++11 -lpthread -fno-strict-aliasing -lrt
+CFLAGS  := -O3 -std=c++14 -lpthread -fno-strict-aliasing -lrt
 
 #头文件路径
 LOWERAPP_INC_ROOT = lib/jsoncpp/include

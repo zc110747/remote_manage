@@ -4,3 +4,6 @@
 *.o
 lower_app/manage/app_demo
 lower_app/server/node/node_modules
+upper_app/manage_tool/manage_tool.pro.user
+upper_app/manage_tool/manage_tool.pro.user.2eaca31
+lower_app/manage/app_demo
