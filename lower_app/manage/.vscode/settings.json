@@ -2,6 +2,9 @@
     "files.associations": {
         "cstddef": "cpp",
         "istream": "cpp",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "ios": "cpp",
+        "vector": "cpp",
+        "xstring": "cpp"
     }
 }

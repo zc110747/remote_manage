@@ -18,15 +18,6 @@
 /////////////////////////////////////////////////////////////////////////////
 #include "driver.hpp"
 
-DriverManage::DriverManage()
-{
-
-}
-
-DriverManage::~DriverManage()
-{
-}
-
 DriverManage* DriverManage::pInstance = nullptr;
 DriverManage* DriverManage::getInstance()
 {

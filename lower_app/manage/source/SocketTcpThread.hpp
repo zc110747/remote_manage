@@ -53,8 +53,8 @@ private:
 	static TcpThreadManage* pInstance;
 
 public:
-	TcpThreadManage();
-	~TcpThreadManage();
+	TcpThreadManage() = default;
+	~TcpThreadManage() = delete;
 
 	bool init();
 	static TcpThreadManage* getInstance();

@@ -20,6 +20,7 @@
 #define _INCLUDE_UART_THREAD_H
 
 #include "UsrProtocol.hpp"
+#include <thread>
 
 #define UART_MAX_BUFFER_SIZE     		512
 
@@ -50,7 +51,7 @@ class UartThreadManage
 private:
 	//device info
 	int nComFd{-1};
-	pthread_t tid;
+	std::thread *pthread{nullptr};
 	CUartProtocolInfo *pProtocolInfo;
 
 	//message buffer
@@ -61,7 +62,7 @@ private:
 
 public:
 	UartThreadManage() = default;
-	~UartThreadManage(){}
+	~UartThreadManage() = delete;
 	
 	bool init();
 	int set_opt(int, int, std::string, int);

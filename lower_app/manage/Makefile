@@ -1,10 +1,10 @@
 #编译工具和编译选项
-#HOST = arm-linux-gnueabihf-
-#CPU = arm-
-HOST=
-CPU=x86-
+HOST = arm-linux-gnueabihf-
+CPU = arm-
+#HOST=
+#CPU=x86-
 CC = $(HOST)g++
-CFLAGS  := -O3 -std=c++14 -lpthread -fno-strict-aliasing -lrt
+CFLAGS  := -O3 -std=c++17 -lpthread -fno-strict-aliasing -lrt
 
 #头文件路径
 LOWERAPP_INC_ROOT = lib/jsoncpp/include

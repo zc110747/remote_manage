@@ -28,7 +28,6 @@ static bool system_init(int is_default, const char* path);
 int main(int argc, char* argv[])
 {
 	int c;
-    int result = 0;
 	int nConfigDefault = 0;
 	std::string sConfigFile(DEFAULT_CONFIG_FILE);
 
@@ -70,7 +69,7 @@ int main(int argc, char* argv[])
 	}
 
 	//守护进程，用于进程后台执行
-    result = daemon(1, 1);
+    auto result = daemon(1, 1);
 	if(result < 0)
 	{
 		PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "daemon error!");

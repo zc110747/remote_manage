@@ -184,37 +184,6 @@ LoggerManage* LoggerManage::getInstance()
     return pInstance;
 }
 
-LoggerManage::LoggerManage()
-{
-    readfd = -1;
-    writefd = -1;
-    socket.islink = false;
-    log_level = LOG_TRACE;
-    set_thread_work = false;
-    is_thread_work = false;
-    pNextMemoryBuffer = memoryBuffer;
-    pEndMemoryBuffer = &memoryBuffer[LOGGER_MESSAGE_BUFFER_SIZE];
-}
-
-LoggerManage::~LoggerManage()
-{
-    is_thread_work = false;
-    pthread_mutex_destroy(&mutex); 
-
-    if(readfd != - 1)
-    {
-        close(readfd);
-        readfd = -1;
-    }
-
-    if(writefd == -1)
-    {
-        close(writefd);   
-        writefd = -1;
-    }
-
-}
-
 bool LoggerManage::createfifo()
 {
     unlink(LOGGER_FIFO_PATH);
@@ -244,6 +213,9 @@ bool LoggerManage::init()
     bool ret = true;
     int nErr;
 
+    pNextMemoryBuffer = memoryBuffer;
+    pEndMemoryBuffer = &memoryBuffer[LOGGER_MESSAGE_BUFFER_SIZE];
+
     pthread_mutex_init(&mutex, NULL);
     createfifo();
 
@@ -261,6 +233,24 @@ bool LoggerManage::init()
         PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "%s failed, err:%d!", __func__, nErr);
     }
     return ret;
+}
+
+void LoggerManage::release()
+{
+    is_thread_work = false;
+    pthread_mutex_destroy(&mutex); 
+
+    if(readfd != - 1)
+    {
+        close(readfd);
+        readfd = -1;
+    }
+
+    if(writefd == -1)
+    {
+        close(writefd);   
+        writefd = -1;
+    }
 }
 
 char *LoggerManage::getMemoryBuffer(uint16_t size)

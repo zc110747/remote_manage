@@ -50,14 +50,6 @@ const static std::map<CmdFormat_t, std::string> CmdHelpMapM = {
     {CmGetHelp, "!? ## !help"},
 };
 
-cmdProcess::cmdProcess()
-{
-}
-
-cmdProcess::~cmdProcess()
-{
-}
-
 cmdProcess *cmdProcess::pInstance = nullptr;
 cmdProcess* cmdProcess::getInstance()
 {
@@ -197,13 +189,9 @@ bool cmdProcess::ProcessData()
             break;
         case CmGetHelp:
             {
-                // std::for_each(CmdHelpMapM.begin(), CmdHelpMapM.end(), [](auto &ref_value){
-                //     PRINT_LOG(LOG_INFO, xGetCurrentTime(), ref_value.second.c_str());
-                // });
-                
-                for(auto &ref : CmdHelpMapM)
+                for(auto &[x, y] : CmdHelpMapM)
                 {
-                    PRINT_LOG(LOG_INFO, xGetCurrentTime(), ref.second.c_str());
+                    PRINT_LOG(LOG_INFO, xGetCurrentTime(), y.c_str());
                     usleep(1000);
                 }
             }

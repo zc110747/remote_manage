@@ -123,10 +123,12 @@ private:
     std::vector<FIFOMessage *> messageM;
 
 public:
-    FIFOManage();
-        ~FIFOManage();
+    FIFOManage() = default;
+    ~FIFOManage() = delete;
     static FIFOManage* getInstance();
+    
     bool init();
+    void release();
 
     MessageBase* getFIFOMessage(uint8_t index){
         return static_cast<MessageBase*>(messageM[index]);

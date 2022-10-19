@@ -16,17 +16,6 @@
 #include <iostream>
 #include "SystemConfig.hpp"
 
-
-SystemConfig::SystemConfig()
-{
-
-}
-
-SystemConfig::~SystemConfig()
-{
-
-}
-
 SystemConfig* SystemConfig::pInstance = nullptr;
 SystemConfig* SystemConfig::getInstance()
 {
@@ -99,7 +88,7 @@ bool SystemConfig::init(const char* path)
     return true;
 }
 
-void SystemConfig::default_init()
+void SystemConfig::default_init() noexcept
 {
     parameter.led.init = DEFAULT_LED_INIT;
     parameter.led.dev = DEFALUT_LED_DEV;

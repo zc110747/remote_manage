@@ -20,16 +20,6 @@
 
 static void *SocketUdpLoopThread(void *arg);
 
-UdpThreadManage::UdpThreadManage()
-{
-
-}
-
-UdpThreadManage::~UdpThreadManage()
-{
-
-}
-
 UdpThreadManage *UdpThreadManage::pInstance = nullptr;
 UdpThreadManage *UdpThreadManage::getInstance()
 {

@@ -68,8 +68,8 @@ private:
 	uint8_t  TxCacheBuffer[UDP_BUFFER_SIZE];
 
 public:
-	UdpThreadManage();
-		~UdpThreadManage();
+	UdpThreadManage() = default;
+	~UdpThreadManage() = delete;
 	
 	static UdpThreadManage *getInstance();
 	bool init();

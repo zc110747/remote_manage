@@ -24,16 +24,6 @@
 static void *SocketTcpLoopThread(void *arg);
 static void *SocketTcpDataProcessThread(void *arg);
 
-TcpThreadManage::TcpThreadManage()
-{
-
-}
-
-TcpThreadManage::~TcpThreadManage()
-{
-    
-}
-
 bool TcpThreadManage::init()
 {
     bool ret = true;

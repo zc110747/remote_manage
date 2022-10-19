@@ -56,23 +56,24 @@ typedef struct
 class LoggerManage
 {
 private:
-    LOG_LEVEL log_level;
-    LOG_SOCKET socket;
-
     char *pNextMemoryBuffer;
     char *pEndMemoryBuffer;
-    
+
+    //logger info
+    LOG_LEVEL log_level{LOG_TRACE};
+    LOG_SOCKET socket{-1, {false}};
+
     //thread
-    std::atomic<bool> set_thread_work;
-    bool is_thread_work;
+    std::atomic<bool> set_thread_work{false};
+    bool is_thread_work{false};
     pthread_mutex_t mutex;
     pthread_t tid;
     pthread_t tid_socket;
 
     //fd
     LOG_MESSAGE message;
-    int readfd;
-    int writefd;
+    int readfd{-1};
+    int writefd{-1};
 
     static LoggerManage *pInstance;
 
@@ -82,10 +83,12 @@ private:
     void mutex_unlock()     {if(is_thread_work) pthread_mutex_unlock(&mutex);}
 
 public:
-    LoggerManage();
-        ~LoggerManage();
+    LoggerManage() = default;
+    ~LoggerManage() = delete;
 
     bool init();
+    void release();
+
     bool createfifo();
     int print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...);
     static LoggerManage *getInstance();

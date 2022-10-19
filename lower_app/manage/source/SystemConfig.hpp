@@ -84,12 +84,12 @@ private:
     SystemParamter parameter;
 
 public:
-    SystemConfig();
-        ~SystemConfig();
+    SystemConfig() = default;
+    ~SystemConfig() = delete;
 
     static SystemConfig* getInstance();
     bool init(const char* path);
-    void default_init();
+    void default_init() noexcept;
 
 public:
     const IoSysConfig *getled()         {return &(parameter.led);}

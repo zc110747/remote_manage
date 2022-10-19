@@ -78,11 +78,15 @@ bool UartThreadManage::init()
 
 	//创建UART协议管理对象
 	pProtocolInfo = new CUartProtocolInfo(nRxCacheBuffer, nTxCacheBuffer, UART_MAX_BUFFER_SIZE);
-	if(pthread_create(&tid, NULL, UartLoopThread, this) != 0)
+	
+	pthread = new(std::nothrow) std::thread(UartLoopThread, this);
+	if(pthread == NULL)
 	{
 		PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Uart Thread Create failed!");
 		return false;
 	}
+
+	PRINT_LOG(LOG_INFO, xGetCurrentTime(), "UartThreadManage init success!");
 #endif
 	return true;
 }
