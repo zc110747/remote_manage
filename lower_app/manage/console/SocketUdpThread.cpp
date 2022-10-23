@@ -39,11 +39,10 @@ bool UdpThreadManage::init()
     bool ret = true;
 
 #if SOCKET_UDP_MODULE_ON == 1
-    int nRet;
     pProtocolInfo = new(std::nothrow) CUdpProtocolInfo(RxCacheBuffer, TxCacheBuffer, UDP_BUFFER_SIZE);
-
-    nRet = pthread_create(&tid, NULL, SocketUdpLoopThread, this);
-    if(nRet < 0 || pProtocolInfo == nullptr)
+    pthread = new(std::nothrow) std::thread(SocketUdpLoopThread, this);
+    
+    if(pthread == nullptr || pProtocolInfo == nullptr)
     {
         PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Socket udp thread init failed!");
         ret = false;
@@ -115,6 +114,4 @@ static void *SocketUdpLoopThread(void *arg)
     }
     
     close(socket_fd);
-    pthread_detach(pthread_self()); //分离线程, 此时线程与创建的进程无关，后续执行join返回值22
-    pthread_exit((void *)0);
 }

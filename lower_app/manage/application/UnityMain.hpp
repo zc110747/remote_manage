@@ -19,9 +19,7 @@
 #ifndef _UNITY_MAIN_HPP
 #define _UNITY_MAIN_HPP
 
-#include "../include/productConfig.hpp"
-#include "GroupApp/MessageBase.hpp"
-#include "GroupApp/CalcCrc16.hpp"
+#include "productConfig.hpp"
 #include "SystemConfig.hpp"
 #include "ApplicationThread.hpp"
 #include "SocketTcpThread.hpp"

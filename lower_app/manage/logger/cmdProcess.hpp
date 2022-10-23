@@ -20,8 +20,7 @@
 #ifndef _INCLUDE_CMD_PROCESS_HPP
 #define _INCLUDE_CMD_PROCESS_HPP
 
-#include "../include/includes.hpp"
-#include <map>
+#include "includes.hpp"
 
 #define COMMAND_MAX_SIZE    4
 typedef enum

@@ -20,9 +20,8 @@
 #define _INCLUDE_SYSTEM_CONFIG_HPP
 
 #include "json/json.h"
-#include "../include/productConfig.hpp"
-#include <iostream>
-#include "../logger/logger.hpp"
+#include "productConfig.hpp"
+#include "logger.hpp"
 
 using JString = Json::String;
 

@@ -51,12 +51,13 @@ class TcpThreadManage
 private:
 	pthread_t	tid;
 	static TcpThreadManage* pInstance;
-
+	std::thread *pthread{nullptr};
 public:
 	TcpThreadManage() = default;
 	~TcpThreadManage() = delete;
 
 	bool init();
 	static TcpThreadManage* getInstance();
+	std::thread *get_thread() { return pthread; }
 };
 #endif

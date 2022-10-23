@@ -39,9 +39,6 @@ static void *UartLoopThread(void *arg)
 			usleep(50); //通讯结束让出线程
 		}
 	}
-
-	pthread_detach(pthread_self()); 
-    pthread_exit((void *)0);
 }
 
 UartThreadManage* UartThreadManage::pInstance = nullptr;
@@ -193,11 +190,20 @@ int UartThreadManage::set_opt(int nBaud, int nDataBits, std::string cParity, int
 
 void UartThreadManage::release()
 {
+	//clear protocol interface
 	if(pProtocolInfo != nullptr)
 	{
 		delete pProtocolInfo;
 		pProtocolInfo = nullptr;
 	}
+
+	//clear pthread
+	// if(pthread != nullptr)
+	// {
+	// 	pthread->join();
+	// 	delete pthread;
+	// 	pthread = nullptr;
+	// }
 
 	if(nComFd >= 0)
 	{

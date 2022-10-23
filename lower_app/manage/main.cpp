@@ -16,8 +16,8 @@
 //  Revision History:
 //      7/30/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
-#include "source/UnityMain.hpp"
-#include "driver/driver.hpp"
+#include "UnityMain.hpp"
+#include "driver.hpp"
 
 #if __SYSTEM_DEBUG == 1
 static void SystemTest(void);

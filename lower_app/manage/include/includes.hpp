@@ -28,7 +28,6 @@
 #include <errno.h>
 #include <dirent.h>
 #include <assert.h>
-#include <pthread.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/termios.h>
@@ -41,6 +40,10 @@
 #include <memory>
 #include <iostream>
 #include <fstream>
+#include <atomic>
+#include <map>
+#include <thread>
+#include <mutex>
 
 typedef signed char int8_t;
 typedef signed short int16_t;

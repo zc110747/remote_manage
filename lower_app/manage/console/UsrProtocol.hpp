@@ -19,9 +19,9 @@
 #ifndef _INCLUDE_USRPROTOCOL_HPP
 #define	_INCLUDE_USRPROTOCOL_HPP
 
-#include "../include/productConfig.hpp"
-#include "GroupApp/MessageBase.hpp"
-#include "GroupApp/CalcCrc16.hpp"
+#include "productConfig.hpp"
+#include "tools/MessageBase.hpp"
+#include "tools/CalcCrc16.hpp"
 #include "SystemConfig.hpp"
 #include "ApplicationThread.hpp"
 

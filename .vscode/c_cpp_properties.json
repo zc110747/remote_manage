@@ -4,6 +4,7 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
+                "${env.includePath}",
                 "F:/arm-gcc/include",
                 "F:/arm-gcc/arm-linux-gnueabihf/libc/usr/include",
                 "F:/arm-gcc/arm-linux-gnueabihf/libc/usr/include/linux",
@@ -15,7 +16,7 @@
                 "_UNICODE"
             ],
             "windowsSdkVersion": "8.1",
-            "compilerPath": "D:/Software/mingw64/bin/g++.exe",
+            "compilerPath": "${env.CppComplier}",
             "cStandard": "c17",
             "cppStandard": "c++17",
             "intelliSenseMode": "linux-gcc-x64"

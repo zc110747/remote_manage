@@ -21,8 +21,8 @@
 #define __DEVICEBASE_HPP
 
 #include "../include/productConfig.hpp"
-#include "../source/SystemConfig.hpp"
-#include <atomic>
+#include "SystemConfig.hpp"
+
 
 class deviceBase
 {

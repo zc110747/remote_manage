@@ -11,15 +11,35 @@ LOWERAPP_INC_ROOT = lib/jsoncpp/include
 
 LIB = lib/$(CPU)libjsoncpp.a #链接的库
 
-OBJS = 	main.o source/SystemConfig.o \
-		source/ApplicationThread.o source/SocketTcpThread.o source/SocketUdpThread.o source/UartThread.o \
-		source/GroupApp/CalcCrc16.o source/GroupApp/MqManage.o source/GroupApp/FIFOManage.o \
-		source/GroupApp/MessageBase.o driver/rtc.o driver/beep.o driver/led.o driver/spi_icm.o driver/i2c_ap.o \
-		driver/deviceBase.o driver/driver.o logger/logger.o logger/cmdProcess.o
+OBJS = 	main.o \
+		console/SocketTcpThread.o 	 \
+		console/SocketUdpThread.o 	 \
+		console/UartThread.o 		 \
+		application/ApplicationThread.o   \
+		application/SystemConfig.o \
+		application/tools/CalcCrc16.o  \
+		application/tools/MqManage.o   \
+		application/tools/FIFOManage.o \
+		application/tools/MessageBase.o \
+		driver/rtc.o \
+		driver/beep.o \
+		driver/led.o \
+		driver/spi_icm.o \
+		driver/i2c_ap.o \
+		driver/deviceBase.o \
+		driver/driver.o \
+		logger/logger.o \
+		logger/cmdProcess.o
+
+LOWERAPP_INC_ROOT = -I console/ -I driver/ \
+					-I lib/ -I include/ \
+					-I application/ -I lib/jsoncpp/include \
+					-I logger/
+					
 
 APP = app_demo
 
-LOWERAPP_INC= -I $(LOWERAPP_INC_ROOT)
+LOWERAPP_INC= $(LOWERAPP_INC_ROOT)
 INCLUDE_PATH = $(LOWERAPP_INC)
 
 all : $(APP)

@@ -24,20 +24,6 @@
 static void *SocketTcpLoopThread(void *arg);
 static void *SocketTcpDataProcessThread(void *arg);
 
-bool TcpThreadManage::init()
-{
-    bool ret = true;
-
-#if SOCKET_TCP_MODULE_ON == 1
-    if(pthread_create(&tid, NULL, SocketTcpLoopThread, this) < 0)
-    {
-        PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Tcp Thread Create failed!");
-        ret = false;
-    }
-#endif
-    return ret;
-}
-
 TcpThreadManage* TcpThreadManage::pInstance = nullptr;
 TcpThreadManage* TcpThreadManage::getInstance()
 {
@@ -52,6 +38,21 @@ TcpThreadManage* TcpThreadManage::getInstance()
     return pInstance;
 }
 
+bool TcpThreadManage::init()
+{
+    bool ret = true;
+
+#if SOCKET_TCP_MODULE_ON == 1
+    pthread = new(std::nothrow) std::thread(SocketTcpLoopThread, this);
+    if(pthread != nullptr)
+    {
+        PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Socket tcp thread init failed!");
+        ret = false;
+    }
+    pthread->detach();
+#endif
+    return ret;
+}
 
 /**
  * Socket绑定和等待接收的接口实现
@@ -123,12 +124,8 @@ static void *SocketTcpLoopThread(void *arg)
             else
             {
                 int nErr;
-                pthread_t tid1;
-                nErr = pthread_create(&tid1, NULL, SocketTcpDataProcessThread, &client_fd);
-                if(nErr != 0)
-                {
-                    PRINT_LOG(LOG_INFO, xGetCurrentTime(), "Socket tcp accept thread create failed!");
-                }
+                std::thread clientThread(SocketTcpDataProcessThread, &client_fd);
+                clientThread.detach();
             }
         }
     }
@@ -138,8 +135,6 @@ static void *SocketTcpLoopThread(void *arg)
     }
 
     close(server_fd);
-    pthread_detach(pthread_self()); 
-    pthread_exit((void *)0);
 }
 
 /**
@@ -192,6 +187,4 @@ static void *SocketTcpDataProcessThread(void *arg)
 	}
 
     close(client_fd);
-    pthread_detach(pthread_self());
-    pthread_exit((void *)0);
 }

@@ -369,11 +369,14 @@ bool ApplicationThread::init()
     pAppMessageInfo = getMessageInfo(APPLICATION_MESS_INDEX);
 
     //创建应用线程
-    nErr = pthread_create(&tid, NULL, ApplicationLoopThread, this);	
-    if(nErr != 0){
+    pthread = new(std::nothrow) std::thread(ApplicationLoopThread, this);	
+    if(pthread == nullptr)
+    {
         PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "ApplicationThread create error!");
         return false;
     }
+    
+    pthread->detach();
     return true;
 }
 

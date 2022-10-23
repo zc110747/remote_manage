@@ -20,7 +20,6 @@
 #define _INCLUDE_UART_THREAD_H
 
 #include "UsrProtocol.hpp"
-#include <thread>
 
 #define UART_MAX_BUFFER_SIZE     		512
 

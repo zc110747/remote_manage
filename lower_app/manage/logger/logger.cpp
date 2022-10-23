@@ -216,29 +216,33 @@ bool LoggerManage::init()
     pNextMemoryBuffer = memoryBuffer;
     pEndMemoryBuffer = &memoryBuffer[LOGGER_MESSAGE_BUFFER_SIZE];
 
-    pthread_mutex_init(&mutex, NULL);
     createfifo();
 
-    nErr = pthread_create(&tid, NULL, loggerTxThread, this);
-    if(nErr != 0)
+    pRxThread = new(std::nothrow) std::thread(loggerSocketThread, this);
+    pTxThread = new(std::nothrow) std::thread(loggerTxThread, this);
+    pMutex = new(std::nothrow) std::mutex();
+
+    if(pRxThread == nullptr || pTxThread == nullptr || pMutex == nullptr)
     {
         ret = false;
         PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "%s failed, err:%d!", __func__, nErr);
     }
 
-    nErr = pthread_create(&tid_socket, NULL, loggerSocketThread, this);
-    if(nErr != 0)
-    {
-        ret = false;
-        PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "%s failed, err:%d!", __func__, nErr);
-    }
+    pRxThread->detach();
+    pTxThread->detach();
+
     return ret;
 }
 
 void LoggerManage::release()
 {
     is_thread_work = false;
-    pthread_mutex_destroy(&mutex); 
+    
+    if(pMutex != nullptr)
+    {
+        delete pMutex;
+        pMutex = nullptr;
+    }
 
     if(readfd != - 1)
     {

@@ -19,7 +19,7 @@
 #ifndef _INCLUDE_LOGGER_HPP
 #define _INCLUDE_LOGGER_HPP
 
-#include "../include/productConfig.hpp"
+#include "productConfig.hpp"
 #include <atomic>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -66,9 +66,9 @@ private:
     //thread
     std::atomic<bool> set_thread_work{false};
     bool is_thread_work{false};
-    pthread_mutex_t mutex;
-    pthread_t tid;
-    pthread_t tid_socket;
+    std::thread *pRxThread{nullptr};
+    std::thread *pTxThread{nullptr};
+    std::mutex *pMutex;
 
     //fd
     LOG_MESSAGE message;
@@ -79,8 +79,8 @@ private:
 
 private:
     char *getMemoryBuffer(uint16_t size);
-    void mutex_lock()       {if(is_thread_work) pthread_mutex_lock(&mutex);}
-    void mutex_unlock()     {if(is_thread_work) pthread_mutex_unlock(&mutex);}
+    void mutex_lock()       {if(is_thread_work) pMutex->lock();}
+    void mutex_unlock()     {if(is_thread_work) pMutex->unlock();}
 
 public:
     LoggerManage() = default;

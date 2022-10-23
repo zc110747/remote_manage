@@ -19,8 +19,8 @@
 
 #include "cmdProcess.hpp"
 #include "logger.hpp"
-#include "../driver/driver.hpp"
-#include "../source/SystemConfig.hpp"
+#include "driver.hpp"
+#include "SystemConfig.hpp"
 #include <algorithm>
 
 /*

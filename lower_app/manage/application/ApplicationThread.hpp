@@ -19,8 +19,8 @@
 #ifndef _INCLUDE_APP_TASK_H
 #define _INCLUDE_APP_TASK_H
 
-#include "GroupApp/FifoManage.hpp"
-#include "GroupApp/MqManage.hpp"
+#include "tools/FifoManage.hpp"
+#include "tools/MqManage.hpp"
 
 #define REG_NUM                 256
 #define REG_CONFIG_NUM          64
@@ -110,7 +110,8 @@ private:
     static ApplicationThread *pInstance;
     CApplicationReg *pApplicationReg{nullptr};
     MessageBase *pAppMessageInfo{nullptr};
-    pthread_t tid;
+    
+    std::thread *pthread{nullptr};
 
 public:
     ApplicationThread();
