@@ -48,12 +48,16 @@
 #define RT_INVALID              4
 
 
-#define __WORK_IN_WSL           1  //在WSL中，Posix Mq不支持，改为FIFO方案
+#define __WORK_IN_WSL               1  //在WSL中，Posix Mq不支持，改为FIFO方案
 
 #define MESSAGE_USE_FIFO            0
 #define MESSAGE_USE_MESSAGEQ        1
 
 #define MESSAGE_USE_INTERFACE       MESSAGE_USE_FIFO
+#if __WORK_IN_WSL == 1
+#undef MESSAGE_USE_INTERFACE
+#define MESSAGE_USE_INTERFACE       MESSAGE_USE_FIFO
+#endif
 
 //默认设备ID
 #define DEVICE_ID                   0x01

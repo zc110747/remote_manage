@@ -118,8 +118,6 @@ static void *loggerSocketThread(void *arg)
     }
 
     close(server_fd);
-    pthread_detach(pthread_self()); //分离线程, 此时线程与创建的进程无关，后续执行join返回值22
-    pthread_exit((void *)0);
 }
 
 static void *loggerTxThread(void *arg)
@@ -165,9 +163,6 @@ static void *loggerTxThread(void *arg)
             PRINT_NOW("%s read failed:%d\n", __func__, len);
         }
     }
-
-    pthread_detach(pthread_self()); 
-    pthread_exit((void *)0);
 }
 
 LoggerManage* LoggerManage::pInstance = nullptr;

@@ -34,7 +34,8 @@ OBJS = 	main.o \
 LOWERAPP_INC_ROOT = -I console/ -I driver/ \
 					-I lib/ -I include/ \
 					-I application/ -I lib/jsoncpp/include \
-					-I logger/
+					-I logger/ \
+					-I application/tools/
 					
 
 APP = app_demo

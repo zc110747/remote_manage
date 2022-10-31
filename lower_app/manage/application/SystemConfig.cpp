@@ -30,6 +30,7 @@ SystemConfig* SystemConfig::getInstance()
     return pInstance;
 }
 
+[[nodiscard]]
 bool SystemConfig::init(const char* path)
 {
     Json::Value root;

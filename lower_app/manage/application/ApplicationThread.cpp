@@ -411,8 +411,5 @@ void *ApplicationLoopThread(void *arg)
         }     
     }
 
-    //将线程和进程脱离,释放线程
-    pthread_detach(pthread_self());
-
     return (void *)0;
 }

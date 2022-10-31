@@ -17,19 +17,21 @@
 //      7/30/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
 #include "UnityMain.hpp"
+#include "Semaphore.hpp"
 #include "driver.hpp"
 
 #if __SYSTEM_DEBUG == 1
 static void SystemTest(void);
 #endif
 
+int nConfigDefault = 0;
+std::string sConfigFile(DEFAULT_CONFIG_FILE);
+
 static bool system_init(int is_default, const char* path);
 
-int main(int argc, char* argv[])
+static void option_process(int argc, char *argv[])
 {
 	int c;
-	int nConfigDefault = 0;
-	std::string sConfigFile(DEFAULT_CONFIG_FILE);
 
 	//命令行输入说明
 	//if no parameter follow, no ":"
@@ -67,6 +69,11 @@ int main(int argc, char* argv[])
 				break;
 		}
 	}
+}
+
+int main(int argc, char* argv[])
+{
+	option_process(argc, argv);
 
 	//守护进程，用于进程后台执行
     auto result = daemon(1, 1);
