@@ -135,6 +135,8 @@ static void *SocketTcpLoopThread(void *arg)
     }
 
     close(server_fd);
+
+    return (void *)arg;
 }
 
 /**
@@ -187,4 +189,5 @@ static void *SocketTcpDataProcessThread(void *arg)
 	}
 
     close(client_fd);
+    return (void *)arg;
 }

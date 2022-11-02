@@ -27,15 +27,10 @@ CApplicationReg::CApplicationReg(void)
 {
     /*清除内部寄存状态*/
     memset((char *)m_RegVal, 0, REG_NUM);
-    if(pthread_mutex_init(&m_RegMutex, NULL) != 0)
-    {
-        printf("mutex init failed\n");
-    }
 }
 
 CApplicationReg::~CApplicationReg()
 {
-    pthread_mutex_destroy(&m_RegMutex);
 }
 
 uint16_t CApplicationReg::GetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize, uint8_t *pDataStart)
@@ -47,12 +42,12 @@ uint16_t CApplicationReg::GetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize, 
     if(nRegSize > REG_NUM)
         nRegSize = REG_NUM;
 
-    pthread_mutex_lock(&m_RegMutex);
+    m_RegMutex.lock();
     for(nIndex=0; nIndex<nRegSize; nIndex++)
     {
         *(pDataStart+nIndex) = m_RegVal[nRegIndex+nIndex];
     }
-    pthread_mutex_unlock(&m_RegMutex);
+    m_RegMutex.unlock();
     #if __SYSTEM_DEBUG
     printf("get array:");
     SystemLogArray(m_RegVal, nRegSize);
@@ -73,12 +68,12 @@ void CApplicationReg::SetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize, uint
     }
     modifySize = nEndRegIndex-nRegIndex;
 
-    pthread_mutex_lock(&m_RegMutex);
+    m_RegMutex.lock();
     for(nIndex=0; nIndex<modifySize; nIndex++)
     {
         m_RegVal[nRegIndex+nIndex] = *(pDataStart+nIndex);
     }
-    pthread_mutex_unlock(&m_RegMutex);
+    m_RegMutex.unlock();
     #if __SYSTEM_DEBUG
     printf("set array:");
     SystemLogArray(&m_RegVal[nRegIndex], nRegSize);
@@ -99,10 +94,10 @@ int CApplicationReg::DiffSetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize,
         nEndRegIndex = REG_NUM;
     modifySize = nEndRegIndex-nRegIndex;
 
-    pthread_mutex_lock(&m_RegMutex);
+    m_RegMutex.lock();
     if(memcmp((char *)&m_RegVal[nRegIndex], pDataCompare, nRegSize) != 0)
     {
-        pthread_mutex_unlock(&m_RegMutex);
+        m_RegMutex.unlock();
         return RT_FAIL;
     }
 
@@ -110,7 +105,7 @@ int CApplicationReg::DiffSetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize,
     {
         m_RegVal[nIndex] = *(pDataStart+nIndex);
     }
-    pthread_mutex_unlock(&m_RegMutex);
+    m_RegMutex.unlock();
     #if __SYSTEM_DEBUG
     printf("diff array:");
     SystemLogArray(m_RegVal, nRegSize);
@@ -230,36 +225,6 @@ void CApplicationReg::WriteDeviceConfig(uint8_t cmd, uint8_t *pConfig, int size)
             PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Invalid Command!");
             break;
     }
-}
-
-static void TimerSignalHandler(int signo)
-{
-    char buf = 1;
-
-
-    ApplicationThread::getInstance()->getAppMessage()->write(&buf, sizeof(buf));
-}
-
-
-void ApplicationThread::TimerSingalStart(void)
-{
-    static struct itimerval tick = {0};
-
-    signal(SIGALRM, TimerSignalHandler);
-    
-    //初始执行的定时器计数值
-    tick.it_value.tv_sec = 2;
-    tick.it_value.tv_usec = 0;
-
-    //后续定时器执行的加载值
-    tick.it_interval.tv_sec = 2;
-    tick.it_interval.tv_usec = 0;
-
-    if(setitimer(ITIMER_REAL, &tick, NULL) < 0)
-    {
-        PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Timer Signal failed!");
-    }
-    PRINT_LOG(LOG_INFO, xGetCurrentTime(), "Timer Signal Successed!");
 }
 
 int CApplicationReg::RefreshAllDevice(void)
@@ -395,13 +360,17 @@ void *ApplicationLoopThread(void *arg)
     CApplicationReg* pAppReg = pAppThread->GetApplicationReg();
 
     PRINT_LOG(LOG_INFO, xGetCurrentTime(), "ApplicationLoopThread start!");
-    pAppThread->TimerSingalStart();
+    pAppThread->getTimer()->start(1000, [&](){
+        char buf = 1;
+        pAppThread->getAppMessage()->write(&buf, sizeof(buf));
+    });
 
     for(;;)
     {
         Flag = pAppThread->getAppMessage()->read(&InfoData, sizeof(InfoData));
         if(Flag > 0)
         {
+            //PRINT_LOG(LOG_INFO, xGetCurrentTime(), "Application Refresh!");
             pAppReg->RefreshAllDevice();
         }
         else

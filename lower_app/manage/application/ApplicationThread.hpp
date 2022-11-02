@@ -21,6 +21,7 @@
 
 #include "tools/FifoManage.hpp"
 #include "tools/MqManage.hpp"
+#include "timer.hpp"
 
 #define REG_NUM                 256
 #define REG_CONFIG_NUM          64
@@ -101,7 +102,7 @@ public:
     int DiffSetMultipleReg(uint16_t nRegIndex, uint16_t nRegSize, uint8_t *pDataStart, uint8_t *pDataCompare);
 private:
     uint8_t m_RegVal[REG_NUM];
-    pthread_mutex_t m_RegMutex; /*数据读取都要执行该锁*/
+    std::mutex m_RegMutex; /*数据读取都要执行该锁*/
 };
 
 class ApplicationThread
@@ -112,6 +113,7 @@ private:
     MessageBase *pAppMessageInfo{nullptr};
     
     std::thread *pthread{nullptr};
+    DeviceManage::Timer timer;
 
 public:
     ApplicationThread();
@@ -119,9 +121,9 @@ public:
         ~ApplicationThread();
 
     bool init();
-    void TimerSingalStart(void);
     static ApplicationThread *getInstance();
     CApplicationReg *GetApplicationReg() {return pApplicationReg;}
     MessageBase *getAppMessage()    {return pAppMessageInfo;}
+    DeviceManage::Timer *getTimer() {return &timer;}
 };
 #endif

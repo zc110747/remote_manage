@@ -114,4 +114,5 @@ static void *SocketUdpLoopThread(void *arg)
     }
     
     close(socket_fd);
+    return (void *)arg;
 }

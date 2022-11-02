@@ -1,8 +1,8 @@
 #编译工具和编译选项
-HOST = arm-linux-gnueabihf-
-CPU = arm-
-#HOST=
-#CPU=x86-
+#HOST = arm-linux-gnueabihf-
+#CPU = arm-
+HOST=
+CPU=x86-
 CC = $(HOST)g++
 CFLAGS  := -O3 -std=c++17 -lpthread -fno-strict-aliasing -lrt
 

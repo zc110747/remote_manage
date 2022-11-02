@@ -118,6 +118,7 @@ static void *loggerSocketThread(void *arg)
     }
 
     close(server_fd);
+    return (void *)arg;
 }
 
 static void *loggerTxThread(void *arg)

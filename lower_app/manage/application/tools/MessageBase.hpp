@@ -28,6 +28,11 @@
 class MessageBase
 {
 public:
+    MessageBase() = default;
+    virtual ~MessageBase(){
+    }
+
+public:
     /*通讯队列的创建*/
     virtual bool Create() = 0;     
 

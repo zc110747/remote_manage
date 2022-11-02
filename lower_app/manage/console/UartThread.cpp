@@ -39,6 +39,8 @@ static void *UartLoopThread(void *arg)
 			usleep(50); //通讯结束让出线程
 		}
 	}
+
+	return (void *)arg;
 }
 
 UartThreadManage* UartThreadManage::pInstance = nullptr;
