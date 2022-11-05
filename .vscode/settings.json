@@ -80,6 +80,9 @@
         "cinttypes": "cpp",
         "typeindex": "cpp",
         "valarray": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "any": "cpp",
+        "codecvt": "cpp",
+        "csignal": "cpp"
     }
 }

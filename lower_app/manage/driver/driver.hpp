@@ -9,7 +9,7 @@
 //      driver init and release interface.
 //
 // Author:
-//      ZhangChao
+//      Alva Zhange
 //
 //  Assumptions:
 //

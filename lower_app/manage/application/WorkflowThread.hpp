@@ -3,13 +3,13 @@
 //  All Rights Reserved
 //
 //  Name:
-//      ApplicationThread.hpp
+//      WorkflowThread.hpp
 //
 //  Purpose:
 //      Deivce Application Process interface.
 //
 // Author:
-//     	ZhangChao
+//     	Alva Zhange
 //
 //  Assumptions:
 //
@@ -21,7 +21,6 @@
 
 #include "tools/FifoManage.hpp"
 #include "tools/MqManage.hpp"
-#include "timer.hpp"
 
 #define REG_NUM                 256
 #define REG_CONFIG_NUM          64
@@ -105,25 +104,22 @@ private:
     std::mutex m_RegMutex; /*数据读取都要执行该锁*/
 };
 
-class ApplicationThread
+class WorkflowThread
 {
 private:
-    static ApplicationThread *pInstance;
+    static WorkflowThread *pInstance;
     CApplicationReg *pApplicationReg{nullptr};
     MessageBase *pAppMessageInfo{nullptr};
     
     std::thread *pthread{nullptr};
-    DeviceManage::Timer timer;
-
 public:
-    ApplicationThread();
-    ApplicationThread(CApplicationReg *pReg);
-        ~ApplicationThread();
+    WorkflowThread();
+    WorkflowThread(CApplicationReg *pReg);
+        ~WorkflowThread();
 
     bool init();
-    static ApplicationThread *getInstance();
+    static WorkflowThread *getInstance();
     CApplicationReg *GetApplicationReg() {return pApplicationReg;}
     MessageBase *getAppMessage()    {return pAppMessageInfo;}
-    DeviceManage::Timer *getTimer() {return &timer;}
 };
 #endif

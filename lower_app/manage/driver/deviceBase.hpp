@@ -9,7 +9,7 @@
 //      Device Base Class Interface.
 //
 // Author:
-//      ZhangChao
+//      Alva Zhange
 //
 //  Assumptions:
 //

@@ -9,7 +9,7 @@
 //      Communication by fifo.
 //
 // Author:
-//      ZhangChao
+//      Alva Zhange
 //
 //  Assumptions:
 //

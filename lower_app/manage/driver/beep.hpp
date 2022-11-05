@@ -9,7 +9,7 @@
 //      Device Beep Interface.
 //
 // Author:
-//      ZhangChao
+//      Alva Zhange
 //
 //  Assumptions:
 //

@@ -9,7 +9,7 @@
 //      logger application
 //
 // Author:
-//      ZhangChao
+//      Alva Zhange
 //
 //  Assumptions:
 //

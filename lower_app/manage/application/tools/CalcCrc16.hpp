@@ -9,7 +9,7 @@
 //      Calculate crc16 interface.
 //
 // Author:
-//      ZhangChao
+//      Alva Zhange
 //
 //  Assumptions:
 //

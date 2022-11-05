@@ -9,7 +9,7 @@
 //      DriverManage init and release.
 //
 // Author:
-//      ZhangChao
+//      Alva Zhange
 //
 //  Assumptions:
 //

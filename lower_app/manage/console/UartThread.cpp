@@ -9,7 +9,7 @@
 //      Uart Thread process workflow.
 //
 // Author:
-//      ZhangChao
+//      Alva Zhange
 //
 //  Assumptions:
 //

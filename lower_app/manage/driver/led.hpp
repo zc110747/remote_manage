@@ -9,7 +9,7 @@
 //      led device interface.
 //
 // Author:
-//      ZhangChao
+//      Alva Zhange
 //
 //  Assumptions:
 //

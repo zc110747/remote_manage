@@ -9,7 +9,7 @@
 //      Communication by fifo interface.
 //
 // Author:
-//      ZhangChao
+//      Alva Zhange
 //
 //  Assumptions:
 //

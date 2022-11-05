@@ -9,7 +9,7 @@
 //      spi read icm interface.
 //
 // Author:
-//      ZhangChao
+//      Alva Zhange
 //
 //  Assumptions:
 //

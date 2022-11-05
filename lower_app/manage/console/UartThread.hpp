@@ -9,7 +9,7 @@
 //      UartThread module interface.
 //
 // Author:
-//      ZhangChao
+//      Alva Zhange
 //
 //  Assumptions:
 //

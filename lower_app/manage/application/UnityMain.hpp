@@ -9,7 +9,7 @@
 //      global process by unity main interface.
 //
 // Author:
-//      ZhangChao
+//      Alva Zhange
 //
 //  Assumptions:
 //
@@ -21,7 +21,7 @@
 
 #include "productConfig.hpp"
 #include "SystemConfig.hpp"
-#include "ApplicationThread.hpp"
+#include "WorkflowThread.hpp"
 #include "SocketTcpThread.hpp"
 #include "SocketUdpThread.hpp"
 #include "UartThread.hpp"

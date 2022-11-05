@@ -9,7 +9,7 @@
 //      i2c read ap interface.
 //
 // Author:
-//      ZhangChao
+//      Alva Zhange
 //
 //  Assumptions:
 //

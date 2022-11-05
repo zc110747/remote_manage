@@ -9,7 +9,7 @@
 //      rtc device.
 //
 // Author:
-//      ZhangChao
+//      Alva Zhange
 //
 //  Assumptions:
 //

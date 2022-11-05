@@ -9,7 +9,7 @@
 //      main entry for the manage system.
 //
 // Author:
-//      ZhangChao
+//      Alva Zhange
 //
 //  Assumptions:
 //
@@ -19,6 +19,7 @@
 #include "UnityMain.hpp"
 #include "Semaphore.hpp"
 #include "driver.hpp"
+#include "TimeManage.hpp"
 
 #if __SYSTEM_DEBUG == 1
 static void SystemTest(void);
@@ -137,10 +138,11 @@ static bool system_init(int is_default, const char* path)
 	ret &= cmdProcess::getInstance()->init();
 	ret &= LoggerManage::getInstance()->init();
 	ret &= DriverManage::getInstance()->init();
-	ret &= ApplicationThread::getInstance()->init();
+	ret &= WorkflowThread::getInstance()->init();
 	ret &= UartThreadManage::getInstance()->init();
 	ret &= TcpThreadManage::getInstance()->init();
 	ret &= UdpThreadManage::getInstance()->init();
+	ret &= TimeManage::getInstance()->init();
 
 	return ret;
 }

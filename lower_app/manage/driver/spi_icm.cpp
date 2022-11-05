@@ -9,7 +9,7 @@
 //      spi read icm application.
 //
 // Author:
-//      ZhangChao
+//      Alva Zhange
 //
 //  Assumptions:
 //

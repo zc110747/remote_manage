@@ -9,7 +9,7 @@
 //      Socket Tcp Thread process interface.
 //
 // Author:
-//      ZhangChao
+//      Alva Zhange
 //
 //  Assumptions:
 //

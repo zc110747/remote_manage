@@ -9,7 +9,7 @@
 //      Communication by message queue.
 //
 // Author:
-//      ZhangChao
+//      Alva Zhange
 //
 //  Assumptions:
 //

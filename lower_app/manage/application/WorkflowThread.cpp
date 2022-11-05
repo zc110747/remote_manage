@@ -3,25 +3,25 @@
 //  All Rights Reserved
 //
 //  Name:
-//      ApplicationThread.cpp
+//      WorkflowThread.cpp
 //
 //  Purpose:
 //      Deivce Application Process.
 //
 // Author:
-//     	ZhangChao
+//     	Alva Zhange
 //
 //  Assumptions:
 //
 //  Revision History:
 //      7/30/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
-#include "ApplicationThread.hpp"
+#include "WorkflowThread.hpp"
 #include "../driver/driver.hpp"
-
+#include "TimeManage.hpp"
 
 /*硬件状态相关应用处理接口*/
-void *ApplicationLoopThread(void *arg);
+void *WorkflowLoopThread(void *arg);
 
 CApplicationReg::CApplicationReg(void)
 {
@@ -286,7 +286,7 @@ int CApplicationReg::RefreshAllDevice(void)
     return RT_OK;
 }
 
-ApplicationThread::ApplicationThread()
+WorkflowThread::WorkflowThread()
 {
     pApplicationReg = new(std::nothrow) CApplicationReg();
     if(pApplicationReg == nullptr)
@@ -295,7 +295,7 @@ ApplicationThread::ApplicationThread()
     }
 }
 
-ApplicationThread::ApplicationThread(CApplicationReg *pReg)
+WorkflowThread::WorkflowThread(CApplicationReg *pReg)
 {
     pApplicationReg = pReg;
     if(pApplicationReg != nullptr)
@@ -304,7 +304,7 @@ ApplicationThread::ApplicationThread(CApplicationReg *pReg)
     }
 }
 
-ApplicationThread::~ApplicationThread()
+WorkflowThread::~WorkflowThread()
 {
     if(pApplicationReg != nullptr)
     {
@@ -313,31 +313,31 @@ ApplicationThread::~ApplicationThread()
     }
 }
 
-ApplicationThread* ApplicationThread::pInstance = nullptr;
-ApplicationThread* ApplicationThread::getInstance()
+WorkflowThread* WorkflowThread::pInstance = nullptr;
+WorkflowThread* WorkflowThread::getInstance()
 {
     if(pInstance == nullptr)
     {
-        pInstance = new(std::nothrow) ApplicationThread();
+        pInstance = new(std::nothrow) WorkflowThread();
         if(pInstance == nullptr)
         {
-            PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "ApplicationThread new error!");
+            PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "WorkflowThread new error!");
         }
     }
     return pInstance;
 }
 
-bool ApplicationThread::init()
+bool WorkflowThread::init()
 {
     int nErr;
 
     pAppMessageInfo = getMessageInfo(APPLICATION_MESS_INDEX);
 
     //创建应用线程
-    pthread = new(std::nothrow) std::thread(ApplicationLoopThread, this);	
+    pthread = new(std::nothrow) std::thread(WorkflowLoopThread, this);	
     if(pthread == nullptr)
     {
-        PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "ApplicationThread create error!");
+        PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "WorkflowThread create error!");
         return false;
     }
     
@@ -352,15 +352,15 @@ bool ApplicationThread::init()
  *  
  * @return NULL
  */
-void *ApplicationLoopThread(void *arg)
+void *WorkflowLoopThread(void *arg)
 {
     int Flag;
     char InfoData;  
-    ApplicationThread *pAppThread = static_cast<ApplicationThread *>(arg);
+    WorkflowThread *pAppThread = static_cast<WorkflowThread *>(arg);
     CApplicationReg* pAppReg = pAppThread->GetApplicationReg();
 
-    PRINT_LOG(LOG_INFO, xGetCurrentTime(), "ApplicationLoopThread start!");
-    pAppThread->getTimer()->start(1000, [&](){
+    PRINT_LOG(LOG_INFO, xGetCurrentTime(), "WorkflowLoopThread start!");
+    TimeManage::getInstance()->registerWork(0, TIME_TICK(1000), TIME_ACTION_ALWAYS, [&](){
         char buf = 1;
         pAppThread->getAppMessage()->write(&buf, sizeof(buf));
     });
@@ -370,7 +370,7 @@ void *ApplicationLoopThread(void *arg)
         Flag = pAppThread->getAppMessage()->read(&InfoData, sizeof(InfoData));
         if(Flag > 0)
         {
-            //PRINT_LOG(LOG_INFO, xGetCurrentTime(), "Application Refresh!");
+            PRINT_LOG(LOG_INFO, xGetCurrentTime(), "Application Refresh!");
             pAppReg->RefreshAllDevice();
         }
         else

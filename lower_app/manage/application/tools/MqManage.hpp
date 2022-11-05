@@ -9,7 +9,7 @@
 //      Communication by message queue interface.
 //
 // Author:
-//      ZhangChao
+//      Alva Zhange
 //
 //  Assumptions:
 //

@@ -9,7 +9,7 @@
 //      led device.
 //
 // Author:
-//      ZhangChao
+//      Alva Zhange
 //
 //  Assumptions:
 //

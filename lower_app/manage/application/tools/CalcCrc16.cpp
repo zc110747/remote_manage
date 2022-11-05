@@ -9,7 +9,7 @@
 //      Calculate crc16 value.
 //
 // Author:
-//      ZhangChao
+//      Alva Zhange
 //
 //  Assumptions:
 //

@@ -9,7 +9,7 @@
 //     	protocol Process interface.
 //
 // Author:
-//     	ZhangChao
+//     	Alva Zhange
 //
 //  Assumptions:
 //
@@ -23,7 +23,7 @@
 #include "tools/MessageBase.hpp"
 #include "tools/CalcCrc16.hpp"
 #include "SystemConfig.hpp"
-#include "ApplicationThread.hpp"
+#include "WorkflowThread.hpp"
 
 /**************************************************************************
 * Global Macro Definition
@@ -133,7 +133,7 @@ public:
 
 		nCommand = m_RxCacheDataPtr[0];
 		m_TxBufSize = 0;
-		pApplicationReg = ApplicationThread::getInstance()->GetApplicationReg();
+		pApplicationReg = WorkflowThread::getInstance()->GetApplicationReg();
 		pAppMessageInfo = getMessageInfo(APPLICATION_MESS_INDEX);
 
 		switch (nCommand)

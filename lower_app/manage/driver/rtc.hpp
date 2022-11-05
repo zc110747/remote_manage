@@ -9,7 +9,7 @@
 //      rtc device interface.
 //
 // Author:
-//      ZhangChao
+//      Alva Zhange
 //
 //  Assumptions:
 //

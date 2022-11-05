@@ -9,7 +9,7 @@
 //      Device Base Class.
 //
 // Author:
-//      ZhangChao
+//      Alva Zhange
 //
 //  Assumptions:
 //

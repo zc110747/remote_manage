@@ -9,7 +9,7 @@
 //      i2c read ap application.
 //
 // Author:
-//      ZhangChao
+//      Alva Zhange
 //
 //  Assumptions:
 //
