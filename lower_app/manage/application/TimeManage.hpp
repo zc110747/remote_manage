@@ -4,6 +4,7 @@ _Pragma("once")
 #include <new>
 #include <vector>
 #include <mutex>
+#include <atomic>
 
 #define TIME_ACTION_ALWAYS      0xFFFFFFF
 #define TIME_INTERVAL           100
@@ -60,14 +61,21 @@ class TimeManage
 {
 public:
     static TimeManage *getInstance();
+    TimeManage(): ticks(0){
+    }
 
-    bool init(int timeval = TIME_INTERVAL);
-    bool removeWork(int id);
-    bool registerWork(int id, uint32_t time, uint32_t count, std::function<void()> func);
+    bool init(uint32_t timeInterval = TIME_INTERVAL);
+    bool removeWork(uint32_t id);
+    bool registerWork(uint32_t id, uint32_t time, uint32_t count, std::function<void()> func);
+    uint32_t get_current_ticks() {return ticks;}
 private:
     void run();
     static TimeManage *pInstance;
     DeviceManage::Timer time;
     std::vector<TimeAction> VecWork;
     std::mutex mt;
+    std::atomic<uint32_t> ticks;
+    uint32_t peroid;
 };
+
+uint32_t xGetCurrentTicks(void);

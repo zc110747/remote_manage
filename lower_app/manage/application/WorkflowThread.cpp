@@ -370,12 +370,12 @@ void *WorkflowLoopThread(void *arg)
         Flag = pAppThread->getAppMessage()->read(&InfoData, sizeof(InfoData));
         if(Flag > 0)
         {
-            PRINT_LOG(LOG_INFO, xGetCurrentTime(), "Application Refresh!");
+            PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "Application Refresh!");
             pAppReg->RefreshAllDevice();
         }
         else
         {
-            PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Application Information error!");
+            PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Application Information error!");
             sleep(10);
         }     
     }

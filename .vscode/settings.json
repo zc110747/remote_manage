@@ -83,6 +83,7 @@
         "variant": "cpp",
         "any": "cpp",
         "codecvt": "cpp",
-        "csignal": "cpp"
+        "csignal": "cpp",
+        "*.ipp": "cpp"
     }
 }

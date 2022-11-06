@@ -22,6 +22,9 @@ void TimeManage::run()
 {
     auto iter = VecWork.begin();  
 
+    //计数
+    ticks += peroid;
+
     std::lock_guard<std::mutex> lock{mt};
     while(iter != VecWork.end())
     {
@@ -37,7 +40,7 @@ void TimeManage::run()
     }
 }
 
-bool TimeManage::registerWork(int id, uint32_t time, uint32_t count, std::function<void()> func)
+bool TimeManage::registerWork(uint32_t id, uint32_t time, uint32_t count, std::function<void()> func)
 {
     auto iter = VecWork.begin();  
     TimeAction work(id, time, count, func);   
@@ -48,7 +51,7 @@ bool TimeManage::registerWork(int id, uint32_t time, uint32_t count, std::functi
     return true;
 }
 
-bool TimeManage::removeWork(int id)
+bool TimeManage::removeWork(uint32_t id)
 {
     auto iter = VecWork.begin();  
 
@@ -68,9 +71,15 @@ bool TimeManage::removeWork(int id)
     return true;
 }
 
-bool TimeManage::init(int timeval)
+bool TimeManage::init(uint32_t timeInterval)
 {
-    time.start(timeval, std::bind(&TimeManage::run, this));
+    peroid = timeInterval;
+    time.start(timeInterval, std::bind(&TimeManage::run, this));
 
     return true;
+}
+
+uint32_t xGetCurrentTicks(void)
+{
+    return TimeManage::getInstance()->get_current_ticks();
 }
