@@ -16,9 +16,9 @@ CC = $(HOST)g++
 CFLAGS := -O3 -std=c++17 -fno-strict-aliasing -lrt
 
 objects = 	main.o \
-			console/SocketTcpThread.o 	 \
-			console/SocketUdpThread.o 	 \
-			console/UartThread.o 		 \
+			linker/SocketTcpThread.o 	 \
+			linker/SocketUdpThread.o 	 \
+			linker/UartThread.o 		 \
 			application/WorkflowThread.o   \
 			application/SystemConfig.o \
 			application/tools/CalcCrc16.o  \
@@ -36,7 +36,7 @@ objects = 	main.o \
 			logger/logger.o \
 			logger/cmdProcess.o 
 
-include_path = -I console/ -I driver/ \
+include_path = -I linker/ -I driver/ \
 				-I lib/ -I include/ \
 				-I application/ -I lib/jsoncpp/include \
 				-I logger/ \
