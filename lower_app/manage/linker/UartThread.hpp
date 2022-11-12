@@ -50,7 +50,7 @@ class UartThreadManage
 private:
 	//device info
 	int nComFd{-1};
-	std::thread *pthread{nullptr};
+	std::thread m_thread;
 	CUartProtocolInfo *pProtocolInfo;
 
 	//message buffer

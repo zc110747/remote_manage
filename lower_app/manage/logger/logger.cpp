@@ -214,18 +214,18 @@ bool LoggerManage::init()
 
     createfifo();
 
-    pRxThread = new(std::nothrow) std::thread(loggerSocketThread, this);
-    pTxThread = new(std::nothrow) std::thread(loggerTxThread, this);
+    m_RxThread = std::move(std::thread(loggerSocketThread, this));
+    m_TxThread = std::move(std::thread(loggerTxThread, this));
     pMutex = new(std::nothrow) std::mutex();
 
-    if(pRxThread == nullptr || pTxThread == nullptr || pMutex == nullptr)
+    if(pMutex == nullptr)
     {
         ret = false;
         PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "%s failed, err:%d!", __func__, nErr);
     }
 
-    pRxThread->detach();
-    pTxThread->detach();
+    m_RxThread.detach();
+    m_TxThread.detach();
 
     return ret;
 }

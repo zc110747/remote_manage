@@ -40,9 +40,10 @@ bool UdpThreadManage::init()
 
 #if SOCKET_UDP_MODULE_ON == 1
     pProtocolInfo = new(std::nothrow) CUdpProtocolInfo(RxCacheBuffer, TxCacheBuffer, UDP_BUFFER_SIZE);
-    pthread = new(std::nothrow) std::thread(SocketUdpLoopThread, this);
-    
-    if(pthread == nullptr || pProtocolInfo == nullptr)
+    m_thread = std::move(std::thread(SocketUdpLoopThread, this));
+    m_thread.detach();
+
+    if(pProtocolInfo == nullptr)
     {
         PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Socket udp thread init failed!");
         ret = false;

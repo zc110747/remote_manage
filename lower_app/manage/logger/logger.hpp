@@ -66,8 +66,8 @@ private:
     //thread
     std::atomic<bool> set_thread_work{false};
     bool is_thread_work{false};
-    std::thread *pRxThread{nullptr};
-    std::thread *pTxThread{nullptr};
+    std::thread m_RxThread;
+    std::thread m_TxThread;
     std::mutex *pMutex;
 
     //fd

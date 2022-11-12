@@ -43,13 +43,8 @@ bool TcpThreadManage::init()
     bool ret = true;
 
 #if SOCKET_TCP_MODULE_ON == 1
-    pthread = new(std::nothrow) std::thread(SocketTcpLoopThread, this);
-    if(pthread != nullptr)
-    {
-        PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Socket tcp thread init failed!");
-        ret = false;
-    }
-    pthread->detach();
+    m_thread = std::move(std::thread(SocketTcpLoopThread, this));
+    m_thread.detach();
 #endif
     return ret;
 }
@@ -67,7 +62,7 @@ static void *SocketTcpLoopThread(void *arg)
     struct sockaddr_in serverip, clientip;
 	const SocketSysConfig *pSocketConfig = SystemConfig::getInstance()->gettcp();
 
-    PRINT_LOG(LOG_INFO, xGetCurrentTime(), "Socket Tcp Thread Start!");
+    PRINT_LOG(LOG_INFO, xGetCurrentTime(), "Socket tcp thread Start!");
     memset((char *)&serverip, 0, sizeof(serverip));
     serverip.sin_family = AF_INET;
     serverip.sin_port = htons(pSocketConfig->port);

@@ -334,14 +334,9 @@ bool WorkflowThread::init()
     pAppMessageInfo = getMessageInfo(APPLICATION_MESS_INDEX);
 
     //创建应用线程
-    pthread = new(std::nothrow) std::thread(WorkflowLoopThread, this);	
-    if(pthread == nullptr)
-    {
-        PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "WorkflowThread create error!");
-        return false;
-    }
+    m_thread= std::move(std::thread(WorkflowLoopThread, this));	
+    m_thread.detach();
     
-    pthread->detach();
     return true;
 }
 
@@ -370,7 +365,7 @@ void *WorkflowLoopThread(void *arg)
         Flag = pAppThread->getAppMessage()->read(&InfoData, sizeof(InfoData));
         if(Flag > 0)
         {
-            PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "Application Refresh!");
+            //PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "Application Refresh!");
             pAppReg->RefreshAllDevice();
         }
         else

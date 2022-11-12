@@ -58,7 +58,7 @@ public:
 class UdpThreadManage
 {
 private:
-	std::thread *pthread{nullptr};
+	std::thread m_thread;
 
 	UDP_CLIENT client;
 	CUdpProtocolInfo *pProtocolInfo;

@@ -111,7 +111,7 @@ private:
     CApplicationReg *pApplicationReg{nullptr};
     MessageBase *pAppMessageInfo{nullptr};
     
-    std::thread *pthread{nullptr};
+    std::thread m_thread;
 public:
     WorkflowThread();
     WorkflowThread(CApplicationReg *pReg);
