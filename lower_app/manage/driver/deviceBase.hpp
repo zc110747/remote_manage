@@ -78,7 +78,7 @@ public:
     using deviceBase::deviceBase;
 
     bool readInfo();
-    T* getInfo() {return &(data.info);}
+    T getInfo() {return data.info;}
 };
 
 template<typename T>

@@ -22,7 +22,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "UsrProtocol.hpp"
+#include "Protocol.hpp"
 
 #define UDP_BUFFER_SIZE		1200
 

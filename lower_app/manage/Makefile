@@ -16,10 +16,10 @@ CC = $(HOST)g++
 CFLAGS := -O3 -std=c++17 -fno-strict-aliasing -lrt
 
 objects = 	main.o \
-			linker/SocketTcpThread.o 	 \
-			linker/SocketUdpThread.o 	 \
-			linker/UartThread.o 		 \
-			application/WorkflowThread.o   \
+			remote/SocketTcpThread.o 	 \
+			remote/SocketUdpThread.o 	 \
+			remote/UartThread.o 		 \
+			application/DeviceManageThread.o   \
 			application/SystemConfig.o \
 			application/tools/CalcCrc16.o  \
 			application/TimeManage.o \
@@ -36,10 +36,13 @@ objects = 	main.o \
 			logger/logger.o \
 			logger/cmdProcess.o 
 
-include_path = -I linker/ -I driver/ \
-				-I lib/ -I include/ \
-				-I application/ -I lib/jsoncpp/include \
-				-I logger/ \
+include_path = -I remote/ 			\
+				-I driver/ 			\
+				-I lib/ 			\
+				-I include/ 		\
+				-I application/ 		\
+				-I lib/jsoncpp/include  \
+				-I logger/ 			\
 				-I application/tools/
 lib = lib/$(CPU)libjsoncpp.a
 

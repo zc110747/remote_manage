@@ -22,6 +22,7 @@
 #include "driver.hpp"
 #include "SystemConfig.hpp"
 #include <algorithm>
+#include "DeviceManageThread.hpp"
 
 /*
 !readdev    [index] #index=[0~3 led,beep,ap,icm]
@@ -111,34 +112,33 @@ bool cmdProcess::ProcessData()
     {
         case CmReadDev:
             { 
+                DeviceReadInfo info = DeviceManageThread::getInstance()->getDeviceInfo();
                 char dev = pDataM[0];
                 if(dev == '0')
                 {
-                    PRINT_LOG(LOG_FATAL, xGetCurrentTime(), "LedStatus:%d!",ledTheOne::getInstance()->getIoStatus());
+                    PRINT_LOG(LOG_FATAL, xGetCurrentTime(), "LedStatus:%d!", info.led_io);
                 }
                 else if(dev == '1')
                 {
-                    PRINT_LOG(LOG_FATAL, xGetCurrentTime(), "beepStatus:%d!",beepTheOne::getInstance()->getIoStatus());
+                    PRINT_LOG(LOG_FATAL, xGetCurrentTime(), "beepStatus:%d!", info.beep_io);
                 }
                 else if(dev == '2')
                 {
-                    AP_INFO *pInfo = APDevice::getInstance()->getInfo();
                     PRINT_LOG(LOG_FATAL, xGetCurrentTime(), "ApInfo, ir:%d, als:%d, ps:%d!",
-                        pInfo->ir,
-                        pInfo->als,
-                        pInfo->ps);
+                        info.ap_info.ir,
+                        info.ap_info.als,
+                        info.ap_info.ps);
                 }
                 else if(dev == '3')
                 {
-                    ICM_INFO *pInfo = ICMDevice::getInstance()->getInfo();
                     PRINT_LOG(LOG_FATAL, xGetCurrentTime(), "ICMInfo, gx,gy,gz:%d,%d,%d;ax,ay,az:%d,%d,%d;temp:%d!",
-                        pInfo->gyro_x_adc,
-                        pInfo->gyro_y_adc,
-                        pInfo->gyro_z_adc,
-                        pInfo->accel_x_adc,
-                        pInfo->accel_y_adc,
-                        pInfo->accel_z_adc,
-                        pInfo->temp_adc);
+                        info.icm_info.gyro_x_adc,
+                        info.icm_info.gyro_y_adc,
+                        info.icm_info.gyro_z_adc,
+                        info.icm_info.accel_x_adc,
+                        info.icm_info.accel_y_adc,
+                        info.icm_info.accel_z_adc,
+                        info.icm_info.temp_adc);
                 }
                 else
                 {

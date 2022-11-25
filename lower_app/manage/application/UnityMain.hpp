@@ -16,14 +16,11 @@
 //  Revision History:
 //      7/30/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
-#ifndef _UNITY_MAIN_HPP
-#define _UNITY_MAIN_HPP
+_Pragma("once")
 
 #include "productConfig.hpp"
 #include "SystemConfig.hpp"
-#include "WorkflowThread.hpp"
+#include "DeviceManageThread.hpp"
 #include "SocketTcpThread.hpp"
 #include "SocketUdpThread.hpp"
 #include "UartThread.hpp"
-
-#endif

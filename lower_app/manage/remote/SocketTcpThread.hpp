@@ -20,7 +20,7 @@
 #define _INCLUDE_SOCKET_THREAD_H
 
 #include <sys/socket.h>
-#include "UsrProtocol.hpp"
+#include "Protocol.hpp"
 
 #define SOCKET_BUFFER_SIZE		1200
 

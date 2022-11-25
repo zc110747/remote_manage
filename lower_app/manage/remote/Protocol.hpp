@@ -3,7 +3,7 @@
 //  All Rights Reserved
 //
 //  Name:
-//      UsrProtocol.hpp
+//      Protocol.hpp
 //
 //  Purpose:
 //     	protocol Process interface.
@@ -16,14 +16,13 @@
 //  Revision History:
 //      7/30/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
-#ifndef _INCLUDE_USRPROTOCOL_HPP
-#define	_INCLUDE_USRPROTOCOL_HPP
+_Pragma("once")
 
 #include "productConfig.hpp"
 #include "tools/MessageBase.hpp"
 #include "tools/CalcCrc16.hpp"
 #include "SystemConfig.hpp"
-#include "WorkflowThread.hpp"
+#include "DeviceManageThread.hpp"
 
 /**************************************************************************
 * Global Macro Definition
@@ -96,7 +95,7 @@ public:
 		m_PacketNum = 0;
 		m_RxTimeout = 0;
 	};
-	~CProtocolInfo(void){};
+	virtual ~CProtocolInfo(void) = default;
 
 	/**
 	 * 判断路径是否存在，不存在则创建路径
@@ -127,37 +126,25 @@ public:
 	{
 		uint8_t nCommand;
 		uint16_t nRegIndex, nRxDataSize;
-		CApplicationReg  *pApplicationReg;
+		DeviceReadInfo read_info;
 	 	MessageBase *pAppMessageInfo;
 		char buf = 1;
 
 		nCommand = m_RxCacheDataPtr[0];
 		m_TxBufSize = 0;
-		pApplicationReg = WorkflowThread::getInstance()->GetApplicationReg();
+		read_info = DeviceManageThread::getInstance()->getDeviceInfo();
 		pAppMessageInfo = getMessageInfo(APPLICATION_MESS_INDEX);
 
 		switch (nCommand)
 		{
 			case CMD_REG_READ:
 				{
-					nRegIndex = m_RxCacheDataPtr[1]<<8 | m_RxCacheDataPtr[2];
-					nRxDataSize = m_RxCacheDataPtr[3]<<8 | m_RxCacheDataPtr[4];
-					std::unique_ptr<uint8_t[]> uq_reg(new uint8_t[nRxDataSize]);
-					pApplicationReg->GetMultipleReg(nRegIndex, nRxDataSize, uq_reg.get());
-					//printf("nRegIndex:%d, size:%d\n", nRegIndex, nRxDataSize);
-					//SystemLogArray(uq_reg.get(), nRxDataSize);
-					pAppMessageInfo->write(&buf, sizeof(buf));
-					m_isUploadStatus = false;
-					m_TxBufSize = CreateTxBuffer(ACK_OK, nRxDataSize, uq_reg.get());
 				}
 				break;
 			case CMD_REG_WRITE:	
-				nRegIndex = m_RxCacheDataPtr[1]<<8 | m_RxCacheDataPtr[2];
-				nRxDataSize = m_RxCacheDataPtr[3]<<8 | m_RxCacheDataPtr[4];
-				pApplicationReg->SetMultipleReg(nRegIndex, nRxDataSize, &m_RxCacheDataPtr[5]);	
-				pAppMessageInfo->write(&buf, sizeof(buf));
-				m_isUploadStatus = false;
-				m_TxBufSize = CreateTxBuffer(ACK_OK, 0, NULL);
+				{
+					
+				}
 				break;
 			case CMD_UPLOAD_CMD:
 				{	
@@ -419,4 +406,3 @@ private:
 /**************************************************************************
 * Global Functon Declaration
 ***************************************************************************/
-#endif
