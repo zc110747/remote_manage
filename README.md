@@ -6,16 +6,16 @@
 
 ## 项目结构
 
-demo/           		测试代码
-document/       	设计文档资料说明
-kernael_mod/     	内核驱动模块
-lower_app/              嵌入式Linux设备应用实现
-	-manage/     	主工作流应用，驱动模块处理，logger实现，外设和其它设备接口访问
-	-gui/        	下位机图形界面，支持状态显示和基本操作(QT)
-	-server/           支持桌面访问得web服务器(node)
-support/        	        用于支持应用执行的lib库或者环境
-upper_app/             PC客户端应用实现
-	-manage/       用于访问嵌入式设备的桌面客户端(暂定QT)
+demo/           	测试代码    
+document/       	设计文档资料说明    
+kernael_mod/     	内核驱动模块  
+lower_app/              嵌入式Linux设备应用实现  
+	-manage/     	主工作流应用，驱动模块处理，logger实现，外设和其它设备接口访问  
+	-gui/        	下位机图形界面，支持状态显示和基本操作(QT)  
+	-server/        支持桌面访问得web服务器(node)  
+support/        	用于支持应用执行的lib库或者环境  
+upper_app/              PC客户端应用实现  
+	-manage/        用于访问嵌入式设备的桌面客户端(暂定QT)  
 
 ## 设计文档
 
@@ -40,15 +40,16 @@ PC应用端设计
 
 ## 硬件适配和兼容性
 
-涉及内核取代模块部分因与平台和硬件绑定，只支持imx6ull内核，使用正点原子阿尔法开发板
-下位机只支持Linux平台，通过修改编译选项和宏定义支持Linux和嵌入式Linux平台，涉及硬件的部分在非嵌入式Linu平台会执行失败
-上位机基于windows平台开发，后续扩展支持其它平台
+涉及内核取代模块部分因与平台和硬件绑定，只支持imx6ull内核，使用正点原子阿尔法开发板  
+下位机只支持Linux平台，通过修改编译选项和宏定义支持Linux和嵌入式Linux平台，涉及硬件的部分在非嵌入式Linu平台会执行失败  
+上位机基于windows平台开发，后续扩展支持其它平台  
 
 ## 编译环境
 
 嵌入式软件交叉编译工具
-	内核模块使用编译工具 - arm-linux-gnueabihf-gcc
-	manage，gui编译工具 - arm-linux-gnueabihf-g++
-	server使用node作为运行环境，网页则使用前端技术
+	内核模块使用编译工具 - arm-linux-gnueabihf-gcc  
+	manage，gui编译工具 - arm-linux-gnueabihf-g++  
+	server使用node作为运行环境  
+	网页则使用前端技术
 上位机编译工具
 	QT(the newest stable version)
