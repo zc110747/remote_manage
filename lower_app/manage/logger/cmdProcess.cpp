@@ -33,20 +33,18 @@
 !? or !help
 */
 const static std::map<std::string, CmdFormat_t> CmdMapM = {
+    {"!getos",      CmdGetOS},
     {"!readdev",    CmReadDev},
     {"!setdev",     CmSetDev},
-    {"!getnet",     CmGetNet},
-    {"!getserial",  CmGetSer},
     {"!testdev",    cmTestDev},
     {"!?",          CmGetHelp},
     {"!help",       CmGetHelp},
 };
 
 const static std::map<CmdFormat_t, std::string> CmdHelpMapM = {
+    {CmdGetOS, "!getos"},
     {CmReadDev, "!readdev [index]"},
     {CmSetDev,  "!setdev [index],[data]"},
-    {CmGetNet,  "!getNet [index]"},
-    {CmGetSer,  "!getSerial"},
     {cmTestDev, "!testdev [index]"},
     {CmGetHelp, "!? ## !help"},
 };
@@ -74,7 +72,7 @@ bool cmdProcess::parseData(char *ptr, int size)
 {
     if(ptr[0] != '!')
     {
-        PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "error command:%s", ptr);
+        PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "error command:%s", ptr);
         return false;
     }
 
@@ -94,14 +92,14 @@ bool cmdProcess::parseData(char *ptr, int size)
 
     if(CmdMapM.count(strDst) == 0)
     {
-        PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "error command:%s", ptr);
+        PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "error command:%s", ptr);
         return false;
     }
 
     formatM = CmdMapM.find(strDst)->second;
     pDataM = pStart+1;
     
-    PRINT_LOG(LOG_INFO, xGetCurrentTime(), "right command:%d, data:%s", formatM, pDataM);
+    PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "right command:%d, data:%s", formatM, pDataM);
     return true;
 }
 
@@ -113,25 +111,13 @@ bool cmdProcess::ProcessData()
         case CmReadDev:
             { 
                 DeviceReadInfo info = DeviceManageThread::getInstance()->getDeviceInfo();
-                char dev = pDataM[0];
-                if(dev == '0')
-                {
-                    PRINT_LOG(LOG_FATAL, xGetCurrentTime(), "LedStatus:%d!", info.led_io);
-                }
-                else if(dev == '1')
-                {
-                    PRINT_LOG(LOG_FATAL, xGetCurrentTime(), "beepStatus:%d!", info.beep_io);
-                }
-                else if(dev == '2')
-                {
-                    PRINT_LOG(LOG_FATAL, xGetCurrentTime(), "ApInfo, ir:%d, als:%d, ps:%d!",
+                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "LedStatus:%d!", info.led_io);
+                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "beepStatus:%d!", info.beep_io);
+                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "ApInfo, ir:%d, als:%d, ps:%d!",
                         info.ap_info.ir,
                         info.ap_info.als,
                         info.ap_info.ps);
-                }
-                else if(dev == '3')
-                {
-                    PRINT_LOG(LOG_FATAL, xGetCurrentTime(), "ICMInfo, gx,gy,gz:%d,%d,%d;ax,ay,az:%d,%d,%d;temp:%d!",
+                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "ICMInfo, gx,gy,gz:%d,%d,%d;ax,ay,az:%d,%d,%d;temp:%d!",
                         info.icm_info.gyro_x_adc,
                         info.icm_info.gyro_y_adc,
                         info.icm_info.gyro_z_adc,
@@ -139,43 +125,20 @@ bool cmdProcess::ProcessData()
                         info.icm_info.accel_y_adc,
                         info.icm_info.accel_z_adc,
                         info.icm_info.temp_adc);
-                }
-                else
-                {
-                    ret = false;
-                }
             }  
             break;
         case CmSetDev:
             break;
-        case CmGetNet:
+        case CmdGetOS:
             {
-                char net = pDataM[0];
-                if(net == '0')
-                {
-                    auto pSocket = SystemConfig::getInstance()->getudp();
-                    PRINT_LOG(LOG_FATAL, xGetCurrentTime(), 
-                        "UDP Sokcet, Ipaddress:%s, port:%d", pSocket->ipaddr.c_str(), pSocket->port);
-                }
-                else if(net == '1')
-                {
-                    auto pSocket = SystemConfig::getInstance()->gettcp();
-                    PRINT_LOG(LOG_FATAL, xGetCurrentTime(), 
-                        "TCP Sokcet, Ipaddress:%s, port:%d", pSocket->ipaddr.c_str(), pSocket->port);
-                }
-                else if(net == '2')
-                {
-                    auto pSocket = SystemConfig::getInstance()->getlogger();
-                    PRINT_LOG(LOG_FATAL, xGetCurrentTime(), 
-                        "Logger Sokcet, Ipaddress:%s, port:%d", pSocket->ipaddr.c_str(), pSocket->port);
-                }
-                else
-                {
-                    ret = false;
-                }
+                auto pSysConfig = SystemConfig::getInstance();
+                auto pVersion = pSysConfig->getversion();
+                PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "FW_Version:%d, %d, %d, %d", pVersion[0], pVersion[1], pVersion[2], pVersion[3]);
+                PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "Sokcet Ipaddress:%s", pSysConfig->getudp()->ipaddr.c_str());
+                PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "TCP Port:%d", pSysConfig->gettcp()->port);
+                PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "UDP Port:%d", pSysConfig->getudp()->port);
+                PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "LOGGER Port:%d", pSysConfig->getlogger()->port);
             }
-            break;
-        case CmGetSer:
             break;
         case cmTestDev:
             { 
@@ -191,8 +154,8 @@ bool cmdProcess::ProcessData()
             {
                 for(auto &[x, y] : CmdHelpMapM)
                 {
-                    PRINT_LOG(LOG_INFO, xGetCurrentTime(), y.c_str());
-                    usleep(1000);
+                    PRINT_LOG(LOG_INFO, xGetCurrentTicks(), y.c_str());
+                    std::this_thread::sleep_for(std::chrono::microseconds(100));
                 }
             }
             break;
@@ -203,7 +166,7 @@ bool cmdProcess::ProcessData()
 
     if(!ret)
     {
-        PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Invalid Formate:%d, data:%s", formatM, pDataM);
+        PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Invalid Formate:%d, data:%s", formatM, pDataM);
     }
     return ret;
 }

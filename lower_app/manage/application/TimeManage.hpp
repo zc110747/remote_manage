@@ -77,5 +77,3 @@ private:
     std::atomic<uint32_t> ticks;
     uint32_t peroid;
 };
-
-uint32_t xGetCurrentTicks(void);

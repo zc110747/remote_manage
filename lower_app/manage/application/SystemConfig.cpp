@@ -16,6 +16,10 @@
 #include <iostream>
 #include "SystemConfig.hpp"
 
+static const uint8_t fw_version[] = {
+    #include "../verion.txt"
+};
+
 SystemConfig* SystemConfig::pInstance = nullptr;
 SystemConfig* SystemConfig::getInstance()
 {
@@ -35,8 +39,11 @@ bool SystemConfig::init(const char* path)
 {
     Json::Value root;
     std::ifstream ifs;
-    ifs.open(path);
 
+    //before init, need default init
+    default_init();
+
+    ifs.open(path);
     if(!ifs.is_open())
     {
         return false;
@@ -115,6 +122,7 @@ void SystemConfig::default_init() noexcept
     parameter.apI2c.dev = DEFAULT_API2C_DEV;
 
     parameter.downloadpath = DEFAULT_DOWNLOAD_PATH;
+    memcpy(parameter.version, fw_version, 4);
 }
 
 std::ostream& operator<<(std::ostream& os, const SystemConfig& config)

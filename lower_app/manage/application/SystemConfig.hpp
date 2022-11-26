@@ -72,6 +72,7 @@ typedef struct
 
     //path
     JString downloadpath;
+    uint8_t version[4];
 }SystemParamter;
 
 class SystemConfig
@@ -101,5 +102,6 @@ public:
     const DeviceSysConfig *geticmSpi()  {return &(parameter.icmSpi);}
     const DeviceSysConfig *getapI2c()   {return &(parameter.apI2c);}
     const JString &getdownloadpath()    {return parameter.downloadpath;}
+    const uint8_t* getversion()         {return parameter.version;}
 };
 #endif

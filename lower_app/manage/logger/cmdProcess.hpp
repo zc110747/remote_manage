@@ -26,9 +26,8 @@
 typedef enum
 {
     CmReadDev = 0,
+    CmdGetOS,
     CmSetDev,
-    CmGetNet,
-    CmGetSer,
     cmTestDev,
     CmGetHelp,
 }CmdFormat_t;

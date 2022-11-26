@@ -20,12 +20,19 @@
 #define _INCLUDE_APP_TASK_H
 
 #include "tools/FifoManage.hpp"
-#include "tools/MqManage.hpp"
 #include "driver.hpp"
 #include <type_traits>
 #include <cstring>
 #include <mutex>
 #include <chrono>
+#include "event.hpp"
+
+#define DEVICE_ID_TIME_UPDATE_PREOID    0x01
+#define DEVICE_ID_HARDWARE_CHANGE       0x02
+
+#define DEVICE_MESSAGE_FIFO             "/tmp/dev.fifo"
+
+#define READ_BUFFER_SIZE                1024
 
 struct DeviceReadInfo
 {
@@ -65,18 +72,22 @@ private:
     std::mutex mut;
     std::thread dmt_thread;
     static DeviceManageThread* pInstance;
+    FIFOMessage *pDevFIFO{nullptr};
 
     void run();
     void update();
+    bool EventProcess(Event *pEvent);
 
 public:
     DeviceManageThread() = default;
-    virtual ~DeviceManageThread() = default; 
+    virtual ~DeviceManageThread() = delete; //单例模式不允许删除 
 
     bool init();
     DeviceReadInfo getDeviceInfo();
-    
     static DeviceManageThread* getInstance();
+
+public:
+    int sendMessage(Event* pEvent);
 };
 
 #endif

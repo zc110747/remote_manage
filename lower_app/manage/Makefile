@@ -23,9 +23,6 @@ objects = 	main.o \
 			application/SystemConfig.o \
 			application/tools/CalcCrc16.o  \
 			application/TimeManage.o \
-			application/tools/MqManage.o   \
-			application/tools/FIFOManage.o \
-			application/tools/MessageBase.o \
 			driver/rtc.o \
 			driver/beep.o \
 			driver/led.o \
@@ -43,7 +40,8 @@ include_path = -I remote/ 			\
 				-I application/ 		\
 				-I lib/jsoncpp/include  \
 				-I logger/ 			\
-				-I application/tools/
+				-I application/tools/ \
+				-I event/
 lib = lib/$(CPU)libjsoncpp.a
 
 # This is the file name of the executables and path where 

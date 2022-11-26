@@ -28,7 +28,7 @@ DeviceManageThread* DeviceManageThread::getInstance()
         pInstance = new(std::nothrow) DeviceManageThread();
         if(pInstance == nullptr)
         {
-            PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "DeviceManageThread new error!");
+            PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "DeviceManageThread new error!");
         }
     }
     return pInstance;
@@ -44,9 +44,22 @@ bool DeviceManageThread::init()
     dmt_thread = std::thread(std::bind(&DeviceManageThread::run, this));
     dmt_thread.detach();
     
-    return true;
+    pDevFIFO = new(std::nothrow) FIFOMessage(DEVICE_MESSAGE_FIFO, S_FIFO_WORK_MODE);
+    if(pDevFIFO == nullptr)
+    {
+        return false;
+    }
+    
+    return pDevFIFO->Create();
 }
 
+int DeviceManageThread::sendMessage(Event* pEvent)
+{
+    int size;
+    size = pDevFIFO->write(reinterpret_cast<char*>(pEvent), pEvent->size());
+    return size;
+}
+ 
 DeviceReadInfo DeviceManageThread::getDeviceInfo()
 {
     DeviceReadInfo info;
@@ -88,27 +101,38 @@ void DeviceManageThread::update()
     }
 }
 
+bool DeviceManageThread::EventProcess(Event *pEvent)
+{
+    switch(pEvent->getId())
+    {
+    case DEVICE_ID_TIME_UPDATE_PREOID:
+        update();
+        break;
+    default:
+        PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Invalid Device Command!");
+        break;
+    }
+    return true;
+}
+
 void DeviceManageThread::run()
 {
-    int flag;
-    char buf;
-    MessageBase *pMessage;
+    int size;
+    char buffer[READ_BUFFER_SIZE];
 
-    PRINT_LOG(LOG_INFO, xGetCurrentTime(), "DeviceManageThread start!");
-    pMessage = getMessageInfo(APPLICATION_MESS_INDEX);
-
+    PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "DeviceManageThread start!");
     TimeManage::getInstance()->registerWork(0, TIME_TICK(1000), TIME_ACTION_ALWAYS, [&](){
-        char buf = 1;
-        pMessage->write(&buf, sizeof(buf));
+        Event event(DEVICE_ID_TIME_UPDATE_PREOID);
+        sendMessage(&event);
     });
 
     for(;;)
     {
-        flag = pMessage->read(&buf, 1);
-        if(flag > 0)
+        size = pDevFIFO->read(buffer, READ_BUFFER_SIZE);
+        if(size > 0)
         {
-            //PRINT_LOG(LOG_DEBUG, xGetCurrentTicks(), "Device Thread Update:%d!", buf);
-            update();
+            PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "Device Command, %d!", size);
+            EventProcess(reinterpret_cast<Event *>(buffer));
         }
         else
         {

@@ -65,3 +65,5 @@ namespace DeviceManage
         std::thread m_thread;
     };
 }
+
+uint32_t xGetCurrentTicks(void);

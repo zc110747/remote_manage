@@ -47,18 +47,18 @@ void ledTheOne::test()
 {
     bool ret = true;
 
-    PRINT_LOG(LOG_INFO, xGetCurrentTime(), "LED On/Off 1s");
+    PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "LED On/Off 1s");
     ret &= on();
     sleep(1);
     ret &= off();
     sleep(1);
 
-    PRINT_LOG(LOG_INFO, xGetCurrentTime(), "LED Trigger 1s, 5 times");
+    PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "LED Trigger 1s, 5 times");
     for(int index=0; index<5; index++)
     {
         ret &= trigger();
         sleep(1);
     }
 
-    PRINT_LOG(LOG_INFO, xGetCurrentTime(), "led test %s", ret?"success":"false");
+    PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "led test %s", ret?"success":"false");
 }

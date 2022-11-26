@@ -19,7 +19,7 @@
 #ifndef _INCLUDE_CALC_CRC16_HPP
 #define _INCLUDE_CALC_CRC16_HPP
 
-#include "../../include/productConfig.hpp"
+#include "includes.hpp"
 
 uint16_t crc16(uint16_t crc, uint8_t const *buffer, uint16_t len);
 #endif

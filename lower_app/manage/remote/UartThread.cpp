@@ -25,7 +25,7 @@ static void *UartLoopThread(void *arg)
 	auto pThreadInfo = static_cast<UartThreadManage *>(arg);
 	auto *pProtocolInfo = pThreadInfo->getProtocolInfo();
 
-	PRINT_LOG(LOG_INFO, xGetCurrentTime(), "UART Thread start!");
+	PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "UART Thread start!");
 	for(;;)
 	{	   
 		nFlag = pProtocolInfo->CheckRxBuffer(pThreadInfo->getComfd(), false);
@@ -51,7 +51,7 @@ UartThreadManage* UartThreadManage::getInstance()
 		pInstance = new(std::nothrow) UartThreadManage();
 		if(pInstance == nullptr)
 		{
-			PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "UartThreadManage new failed!");
+			PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "UartThreadManage new failed!");
 		}
 	}
 	return pInstance;
@@ -63,14 +63,14 @@ bool UartThreadManage::init()
 	const SerialSysConfig* pSerialConfig = SystemConfig::getInstance()->getserial();
 	if((nComFd = open(pSerialConfig->dev.c_str(), O_RDWR|O_NOCTTY|O_NDELAY))<0)
 	{	
-		PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Open Device %s failed!", pSerialConfig->dev.c_str());
+		PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Open Device %s failed!", pSerialConfig->dev.c_str());
 		return false;
 	}
 	else
 	{
 		if(set_opt(pSerialConfig->baud, pSerialConfig->dataBits, pSerialConfig->parity, pSerialConfig->stopBits) != 0)
 		{
-			PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Serial Option failed!");
+			PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Serial Option failed!");
 			return false;
 		}
 	}
@@ -79,7 +79,7 @@ bool UartThreadManage::init()
 	pProtocolInfo = new CUartProtocolInfo(nRxCacheBuffer, nTxCacheBuffer, UART_MAX_BUFFER_SIZE);
 	
 	m_thread = std::move(std::thread(UartLoopThread, this));
-	PRINT_LOG(LOG_INFO, xGetCurrentTime(), "UartThreadManage init success!");
+	PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "UartThreadManage init success!");
 #endif
 	return true;
 }
@@ -91,7 +91,7 @@ int UartThreadManage::set_opt(int nBaud, int nDataBits, std::string cParity, int
 
 	if(tcgetattr(nComFd, &oldtio)  !=  0) 
 	{ 
-		PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Get serial attribute failed!");
+		PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Get serial attribute failed!");
 		return -1;
 	}
 	bzero(&newtio, sizeof(newtio));
@@ -176,11 +176,11 @@ int UartThreadManage::set_opt(int nBaud, int nDataBits, std::string cParity, int
 	tcflush(nComFd, TCIFLUSH);
 	if((tcsetattr(nComFd, TCSANOW, &newtio))!=0)
 	{
-		PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Serial Config Error!");
+		PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Serial Config Error!");
 		return -1;
 	}
 
-	PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Serial Config Done Success!");
+	PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Serial Config Done Success!");
 	return 0;
 }
 

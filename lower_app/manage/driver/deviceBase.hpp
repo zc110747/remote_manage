@@ -23,7 +23,6 @@
 #include "../include/productConfig.hpp"
 #include "SystemConfig.hpp"
 
-
 class deviceBase
 {
 private:

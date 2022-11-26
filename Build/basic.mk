@@ -28,6 +28,7 @@ tags :
 
 # this is the rule how to clean all the file
 clean:
+	rm -f $(objects)
 	rm $(executables_path)/$(executables)
 
 # this tags let the make can execute the executabls.

@@ -37,7 +37,7 @@ static void *loggerSocketThread(void *arg)
     servaddr.sin_addr.s_addr = inet_addr(pSocketConfig->ipaddr.c_str());  
     servaddr.sin_port = htons(pSocketConfig->port); 
 
-    PRINT_LOG(LOG_INFO, xGetCurrentTime(), "%s start!", __func__);
+    PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "%s start!", __func__);
     server_fd = socket(PF_INET, SOCK_STREAM, 0);
     if(server_fd != -1)
     {
@@ -56,7 +56,7 @@ static void *loggerSocketThread(void *arg)
                 if(is_bind_fail == 0)
                 {
                     is_bind_fail = 1;
-                    PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Socket logger bind %s:%d failed!", pSocketConfig->ipaddr.c_str(), pSocketConfig->port); 
+                    PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Socket logger bind %s:%d failed!", pSocketConfig->ipaddr.c_str(), pSocketConfig->port); 
                 }
                 sleep(1);
             }
@@ -66,7 +66,7 @@ static void *loggerSocketThread(void *arg)
             }
         } while (1); //网络等待socket绑定完成后执行后续
 
-        PRINT_LOG(LOG_INFO, xGetCurrentTime(), "Socket logger bind %s:%d success!", pSocketConfig->ipaddr.c_str(), pSocketConfig->port); 
+        PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "Socket logger bind %s:%d success!", pSocketConfig->ipaddr.c_str(), pSocketConfig->port); 
         listen(server_fd, 1);
         for(;;)
         {	   
@@ -86,7 +86,7 @@ static void *loggerSocketThread(void *arg)
                 pSocket->islink = true;    
             }
 
-            PRINT_LOG(LOG_INFO, xGetCurrentTime(), "Socket logger accept success!");
+            PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "Socket logger accept success!");
             for(;;)
             {
                 char recvbuf[64];
@@ -98,7 +98,7 @@ static void *loggerSocketThread(void *arg)
                     pSocket->islink = false;
                     pSocket->fd = -1;
                     close(client_fd);
-                    PRINT_LOG(LOG_INFO, xGetCurrentTime(), "Socket logger recv error!");
+                    PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "Socket logger recv error!");
                     break;
                 }
                 else
@@ -114,7 +114,7 @@ static void *loggerSocketThread(void *arg)
     }
     else
     {
-        PRINT_LOG(LOG_INFO, xGetCurrentTime(), "Socket logger create failed!");
+        PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "Socket logger create failed!");
     }
 
     close(server_fd);
@@ -144,9 +144,9 @@ static void *loggerTxThread(void *arg)
                 }
                 else
                 {
-                    printf("%s", message.ptr);
-                    fflush(stdout);
-                    usleep(300);
+                    // printf("%s", message.ptr);
+                    // fflush(stdout);
+                    std::this_thread::sleep_for(std::chrono::milliseconds(20));
                 }
             }
             else
@@ -185,7 +185,7 @@ bool LoggerManage::createfifo()
     unlink(LOGGER_FIFO_PATH);
 
     if(mkfifo(LOGGER_FIFO_PATH, (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) < 0){
-        PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Logger Fifo Create error!");
+        PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Logger Fifo Create error!");
         return false;
     }
 
@@ -221,7 +221,7 @@ bool LoggerManage::init()
     if(pMutex == nullptr)
     {
         ret = false;
-        PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "%s failed, err:%d!", __func__, nErr);
+        PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "%s failed, err:%d!", __func__, nErr);
     }
 
     m_RxThread.detach();

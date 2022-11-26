@@ -28,7 +28,7 @@ UdpThreadManage *UdpThreadManage::getInstance()
         pInstance = new(std::nothrow) UdpThreadManage;
         if(pInstance == nullptr)
         {
-            PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "UdpThreadManage new failed!");
+            PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "UdpThreadManage new failed!");
         }
     }
     return pInstance;
@@ -45,7 +45,7 @@ bool UdpThreadManage::init()
 
     if(pProtocolInfo == nullptr)
     {
-        PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Socket udp thread init failed!");
+        PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Socket udp thread init failed!");
         ret = false;
     }
 #endif
@@ -61,7 +61,7 @@ static void *SocketUdpLoopThread(void *arg)
     UDP_CLIENT *pClient = pUdpThreadInfo->getClient();
     auto pProtocolInfo = pUdpThreadInfo->getProtocolInfo();
 
-    PRINT_LOG(LOG_INFO, xGetCurrentTime(), "Socket udp thread start!");
+    PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "Socket udp thread start!");
     /*创建socket接口, SOCK_DGRAM表示无连接的udp接口*/
     socket_fd = socket(PF_INET, SOCK_DGRAM, 0);
     if(socket_fd != -1)
@@ -82,7 +82,7 @@ static void *SocketUdpLoopThread(void *arg)
                 if(is_bind_fail == 0)
                 {
                     is_bind_fail = 1;
-                    PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Socket udp bind %s:%d failed!", pSocketConfig->ipaddr.c_str(), pSocketConfig->port); 
+                    PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Socket udp bind %s:%d failed!", pSocketConfig->ipaddr.c_str(), pSocketConfig->port); 
                 }
                 sleep(1);
             }
@@ -92,7 +92,7 @@ static void *SocketUdpLoopThread(void *arg)
             }
         } while (1); //网络等待socket绑定完成后执行后续
 
-        PRINT_LOG(LOG_INFO, xGetCurrentTime(), "Socket udp bind %s:%d success!", pSocketConfig->ipaddr.c_str(), pSocketConfig->port); 
+        PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "Socket udp bind %s:%d success!", pSocketConfig->ipaddr.c_str(), pSocketConfig->port); 
 
         for(;;)
         {	   
@@ -111,7 +111,7 @@ static void *SocketUdpLoopThread(void *arg)
 	}
     else
     {
-        PRINT_LOG(LOG_INFO, xGetCurrentTime(), "Socket udp create failed!");
+        PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "Socket udp create failed!");
     }
     
     close(socket_fd);
