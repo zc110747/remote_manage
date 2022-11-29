@@ -46,6 +46,8 @@ namespace Tools
             {
                 if (globalSocketManage.TcpSocket != null)
                 {
+                    globalSocketManage.tx_count += (ulong)sendBytes.Length;
+                    TxLable.Text = String.Format("tx: {0}", globalSocketManage.tx_count.ToString());
                     globalSocketManage.TcpSocket.Send(sendBytes, sendBytes.Length, 0);
                 }
             }
@@ -53,15 +55,22 @@ namespace Tools
             {
                 if(globalSocketManage.TcpClientSocket != null)
                 {
+                    globalSocketManage.tx_count += (ulong)sendBytes.Length;
+                    TxLable.Text = String.Format("tx: {0}", globalSocketManage.tx_count.ToString());
                     globalSocketManage.TcpClientSocket.Send(sendBytes, sendBytes.Length, 0);
                 }
             }
+
 
         }
 
         private void Clear_Click(object sender, EventArgs e)
         {
+            globalSocketManage.rx_count = 0;
+            globalSocketManage.tx_count = 0;
 
+            TxLable.Text = String.Format("tx: {0}", globalSocketManage.tx_count.ToString());
+            RxLable.Text = String.Format("rx: {0}", globalSocketManage.rx_count.ToString());
         }
 
         private bool is_thread_start = false;
@@ -85,6 +94,7 @@ namespace Tools
                 IpAddrTextBox.ReadOnly = false;
                 PortTextBox.ReadOnly = false;
 
+                //if server
                 if (ProtocolComboBox.SelectedIndex != 0)
                 {
                     if (globalSocketManage.TcpClientSocket != null
@@ -103,7 +113,7 @@ namespace Tools
             }
             catch(Exception ex)
             {
-                ShowBox.Invoke(AppendString, ex.Message);
+                ShowBox.Invoke(AppendString, ex.Message+"\n");
             }
         }
 
@@ -143,6 +153,8 @@ namespace Tools
             globalSocketManage.TcpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
             globalSocketManage.TcpSocket.Connect(IpGlobal);
 
+            //if accept, enter network
+            enter_network();
             ShowBox.Invoke(AppendString, String.Format("IPAddress:{0}:{1} Connect Success!\n", globalSocketManage.socket_ip, globalSocketManage.port));
             string recvStr;
             byte[] recvBytes = new byte[1024];
@@ -151,24 +163,43 @@ namespace Tools
             while (true)
             {
                 length = globalSocketManage.TcpSocket.Receive(recvBytes, recvBytes.Length, 0);
-                recvStr = Encoding.UTF8.GetString(recvBytes, 0, length);
-                ShowBox.Invoke(AppendString, recvStr);
+                if(length > 0)
+                {
+                    globalSocketManage.rx_count += (ulong)length;
+                    RxLable.Text = String.Format("rx: {0}", globalSocketManage.rx_count.ToString());
+
+                    recvStr = Encoding.UTF8.GetString(recvBytes, 0, length);
+                    ShowBox.Invoke(AppendString, recvStr);
+                }
+                else
+                {
+                    ShowBox.Invoke(AppendString, "Remote Close, Socket break!\n");
+                    break;
+                }
             }
         }
 
         private void tcp_server_loop()
         {
-            ShowBox.Invoke(AppendString, String.Format("IPAddress:{0}:{1} Server Start!\n", globalSocketManage.socket_ip, globalSocketManage.port));
+           
             IPEndPoint IpGlobal = new IPEndPoint(IPAddress.Parse(globalSocketManage.socket_ip), globalSocketManage.port);
             globalSocketManage.TcpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             globalSocketManage.TcpSocket.ExclusiveAddressUse = false;
             globalSocketManage.TcpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
             globalSocketManage.TcpSocket.Bind(IpGlobal);
             globalSocketManage.TcpSocket.Listen(1);
+
+            ShowBox.Invoke(AppendString, String.Format("Server Start Success, Now IPAddress is {0}:{1}!\n", 
+                            globalSocketManage.socket_ip, 
+                            globalSocketManage.port));
+            //if listen success, enter network
+            enter_network();
+
             globalSocketManage.TcpClientSocket = null;
             globalSocketManage.TcpClientSocket = globalSocketManage.TcpSocket.Accept();
 
-            ShowBox.Invoke(AppendString, "Client IPAddress Connect Success!\n");
+            ShowBox.Invoke(AppendString, "Client Tcp Connect Success With Server!\n");
+
             string recvStr;
             byte[] recvBytes = new byte[1024];
             int length;
@@ -176,15 +207,20 @@ namespace Tools
             while (true)
             {
                 length = globalSocketManage.TcpClientSocket.Receive(recvBytes, recvBytes.Length, 0);
-                recvStr = Encoding.UTF8.GetString(recvBytes, 0, length);
-                ShowBox.Invoke(AppendString, recvStr);
+                if(length > 0)
+                {
+                    globalSocketManage.rx_count += (ulong)length;
+                    RxLable.Text = String.Format("rx: {0}", globalSocketManage.rx_count.ToString());
+
+                    recvStr = Encoding.UTF8.GetString(recvBytes, 0, length);
+                    ShowBox.Invoke(AppendString, recvStr);
+
+                }
             }
         }
 
         private void ConnetStartThread()
         {
-            enter_network();
-
             try
             {
                 if (ProtocolComboBox.SelectedIndex == 0)

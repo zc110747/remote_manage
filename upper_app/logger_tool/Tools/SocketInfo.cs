@@ -23,6 +23,12 @@ namespace Tools
         /*Tcp Client Socket*/
         public Socket? TcpClientSocket;
 
+        /*socket tx count*/
+        public UInt64 tx_count;
+
+        /*socket tx count*/
+        public UInt64 rx_count;
+
         /*支持协议组合*/
         public string[] protocolList =
         {
@@ -54,7 +60,9 @@ namespace Tools
         public void initilize()
         {
             socket_ip = "127.0.0.1";
-            port = 8000;
+            port = 15535;
+            tx_count = 0;
+            rx_count = 0;
 
             //获得远端dns服务器的ip地址
             //IPAddress[] Address = Dns.GetHostAddresses("www.baidu.com");

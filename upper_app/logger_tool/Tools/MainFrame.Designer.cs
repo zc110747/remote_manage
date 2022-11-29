@@ -37,15 +37,15 @@
             this.PortTextBox = new System.Windows.Forms.TextBox();
             this.IpAddrTextBox = new System.Windows.Forms.TextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.SaveLinkLabel = new System.Windows.Forms.LinkLabel();
             this.ClearLinkLabel = new System.Windows.Forms.LinkLabel();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.Clear = new System.Windows.Forms.Button();
             this.RxLable = new System.Windows.Forms.Label();
-            this.TxLabel = new System.Windows.Forms.Label();
+            this.TxLable = new System.Windows.Forms.Label();
             this.WriteBox = new System.Windows.Forms.RichTextBox();
             this.SendBtn = new System.Windows.Forms.Button();
             this.ShowBox = new System.Windows.Forms.RichTextBox();
-            this.SaveLinkLabel = new System.Windows.Forms.LinkLabel();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -149,6 +149,17 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Recv Process";
             // 
+            // SaveLinkLabel
+            // 
+            this.SaveLinkLabel.AutoSize = true;
+            this.SaveLinkLabel.Location = new System.Drawing.Point(14, 47);
+            this.SaveLinkLabel.Name = "SaveLinkLabel";
+            this.SaveLinkLabel.Size = new System.Drawing.Size(86, 25);
+            this.SaveLinkLabel.TabIndex = 1;
+            this.SaveLinkLabel.TabStop = true;
+            this.SaveLinkLabel.Text = "Save As...";
+            this.SaveLinkLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.SaveLinkLabel_LinkClicked);
+            // 
             // ClearLinkLabel
             // 
             this.ClearLinkLabel.AutoSize = true;
@@ -165,7 +176,7 @@
             // 
             this.groupBox3.Controls.Add(this.Clear);
             this.groupBox3.Controls.Add(this.RxLable);
-            this.groupBox3.Controls.Add(this.TxLabel);
+            this.groupBox3.Controls.Add(this.TxLable);
             this.groupBox3.Controls.Add(this.WriteBox);
             this.groupBox3.Controls.Add(this.SendBtn);
             this.groupBox3.Controls.Add(this.ShowBox);
@@ -197,19 +208,19 @@
             this.RxLable.Location = new System.Drawing.Point(589, 707);
             this.RxLable.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.RxLable.Name = "RxLable";
-            this.RxLable.Size = new System.Drawing.Size(50, 25);
+            this.RxLable.Size = new System.Drawing.Size(45, 25);
             this.RxLable.TabIndex = 3;
-            this.RxLable.Text = "Rx: 0";
+            this.RxLable.Text = "rx: 0";
             // 
-            // TxLabel
+            // TxLable
             // 
-            this.TxLabel.AutoSize = true;
-            this.TxLabel.Location = new System.Drawing.Point(535, 707);
-            this.TxLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.TxLabel.Name = "TxLabel";
-            this.TxLabel.Size = new System.Drawing.Size(46, 25);
-            this.TxLabel.TabIndex = 2;
-            this.TxLabel.Text = "Tx: 0";
+            this.TxLable.AutoSize = true;
+            this.TxLable.Location = new System.Drawing.Point(536, 703);
+            this.TxLable.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.TxLable.Name = "TxLable";
+            this.TxLable.Size = new System.Drawing.Size(45, 25);
+            this.TxLable.TabIndex = 2;
+            this.TxLable.Text = "tx: 0";
             // 
             // WriteBox
             // 
@@ -240,17 +251,6 @@
             this.ShowBox.TabIndex = 0;
             this.ShowBox.Text = "";
             this.ShowBox.TextChanged += new System.EventHandler(this.ShowBox_TextChanged);
-            // 
-            // SaveLinkLabel
-            // 
-            this.SaveLinkLabel.AutoSize = true;
-            this.SaveLinkLabel.Location = new System.Drawing.Point(14, 47);
-            this.SaveLinkLabel.Name = "SaveLinkLabel";
-            this.SaveLinkLabel.Size = new System.Drawing.Size(86, 25);
-            this.SaveLinkLabel.TabIndex = 1;
-            this.SaveLinkLabel.TabStop = true;
-            this.SaveLinkLabel.Text = "Save As...";
-            this.SaveLinkLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.SaveLinkLabel_LinkClicked);
             // 
             // MainFrame
             // 
@@ -284,7 +284,7 @@
         private RichTextBox WriteBox;
         private Button Clear;
         private Label RxLable;
-        private Label TxLabel;
+        private Label TxLable;
         private ComboBox ProtocolComboBox;
         private Button ConnectBtn;
         private Label Port_label;
