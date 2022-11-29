@@ -32,7 +32,7 @@ namespace Tools
 
             AppendString = new AppendMethod(str =>
             {
-                ShowBox.AppendText(str+"\n");
+                ShowBox.AppendText(str);
             });
         }
 
@@ -41,10 +41,22 @@ namespace Tools
             string text = WriteBox.Text;
             byte[] sendBytes = new byte[text.Length];
             sendBytes = Encoding.UTF8.GetBytes(text);
-            if (globalSocketManage.TcpSocket != null)
+
+            if (ProtocolComboBox.SelectedIndex == 0)
             {
-                globalSocketManage.TcpSocket.Send(sendBytes, sendBytes.Length, 0);
+                if (globalSocketManage.TcpSocket != null)
+                {
+                    globalSocketManage.TcpSocket.Send(sendBytes, sendBytes.Length, 0);
+                }
             }
+            else
+            {
+                if(globalSocketManage.TcpClientSocket != null)
+                {
+                    globalSocketManage.TcpClientSocket.Send(sendBytes, sendBytes.Length, 0);
+                }
+            }
+
         }
 
         private void Clear_Click(object sender, EventArgs e)
@@ -54,23 +66,63 @@ namespace Tools
 
         private bool is_thread_start = false;
 
+        private void enter_network()
+        {
+            ConnectBtn.Text = "Close";
+            is_thread_start = true;
+            ProtocolComboBox.Enabled = false;
+            IpAddrTextBox.ReadOnly = true;
+            PortTextBox.ReadOnly = true;
+        }
+
+        private void exit_network()
+        {
+            try
+            {
+                ConnectBtn.Text = "Open";
+                is_thread_start = false;
+                ProtocolComboBox.Enabled = true;
+                IpAddrTextBox.ReadOnly = false;
+                PortTextBox.ReadOnly = false;
+
+                if (ProtocolComboBox.SelectedIndex != 0)
+                {
+                    if (globalSocketManage.TcpClientSocket != null
+                    && globalSocketManage.TcpClientSocket.Connected)
+                    {
+                        ShowBox.Invoke(AppendString, "Client Socket Close!\n");
+                        globalSocketManage.TcpClientSocket.Shutdown(SocketShutdown.Both);
+                        globalSocketManage.TcpClientSocket.Close();
+                    }
+                }
+
+                if (globalSocketManage.TcpSocket != null)
+                {
+                    globalSocketManage.TcpSocket.Close();
+                }
+            }
+            catch(Exception ex)
+            {
+                ShowBox.Invoke(AppendString, ex.Message);
+            }
+        }
+
         private void ConnectBtn_Click(object sender, EventArgs e)
         {
             if (!globalSocketManage.IsIPv4Address(IpAddrTextBox.Text))
             {
-                ShowBox.Invoke(AppendString, "Invalid IPAddress!");
+                ShowBox.Invoke(AppendString, "Invalid IPAddress!\n");
                 return;
             }
 
             if (!globalSocketManage.IsPort(PortTextBox.Text))
             {
-                ShowBox.Invoke(AppendString, "Invalid Port!");
+                ShowBox.Invoke(AppendString, "Invalid Port!\n");
                 return;
             }
             globalSocketManage.port = Int32.Parse(PortTextBox.Text);
             globalSocketManage.socket_ip = IpAddrTextBox.Text;
 
-            //单开一个线程用来处理按键信息
             if(!is_thread_start)
             {
                 Thread process_thread = new Thread(ConnetStartThread);
@@ -79,58 +131,93 @@ namespace Tools
             }
             else
             {
-                if(globalSocketManage.TcpSocket != null)
-                {
-                    globalSocketManage.TcpSocket.Close();
-                }
-                ConnectBtn.Text = "打开连接";
+                exit_network();
+            }
+        }
+
+        private void tcp_client_loop()
+        {
+            IPEndPoint IpGlobal = new IPEndPoint(IPAddress.Parse(globalSocketManage.socket_ip), globalSocketManage.port);
+            globalSocketManage.TcpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            globalSocketManage.TcpSocket.ExclusiveAddressUse = false;
+            globalSocketManage.TcpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+            globalSocketManage.TcpSocket.Connect(IpGlobal);
+
+            ShowBox.Invoke(AppendString, String.Format("IPAddress:{0}:{1} Connect Success!\n", globalSocketManage.socket_ip, globalSocketManage.port));
+            string recvStr;
+            byte[] recvBytes = new byte[1024];
+            int length;
+
+            while (true)
+            {
+                length = globalSocketManage.TcpSocket.Receive(recvBytes, recvBytes.Length, 0);
+                recvStr = Encoding.UTF8.GetString(recvBytes, 0, length);
+                ShowBox.Invoke(AppendString, recvStr);
+            }
+        }
+
+        private void tcp_server_loop()
+        {
+            ShowBox.Invoke(AppendString, String.Format("IPAddress:{0}:{1} Server Start!\n", globalSocketManage.socket_ip, globalSocketManage.port));
+            IPEndPoint IpGlobal = new IPEndPoint(IPAddress.Parse(globalSocketManage.socket_ip), globalSocketManage.port);
+            globalSocketManage.TcpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            globalSocketManage.TcpSocket.ExclusiveAddressUse = false;
+            globalSocketManage.TcpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+            globalSocketManage.TcpSocket.Bind(IpGlobal);
+            globalSocketManage.TcpSocket.Listen(1);
+            globalSocketManage.TcpClientSocket = null;
+            globalSocketManage.TcpClientSocket = globalSocketManage.TcpSocket.Accept();
+
+            ShowBox.Invoke(AppendString, "Client IPAddress Connect Success!\n");
+            string recvStr;
+            byte[] recvBytes = new byte[1024];
+            int length;
+
+            while (true)
+            {
+                length = globalSocketManage.TcpClientSocket.Receive(recvBytes, recvBytes.Length, 0);
+                recvStr = Encoding.UTF8.GetString(recvBytes, 0, length);
+                ShowBox.Invoke(AppendString, recvStr);
             }
         }
 
         private void ConnetStartThread()
         {
+            enter_network();
+
             try
             {
-                //创建新的Socket连接，绑定在本地端口，并监听
-                //AddressFamily 指定网络类型，其中AddressFamily.InteRingNetwork表示IVP4地址
-                //SocketType.Stream指定Socket的类型(udp: Dgram, tcp：Stream, ICMP/Raw: Raw
-                //ProtocolType: 指定可用的协议类型
-                IPEndPoint IpGlobal = new IPEndPoint(IPAddress.Parse(globalSocketManage.socket_ip), globalSocketManage.port);
-                globalSocketManage.TcpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                globalSocketManage.TcpSocket.ExclusiveAddressUse = false;
-                globalSocketManage.TcpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-                globalSocketManage.TcpSocket.Connect(IpGlobal);
-
-                ShowBox.Invoke(AppendString, String.Format("IPAddr:{0}:{1} Connect Success!", globalSocketManage.socket_ip, globalSocketManage.port));
-                ConnectBtn.Text = "关闭连接";
-                is_thread_start = true;
-
-                string recvStr;
-                byte[] recvBytes = new byte[1024];
-                int length;
-
-                while (true)
+                if (ProtocolComboBox.SelectedIndex == 0)
                 {
-                    //获得当前Socket连接传输的数据，并转换为utf-8格式
-                    length = globalSocketManage.TcpSocket.Receive(recvBytes, recvBytes.Length, 0);
-                    recvStr = Encoding.UTF8.GetString(recvBytes, 0, length);
-                    ShowBox.Invoke(AppendString, recvStr);
+                    tcp_client_loop();
+                }
+                else
+                {
+                    tcp_server_loop();
                 }
             }
             catch
             {
-                ShowBox.Invoke(AppendString, String.Format("TCP Connect Close Now!"));
+                ShowBox.Invoke(AppendString, String.Format("TCP Connect Close Now!\n"));
             }
 
-            ConnectBtn.Text = "打开连接";
-            is_thread_start = false;
+            exit_network();
         }
 
         private void ShowBox_TextChanged(object sender, EventArgs e)
         {
-            //滚动到最新光标位置
             ShowBox.SelectionStart = ShowBox.Text.Length;
             ShowBox.ScrollToCaret();
+        }
+
+        private void ClearLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            ShowBox.Clear();
+        }
+
+        private void SaveLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            
         }
     }
 }

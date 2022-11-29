@@ -17,7 +17,11 @@ namespace Tools
         /*端口号*/
         public int port;
 
+        /*Tcp Socket*/
         public Socket? TcpSocket;
+
+        /*Tcp Client Socket*/
+        public Socket? TcpClientSocket;
 
         /*支持协议组合*/
         public string[] protocolList =
