@@ -2,6 +2,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Net.WebSockets;
 using System.Text;
+using System.Windows;
+using System.Xml;
 
 namespace Tools
 {
@@ -36,32 +38,40 @@ namespace Tools
             });
         }
 
+        //private byte[] GetRichTextBox(RichTextBox box)
+        //{
+        //    MemoryStream ms = new MemoryStream();
+        //}
+
         private void SendBtn_Click(object sender, EventArgs e)
         {
             string text = WriteBox.Text;
-            byte[] sendBytes = new byte[text.Length];
-            sendBytes = Encoding.UTF8.GetBytes(text);
 
-            if (ProtocolComboBox.SelectedIndex == 0)
+
+            if (text.Length > 0) 
             {
-                if (globalSocketManage.TcpSocket != null)
+                byte[] sendBytes = new byte[text.Length];
+                sendBytes = Encoding.UTF8.GetBytes(text);
+
+                if (ProtocolComboBox.SelectedIndex == 0)
                 {
-                    globalSocketManage.tx_count += (ulong)sendBytes.Length;
-                    TxLable.Text = String.Format("tx: {0}", globalSocketManage.tx_count.ToString());
-                    globalSocketManage.TcpSocket.Send(sendBytes, sendBytes.Length, 0);
+                    if (globalSocketManage.TcpSocket != null)
+                    {
+                        globalSocketManage.tx_count += (ulong)sendBytes.Length;
+                        TxLable.Text = $"tx: {globalSocketManage.tx_count.ToString()}";
+                        globalSocketManage.TcpSocket.Send(sendBytes, sendBytes.Length, 0);
+                    }
+                }
+                else
+                {
+                    if (globalSocketManage.TcpClientSocket != null)
+                    {
+                        globalSocketManage.tx_count += (ulong)sendBytes.Length;
+                        TxLable.Text = $"tx: {globalSocketManage.tx_count.ToString()}";
+                        globalSocketManage.TcpClientSocket.Send(sendBytes, sendBytes.Length, 0);
+                    }
                 }
             }
-            else
-            {
-                if(globalSocketManage.TcpClientSocket != null)
-                {
-                    globalSocketManage.tx_count += (ulong)sendBytes.Length;
-                    TxLable.Text = String.Format("tx: {0}", globalSocketManage.tx_count.ToString());
-                    globalSocketManage.TcpClientSocket.Send(sendBytes, sendBytes.Length, 0);
-                }
-            }
-
-
         }
 
         private void Clear_Click(object sender, EventArgs e)
@@ -69,8 +79,8 @@ namespace Tools
             globalSocketManage.rx_count = 0;
             globalSocketManage.tx_count = 0;
 
-            TxLable.Text = String.Format("tx: {0}", globalSocketManage.tx_count.ToString());
-            RxLable.Text = String.Format("rx: {0}", globalSocketManage.rx_count.ToString());
+            TxLable.Text = $"tx: {globalSocketManage.tx_count.ToString()}";
+            RxLable.Text = $"rx: {globalSocketManage.rx_count.ToString()}";
         }
 
         private bool is_thread_start = false;
@@ -100,7 +110,7 @@ namespace Tools
                     if (globalSocketManage.TcpClientSocket != null
                     && globalSocketManage.TcpClientSocket.Connected)
                     {
-                        ShowBox.Invoke(AppendString, "Client Socket Close!\n");
+                        ShowBox.Invoke(AppendString, "\nClient Socket Close!\n");
                         globalSocketManage.TcpClientSocket.Shutdown(SocketShutdown.Both);
                         globalSocketManage.TcpClientSocket.Close();
                     }
@@ -121,13 +131,13 @@ namespace Tools
         {
             if (!globalSocketManage.IsIPv4Address(IpAddrTextBox.Text))
             {
-                ShowBox.Invoke(AppendString, "Invalid IPAddress!\n");
+                ShowBox.Invoke(AppendString, $"Invalid IPAddress:{IpAddrTextBox.Text}!\n");
                 return;
             }
 
             if (!globalSocketManage.IsPort(PortTextBox.Text))
             {
-                ShowBox.Invoke(AppendString, "Invalid Port!\n");
+                ShowBox.Invoke(AppendString, $"Invalid Port:{PortTextBox.Text}!\n");
                 return;
             }
             globalSocketManage.port = Int32.Parse(PortTextBox.Text);
@@ -155,7 +165,7 @@ namespace Tools
 
             //if accept, enter network
             enter_network();
-            ShowBox.Invoke(AppendString, String.Format("IPAddress:{0}:{1} Connect Success!\n", globalSocketManage.socket_ip, globalSocketManage.port));
+            ShowBox.Invoke(AppendString, $"IPAddress:{globalSocketManage.socket_ip}:{globalSocketManage.port} Connect Success!\n");
             string recvStr;
             byte[] recvBytes = new byte[1024];
             int length;
@@ -166,14 +176,14 @@ namespace Tools
                 if(length > 0)
                 {
                     globalSocketManage.rx_count += (ulong)length;
-                    RxLable.Text = String.Format("rx: {0}", globalSocketManage.rx_count.ToString());
+                    RxLable.Text = String.Format($"rx: {globalSocketManage.rx_count.ToString()}");
 
                     recvStr = Encoding.UTF8.GetString(recvBytes, 0, length);
                     ShowBox.Invoke(AppendString, recvStr);
                 }
                 else
                 {
-                    ShowBox.Invoke(AppendString, "Remote Close, Socket break!\n");
+                    ShowBox.Invoke(AppendString, "\nRemote Close, Socket break!\n");
                     break;
                 }
             }
@@ -189,9 +199,7 @@ namespace Tools
             globalSocketManage.TcpSocket.Bind(IpGlobal);
             globalSocketManage.TcpSocket.Listen(1);
 
-            ShowBox.Invoke(AppendString, String.Format("Server Start Success, Now IPAddress is {0}:{1}!\n", 
-                            globalSocketManage.socket_ip, 
-                            globalSocketManage.port));
+            ShowBox.Invoke(AppendString, $"Server Start Success, Now IPAddress is {globalSocketManage.socket_ip}:{globalSocketManage.port}!\n");
             //if listen success, enter network
             enter_network();
 
@@ -210,7 +218,7 @@ namespace Tools
                 if(length > 0)
                 {
                     globalSocketManage.rx_count += (ulong)length;
-                    RxLable.Text = String.Format("rx: {0}", globalSocketManage.rx_count.ToString());
+                    RxLable.Text = $"rx: {globalSocketManage.rx_count.ToString()}";
 
                     recvStr = Encoding.UTF8.GetString(recvBytes, 0, length);
                     ShowBox.Invoke(AppendString, recvStr);
@@ -255,5 +263,6 @@ namespace Tools
         {
             
         }
+
     }
 }
