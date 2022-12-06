@@ -19,18 +19,31 @@
 #include <stdarg.h>
 #include "logger.hpp"
 #include "../driver/driver.hpp"
+#include "asio_server.hpp"
 
-char memoryBuffer[LOGGER_MESSAGE_BUFFER_SIZE+1];
+//asio server test ok
+void LoggerManage::asio_server_run()
+{
+    PRINT_LOG(LOG_DEBUG, xGetCurrentTicks(), "asio_server_run start!");
+    try
+    {
+        asio_server server("192.168.113.1", "5060");
+        server.run();
+    }
+    catch (std::exception& e)
+    {
+        PRINT_LOG(LOG_DEBUG, xGetCurrentTicks(), "Exception:%s", e.what());
+    }
+}
 
-static void *loggerSocketThread(void *arg)
+void LoggerManage::logger_rx_run()
 {
     int server_fd;
-    LoggerManage *plogger = static_cast<LoggerManage *>(arg);
     struct sockaddr_in servaddr, clientaddr;  
     socklen_t client_sock_len;  
     int result, is_bind_fail;
     const SocketSysConfig *pSocketConfig = SystemConfig::getInstance()->getlogger();
-    LOG_SOCKET *pSocket = LoggerManage::getInstance()->getsocket();
+    LOG_SOCKET *pSocket = getsocket();
 
     memset(&servaddr, 0, sizeof(servaddr));    
     servaddr.sin_family = AF_INET;     
@@ -38,7 +51,7 @@ static void *loggerSocketThread(void *arg)
     servaddr.sin_port = htons(pSocketConfig->port); 
 
     PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "%s start!", __func__);
-    server_fd = socket(PF_INET, SOCK_STREAM, 0);
+    server_fd = ::socket(PF_INET, SOCK_STREAM, 0);
     if(server_fd != -1)
     {
 
@@ -118,20 +131,18 @@ static void *loggerSocketThread(void *arg)
     }
 
     close(server_fd);
-    return (void *)arg;
 }
 
-static void *loggerTxThread(void *arg)
+void LoggerManage::logger_tx_run()
 {
     int len;
     LOG_MESSAGE message;
-    LoggerManage *plogger = static_cast<LoggerManage *>(arg);
-    LOG_SOCKET *pSocket = LoggerManage::getInstance()->getsocket();
+    LOG_SOCKET *pSocket = getsocket();
 
-    plogger->setThreadWork();
+    setThreadWork();
     while(1)
     {
-        len = ::read(plogger->read_fd(), &message, sizeof(message));
+        len = ::read(read_fd(), &message, sizeof(message));
         if(len > 0)
         {
             if(pSocket->islink)
@@ -204,6 +215,7 @@ bool LoggerManage::createfifo()
     return true;
 }
 
+char memoryBuffer[LOGGER_MESSAGE_BUFFER_SIZE+1];
 bool LoggerManage::init()
 {
     bool ret = true;
@@ -214,8 +226,9 @@ bool LoggerManage::init()
 
     createfifo();
 
-    m_RxThread = std::move(std::thread(loggerSocketThread, this));
-    m_TxThread = std::move(std::thread(loggerTxThread, this));
+    m_RxThread = std::thread(std::bind(&LoggerManage::logger_rx_run, this));
+    m_TxThread = std::thread(std::bind(&LoggerManage::logger_tx_run, this));
+    //m_AsioServerThread = std::thread(std::bind(&LoggerManage::asio_server_run, this));
     pMutex = new(std::nothrow) std::mutex();
 
     if(pMutex == nullptr)
@@ -226,6 +239,7 @@ bool LoggerManage::init()
 
     m_RxThread.detach();
     m_TxThread.detach();
+    //m_AsioServerThread.detach();
 
     return ret;
 }

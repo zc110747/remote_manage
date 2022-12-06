@@ -31,7 +31,8 @@ objects = 	main.o \
 			driver/deviceBase.o \
 			driver/driver.o \
 			logger/logger.o \
-			logger/cmdProcess.o 
+			logger/cmdProcess.o \
+			logger/asio_server.o 
 
 include_path = -I remote/ 			\
 				-I driver/ 			\
@@ -39,9 +40,10 @@ include_path = -I remote/ 			\
 				-I include/ 		\
 				-I application/ 		\
 				-I lib/jsoncpp/include  \
+				-I lib/asio/include		\
 				-I logger/ 			\
 				-I application/tools/ \
-				-I event/
+				-I event/			
 lib = lib/$(CPU)libjsoncpp.a
 
 # This is the file name of the executables and path where 

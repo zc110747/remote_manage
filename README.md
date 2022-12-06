@@ -9,12 +9,12 @@
 demo/           	测试代码    
 document/       	设计文档资料说明    
 kernael_mod/     	内核驱动模块  
-lower_app/              嵌入式Linux设备应用实现  
+lower_app/          嵌入式Linux设备应用实现  
 	-manage/     	主工作流应用，驱动模块处理，logger实现，外设和其它设备接口访问  
 	-gui/        	下位机图形界面，支持状态显示和基本操作(QT)  
 	-server/        支持桌面访问得web服务器(node)  
 support/        	用于支持应用执行的lib库或者环境  
-upper_app/              PC客户端应用实现  
+upper_app/          PC客户端应用实现  
 	-manage/        用于访问嵌入式设备的桌面客户端(暂定QT)  
 
 ## 设计文档

@@ -69,6 +69,7 @@ private:
     bool is_thread_work{false};
     std::thread m_RxThread;
     std::thread m_TxThread;
+    std::thread m_AsioServerThread;
     std::mutex *pMutex;
 
     //fd
@@ -77,6 +78,10 @@ private:
     int writefd{-1};
 
     static LoggerManage *pInstance;
+    
+    void logger_rx_run();
+    void logger_tx_run();
+    void asio_server_run();
 
 private:
     char *getMemoryBuffer(uint16_t size);

@@ -224,7 +224,7 @@ static void key_gpio_release(void)
 }
 
 /**
- * 打开LED，获取LED资源
+ * 打开按键节点
  * 
  * @param inode  驱动内的节点信息
  * @param filp   要处理的设备文件(文件描述符)
@@ -413,8 +413,7 @@ exit:
 }
 
 /*
- * @description		: flatform驱动的probe函数，当驱动与
- * 					  设备匹配以后此函数就会执行
+ * @description		: 移除按键执行的函数
  * @param - dev 	: platform设备
  * @return 			: 0，成功;其他负值,失败
  */

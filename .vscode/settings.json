@@ -84,6 +84,7 @@
         "any": "cpp",
         "codecvt": "cpp",
         "csignal": "cpp",
-        "*.ipp": "cpp"
+        "*.ipp": "cpp",
+        "future": "cpp"
     }
 }

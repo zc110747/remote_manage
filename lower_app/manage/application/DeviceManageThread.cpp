@@ -131,7 +131,7 @@ void DeviceManageThread::run()
         size = pDevFIFO->read(buffer, READ_BUFFER_SIZE);
         if(size > 0)
         {
-            PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "Device Command, %d!", size);
+            //PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "Device Command, %d!", size);
             EventProcess(reinterpret_cast<Event *>(buffer));
         }
         else
