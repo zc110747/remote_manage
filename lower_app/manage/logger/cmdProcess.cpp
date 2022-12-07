@@ -99,7 +99,7 @@ bool cmdProcess::parseData(char *ptr, int size)
     formatM = CmdMapM.find(strDst)->second;
     pDataM = pStart+1;
     
-    PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "right command:%d, data:%s", formatM, pDataM);
+    PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "right command:%d", formatM);
     return true;
 }
 
@@ -127,8 +127,6 @@ bool cmdProcess::ProcessData()
                         info.icm_info.temp_adc);
             }  
             break;
-        case CmSetDev:
-            break;
         case CmdGetOS:
             {
                 auto pSysConfig = SystemConfig::getInstance();
@@ -139,6 +137,8 @@ bool cmdProcess::ProcessData()
                 PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "UDP Port:%d", pSysConfig->getudp()->port);
                 PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "LOGGER Port:%d", pSysConfig->getlogger()->port);
             }
+            break;
+        case CmSetDev:
             break;
         case cmTestDev:
             { 

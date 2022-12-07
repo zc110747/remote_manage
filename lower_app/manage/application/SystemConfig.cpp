@@ -72,11 +72,11 @@ bool SystemConfig::init(const char* path)
         parameter.serial.parity = root["serial"]["parity"].asString();;
         parameter.serial.dev = root["serial"]["dev"].asString();
 
-        parameter.tcp.ipaddr = root["tcp"]["ipaddr"].asString();
+        parameter.tcp.ipaddr = root["socket"]["ipaddr"].asString();
         parameter.tcp.port = root["tcp"]["port"].asInt();
-        parameter.udp.ipaddr = root["udp"]["ipaddr"].asString();
+        parameter.udp.ipaddr = root["socket"]["ipaddr"].asString();
         parameter.udp.port = root["udp"]["port"].asInt();
-        parameter.logger.ipaddr = root["logger"]["ipaddr"].asString();
+        parameter.logger.ipaddr = root["socket"]["ipaddr"].asString();
         parameter.logger.port = root["logger"]["port"].asInt();
 
         parameter.rtc.dev = root["rtc"]["dev"].asString();

@@ -67,10 +67,9 @@ private:
     //thread
     std::atomic<bool> set_thread_work{false};
     bool is_thread_work{false};
-    std::thread m_RxThread;
     std::thread m_TxThread;
     std::thread m_AsioServerThread;
-    std::mutex *pMutex;
+    std::mutex mutex_;
 
     //fd
     LOG_MESSAGE message;
@@ -85,8 +84,8 @@ private:
 
 private:
     char *getMemoryBuffer(uint16_t size);
-    void mutex_lock()       {if(is_thread_work) pMutex->lock();}
-    void mutex_unlock()     {if(is_thread_work) pMutex->unlock();}
+    void mutex_lock()       {if(is_thread_work) mutex_.lock();}
+    void mutex_unlock()     {if(is_thread_work) mutex_.unlock();}
 
 public:
     LoggerManage() = default;

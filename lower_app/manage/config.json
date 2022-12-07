@@ -14,17 +14,17 @@
                 "parity":"n",
                 "dev":"/dev/ttymxc2"
         },
-        "tcp":{
+        "socket":{
                 "ipaddr":"192.168.113.1",
-                "port":5057
+        },
+        "tcp":{
+                "port":15057
         },
         "udp":{
-                "ipaddr":"192.168.113.1",
-                "port":5058
+                "port":15058
         },
         "logger":{
-                "ipaddr":"192.168.113.1",
-                "port":5059
+                "port":15059
         },
         "rtc":{
                 "dev":"/dev/rtc0"

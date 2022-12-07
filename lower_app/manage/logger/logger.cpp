@@ -21,116 +21,27 @@
 #include "../driver/driver.hpp"
 #include "asio_server.hpp"
 
+static asio_server logger_server;
+
 //asio server test ok
 void LoggerManage::asio_server_run()
 {
-    PRINT_LOG(LOG_DEBUG, xGetCurrentTicks(), "asio_server_run start!");
+    const SocketSysConfig *pSocketConfig = SystemConfig::getInstance()->getlogger();
+    
     try
     {
-        asio_server server("192.168.113.1", "5060");
-        server.run();
+        logger_server.init(pSocketConfig->ipaddr, std::to_string(pSocketConfig->port), [](char* ptr, int length){
+            if(cmdProcess::getInstance()->parseData(ptr, length))
+            {
+                cmdProcess::getInstance()->ProcessData();
+            }
+        });
+        logger_server.run();
     }
     catch (std::exception& e)
     {
         PRINT_LOG(LOG_DEBUG, xGetCurrentTicks(), "Exception:%s", e.what());
     }
-}
-
-void LoggerManage::logger_rx_run()
-{
-    int server_fd;
-    struct sockaddr_in servaddr, clientaddr;  
-    socklen_t client_sock_len;  
-    int result, is_bind_fail;
-    const SocketSysConfig *pSocketConfig = SystemConfig::getInstance()->getlogger();
-    LOG_SOCKET *pSocket = getsocket();
-
-    memset(&servaddr, 0, sizeof(servaddr));    
-    servaddr.sin_family = AF_INET;     
-    servaddr.sin_addr.s_addr = inet_addr(pSocketConfig->ipaddr.c_str());  
-    servaddr.sin_port = htons(pSocketConfig->port); 
-
-    PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "%s start!", __func__);
-    server_fd = ::socket(PF_INET, SOCK_STREAM, 0);
-    if(server_fd != -1)
-    {
-
-        int one = 1;
-#ifndef WIN32
-        /*Linux平台默认断开后2min内处于Wait Time状态，不允许重新绑定，需要添加配置，允许在该状态下重新绑定*/
-        setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, (void*) &one, (socklen_t)sizeof(one));
-#endif
-
-        do 
-        {
-            result = bind(server_fd, (struct sockaddr *)&servaddr, sizeof(servaddr));
-            if(result == -1)
-            {
-                if(is_bind_fail == 0)
-                {
-                    is_bind_fail = 1;
-                    PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Socket logger bind %s:%d failed!", pSocketConfig->ipaddr.c_str(), pSocketConfig->port); 
-                }
-                sleep(1);
-            }
-            else
-            {
-                break;
-            }
-        } while (1); //网络等待socket绑定完成后执行后续
-
-        PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "Socket logger bind %s:%d success!", pSocketConfig->ipaddr.c_str(), pSocketConfig->port); 
-        listen(server_fd, 1);
-        for(;;)
-        {	   
-            uint32_t client_size;
-            int client_fd;
-
-            client_size = sizeof(clientaddr);
-            client_fd = accept(server_fd, (struct sockaddr *)&clientaddr, &client_size);
-            if(client_fd < 0)
-            {
-                pSocket->islink = false;
-                continue;
-            } 
-            else
-            {
-                pSocket->fd = client_fd;
-                pSocket->islink = true;    
-            }
-
-            PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "Socket logger accept success!");
-            for(;;)
-            {
-                char recvbuf[64];
-                int recvlen;
-
-                recvlen = ::recv(client_fd, recvbuf, 64, 0);
-                if(recvlen <= 0)
-                {   
-                    pSocket->islink = false;
-                    pSocket->fd = -1;
-                    close(client_fd);
-                    PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "Socket logger recv error!");
-                    break;
-                }
-                else
-                {
-                    if(cmdProcess::getInstance()->parseData(recvbuf, recvlen))
-                    {
-                        //PRINT_NOW("Socket logger command Process!");
-                        cmdProcess::getInstance()->ProcessData();
-                    }
-                }
-            }
-        }
-    }
-    else
-    {
-        PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "Socket logger create failed!");
-    }
-
-    close(server_fd);
 }
 
 void LoggerManage::logger_tx_run()
@@ -145,20 +56,11 @@ void LoggerManage::logger_tx_run()
         len = ::read(read_fd(), &message, sizeof(message));
         if(len > 0)
         {
-            if(pSocket->islink)
+            auto session_ptr = logger_server.get_valid_session();
+            if(session_ptr != nullptr)
             {
-                len = ::send(pSocket->fd, message.ptr, message.length, 0);
-                if(len < 0)
-                {
-                    //do something
-                    PRINT_NOW("%s send failed:%d\n", __func__, len);
-                }
-                else
-                {
-                    // printf("%s", message.ptr);
-                    // fflush(stdout);
-                    std::this_thread::sleep_for(std::chrono::milliseconds(20));
-                }
+                session_ptr->do_write(message.ptr, message.length);
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
             else
             {
@@ -226,21 +128,10 @@ bool LoggerManage::init()
 
     createfifo();
 
-    m_RxThread = std::thread(std::bind(&LoggerManage::logger_rx_run, this));
     m_TxThread = std::thread(std::bind(&LoggerManage::logger_tx_run, this));
-    //m_AsioServerThread = std::thread(std::bind(&LoggerManage::asio_server_run, this));
-    pMutex = new(std::nothrow) std::mutex();
-
-    if(pMutex == nullptr)
-    {
-        ret = false;
-        PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "%s failed, err:%d!", __func__, nErr);
-    }
-
-    m_RxThread.detach();
     m_TxThread.detach();
-    //m_AsioServerThread.detach();
-
+    m_AsioServerThread = std::thread(std::bind(&LoggerManage::asio_server_run, this));
+    m_AsioServerThread.detach();
     return ret;
 }
 
@@ -248,12 +139,6 @@ void LoggerManage::release()
 {
     is_thread_work = false;
     
-    if(pMutex != nullptr)
-    {
-        delete pMutex;
-        pMutex = nullptr;
-    }
-
     if(readfd != - 1)
     {
         close(readfd);
@@ -335,8 +220,7 @@ int LoggerManage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...
     
     pbuf[0] = '\r';
     pbuf[1] = '\n';
-    pbuf[2] = 0;
-    message.length += 3;
+    message.length += 2;
 
     if(!is_thread_work)
     {

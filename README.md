@@ -28,7 +28,7 @@ upper_app/          PC客户端应用实现
 3. 基于linux系统API的线程创建，管理，线程间通讯支持
 4. 本地端的通讯处理(Serial, Socket)等，基于自定义协议进行通讯(特殊指令的安全机制)
 5. 内部状态读取更新显示，远端和本地的设置修改
-6. 支持本地和网络的logger打印接口，调试等级显示可调
+6. 支持本地和网络的logger打印接口(基于asio设计)，调试等级显示可调
 7. 访问外部设备的模块接口
 
 PC应用端设计
@@ -46,10 +46,18 @@ PC应用端设计
 
 ## 编译环境
 
-嵌入式软件交叉编译工具
+嵌入式软件交叉编译工具  
 	内核模块使用编译工具 - arm-linux-gnueabihf-gcc  
 	manage，gui编译工具 - arm-linux-gnueabihf-g++  
 	server使用node作为运行环境  
-	网页则使用前端技术
-上位机编译工具
-	QT(the newest stable version)
+	网页则使用前端技术  
+上位机编译工具  
+	QT(the newest stable version)  
+logger显示工具  
+	visual studio(the newest stable version) 
+
+## 注意事项  
+  
+### lower_app/manage
+1.编译lowr_app/manage, 需要首先解压lower/manage/lib下的asio.zip到同一目录下  
+2.进入lower_app/manage, 执行make即可编译，默认编译为桌面端，可修改makefile编译嵌入式linux平台  

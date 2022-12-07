@@ -18,6 +18,7 @@ namespace Tools
         {
             InitializeComponent();
             InitUserView();
+            Control.CheckForIllegalCrossThreadCalls = false;
         }
 
         public void InitUserView()
