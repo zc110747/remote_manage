@@ -43,8 +43,8 @@ const static std::map<std::string, CmdFormat_t> CmdMapM = {
 
 const static std::map<CmdFormat_t, std::string> CmdHelpMapM = {
     {CmdGetOS, "!getos"},
-    {CmReadDev, "!readdev [index]"},
-    {CmSetDev,  "!setdev [index],[data]"},
+    {CmReadDev, "!readdev"},
+    {CmSetDev,  "!setdev [index],[action]"},
     {cmTestDev, "!testdev [index]"},
     {CmGetHelp, "!? ## !help"},
 };
@@ -139,6 +139,12 @@ bool cmdProcess::ProcessData()
             }
             break;
         case CmSetDev:
+            {
+                uint8_t device = 0, action = 0;
+                sscanf(pDataM, "%d,%d", &device, &action);
+                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "SetDev:%d, %d!", device, action);
+                DeviceManageThread::getInstance()->sendHardProcessMsg(device, action);
+            }
             break;
         case cmTestDev:
             { 
@@ -146,7 +152,6 @@ bool cmdProcess::ProcessData()
                 
                 if(dev == '0')
                 {
-                    ledTheOne::getInstance()->test();
                 }
             }
             break;

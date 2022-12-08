@@ -53,11 +53,19 @@ bool DeviceManageThread::init()
     return pDevFIFO->Create();
 }
 
-int DeviceManageThread::sendMessage(Event* pEvent)
+int DeviceManageThread::sendHardProcessMsg(uint8_t device, uint8_t action)
 {
-    int size;
-    size = pDevFIFO->write(reinterpret_cast<char*>(pEvent), pEvent->size());
-    return size;
+    EventBufMessage ebufMsg(DEVICE_ID_HARDWARE_CHANGE);
+
+    ebufMsg.getData().buffer[0] = device;
+    ebufMsg.getData().buffer[1] = action;
+
+    return sendMessage(reinterpret_cast<char *>(&ebufMsg), sizeof(ebufMsg));
+}
+
+int DeviceManageThread::sendMessage(char* pEvent, int size)
+{
+  return pDevFIFO->write(pEvent, size);
 }
  
 DeviceReadInfo DeviceManageThread::getDeviceInfo()
@@ -101,15 +109,43 @@ void DeviceManageThread::update()
     }
 }
 
+void DeviceManageThread::HardProcess(Event *pEvent)
+{
+    EventBufMessage *pHardEvent = static_cast<EventBufMessage *>(pEvent);
+    auto data = pHardEvent->getData();
+
+    uint8_t device = data.buffer[0];
+    uint8_t action = data.buffer[1];
+
+    PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "Device Process:%d, %d!", device, action);
+
+    switch (device)
+    {
+    case EVENT_HADWARE_LED:
+        ledTheOne::getInstance()->writeIoStatus(action);
+        break;
+    case EVENT_HADWARE_BEEP:
+        beepTheOne::getInstance()->writeIoStatus(action);
+        break;
+    default:
+        PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Invalid Device:%d!", device);
+        break;
+    }
+}
+
 bool DeviceManageThread::EventProcess(Event *pEvent)
 {
-    switch(pEvent->getId())
+    uint16_t id = pEvent->getId();
+    switch(id)
     {
     case DEVICE_ID_TIME_UPDATE_PREOID:
         update();
         break;
+    case DEVICE_ID_HARDWARE_CHANGE:
+        HardProcess(pEvent);
+        break;
     default:
-        PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Invalid Device Command!");
+        PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Invalid Device Command:%d!", id);
         break;
     }
     return true;
@@ -123,7 +159,7 @@ void DeviceManageThread::run()
     PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "DeviceManageThread start!");
     TimeManage::getInstance()->registerWork(0, TIME_TICK(1000), TIME_ACTION_ALWAYS, [&](){
         Event event(DEVICE_ID_TIME_UPDATE_PREOID);
-        sendMessage(&event);
+        sendMessage(reinterpret_cast<char *>(&event), sizeof(event));
     });
 
     for(;;)

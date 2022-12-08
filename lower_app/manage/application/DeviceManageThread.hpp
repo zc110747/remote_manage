@@ -27,11 +27,16 @@
 #include <chrono>
 #include "event.hpp"
 
-#define DEVICE_ID_TIME_UPDATE_PREOID    0x01
-#define DEVICE_ID_HARDWARE_CHANGE       0x02
+//interal event
+#define DEVICE_ID_TIME_UPDATE_PREOID    0x0001
+#define DEVICE_ID_HARDWARE_CHANGE       0x0002
+
+
+//process hardware chage
+#define EVENT_HADWARE_LED               0x00
+#define EVENT_HADWARE_BEEP              0x01
 
 #define DEVICE_MESSAGE_FIFO             "/tmp/dev.fifo"
-
 #define READ_BUFFER_SIZE                1024
 
 struct DeviceReadInfo
@@ -75,8 +80,10 @@ private:
     FIFOMessage *pDevFIFO{nullptr};
 
     void run();
-    void update();
     bool EventProcess(Event *pEvent);
+
+    void update();
+    void HardProcess(Event *pEvent);
 
 public:
     DeviceManageThread() = default;
@@ -86,8 +93,10 @@ public:
     DeviceReadInfo getDeviceInfo();
     static DeviceManageThread* getInstance();
 
+    
 public:
-    int sendMessage(Event* pEvent);
+    int sendMessage(char* pEvent, int size);
+    int sendHardProcessMsg(uint8_t device, uint8_t action);
 };
 
 #endif

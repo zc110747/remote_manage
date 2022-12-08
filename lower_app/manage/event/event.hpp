@@ -39,9 +39,6 @@ public:
     uint16_t getId(){
         return _id;
     }
-    size_t size(){
-        return sizeof(*this);
-    }
 };
 
 template<typename T>
@@ -59,12 +56,13 @@ public:
     }
 };
 
+template<int N>
 struct Buffer
 {
-    uint8_t buffer[256];
+    uint8_t buffer[N];
 };
 
 using EventU8Message = EventExtend<uint8_t>;
 using EventU16Message = EventExtend<uint16_t>;
 using EventU32Message = EventExtend<uint32_t>;
-using EventBufMessage = EventExtend<Buffer>;
+using EventBufMessage = EventExtend<Buffer<16>>;
