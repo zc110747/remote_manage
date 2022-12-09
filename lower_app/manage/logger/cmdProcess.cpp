@@ -34,19 +34,19 @@
 */
 const static std::map<std::string, CmdFormat_t> CmdMapM = {
     {"!getos",      CmdGetOS},
-    {"!readdev",    CmReadDev},
-    {"!setdev",     CmSetDev},
-    {"!testdev",    cmTestDev},
-    {"!?",          CmGetHelp},
-    {"!help",       CmGetHelp},
+    {"!readdev",    CmdReadDev},
+    {"!setdev",     CmdSetDev},
+    {"!setlevel",   cmdSetLevel},
+    {"!?",          CmdGetHelp},
+    {"!help",       CmdGetHelp},
 };
 
 const static std::map<CmdFormat_t, std::string> CmdHelpMapM = {
-    {CmdGetOS, "!getos"},
-    {CmReadDev, "!readdev"},
-    {CmSetDev,  "!setdev [index],[action]"},
-    {cmTestDev, "!testdev [index]"},
-    {CmGetHelp, "!? ## !help"},
+    {CmdGetOS,   "!getos"},
+    {CmdReadDev, "!readdev"},
+    {CmdSetDev,  "!setdev [index],[action]"},
+    {cmdSetLevel, "!setlevel [lev 0-5]",},
+    {CmdGetHelp, "!? ## !help"},
 };
 
 cmdProcess *cmdProcess::pInstance = nullptr;
@@ -90,16 +90,14 @@ bool cmdProcess::parseData(char *ptr, int size)
     strDst.resize(strVal.size());
     std::transform(strVal.begin(), strVal.end(), strDst.begin(), ::tolower);
 
+    PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "rx command:%s", ptr);
     if(CmdMapM.count(strDst) == 0)
     {
-        PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "error command:%s", ptr);
         return false;
     }
 
     formatM = CmdMapM.find(strDst)->second;
     pDataM = pStart+1;
-    
-    PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "right command:%d", formatM);
     return true;
 }
 
@@ -108,9 +106,10 @@ bool cmdProcess::ProcessData()
     bool ret = true;
     switch(formatM)
     {
-        case CmReadDev:
+        case CmdReadDev:
             { 
-                DeviceReadInfo info = DeviceManageThread::getInstance()->getDeviceInfo();
+                auto info = NAMESPACE_DEVICE::DeviceManageThread::getInstance()->getDeviceInfo();
+                
                 PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "LedStatus:%d!", info.led_io);
                 PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "beepStatus:%d!", info.beep_io);
                 PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "ApInfo, ir:%d, als:%d, ps:%d!",
@@ -131,31 +130,31 @@ bool cmdProcess::ProcessData()
             {
                 auto pSysConfig = SystemConfig::getInstance();
                 auto pVersion = pSysConfig->getversion();
-                PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "FW_Version:%d, %d, %d, %d", pVersion[0], pVersion[1], pVersion[2], pVersion[3]);
-                PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "Sokcet Ipaddress:%s", pSysConfig->getudp()->ipaddr.c_str());
-                PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "TCP Port:%d", pSysConfig->gettcp()->port);
-                PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "UDP Port:%d", pSysConfig->getudp()->port);
-                PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "LOGGER Port:%d", pSysConfig->getlogger()->port);
+                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "FW_Version:%d, %d, %d, %d", pVersion[0], pVersion[1], pVersion[2], pVersion[3]);
+                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Sokcet Ipaddress:%s", pSysConfig->getudp()->ipaddr.c_str());
+                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Port TCP:%d, UDP: %d, LOGGER:%d ", 
+                    pSysConfig->gettcp()->port, pSysConfig->getudp()->port, pSysConfig->getlogger()->port);
+                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Logger Level:%d ", (int)LoggerManage::getInstance()->getlevel());
             }
             break;
-        case CmSetDev:
+        case CmdSetDev:
             {
                 uint8_t device = 0, action = 0;
                 sscanf(pDataM, "%d,%d", &device, &action);
                 PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "SetDev:%d, %d!", device, action);
-                DeviceManageThread::getInstance()->sendHardProcessMsg(device, action);
+                NAMESPACE_DEVICE::DeviceManageThread::getInstance()->sendHardProcessMsg(device, action);
             }
             break;
-        case cmTestDev:
+        case cmdSetLevel:
             { 
-                char dev = pDataM[0];
-                
-                if(dev == '0')
-                {
-                }
+                uint8_t level = pDataM[0] - '0';
+                if(level > 5)
+                    level = 5;
+                LoggerManage::getInstance()->setlevel((LOG_LEVEL)level);
+                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Set Logger Level:%d!", level);
             }
             break;
-        case CmGetHelp:
+        case CmdGetHelp:
             {
                 for(auto &[x, y] : CmdHelpMapM)
                 {

@@ -48,9 +48,9 @@ void LoggerManage::logger_tx_run()
 {
     int len;
     LOG_MESSAGE message;
-    LOG_SOCKET *pSocket = getsocket();
-
+    
     setThreadWork();
+
     while(1)
     {
         len = ::read(read_fd(), &message, sizeof(message));

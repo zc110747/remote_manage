@@ -126,12 +126,12 @@ public:
 	{
 		uint8_t nCommand;
 		uint16_t nRegIndex, nRxDataSize;
-		DeviceReadInfo read_info;
+		NAMESPACE_DEVICE::DeviceReadInfo read_info;
 		char buf = 1;
 
 		nCommand = m_RxCacheDataPtr[0];
 		m_TxBufSize = 0;
-		read_info = DeviceManageThread::getInstance()->getDeviceInfo();
+		read_info = NAMESPACE_DEVICE::DeviceManageThread::getInstance()->getDeviceInfo();
 
 		switch (nCommand)
 		{

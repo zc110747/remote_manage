@@ -48,12 +48,6 @@ typedef struct
     int length;
 }LOG_MESSAGE;
 
-typedef struct 
-{
-    int fd;
-    std::atomic<bool> islink;
-}LOG_SOCKET;
-
 class LoggerManage
 {
 private:
@@ -61,8 +55,7 @@ private:
     char *pEndMemoryBuffer;
 
     //logger info
-    LOG_LEVEL log_level{LOG_TRACE};
-    LOG_SOCKET socket{-1, {false}};
+    LOG_LEVEL log_level{LOG_INFO};
 
     //thread
     std::atomic<bool> set_thread_work{false};
@@ -102,7 +95,6 @@ public:
     int read_fd()                   {return readfd;}
     void setlevel(LOG_LEVEL level)  {log_level = level;}
     LOG_LEVEL getlevel()            {return log_level;} 
-    LOG_SOCKET *getsocket()          {return &socket;}
 };
 
 #define PRINT_NOW(...)    { printf(__VA_ARGS__); fflush(stdout);}

@@ -18,31 +18,6 @@
 /////////////////////////////////////////////////////////////////////////////
 #include "UartThread.hpp"
 
-static void *UartLoopThread(void *arg)
-{
-	int nFlag;
-	int size;
-	auto pThreadInfo = static_cast<UartThreadManage *>(arg);
-	auto *pProtocolInfo = pThreadInfo->getProtocolInfo();
-
-	PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "UART Thread start!");
-	for(;;)
-	{	   
-		nFlag = pProtocolInfo->CheckRxBuffer(pThreadInfo->getComfd(), false);
-		if(nFlag == RT_OK)
-		{
-			pProtocolInfo->ExecuteCommand(pThreadInfo->getComfd());
-			pProtocolInfo->SendTxBuffer(pThreadInfo->getComfd());
-		}
-		else
-		{
-			usleep(50); //通讯结束让出线程
-		}
-	}
-
-	return (void *)arg;
-}
-
 UartThreadManage* UartThreadManage::pInstance = nullptr;
 UartThreadManage* UartThreadManage::getInstance()
 {
@@ -57,10 +32,34 @@ UartThreadManage* UartThreadManage::getInstance()
 	return pInstance;
 }
 
+void UartThreadManage::run()
+{
+	int nFlag;
+	int size;
+	auto *pProtocolInfo = getProtocolInfo();
+
+	PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "UART Thread start!");
+	for(;;)
+	{	   
+		nFlag = pProtocolInfo->CheckRxBuffer(nComFd, false);
+		if(nFlag == RT_OK)
+		{
+			pProtocolInfo->ExecuteCommand(nComFd);
+			pProtocolInfo->SendTxBuffer(nComFd);
+		}
+		else
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		}
+	}
+}
+
 bool UartThreadManage::init()
 {
 #if UART_MODULE_ON == 1
-	const SerialSysConfig* pSerialConfig = SystemConfig::getInstance()->getserial();
+
+	auto pSerialConfig = SystemConfig::getInstance()->getserial();
+
 	if((nComFd = open(pSerialConfig->dev.c_str(), O_RDWR|O_NOCTTY|O_NDELAY))<0)
 	{	
 		PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Open Device %s failed!", pSerialConfig->dev.c_str());
@@ -78,7 +77,7 @@ bool UartThreadManage::init()
 	//创建UART协议管理对象
 	pProtocolInfo = new CUartProtocolInfo(nRxCacheBuffer, nTxCacheBuffer, UART_MAX_BUFFER_SIZE);
 	
-	m_thread = std::move(std::thread(UartLoopThread, this));
+	std::thread(std::bind(&UartThreadManage::run, this)).detach();
 	PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "UartThreadManage init success!");
 #endif
 	return true;
@@ -192,14 +191,6 @@ void UartThreadManage::release()
 		delete pProtocolInfo;
 		pProtocolInfo = nullptr;
 	}
-
-	//clear pthread
-	// if(pthread != nullptr)
-	// {
-	// 	pthread->join();
-	// 	delete pthread;
-	// 	pthread = nullptr;
-	// }
 
 	if(nComFd >= 0)
 	{

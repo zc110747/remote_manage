@@ -23,8 +23,9 @@ namespace DeviceManage
         {
             milli_s = interval;
             m_task = task;
-            m_thread = std::thread(std::bind(&Timer::run, this));
-            m_thread.detach();
+
+            //start thread
+            std::thread(std::bind(&Timer::run, this)).detach();
         }
 
         void stop()
@@ -62,7 +63,6 @@ namespace DeviceManage
         uint32_t milli_s{1};
         std::function<void()> m_task;
         std::atomic<bool> m_stop{false};
-        std::thread m_thread;
     };
 }
 

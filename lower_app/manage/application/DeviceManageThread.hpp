@@ -19,7 +19,7 @@
 #ifndef _INCLUDE_APP_TASK_H
 #define _INCLUDE_APP_TASK_H
 
-#include "tools/FifoManage.hpp"
+#include "FifoManage.hpp"
 #include "driver.hpp"
 #include <type_traits>
 #include <cstring>
@@ -39,64 +39,67 @@
 #define DEVICE_MESSAGE_FIFO             "/tmp/dev.fifo"
 #define READ_BUFFER_SIZE                1024
 
-struct DeviceReadInfo
+namespace NAMESPACE_DEVICE
 {
-    uint8_t   led_io;
-    uint8_t   beep_io; 
-    AP_INFO   ap_info;
-    ICM_INFO  icm_info;
-
-    //for compare, need clear before to avoid fill by align.
-    bool operator != (const DeviceReadInfo& dev_info)
+    struct DeviceReadInfo
     {
-        static_assert(std::is_trivial_v<DeviceReadInfo>, "Not Allow C memory process!");
+        uint8_t   led_io;
+        uint8_t   beep_io; 
+        AP_INFO   ap_info;
+        ICM_INFO  icm_info;
 
-        if(memcmp((char *)this, (char *)&dev_info, size()) != 0)
-            return true;
-        return false;
-    }
+        //for compare, need clear before to avoid fill by align.
+        bool operator != (const DeviceReadInfo& dev_info)
+        {
+            static_assert(std::is_trivial_v<DeviceReadInfo>, "Not Allow C memory process!");
 
-    void clear()
+            if(memcmp((char *)this, (char *)&dev_info, size()) != 0)
+                return true;
+            return false;
+        }
+
+        void clear()
+        {
+            static_assert(std::is_trivial_v<DeviceReadInfo>, "Not Allow C memory process!");
+
+            memset((char *)this, 0, size());
+        }
+
+        size_t size()
+        {
+            return sizeof(*this);
+        }
+    };
+
+    class DeviceManageThread
     {
-        static_assert(std::is_trivial_v<DeviceReadInfo>, "Not Allow C memory process!");
+    private:
+        DeviceReadInfo inter_info;
+        DeviceReadInfo outer_info;
+        std::mutex mut;
+        static DeviceManageThread* pInstance;
+        FIFOMessage *pDevFIFO{nullptr};
 
-        memset((char *)this, 0, size());
-    }
+        void run();
+        bool EventProcess(Event *pEvent);
 
-    size_t size()
-    {
-        return sizeof(*this);
-    }
-};
+        void update();
+        void HardProcess(Event *pEvent);
 
-class DeviceManageThread
-{
-private:
-    DeviceReadInfo inter_info;
-    DeviceReadInfo outer_info;
-    std::mutex mut;
-    std::thread dmt_thread;
-    static DeviceManageThread* pInstance;
-    FIFOMessage *pDevFIFO{nullptr};
+    public:
+        DeviceManageThread() = default;
+        virtual ~DeviceManageThread() = delete; //单例模式不允许删除 
 
-    void run();
-    bool EventProcess(Event *pEvent);
+        bool init();
+        DeviceReadInfo getDeviceInfo();
+        static DeviceManageThread* getInstance();
 
-    void update();
-    void HardProcess(Event *pEvent);
+        
+    public:
+        int sendMessage(char* pEvent, int size);
+        int sendHardProcessMsg(uint8_t device, uint8_t action);
+    };
+}
 
-public:
-    DeviceManageThread() = default;
-    virtual ~DeviceManageThread() = delete; //单例模式不允许删除 
-
-    bool init();
-    DeviceReadInfo getDeviceInfo();
-    static DeviceManageThread* getInstance();
-
-    
-public:
-    int sendMessage(char* pEvent, int size);
-    int sendHardProcessMsg(uint8_t device, uint8_t action);
-};
 
 #endif

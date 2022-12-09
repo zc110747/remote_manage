@@ -119,8 +119,7 @@ static void *SocketTcpLoopThread(void *arg)
             else
             {
                 int nErr;
-                std::thread clientThread(SocketTcpDataProcessThread, &client_fd);
-                clientThread.detach();
+                std::thread(SocketTcpDataProcessThread, &client_fd).detach();
             }
         }
     }
