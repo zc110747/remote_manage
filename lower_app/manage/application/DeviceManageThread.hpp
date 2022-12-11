@@ -19,7 +19,7 @@
 #ifndef _INCLUDE_APP_TASK_H
 #define _INCLUDE_APP_TASK_H
 
-#include "FifoManage.hpp"
+#include "FIFOManage.hpp"
 #include "driver.hpp"
 #include <type_traits>
 #include <cstring>
