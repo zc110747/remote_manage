@@ -21,7 +21,7 @@ namespace Tools
         public Socket? TcpSocket;
 
         /*Tcp Client Socket*/
-        public Socket? TcpClientSocket;
+        public HashSet<Socket> TcpClientSocket = new HashSet<Socket>();
 
         /*socket tx count*/
         public UInt64 tx_count;
@@ -63,6 +63,8 @@ namespace Tools
             port = 15535;
             tx_count = 0;
             rx_count = 0;
+
+            TcpClientSocket.Clear();
 
             //获得远端dns服务器的ip地址
             //IPAddress[] Address = Dns.GetHostAddresses("www.baidu.com");

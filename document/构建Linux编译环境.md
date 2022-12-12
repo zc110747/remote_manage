@@ -96,4 +96,33 @@ KexAlgorithms diffie-hellman-group1-sha1
 scp -r [file] [用户名]@[ipAddress]:[目录]
 ```
 例如 scp -r test.txt freedom@192.168.0.99:/tmp/, 另外目录需要在当前权限下可写才可以.  
-上诉主要讲述了如何在linux平台使用openssh, 不过对于嵌入式linux平台，就需要自己编译openssh，这里给出说明。 
+上诉主要讲述了如何在linux平台使用openssh, 不过对于嵌入式linux平台，就需要自己编译openssh，这里给出说明.  
+
+### 编译嵌入式环境下的ssh服务  
+1.下载zlib, openssl, openssh, 将所有文件下载并解压到/home/[自定义]/download目录下，这里目录选择center.  
+```bash
+wget http://www.zlib.net/fossils/zlib-1.2.13.tar.gz
+wget https://www.openssl.org/source/openssl-3.0.7.tar.gz
+wget https://mirrors.tuna.tsinghua.edu.cn/OpenBSD/OpenSSH/portable/openssh-9.1p1.tar.gz
+tar -xvf zlib-1.2.13.tar.gz
+tar -xvf openssl-3.0.7.tar.gz
+tar -xvf openssh-9.1p1.tar.gz
+```
+2.编译zlib库.  
+```bash
+cd zlib-1.2.13/
+export CHOST=arm-linux-gnueabihf
+./configure --prefix=/home/center/download/openssh-9.1p1/zlib
+make & make install
+```
+3.编译openssl.
+```bash
+cd openssl-3.0.7/
+./config --cross-compile-prefix=arm-linux-gnueabihf- no-asm linux-aarch64 --prefix=/home/center/download/openssh-9.1p1/openssl
+make & make install
+```
+4.编译openssh.
+```bash
+./configure --host=arm-linux-gnueabihf --with-libs --with-zlib=/home/center/download/openssh-9.1p1/zlib --with-ssl-dir=/home/center/download/openssh-9.1p1/openssl --disable-etc-default-login 
+```
+编译完成后，目录下的scp sftp ssh sshd ssh-add ssh-agent ssh-keygen ssh-keyscan文件，即是编译后的执行文件，可上传到server上执行运行环境即可.  

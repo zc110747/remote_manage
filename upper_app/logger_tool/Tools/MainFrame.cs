@@ -39,11 +39,6 @@ namespace Tools
             });
         }
 
-        //private byte[] GetRichTextBox(RichTextBox box)
-        //{
-        //    MemoryStream ms = new MemoryStream();
-        //}
-
         private void SendBtn_Click(object sender, EventArgs e)
         {
             string text = WriteBox.Text;
@@ -69,7 +64,12 @@ namespace Tools
                     {
                         globalSocketManage.tx_count += (ulong)sendBytes.Length;
                         TxLable.Text = $"tx: {globalSocketManage.tx_count.ToString()}";
-                        globalSocketManage.TcpClientSocket.Send(sendBytes, sendBytes.Length, 0);
+                        
+                        foreach(var socket in globalSocketManage.TcpClientSocket)
+                        {
+                            socket.Send(sendBytes, sendBytes.Length, 0);
+                        }
+                            
                     }
                 }
             }
@@ -108,12 +108,13 @@ namespace Tools
                 //if server
                 if (ProtocolComboBox.SelectedIndex != 0)
                 {
-                    if (globalSocketManage.TcpClientSocket != null
-                    && globalSocketManage.TcpClientSocket.Connected)
+                    if (globalSocketManage.TcpClientSocket != null)
                     {
-                        ShowBox.Invoke(AppendString, "\nClient Socket Close!\n");
-                        globalSocketManage.TcpClientSocket.Shutdown(SocketShutdown.Both);
-                        globalSocketManage.TcpClientSocket.Close();
+                        foreach (var socket in globalSocketManage.TcpClientSocket)
+                        {
+                            socket.Shutdown(SocketShutdown.Both);
+                            socket.Close();
+                        }    
                     }
                 }
 
@@ -184,9 +185,55 @@ namespace Tools
                 }
                 else
                 {
-                    ShowBox.Invoke(AppendString, "\nRemote Close, Socket break!\n");
+                    ShowBox.Invoke(AppendString, "Remote Close, Socket break!\n");
                     break;
                 }
+            }
+        }
+
+        private void thread_accpet(object? sender)
+        {
+            if (sender != null)
+            {
+
+                Socket AcceptSocket = (Socket)sender;
+
+                try
+                {
+                    string recvStr;
+                    byte[] recvBytes = new byte[1024];
+                    int length;
+
+                    while (true)
+                    {
+                        length = AcceptSocket.Receive(recvBytes, recvBytes.Length, 0);
+                        if (length > 0)
+                        {
+                            globalSocketManage.rx_count += (ulong)length;
+                            RxLable.Text = $"rx: {globalSocketManage.rx_count.ToString()}";
+
+                            recvStr = Encoding.UTF8.GetString(recvBytes, 0, length);
+                            ShowBox.Invoke(AppendString, recvStr);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+                    globalSocketManage.TcpClientSocket.Remove(AcceptSocket);
+                    AcceptSocket.Close();
+                }
+                catch
+                {
+                    globalSocketManage.TcpClientSocket.Remove(AcceptSocket);
+                    AcceptSocket.Close();
+                    ShowBox.Invoke(AppendString, String.Format("TCP Accpet Connect Close Now!\n"));
+                }
+            }
+            else
+            {
+                ShowBox.Invoke(AppendString, "Accept Socket is error!\n");
             }
         }
 
@@ -198,33 +245,19 @@ namespace Tools
             globalSocketManage.TcpSocket.ExclusiveAddressUse = false;
             globalSocketManage.TcpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
             globalSocketManage.TcpSocket.Bind(IpGlobal);
-            globalSocketManage.TcpSocket.Listen(1);
+            globalSocketManage.TcpSocket.Listen(32);
 
             ShowBox.Invoke(AppendString, $"Server Start Success, Now IPAddress is {globalSocketManage.socket_ip}:{globalSocketManage.port}!\n");
             //if listen success, enter network
             enter_network();
 
-            globalSocketManage.TcpClientSocket = null;
-            globalSocketManage.TcpClientSocket = globalSocketManage.TcpSocket.Accept();
-
-            ShowBox.Invoke(AppendString, "Client Tcp Connect Success With Server!\n");
-
-            string recvStr;
-            byte[] recvBytes = new byte[1024];
-            int length;
-
             while (true)
             {
-                length = globalSocketManage.TcpClientSocket.Receive(recvBytes, recvBytes.Length, 0);
-                if(length > 0)
-                {
-                    globalSocketManage.rx_count += (ulong)length;
-                    RxLable.Text = $"rx: {globalSocketManage.rx_count.ToString()}";
+                var accept_socket = globalSocketManage.TcpSocket.Accept();
+                globalSocketManage.TcpClientSocket.Add(accept_socket);
 
-                    recvStr = Encoding.UTF8.GetString(recvBytes, 0, length);
-                    ShowBox.Invoke(AppendString, recvStr);
-
-                }
+                Thread t = new Thread(thread_accpet);
+                t.Start(accept_socket);
             }
         }
 
