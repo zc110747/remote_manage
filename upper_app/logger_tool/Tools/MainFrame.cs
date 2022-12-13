@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
 using System.Net.WebSockets;
 using System.Text;
@@ -23,32 +23,32 @@ namespace Tools
 
         public void InitUserView()
         {
-            globalSocketManage.initilize();
-            IpAddrTextBox.Text = globalSocketManage.socket_ip;
-            PortTextBox.Text = globalSocketManage.port.ToString();
-
-            foreach(var value in globalSocketManage.protocolList)
-            {
-                ProtocolComboBox.Items.Add(value);
-            }
-            ProtocolComboBox.SelectedIndex = ProtocolComboBox.Items.IndexOf(globalSocketManage.protocolList.First());
-
             AppendString = new AppendMethod(str =>
             {
                 ShowBox.AppendText(str);
             });
+
+            globalSocketManage.initilize();
+
+            foreach (var value in globalSocketManage.protocolList)
+            {
+                ProtocolComboBox.Items.Add(value);
+            }
+            ProtocolComboBox.SelectedIndex = globalSocketManage.work_mode;
+            IpAddrTextBox.Text = globalSocketManage.socket_ip;
+            PortTextBox.Text = globalSocketManage.port.ToString(); 
         }
 
-        private void SendBtn_Click(object sender, EventArgs e)
+        void SendSocket()
         {
             string text = WriteBox.Text;
 
-
-            if (text.Length > 0) 
+            if (text.Length > 0)
             {
                 byte[] sendBytes = new byte[text.Length];
                 sendBytes = Encoding.UTF8.GetBytes(text);
 
+                //client mode
                 if (ProtocolComboBox.SelectedIndex == 0)
                 {
                     if (globalSocketManage.TcpSocket != null)
@@ -58,19 +58,97 @@ namespace Tools
                         globalSocketManage.TcpSocket.Send(sendBytes, sendBytes.Length, 0);
                     }
                 }
+                //server mode
                 else
                 {
                     if (globalSocketManage.TcpClientSocket != null)
                     {
                         globalSocketManage.tx_count += (ulong)sendBytes.Length;
                         TxLable.Text = $"tx: {globalSocketManage.tx_count.ToString()}";
-                        
-                        foreach(var socket in globalSocketManage.TcpClientSocket)
+
+                        foreach (var socket in globalSocketManage.TcpClientSocket)
                         {
                             socket.Send(sendBytes, sendBytes.Length, 0);
                         }
-                            
                     }
+                }
+            }
+        }
+
+        bool is_send = false;
+        private Semaphore sendSemp = new Semaphore(0, 1);
+
+        void enter_send()
+        {
+            LoopCheck.Enabled = false;
+            TimeLoop.Enabled = false;
+            ConnectBtn.Enabled = false;
+            SendBtn.Text = "停止";
+        }
+
+        void exit_send()
+        {
+            LoopCheck.Enabled = true;
+            TimeLoop.Enabled = true;
+            ConnectBtn.Enabled = true;
+            SendBtn.Text = "发送";
+        }
+
+        void SendLoopThread(object? obj)
+        {
+            if(obj != null)
+            {
+                int time = (int)obj;
+
+                while (true)
+                {
+                    if (sendSemp.WaitOne(time))
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        SendSocket();
+                    }
+                }
+            }
+        }
+
+        private void SendBtn_Click(object sender, EventArgs e)
+        {
+            bool isLoop;
+            int wait_time = 0;
+
+            //only checked and time is allowed
+            isLoop = LoopCheck.Checked;
+            if(isLoop)
+            {
+                if(!int.TryParse(TimeLoop.Text, out wait_time))
+                {
+                    isLoop = false;
+                }
+            }
+               
+            if (!isLoop)
+            {
+                SendSocket();
+            }
+            else
+            {
+                if(!is_send)
+                {
+                    enter_send();
+                    is_send = true;
+
+                    Thread t = new Thread(SendLoopThread);
+                    t.IsBackground = true;
+                    t.Start(wait_time);
+                }
+                else
+                {
+                    exit_send();
+                    is_send = false;
+                    sendSemp.Release();
                 }
             }
         }
@@ -88,7 +166,7 @@ namespace Tools
 
         private void enter_network()
         {
-            ConnectBtn.Text = "Close";
+            ConnectBtn.Text = "关闭";
             is_thread_start = true;
             ProtocolComboBox.Enabled = false;
             IpAddrTextBox.ReadOnly = true;
@@ -99,7 +177,7 @@ namespace Tools
         {
             try
             {
-                ConnectBtn.Text = "Open";
+                ConnectBtn.Text = "打开";
                 is_thread_start = false;
                 ProtocolComboBox.Enabled = true;
                 IpAddrTextBox.ReadOnly = false;
@@ -144,8 +222,9 @@ namespace Tools
             }
             globalSocketManage.port = Int32.Parse(PortTextBox.Text);
             globalSocketManage.socket_ip = IpAddrTextBox.Text;
+            globalSocketManage.work_mode = ProtocolComboBox.SelectedIndex;
 
-            if(!is_thread_start)
+            if (!is_thread_start)
             {
                 Thread process_thread = new Thread(ConnetStartThread);
                 process_thread.IsBackground = true;
@@ -257,6 +336,7 @@ namespace Tools
                 globalSocketManage.TcpClientSocket.Add(accept_socket);
 
                 Thread t = new Thread(thread_accpet);
+                t.IsBackground = true;
                 t.Start(accept_socket);
             }
         }
@@ -295,8 +375,49 @@ namespace Tools
 
         private void SaveLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            
+            if (File.Exists(globalSocketManage.LoggerFile))
+            {
+                File.Delete(globalSocketManage.LoggerFile);
+            }
+
+            if (!File.Exists(globalSocketManage.LoggerFile))
+            {
+                var fs = new FileStream(globalSocketManage.LoggerFile, FileMode.Create, FileAccess.Write);
+                var sw = new StreamWriter(fs);
+                sw.WriteLine(ShowBox.Text);
+                sw.Flush();
+                sw.Close();
+                fs.Close();
+                ShowBox.Invoke(AppendString, $"Save Logger in file {globalSocketManage.LoggerFile}\r\n");
+            }
         }
 
+        private void SaveLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            var FileString = "[Config]" + "\r\n"
+                            + $"mode={ProtocolComboBox.SelectedIndex.ToString()}" + "\r\n"
+                            + $"ipaddres={IpAddrTextBox.Text}" + "\r\n"
+                            + $"port={PortTextBox.Text}" + "\r\n";
+            if (File.Exists(globalSocketManage.ConfigFile))
+            {
+                File.Delete(globalSocketManage.ConfigFile);
+            }
+
+            if (!File.Exists(globalSocketManage.ConfigFile))
+            {
+                var fs = new FileStream(globalSocketManage.ConfigFile, FileMode.Create, FileAccess.Write);
+                var sw = new StreamWriter(fs);
+                sw.WriteLine(FileString);
+                sw.Flush();
+                sw.Close();
+                fs.Close();
+                ShowBox.Invoke(AppendString, $"{FileString}");
+            }
+        }
+
+        private void ClearSendLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            WriteBox.Clear();
+        }
     }
 }

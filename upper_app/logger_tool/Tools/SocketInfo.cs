@@ -14,8 +14,17 @@ namespace Tools
         /*socket ipaddress*/
         public string socket_ip = "127.0.0.1";
 
+        /*config file*/
+        public string ConfigFile = "config.ini";
+
+        /*logger file*/
+        public string LoggerFile = "logger.txt";
+
         /*端口号*/
         public int port;
+
+        /*工作模式，客户端、服务器*/
+        public int work_mode;
 
         /*Tcp Socket*/
         public Socket? TcpSocket;
@@ -25,7 +34,7 @@ namespace Tools
 
         /*socket tx count*/
         public UInt64 tx_count;
-
+    
         /*socket tx count*/
         public UInt64 rx_count;
 
@@ -77,6 +86,46 @@ namespace Tools
                 {
                     socket_ip = ip.ToString();
                     break;
+                }
+            }
+
+            if (File.Exists(ConfigFile))
+            {
+                string[] lines = File.ReadAllLines(ConfigFile);
+                HashSet<string[]> Hashlist = new HashSet<string[]>();
+
+                foreach (var line in lines)
+                {
+                    if (line.Split('=').Length == 2)
+                    {
+                        Hashlist.Add(line.Split('='));
+                    }
+                }
+
+                foreach (var strarry in Hashlist)
+                {
+                    if (strarry[0].ToLower().Equals("mode"))
+                    {
+                        int data;
+                        if (int.TryParse(strarry[1], out data))
+                        {
+                            work_mode = data;
+                        }
+                    }
+
+                    if (strarry[0].ToLower().Equals("ipaddress"))
+                    {
+                        socket_ip = strarry[1];
+                    }
+
+                    if (strarry[0].ToLower().Equals("port"))
+                    {
+                        int data;
+                        if (int.TryParse(strarry[1], out data))
+                        {
+                            port = data;
+                        }
+                    }
                 }
             }
         }
