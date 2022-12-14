@@ -1,8 +1,14 @@
 # remote_manage
 
-web服务应用的实现  
+## web服务应用的实现  
+web应用服务主要包含后端应用和前端界面实现.  
+后端应用基于node.js的服务器应用，由两部分组成.  
+1.作为客户端维持和设备管理模块的可靠连接(TCP+心跳包).  
+2.支持服务端允许前端界面获取信息刷新(短连接，请求刷新).  
+前端主要是包含控制和显示的管理界面，计划采用vue实现.  
 
-文档结构  
-python_server/  python服务器代码实现  
-python_web/     python网页端web界面实现
-test/           python应用测试代码  
+支持嵌入式平台运行的node可通过在嵌入式平台执行如下命令下载，如我使用的是13.14版本，命令如下
+```bash
+wget https://nodejs.org/dist/latest-v13.x/node-v13.14.0-linux-armv7l.tar.gz
+```
+并将node添加到PATH目录下即可使用.
