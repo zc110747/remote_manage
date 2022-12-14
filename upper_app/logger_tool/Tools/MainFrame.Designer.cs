@@ -102,10 +102,10 @@
             // ConnectBtn
             // 
             this.ConnectBtn.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.ConnectBtn.Location = new System.Drawing.Point(14, 240);
+            this.ConnectBtn.Location = new System.Drawing.Point(15, 236);
             this.ConnectBtn.Margin = new System.Windows.Forms.Padding(4);
             this.ConnectBtn.Name = "ConnectBtn";
-            this.ConnectBtn.Size = new System.Drawing.Size(184, 51);
+            this.ConnectBtn.Size = new System.Drawing.Size(182, 56);
             this.ConnectBtn.TabIndex = 6;
             this.ConnectBtn.Text = "打开";
             this.ConnectBtn.UseVisualStyleBackColor = true;
@@ -124,12 +124,12 @@
             // Ipaddr_label
             // 
             this.Ipaddr_label.AutoSize = true;
-            this.Ipaddr_label.Location = new System.Drawing.Point(16, 94);
+            this.Ipaddr_label.Location = new System.Drawing.Point(14, 93);
             this.Ipaddr_label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.Ipaddr_label.Name = "Ipaddr_label";
-            this.Ipaddr_label.Size = new System.Drawing.Size(64, 25);
+            this.Ipaddr_label.Size = new System.Drawing.Size(63, 25);
             this.Ipaddr_label.TabIndex = 4;
-            this.Ipaddr_label.Text = "Ip地址";
+            this.Ipaddr_label.Text = "IP地址";
             // 
             // Protocol_label
             // 
@@ -216,36 +216,36 @@
             this.Clear.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.Clear.Font = new System.Drawing.Font("Arial", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.Clear.Font = new System.Drawing.Font("Courier New", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.Clear.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.Clear.Location = new System.Drawing.Point(663, 687);
+            this.Clear.Location = new System.Drawing.Point(686, 687);
             this.Clear.Margin = new System.Windows.Forms.Padding(1);
             this.Clear.Name = "Clear";
-            this.Clear.Size = new System.Drawing.Size(134, 35);
+            this.Clear.Size = new System.Drawing.Size(90, 35);
             this.Clear.TabIndex = 4;
-            this.Clear.Text = "reset";
+            this.Clear.Text = "Reset";
             this.Clear.UseVisualStyleBackColor = true;
             this.Clear.Click += new System.EventHandler(this.Clear_Click);
             // 
             // RxLable
             // 
             this.RxLable.AutoSize = true;
-            this.RxLable.Location = new System.Drawing.Point(575, 697);
+            this.RxLable.Location = new System.Drawing.Point(576, 697);
             this.RxLable.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.RxLable.Name = "RxLable";
-            this.RxLable.Size = new System.Drawing.Size(45, 25);
+            this.RxLable.Size = new System.Drawing.Size(67, 25);
             this.RxLable.TabIndex = 3;
-            this.RxLable.Text = "rx: 0";
+            this.RxLable.Text = "接收: 0";
             // 
             // TxLable
             // 
             this.TxLable.AutoSize = true;
-            this.TxLable.Location = new System.Drawing.Point(509, 697);
+            this.TxLable.Location = new System.Drawing.Point(466, 697);
             this.TxLable.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.TxLable.Name = "TxLable";
-            this.TxLable.Size = new System.Drawing.Size(45, 25);
+            this.TxLable.Size = new System.Drawing.Size(63, 25);
             this.TxLable.TabIndex = 2;
-            this.TxLable.Text = "tx: 0";
+            this.TxLable.Text = "发送:0";
             // 
             // WriteBox
             // 

@@ -93,63 +93,83 @@ namespace Tools
             ConnectBtn.Enabled = true;
             SendBtn.Text = "发送";
         }
-
+        
+        //update data to remote by peroid
         void SendLoopThread(object? obj)
         {
-            if(obj != null)
+            try
             {
-                int time = (int)obj;
-
-                while (true)
+                if (obj != null)
                 {
-                    if (sendSemp.WaitOne(time))
+                    int time = (int)obj;
+
+                    //if start, send at once
+                    SendSocket();
+
+                    while (true)
                     {
-                        break;
-                    }
-                    else
-                    {
-                        SendSocket();
+                        if (sendSemp.WaitOne(time))
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            //for timeout preoid, update
+                            SendSocket();
+                        }
                     }
                 }
             }
+            catch
+            {
+                ShowBox.Invoke(AppendString, "Send Socket is error!\n");
+            }
+
         }
 
         private void SendBtn_Click(object sender, EventArgs e)
         {
-            bool isLoop;
-            int wait_time = 0;
-
-            //only checked and time is allowed
-            isLoop = LoopCheck.Checked;
-            if(isLoop)
+            try
             {
-                if(!int.TryParse(TimeLoop.Text, out wait_time))
+                bool isLoop;
+                int wait_time = 0;
+
+                //only checked and time is allowed
+                isLoop = LoopCheck.Checked;
+                if (isLoop)
                 {
-                    isLoop = false;
+                    if (!int.TryParse(TimeLoop.Text, out wait_time))
+                    {
+                        isLoop = false;
+                    }
                 }
-            }
-               
-            if (!isLoop)
-            {
-                SendSocket();
-            }
-            else
-            {
-                if(!is_send)
-                {
-                    enter_send();
-                    is_send = true;
 
-                    Thread t = new Thread(SendLoopThread);
-                    t.IsBackground = true;
-                    t.Start(wait_time);
+                if (!isLoop)
+                {
+                    SendSocket();
                 }
                 else
                 {
-                    exit_send();
-                    is_send = false;
-                    sendSemp.Release();
+                    if (!is_send)
+                    {
+                        enter_send();
+                        is_send = true;
+
+                        Thread t = new Thread(SendLoopThread);
+                        t.IsBackground = true;
+                        t.Start(wait_time);
+                    }
+                    else
+                    {
+                        exit_send();
+                        is_send = false;
+                        sendSemp.Release();
+                    }
                 }
+            }
+            catch
+            {
+                ShowBox.Invoke(AppendString, "Send Socket is error!\n");
             }
         }
 
@@ -307,12 +327,12 @@ namespace Tools
                 {
                     globalSocketManage.TcpClientSocket.Remove(AcceptSocket);
                     AcceptSocket.Close();
-                    ShowBox.Invoke(AppendString, String.Format("TCP Accpet Connect Close Now!\n"));
+                    ShowBox.Invoke(AppendString, String.Format("TCP Accpet Connect Close Now\r\n"));
                 }
             }
             else
             {
-                ShowBox.Invoke(AppendString, "Accept Socket is error!\n");
+                ShowBox.Invoke(AppendString, "Accept socket is empty\r\n");
             }
         }
 
@@ -324,9 +344,9 @@ namespace Tools
             globalSocketManage.TcpSocket.ExclusiveAddressUse = false;
             globalSocketManage.TcpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
             globalSocketManage.TcpSocket.Bind(IpGlobal);
-            globalSocketManage.TcpSocket.Listen(32);
+            globalSocketManage.TcpSocket.Listen();
 
-            ShowBox.Invoke(AppendString, $"Server Start Success, Now IPAddress is {globalSocketManage.socket_ip}:{globalSocketManage.port}!\n");
+            ShowBox.Invoke(AppendString, $"Server Start Success, Binding:{globalSocketManage.socket_ip}:{globalSocketManage.port}\r\n");
             //if listen success, enter network
             enter_network();
 
@@ -335,6 +355,7 @@ namespace Tools
                 var accept_socket = globalSocketManage.TcpSocket.Accept();
                 globalSocketManage.TcpClientSocket.Add(accept_socket);
 
+                ShowBox.Invoke(AppendString, $"Accept Socket Connect, Ipaddresss:{accept_socket.RemoteEndPoint?.ToString()}\r\n");
                 Thread t = new Thread(thread_accpet);
                 t.IsBackground = true;
                 t.Start(accept_socket);
@@ -396,7 +417,7 @@ namespace Tools
         {
             var FileString = "[Config]" + "\r\n"
                             + $"mode={ProtocolComboBox.SelectedIndex.ToString()}" + "\r\n"
-                            + $"ipaddres={IpAddrTextBox.Text}" + "\r\n"
+                            + $"ipaddress={IpAddrTextBox.Text}" + "\r\n"
                             + $"port={PortTextBox.Text}" + "\r\n";
             if (File.Exists(globalSocketManage.ConfigFile))
             {
@@ -419,5 +440,6 @@ namespace Tools
         {
             WriteBox.Clear();
         }
+
     }
 }
