@@ -55,7 +55,7 @@ public:
             if(set_.size() == 0)
                 current_session = nullptr;
             else
-                current_session = *set_.begin();
+                current_session = *set_.begin(); //only send message to first session
         }
         return current_session;
     }

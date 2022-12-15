@@ -98,7 +98,7 @@ scp -r [file] [用户名]@[ipAddress]:[目录]
 例如 scp -r test.txt freedom@192.168.0.99:/tmp/, 另外目录需要在当前权限下可写才可以.  
 上诉主要讲述了如何在linux平台使用openssh, 不过对于嵌入式linux平台，就需要自己编译openssh，这里给出说明.  
 
-### 编译嵌入式环境下的ssh服务  
+#### 编译嵌入式环境下的ssh服务  
 1.下载zlib, openssl, openssh, 将所有文件下载并解压到/home/[自定义]/download目录下，这里目录选择center.  
 ```bash
 wget http://www.zlib.net/fossils/zlib-1.2.13.tar.gz
