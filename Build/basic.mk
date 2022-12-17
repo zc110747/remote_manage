@@ -16,7 +16,7 @@ CFLAGS  += -lpthread -lm
 all : $(executables)
 
 %.o : %.cpp
-	$(CC) $(CFLAGS) -c $< -o $@ $(include_path)
+	$(CC) $(CFLAGS) -c $< -o $@ -MD -MF "$(dir $@).$(notdir $@).d" -MT "$@" $(include_path)
 
 $(executables): $(objects)
 	$(CC) -o $(executables) $(objects) $(lib) $(CFLAGS)
@@ -29,6 +29,7 @@ tags :
 # this is the rule how to clean all the file
 clean:
 	rm -f $(objects)
+	rm -f $(clear_dobject)
 	rm -f $(executables_path)/$(executables)
 
 # this tags let the make can execute the executabls.

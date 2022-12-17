@@ -19,12 +19,8 @@
 #ifndef _INCLUDE_LOGGER_HPP
 #define _INCLUDE_LOGGER_HPP
 
-#include "productConfig.hpp"
 #include <atomic>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <sys/types.h>
-#include <arpa/inet.h>
+#include "productConfig.hpp"
 #include "cmdProcess.hpp"
 #include "timer.hpp"
 
@@ -48,7 +44,7 @@ typedef struct
     int length;
 }LOG_MESSAGE;
 
-class LoggerManage
+class LoggerManage final
 {
 private:
     char *pNextMemoryBuffer;

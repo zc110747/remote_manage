@@ -18,10 +18,14 @@
 //      8/8/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
 
+#if !__has_include("asio.hpp")
+#error "asio library not exist, need release in lib directory"
+#endif
+
 #include "asio.hpp"
+#include <set>
 #include <memory>
 #include <iostream>
-#include <set>
 
 class session;
 using share_session_ptr = std::shared_ptr<session>;

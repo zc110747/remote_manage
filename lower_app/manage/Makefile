@@ -13,7 +13,7 @@
 HOST=
 CPU=x86-
 CC = $(HOST)g++
-CFLAGS := -O3 -std=c++17 -fno-strict-aliasing -lrt
+CFLAGS := -O3 -std=c++17 -fno-strict-aliasing -lrt 
 
 objects = 	main.o \
 			remote/SocketTcpThread.o 	 \
@@ -33,6 +33,14 @@ objects = 	main.o \
 			logger/logger.o \
 			logger/cmdProcess.o \
 			logger/asio_server.o 
+
+clear_dobject = *.d .*.o.d \
+				application/*.d application/.*.o.d \
+				driver/*.d driver/.*.o.d \
+				event/*.d event/.*.o.d \
+				lib/*.d lib/.*.o.d \
+				logger/*.d logger/.*.o.d \
+				remote/*.d remote/.*.o.d 
 
 include_path = -I remote/ 			\
 				-I driver/ 			\

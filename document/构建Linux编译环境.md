@@ -64,9 +64,14 @@ export PATH=$PATH:/home/[自定义]/install/[gcc]/bin
 ```
 
 对于ROOT用户，可直接修改/etc/environment,添加到里面指定的PATH路径即可.  
-如果在环境中输入arm-linux-，按tab能扩展出支持arm的编译工具，此时即表示添加成功.  
+如果在环境中输入arm-linux-，按tab能扩展出支持arm的编译工具，此时即表示添加成功. 
 
-## 3.常用工具安装和编译(可跳过)
+## 3.嵌入式Linux支持环境编译
+
+### uboot的编译
+
+
+## 4.常用工具安装和编译(可跳过)
 
 本小节主要列出常用的工具指导，如远程访问的ssh，用于程序开发的vscode，当然也提供用于支持嵌入式Linux平台的工具编译如sqlite，node, mtd-utils,不过这些都是编译和积累的技术，可以先不需要了解，用到当作查找工具即可.  
 
@@ -89,13 +94,19 @@ Ciphers aes128-cbc
 MACs  hmac-md5
 KexAlgorithms diffie-hellman-group1-sha1
 ```
-分别放在服务端的/etc/ssh/sshd_config和客户端的/etc/ssh/ssh_config中末尾即可.  
+分别放在服务端的/etc/ssh/sshd_config和客户端的/etc/ssh/ssh_config中即可.  
 当然对于windows系统，添加在C:\ProgramData\ssh\ssh_config中.  
 此外也可以通过scp命令传文件到系统中，这样可以提高效率，执行命令如下  
 ```bash
 scp -r [file] [用户名]@[ipAddress]:[目录]
 ```
 例如 scp -r test.txt freedom@192.168.0.99:/tmp/, 另外目录需要在当前权限下可写才可以.  
+如果远端的ssh服务器发生变化与本地保存不一致，可通过  
+```bash
+ssh-keygen -f "/root/.ssh/known_hosts" -R [ipaddress]  
+```
+清除本地保存的密钥
+
 上诉主要讲述了如何在linux平台使用openssh, 不过对于嵌入式linux平台，就需要自己编译openssh，这里给出说明.  
 
 #### 编译嵌入式环境下的ssh服务  
@@ -125,4 +136,30 @@ make & make install
 ```bash
 ./configure --host=arm-linux-gnueabihf --with-libs --with-zlib=/home/center/download/openssh-9.1p1/zlib --with-ssl-dir=/home/center/download/openssh-9.1p1/openssl --disable-etc-default-login 
 ```
-编译完成后，目录下的scp sftp ssh sshd ssh-add ssh-agent ssh-keygen ssh-keyscan文件，即是编译后的执行文件，可上传到server上执行运行环境即可.  
+编译完成后，目录下的scp sftp ssh sshd ssh-add ssh-agent ssh-keygen ssh-keyscan文件，即是编译后的执行文件.  
+
+5.上传文件到嵌入式linux平台，并创建运行环境  
+创建以下目录(存在则不需要创建)  
+```bash
+mkdir /usr/local/bin
+mkdir /usr/local/etc
+mkdir /usr/libexec
+mkdir /var/run
+mkdir /var/empty
+```
+将scp, sftp, ssh, sshd, ssh-agent, ssh-keygen, ssh-keyscan拷贝到/usr/local/bin目录.  
+将sftp-server, ssh-keysign拷贝到/usr/libexec目录.  
+将moduli, ssh_config, sshd_config拷贝到/usr/local/etc目录.  
+在嵌入式平台生成ssh对应密钥  
+```bash
+cd /usr/bin/etc
+/usr/local/bin/ssh-keygen -t rsa -f ssh_host_rsa_key -N ""
+/usr/local/bin/ssh-keygen -t dsa -f ssh_host_dsa_key -N ""
+/usr/local/bin/ssh-keygen -t ecdsa -f ssh_host_ecdsa_key -N ""
+/usr/local/bin/ssh-keygen -t dsa -f ssh_host_ed25519_key -N ""
+```
+生成完成后，在/etc/passwd中添加sshd用户支持  
+```bash
+sshd:x:115:65534::/var/run/sshd:/usr/sbin/nologin
+```
+当然也要和上面桌面端一样，在/usr/local/etc/sshd_config添加支持的加密算法，至此，对嵌入式端ssh的编译支持完成.
