@@ -9,13 +9,13 @@
 cd lower_app/manage/lib/
 tar -xvf asio.tar.bz2
 cd ../
-make run
+make
 ```
-还要修改manage目录下的config.json
-"socket":{
-		"ipaddr":"192.168.113.1"
-},
-其中ipaddr改成本地ip地址
+在执行修改manage目录下的config.json  
+"socket":{  
+		"ipaddr":"192.168.113.1"  
+},  
+其中ipaddr改成本地ip地址, 并复制到../Execute/目录下，并进入目录执行app_demo即可运行下位机.  
 
 ## 项目结构
 
@@ -25,14 +25,15 @@ kernael_mod/     	内核驱动模块
 lower_app/          嵌入式Linux设备应用实现  
 	-manage/     	主工作流应用，驱动模块处理，logger实现，外设和其它设备接口访问  
 	-gui/        	下位机图形界面，支持状态显示和基本操作(QT)  
-	-server/        支持桌面访问得web服务器(node)  
+	-server/        支持桌面访问得web服务器(node/js/web)  
 support/        	用于支持应用执行的lib库或者环境  
 upper_app/          PC客户端应用实现  
 	-manage/        用于访问嵌入式设备的桌面客户端(暂定QT)  
+	-loger_tool/    用于支持logger打印的网络调试工具(C#)
 
 ## 设计文档
 
-参考文档(见document目录下说明), 初步设计包含:
+参考文档(见document目录下说明), 初步设计包含:  
 
 嵌入式Linux端设计  
 
@@ -45,7 +46,7 @@ upper_app/          PC客户端应用实现
 7. 访问外部设备的模块接口(基于CAN或者串口的轮询控制接口)  
 
 
-PC应用端设计
+PC应用端设计  
 
 1. 访问Linux端接口，获取内部数据  
 2. 操作Linux端设备外设  
@@ -68,7 +69,7 @@ PC应用端设计
 上位机编译工具  
 	QT(the newest stable version)  
 logger显示工具  
-	visual studio(the newest stable version) 
+	visual studio(the newest stable version)  
 
 ## 注意事项  
   
