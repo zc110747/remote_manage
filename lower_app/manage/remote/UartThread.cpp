@@ -17,6 +17,7 @@
 //      7/30/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
 #include "UartThread.hpp"
+#include <sys/termios.h>
 
 UartThreadManage* UartThreadManage::pInstance = nullptr;
 UartThreadManage* UartThreadManage::getInstance()

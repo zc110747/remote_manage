@@ -24,6 +24,8 @@ void asio_server::init(const std::string& address, const std::string& port, std:
     //update for rx handler
     group.init(handler);
 
+    PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "asio_server start, bind:%s:%s!", address.c_str(), port.c_str());
+    
     // Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
     asio::ip::tcp::resolver resolver(io_context_);
     asio::ip::tcp::endpoint endpoint =
@@ -33,7 +35,6 @@ void asio_server::init(const std::string& address, const std::string& port, std:
     acceptor_.bind(endpoint);
     acceptor_.listen();
     
-    PRINT_LOG(LOG_DEBUG, xGetCurrentTicks(), "asio_server start, bind:%s:%s!", address.c_str(), port.c_str());
     do_accept();
 } 
 
@@ -50,6 +51,7 @@ void asio_server::do_accept()
         if (!ec)
         {
             std::make_shared<session>(std::move(socket), group)->start();
+            PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Connect from client!");
         }
 
         do_accept();

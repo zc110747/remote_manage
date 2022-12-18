@@ -20,7 +20,7 @@ all : $(executables)
 
 $(executables): $(objects)
 	$(CC) -o $(executables) $(objects) $(lib) $(CFLAGS)
-# rm -f $(objects)
+	rm -f $(objects) $(clear_dobject)
 	$(shell if [ -d $(executables_path) ]; then echo; else mkdir $(executables_path); fi)
 	mv $(executables) $(executables_path)
 tags :
@@ -28,8 +28,7 @@ tags :
 
 # this is the rule how to clean all the file
 clean:
-	rm -f $(objects)
-	rm -f $(clear_dobject)
+	rm -f $(objects) $(clear_dobject)
 	rm -f $(executables_path)/$(executables)
 
 # this tags let the make can execute the executabls.

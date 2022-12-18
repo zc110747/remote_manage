@@ -30,9 +30,8 @@
 #include <assert.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/termios.h>
 #include <sys/time.h>
-#include <sys/signal.h>
+//#include <sys/signal.h>
 
 //c++ interface
 #include <new>

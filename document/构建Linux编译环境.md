@@ -110,7 +110,7 @@ ssh-keygen -f "/root/.ssh/known_hosts" -R [ipaddress]
 上诉主要讲述了如何在linux平台使用openssh, 不过对于嵌入式linux平台，就需要自己编译openssh，这里给出说明.  
 
 #### 编译嵌入式环境下的ssh服务  
-1.下载zlib, openssl, openssh, 将所有文件下载并解压到/home/[自定义]/download目录下，这里目录选择center.  
+[1].下载zlib, openssl, openssh, 将所有文件下载并解压到/home/[自定义]/download目录下，这里目录选择center.  
 ```bash
 wget http://www.zlib.net/fossils/zlib-1.2.13.tar.gz
 wget https://www.openssl.org/source/openssl-3.0.7.tar.gz
@@ -119,26 +119,26 @@ tar -xvf zlib-1.2.13.tar.gz
 tar -xvf openssl-3.0.7.tar.gz
 tar -xvf openssh-9.1p1.tar.gz
 ```
-2.编译zlib库.  
+[2].编译zlib库.  
 ```bash
 cd zlib-1.2.13/
 export CHOST=arm-linux-gnueabihf
 ./configure --prefix=/home/center/download/openssh-9.1p1/zlib
 make & make install
 ```
-3.编译openssl.
+[3].编译openssl.
 ```bash
 cd openssl-3.0.7/
 ./config --cross-compile-prefix=arm-linux-gnueabihf- no-asm linux-aarch64 --prefix=/home/center/download/openssh-9.1p1/openssl
 make & make install
 ```
-4.编译openssh.
+[4].编译openssh.
 ```bash
 ./configure --host=arm-linux-gnueabihf --with-libs --with-zlib=/home/center/download/openssh-9.1p1/zlib --with-ssl-dir=/home/center/download/openssh-9.1p1/openssl --disable-etc-default-login 
 ```
 编译完成后，目录下的scp sftp ssh sshd ssh-add ssh-agent ssh-keygen ssh-keyscan文件，即是编译后的执行文件.  
 
-5.上传文件到嵌入式linux平台，并创建运行环境  
+[5].上传文件到嵌入式linux平台，并创建运行环境  
 创建以下目录(存在则不需要创建)  
 ```bash
 mkdir /usr/local/bin
@@ -163,3 +163,42 @@ cd /usr/bin/etc
 sshd:x:115:65534::/var/run/sshd:/usr/sbin/nologin
 ```
 当然也要和上面桌面端一样，在/usr/local/etc/sshd_config添加支持的加密算法，至此，对嵌入式端ssh的编译支持完成.
+
+
+### (2)编译和安装最新的g++
+首先安装最新的gcc版本，可以在https://mirrors.tuna.tsinghua.edu.cn/gnu/gcc/ 目录下找寻下载，如现在采用最新的为12.2.0, 进入下载目录，使用wget即可下载.  
+```bash
+wget https://mirrors.tuna.tsinghua.edu.cn/gnu/gcc/gcc-12.2.0/gcc-12.2.0.tar.gz
+tar -xvf gcc-12.2.0.tar.gz
+cd gcc-12.2.0
+```
+理论上要执行./contrib/download_prerequisites直接安装编译环境，不过国内节点速度会很慢，建议先通过vim contrib/download_prerequisites，在起始处有需要的版本,如12.2.0需要如下.
+gmp='gmp-6.2.1.tar.bz2'
+mpfr='mpfr-4.1.0.tar.bz2'
+mpc='mpc-1.2.1.tar.gz'
+isl='isl-0.24.tar.bz2'
+然后就可以使用命令在目录下下载。
+```bash
+wget https://mirrors.tuna.tsinghua.edu.cn/gnu/gmp/gmp-6.2.1.tar.bz2
+wget https://mirrors.tuna.tsinghua.edu.cn/gnu/mpfr/mpfr-4.1.0.tar.bz2
+wget https://mirrors.tuna.tsinghua.edu.cn/gnu/mpc/mpc-1.2.1.tar.gz
+wget https://gcc.gnu.org/pub/gcc/infrastructure/isl-0.24.tar.bz2
+./contrib/download_prerequisites
+./configure --enable-checking=release --enable-languages=c,c++ --disable-multilib --prefix=/home/center/install/gcc12/
+make -j4
+make install
+```
+如果编译出现了'stage1-bubble' 清除make distclean, 重新执行make即可
+编译完成后，需要将编译完成的gcc和g++文件链接到系统目录/usr/bin/下，执行如下
+```bash
+GCC_INSTALL_PATH=/home/center/install/gcc12
+echo $GCC_INSTALL_PATH
+sudo ln -sf $GCC_INSTALL_PATH/bin/g++ /usr/bin/g++
+sudo ln -sf $GCC_INSTALL_PATH/bin/gcc /usr/bin/gcc
+sudo ln -sf $GCC_INSTALL_PATH/bin/gcc-ranlib /usr/bin/gcc-ranlib
+sudo ln -sf $GCC_INSTALL_PATH/bin//gcc-ar /usr/bin/gcc-ar
+sudo ln -sf $GCC_INSTALL_PATH/bin/gcc-nm /usr/bin/gcc-nm
+sudo ln -sf $GCC_INSTALL_PATH/bin/gcov /usr/bin/gcov
+sudo ln -sf $GCC_INSTALL_PATH/lib64/libstdc++.so.6.0.30 /usr/lib/x86_64-linux-gnu/libstdc++.so.6
+```
+可通过gcc -v或者g++ -v查询版本是否替换成功.

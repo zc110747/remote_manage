@@ -4,6 +4,19 @@
 
 ![image](https://github.com/zc110747/remote_manage/blob/master/document/Image/firmware.jpg)
 
+## 如何编译执行项目
+```bash
+cd lower_app/manage/lib/
+tar -xvf asio.tar.bz2
+cd ../
+make run
+```
+还要修改manage目录下的config.json
+"socket":{
+		"ipaddr":"192.168.113.1"
+},
+其中ipaddr改成本地ip地址
+
 ## 项目结构
 
 demo/           	测试代码    
