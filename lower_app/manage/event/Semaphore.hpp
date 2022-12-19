@@ -27,6 +27,7 @@ namespace EVENT
             std::unique_lock<std::mutex> lock(mt);
             if(--count < 0)
             {
+                //在这一步释放了lock, 同时进行解锁
                 cv.wait(lock, [this]()->bool{
                     return wakeups > 0;
                 });

@@ -3,21 +3,20 @@
 //  All Rights Reserved
 //
 //  Name:
-//      FIFOMessage.hpp
+//      FIFOManage.hpp
 //
 //  Purpose:
-//      Communication by fifo interface.
+//      FIFO管理接口，用于提供外部，支持创建读写的接口
 //
 // Author:
-//      Alva Zhange
+//      听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
-//      7/24/2022   Create New Version
+//      12/19/2022   Add explian and update structure.
 /////////////////////////////////////////////////////////////////////////////
-#ifndef _INCLUDE_FIFO_MANAGE_HPP
-#define _INCLUDE_FIFO_MANAGE_HPP
+_Pragma("once")
 
 #include "logger.hpp"
 #include <mqueue.h>
@@ -25,7 +24,7 @@
 
 #define S_FIFO_WORK_MODE               (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)  
 
-class FIFOMessage
+class FIFOMessage final
 {
 private:
     std::string  fifoM;
@@ -111,4 +110,3 @@ public:
         return writebytes;
     }  
 };
-#endif

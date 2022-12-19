@@ -63,7 +63,7 @@ static void option_process(int argc, char *argv[])
 				break;
 			case 'v':
 			case 'V':
-				printf("app_demo %s\n", DEVICE_VERSION);
+				//printf("app_demo %s\n", DEVICE_VERSION);
 				exit(0);	
 			default:
 				exit(1);

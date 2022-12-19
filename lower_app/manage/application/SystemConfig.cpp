@@ -1,17 +1,25 @@
-/*
- * File      : SystemConfig.cpp
- * 系统配置信息文件处理
- * COPYRIGHT (C) 2020, zc
- *
- * Change Logs:
- * Date           Author       Notes
- * 2020-5-4      zc           the first version
- */
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2022-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      SystemConfigProcess.cpp
+//
+//  Purpose:
+//      系统信息配置组件，主要实现如下功能
+//      1.读取配置文件config.json, 赋值到内部配置中，如读取失败则使用默认配置
+//      2.提供接口，允许上位机读取配置信息
+//      3.提供接口，允许上位机写入配置信息，并保存到config.json文件中, 并支持一键复位
+//
+// Author:
+//     	Alva Zhange
+//
+//  Assumptions:
+//
+//  Revision History:
+//      12/19/2022   Create New Version
+/////////////////////////////////////////////////////////////////////////////
 
-/**
- * @addtogroup IMX6ULL
- */
-/*@{*/
 #include <fstream>
 #include <iostream>
 #include "SystemConfig.hpp"
