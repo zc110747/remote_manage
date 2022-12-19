@@ -18,11 +18,7 @@
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
-#include "productConfig.hpp"
-#include "CalcCrc16.hpp"
-#include "SystemConfig.hpp"
-#include "DeviceManageThread.hpp"
-#include "FIFOManage.hpp"
+#include "modules.hpp"
 
 /**************************************************************************
 * Global Macro Definition

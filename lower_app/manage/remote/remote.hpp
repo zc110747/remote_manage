@@ -3,10 +3,10 @@
 //  All Rights Reserved
 //
 //  Name:
-//      CalcCrc16.cpp
+//      remote.hpp
 //
 //  Purpose:
-//      Calculate crc16 interface.
+//      global process by unity main interface.
 //
 // Author:
 //      Alva Zhange
@@ -14,12 +14,10 @@
 //  Assumptions:
 //
 //  Revision History:
-//      7/24/2022   Create New Version
+//      7/30/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
-#ifndef _INCLUDE_CALC_CRC16_HPP
-#define _INCLUDE_CALC_CRC16_HPP
+_Pragma("once")
 
-#include "includes.hpp"
-
-uint16_t crc16(uint16_t crc, uint8_t const *buffer, uint16_t len);
-#endif
+#include "SocketTcpThread.hpp"
+#include "SocketUdpThread.hpp"
+#include "UartThread.hpp"

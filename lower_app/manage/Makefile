@@ -19,10 +19,10 @@ objects = 	main.o \
 			remote/SocketTcpThread.o 	 \
 			remote/SocketUdpThread.o 	 \
 			remote/UartThread.o 		 \
-			application/DeviceManageThread.o   \
-			application/SystemConfig.o \
-			application/tools/CalcCrc16.o  \
-			application/TimeManage.o \
+			module/DeviceManageThread.o   \
+			module/SystemConfig.o \
+			module/CalcCrc16.o  \
+			module/TimeManage.o \
 			driver/rtc.o \
 			driver/beep.o \
 			driver/led.o \
@@ -35,7 +35,7 @@ objects = 	main.o \
 			logger/asio_server.o 
 
 clear_dobject = *.d .*.o.d \
-				application/*.d application/.*.o.d \
+				module/*.d module/.*.o.d \
 				driver/*.d driver/.*.o.d \
 				event/*.d event/.*.o.d \
 				lib/*.d lib/.*.o.d \
@@ -46,11 +46,11 @@ include_path = -I remote/ 			\
 				-I driver/ 			\
 				-I lib/ 			\
 				-I include/ 		\
-				-I application/ 		\
+				-I module/ 		\
 				-I lib/jsoncpp/include  \
 				-I lib/asio/include		\
 				-I logger/ 			\
-				-I application/tools/ \
+				-I module/tools/ \
 				-I event/			
 lib = lib/$(CPU)libjsoncpp.a
 

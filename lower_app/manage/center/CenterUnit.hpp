@@ -3,18 +3,20 @@
 //  All Rights Reserved
 //
 //  Name:
-//      CenterUnit.hpp
+//      CenterUnit.cpp
 //
 //  Purpose:
-//      用于管理整个数据通讯的核心线程
+//      核心管理模块，用于接收所有模块的数据，进行管理并分发
+//      输入:网络通讯模块, QT界面事件，node输入事件, 设备状态更新，logger调试接口
+//      输出：本地硬件设备
 //
 // Author:
-//     	Alva Zhange
+//     @听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
-//      7/30/2022   Create New Version
+//      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 

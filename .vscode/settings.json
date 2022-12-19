@@ -85,6 +85,7 @@
         "codecvt": "cpp",
         "csignal": "cpp",
         "*.ipp": "cpp",
-        "future": "cpp"
+        "future": "cpp",
+        "*.txt": "cpp"
     }
 }

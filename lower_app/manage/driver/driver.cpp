@@ -3,18 +3,18 @@
 //  All Rights Reserved
 //
 //  Name:
-//      DriverManage.cpp
+//      driver.cpp
 //
 //  Purpose:
-//      DriverManage init and release.
+//      驱动管理模块，用于初始化开启所有硬件使用的外设
 //
 // Author:
-//      Alva Zhange
+//     @听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
-//      7/24/2022   Create New Version
+//      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
 #include "driver.hpp"
 

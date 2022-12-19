@@ -3,21 +3,20 @@
 //  All Rights Reserved
 //
 //  Name:
-//      i2c_ap.cpp
+//      i2c_ap.hpp
 //
 //  Purpose:
-//      i2c read ap interface.
+//      AP模块对应的I2C接口，通过继承支持直接读取模块信息
 //
 // Author:
-//      Alva Zhange
+//     @听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
-//      7/24/2022   Create New Version
+//      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
-#ifndef _I2C_AP_HPP
-#define _I2C_AP_HPP
+_Pragma("once")
 
 #include "deviceBase.hpp"
 
@@ -40,4 +39,3 @@ public:
     static APDevice *getInstance();
     void release();
 };
-#endif

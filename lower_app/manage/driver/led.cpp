@@ -6,15 +6,15 @@
 //      led.cpp
 //
 //  Purpose:
-//      led device.
+//      LED管理驱动，包含IO支持特性
 //
 // Author:
-//      Alva Zhange
+//     @听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
-//      7/24/2022   Create New Version
+//      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
 #include "led.hpp"
 #include "../logger/logger.hpp"

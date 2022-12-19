@@ -21,8 +21,5 @@ _Pragma("once")
 #include "productConfig.hpp"
 #include "SystemConfig.hpp"
 #include "DeviceManageThread.hpp"
-#include "SocketTcpThread.hpp"
-#include "SocketUdpThread.hpp"
-#include "UartThread.hpp"
 
-void exit_main_app();
+uint16_t crc16(uint16_t crc, uint8_t const *buffer, uint16_t len);

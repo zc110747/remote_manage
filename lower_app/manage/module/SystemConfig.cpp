@@ -24,10 +24,10 @@
 #include <iostream>
 #include "SystemConfig.hpp"
 
-static const uint8_t fw_version[] = {
+//const默认内部链接的, 需要在初始化地方加上const
+const uint8_t fw_version[4] = {
     #include "../verion.txt"
 };
-
 SystemConfig* SystemConfig::pInstance = nullptr;
 SystemConfig* SystemConfig::getInstance()
 {
@@ -152,4 +152,9 @@ std::ostream& operator<<(std::ostream& os, const SystemConfig& config)
     os<<"apI2c:"<<parameter->apI2c.dev<<"\n";
     os<<"downloadpath:"<<parameter->downloadpath;
     return os;
+}
+
+const uint8_t *get_version()
+{
+    return fw_version;
 }

@@ -6,15 +6,17 @@
 //      deviceBase.cpp
 //
 //  Purpose:
-//      Device Base Class.
+//      封装的设备底层接口，基类为deviceBase, 支持open/close
+//      IOBase主要封装IO支持的接口, open, read, write, close
+//      InfoBase主要封装支持特定外设的接口, 可以读取内部信息
 //
 // Author:
-//      Alva Zhange
+//     @听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
-//      7/24/2022   Create New Version
+//      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
 #include "deviceBase.hpp"
 

@@ -6,18 +6,17 @@
 //      spi_icm.hpp
 //
 //  Purpose:
-//      spi read icm interface.
+//      ICM模块对应的SPI接口，通过继承支持直接读取模块信息
 //
 // Author:
-//      Alva Zhange
+//     @听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
-//      7/24/2022   Create New Version
+//      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
-#ifndef _SPI_ICM_HPP
-#define _SPI_ICM_HPP
+_Pragma("once")
 
 #include "deviceBase.hpp"
 
@@ -44,4 +43,4 @@ public:
     static ICMDevice *getInstance();
     void release();
 };
-#endif
+

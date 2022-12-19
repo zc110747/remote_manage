@@ -6,17 +6,18 @@
 //      deviceBase.hpp
 //
 //  Purpose:
-//      Device Base Class Interface.
+//      封装的设备底层接口，基类为deviceBase, 支持open/close
+//      IOBase主要封装IO支持的接口, open, read, write, close
+//      InfoBase主要封装支持特定外设的接口, 可以读取内部信息
 //
 // Author:
-//      Alva Zhange
+//     @听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
-//      7/24/2022   Create New Version
+//      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
-
 #ifndef __DEVICEBASE_HPP
 #define __DEVICEBASE_HPP
 
@@ -76,33 +77,30 @@ public:
     //constructor
     using deviceBase::deviceBase;
 
-    bool readInfo();
-    T getInfo() {return data.info;}
-};
-
-template<typename T>
-bool InfoBase<T>::readInfo()
-{
-    bool ret = false;
-    ssize_t nSize;
-
-    if(DeviceFdM >= 0)
+    bool readInfo()
     {
-        int readSize = sizeof(data.info);
-        
-        readSize = readSize<MAX_INFO_SIZE?readSize:MAX_INFO_SIZE;
-        nSize = ::read(DeviceFdM, data.buffer, readSize);
-        if(nSize > 0)
-        {
-            ret = true;
-        }
-        else
-        {
+        bool ret = false;
+        ssize_t nSize;
 
+        if(DeviceFdM >= 0)
+        {
+            int readSize = sizeof(data.info);
+            
+            readSize = readSize<MAX_INFO_SIZE?readSize:MAX_INFO_SIZE;
+            nSize = ::read(DeviceFdM, data.buffer, readSize);
+            if(nSize > 0)
+            {
+                ret = true;
+            }
+            else
+            {
+
+            }
         }
+        return ret;
     }
 
-    return ret;
-}
+    T getInfo() {return data.info;}
+};
 
 #endif

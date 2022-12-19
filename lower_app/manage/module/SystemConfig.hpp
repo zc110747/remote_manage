@@ -108,4 +108,6 @@ public:
     const JString &getdownloadpath()    {return parameter.downloadpath;}
     const uint8_t* getversion()         {return parameter.version;}
 };
+
+const uint8_t *get_version();
 #endif
