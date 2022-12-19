@@ -23,6 +23,7 @@ objects = 	main.o \
 			module/SystemConfig.o \
 			module/CalcCrc16.o  \
 			module/TimeManage.o \
+			module/FIFOManage.o \
 			driver/rtc.o \
 			driver/beep.o \
 			driver/led.o \

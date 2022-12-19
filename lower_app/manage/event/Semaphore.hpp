@@ -1,3 +1,21 @@
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2022-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      Semaphore.hpp
+//
+//  Purpose:
+//      信号量, 用于线程间通讯的触发, 支持长等待和超时模式
+//
+// Author:
+//     @听心跳的声音
+//
+//  Assumptions:
+//
+//  Revision History:
+//      12/19/2022   Create New Version	
+/////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
 #include <mutex>

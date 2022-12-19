@@ -6,17 +6,17 @@
 //      asio_server.hpp
 //
 //  Purpose:
-//      support for tcp server by asio.
-//      this copy from the example by asio application.
+//      基于asio库实现的web服务器
 //
 // Author:
-//      Alva Zhange
+//     @听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
-//      8/8/2022   Create New Version
+//      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
+_Pragma("once")
 
 #if !__has_include("asio.hpp")
 #error "asio library not exist, need release in lib directory"

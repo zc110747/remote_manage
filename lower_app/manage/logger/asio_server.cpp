@@ -6,15 +6,15 @@
 //      asio_server.cpp
 //
 //  Purpose:
-//      support for tcp server by asio
+//      基于asio库实现的web服务器
 //
 // Author:
-//      Alva Zhange
+//     @听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
-//      8/8/2022   Create New Version
+//      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
 #include "asio_server.hpp"
 #include "logger.hpp"

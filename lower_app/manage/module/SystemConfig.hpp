@@ -3,7 +3,7 @@
 //  All Rights Reserved
 //
 //  Name:
-//      SystemConfigProcess.hpp
+//      SystemConfig.hpp
 //
 //  Purpose:
 //      系统信息配置组件，主要实现如下功能
@@ -12,16 +12,14 @@
 //      3.提供接口，允许上位机写入配置信息，并保存到config.json文件中, 并支持一键复位
 //
 // Author:
-//     	Alva Zhange
+//     	@听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
 //      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
-
-#ifndef _INCLUDE_SYSTEM_CONFIG_HPP
-#define _INCLUDE_SYSTEM_CONFIG_HPP
+_Pragma("once")
 
 #include "json/json.h"
 #include "productConfig.hpp"
@@ -110,4 +108,3 @@ public:
 };
 
 const uint8_t *get_version();
-#endif

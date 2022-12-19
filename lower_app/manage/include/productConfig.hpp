@@ -3,18 +3,18 @@
 //  All Rights Reserved
 //
 //  Name:
-//      productConfig.hpp
+//      ProductConfig.hpp
 //
 //  Purpose:
-//      product default config.
+//      包含应用配置信息的文件
 //
 // Author:
-//      Alva Zhange
+//     @听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
-//      7/24/2022   Create New Version
+//      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 

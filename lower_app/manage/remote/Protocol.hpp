@@ -6,15 +6,15 @@
 //      Protocol.hpp
 //
 //  Purpose:
-//     	protocol Process interface.
+//      用于处理协议定义的接口
 //
 // Author:
-//     	Alva Zhange
+//     	@听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
-//      7/30/2022   Create New Version
+//      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 

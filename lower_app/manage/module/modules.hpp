@@ -3,18 +3,18 @@
 //  All Rights Reserved
 //
 //  Name:
-//      UnityMain.hpp
+//      modules.hpp
 //
 //  Purpose:
-//      global process by unity main interface.
+//      组件的总接口, 提供对外的接口
 //
 // Author:
-//      Alva Zhange
+//      @听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
-//      7/30/2022   Create New Version
+//      12/19/2022   Add explian and update structure.
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 

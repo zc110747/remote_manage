@@ -1,3 +1,21 @@
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2022-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      thread_queue.hpp
+//
+//  Purpose:
+//      基于Semaphore实现的消息队列, 用于线程间传递消息
+//
+// Author:
+//     @听心跳的声音
+//
+//  Assumptions:
+//
+//  Revision History:
+//      12/19/2022   Create New Version	
+/////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
 #include <queue>
@@ -13,18 +31,15 @@ namespace EVENT
         std::queue<T> Queue_;
         std::mutex  mut;
         Semaphore Semaphore_;
+        
     public:
-        size_t size() {
-            return Queue_.size();
-        }
-
         void QueueSend(T& Object)
         {
             {
                 std::unique_lock<std::mutex> lock(mut);
                 Queue_.push(Object);
             }
-            //std::cout<<Queue_.size()<<" | ";
+
             Semaphore_.signal();
         }
 
@@ -42,11 +57,6 @@ namespace EVENT
                     ret = true;
                 }
             }
-            else
-            {
-                std::cout<<"rx failed"<<" | ";
-            }
-
             return ret;
         }
     };

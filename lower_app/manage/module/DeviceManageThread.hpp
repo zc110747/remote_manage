@@ -3,28 +3,25 @@
 //  All Rights Reserved
 //
 //  Name:
-//      WorkflowThread.hpp
+//      DeviceManageThread.hpp
 //
 //  Purpose:
-//      Deivce Application Process interface.
+//   	进行设备的管理，周期性的读取硬件信息, 并能够处理外部事件来控制硬件
 //
 // Author:
-//     	Alva Zhange
+//     @听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
-//      7/30/2022   Create New Version
+//      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
-#ifndef _INCLUDE_APP_TASK_H
-#define _INCLUDE_APP_TASK_H
+_Pragma("once")
 
 #include "FIFOManage.hpp"
 #include "driver.hpp"
 #include <type_traits>
 #include <cstring>
-#include <mutex>
-#include <chrono>
 #include "event.hpp"
 
 //interal event
@@ -100,6 +97,3 @@ namespace NAMESPACE_DEVICE
         int sendHardProcessMsg(uint8_t device, uint8_t action);
     };
 }
-
-
-#endif

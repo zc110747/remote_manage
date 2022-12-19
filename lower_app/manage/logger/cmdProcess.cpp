@@ -6,22 +6,19 @@
 //      cmdProcess.cpp
 //
 //  Purpose:
-//      cmdProcess done.
+//      用于支持命令行处理的接口, 包含字符串处理和事件触发
 //
 // Author:
-//      Alva Zhange
+//     @听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
-//      8/8/2022   Create New Version
+//      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
 
 #include "cmdProcess.hpp"
 #include "logger.hpp"
-#include "driver.hpp"
-#include "SystemConfig.hpp"
-#include <algorithm>
 #include "DeviceManageThread.hpp"
 
 /*

@@ -6,32 +6,28 @@
 //      includes.hpp
 //
 //  Purpose:
-//      system include.
+//      全局的用于支持项目编译包含的库
 //
 // Author:
-//      Alva Zhange
+//     @听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
-//      7/24/2022   Create New Version
+//      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
-#ifndef __INCLUDES_HPP
-#define __INCLUDES_HPP
+_Pragma("once")
 
 //c interface
 #include <stdio.h>
-#include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <stdlib.h>
 #include <errno.h>
 #include <dirent.h>
 #include <assert.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/time.h>
-//#include <sys/signal.h>
 
 //c++ interface
 #include <new>
@@ -43,12 +39,6 @@
 #include <map>
 #include <thread>
 #include <mutex>
-
-typedef signed char int8_t;
-typedef signed short int16_t;
-typedef signed int int32_t;
-typedef unsigned char uint8_t;
-typedef unsigned short uint16_t;
-typedef unsigned int uint32_t;
-
-#endif
+#include <algorithm>
+#include <chrono>
+#include <atomic>

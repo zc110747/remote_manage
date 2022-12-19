@@ -6,19 +6,17 @@
 //      cmdProcess.hpp
 //
 //  Purpose:
-//      cmdProcess Interface.
+//      用于支持命令行处理的接口, 包含字符串处理和事件触发
 //
 // Author:
-//      Alva Zhange
+//     @听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
-//      8/8/2022   Create New Version
+//      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
-
-#ifndef _INCLUDE_CMD_PROCESS_HPP
-#define _INCLUDE_CMD_PROCESS_HPP
+_Pragma("once")
 
 #include "includes.hpp"
 
@@ -49,4 +47,3 @@ public:
     bool ProcessData();
 };
 
-#endif

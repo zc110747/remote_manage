@@ -3,18 +3,18 @@
 //  All Rights Reserved
 //
 //  Name:
-//      WorkflowThread.cpp
+//      DeviceManageThread.cpp
 //
 //  Purpose:
-//      Deivce Application Process.
+//   	进行设备的管理，周期性的读取硬件信息, 并能够处理外部事件来控制硬件
 //
 // Author:
-//     	Alva Zhange
+//     @听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
-//      7/30/2022   Create New Version
+//      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
 #include "DeviceManageThread.hpp"
 #include "driver.hpp"

@@ -1,7 +1,23 @@
-
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2022-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      TimeManage.cpp
+//
+//  Purpose:
+//      时间管理模块, 支持注册周期性触发的事件
+//
+// Author:
+//     	@听心跳的声音
+//
+//  Assumptions:
+//
+//  Revision History:
+//      12/19/2022   Create New Version
+/////////////////////////////////////////////////////////////////////////////
 #include "TimeManage.hpp"
 #include "logger.hpp"
-#include "rtc.hpp"
 
 TimeManage *TimeManage::pInstance = nullptr;
 
