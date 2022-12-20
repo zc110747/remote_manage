@@ -3,8 +3,21 @@
     <head>
         <meta charset="utf-8">
         <title>hello</title>
+        <script type="importmap">
+            {
+              "imports": {
+                "vue": "./js/vue.esm-browser.js",
+                "axios": "./js/axios.js"
+              }
+            }
+        </script>
     </head>
     <body>
-        <div>hello world!</div>
+        <div id="app">
+            <button @click="dev_set('led', 'on')">LED ON</button>
+            <button @click="dev_set('led', 'off')">LED OFF</button>
+        </div>
     </body>
+    <script src="js/axios.js"></script>
+    <script type="module" src="js/main.js"></script>
 </html>

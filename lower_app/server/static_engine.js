@@ -48,7 +48,7 @@ function engine_process(request, response)
     }
     else
     {
-        console.log("content-type:".concat(ext));
+        console.log("not invalid static request");
     }
     
     return false;
