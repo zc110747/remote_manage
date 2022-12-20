@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
-        <meta charset="utf-8">
-        <title>hello</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>device mange</title>
         <script type="importmap">
             {
               "imports": {
@@ -11,9 +11,10 @@
               }
             }
         </script>
+        <link href="css/global.css" rel="stylesheet" type="text/css" />
     </head>
     <body>
-        <div id="app">
+        <div id="app" class="segregate">
             <button @click="dev_set('led', 'on')">LED ON</button>
             <button @click="dev_set('led', 'off')">LED OFF</button>
         </div>

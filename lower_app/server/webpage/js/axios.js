@@ -1,4 +1,3 @@
-//https://cdn.jsdelivr.net/npm/axios/dist/axios.js
 // Axios v1.2.1 Copyright (c) 2022 Matt Zabriskie and contributors
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
