@@ -46,25 +46,6 @@ const static std::map<CmdFormat_t, std::string> CmdHelpMapM = {
     {CmdGetHelp, "!? ## !help"},
 };
 
-cmdProcess *cmdProcess::pInstance = nullptr;
-cmdProcess* cmdProcess::getInstance()
-{
-    if(pInstance == nullptr)
-    {
-        pInstance = new(std::nothrow) cmdProcess();
-        if(pInstance == nullptr)
-        {
-            //do something
-        }
-    }
-    return pInstance;
-}
-
-bool cmdProcess::init()
-{
-    return true;
-}
-
 bool cmdProcess::parseData(char *ptr, int size)
 {
     if(ptr[0] != '!')

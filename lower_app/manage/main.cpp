@@ -23,6 +23,7 @@
 #include "Semaphore.hpp"
 #include "driver.hpp"
 #include "TimeManage.hpp"
+#include "node_process.hpp"
 
 //internal data
 static int nConfigDefault = 0;
@@ -126,13 +127,13 @@ static bool system_init(int is_default, const char* path)
 	}
 	std::cout<<*(SystemConfig::getInstance())<<std::endl;
 
-	ret &= cmdProcess::getInstance()->init();
 	ret &= LoggerManage::getInstance()->init();
 	ret &= DriverManage::getInstance()->init();
 	ret &= NAMESPACE_DEVICE::DeviceManageThread::getInstance()->init();
 	ret &= UartThreadManage::getInstance()->init();
 	ret &= TcpThreadManage::getInstance()->init();
 	ret &= UdpThreadManage::getInstance()->init();
+	ret &= NodeProcess::getInstance()->init();
 	ret &= TimeManage::getInstance()->init();
 
 	return ret;

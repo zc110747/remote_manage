@@ -26,6 +26,10 @@
         "logger":{
                 "port":15059
         },
+        "node":{
+                "web_port":15060,
+                "socket_port":15061 
+        },
         "rtc":{
                 "dev":"/dev/rtc0"
         },
@@ -35,5 +39,5 @@
         "apI2c":{
                 "dev":"/dev/ap3216"
         },
-        "downloadpath":"/home/manage/download/",
+        "downloadpath":"/home/manage/download/"
 }

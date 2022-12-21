@@ -33,14 +33,11 @@ typedef enum
 class cmdProcess
 {
 private:
-    static cmdProcess* pInstance;    
     char *pDataM;
     CmdFormat_t formatM;
 
 public:
     cmdProcess() = default;
-    ~cmdProcess() = delete;
-    static cmdProcess* getInstance();
     
     bool init();
     bool parseData(char *ptr, int size);

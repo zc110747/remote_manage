@@ -66,6 +66,7 @@ typedef struct
     SocketSysConfig tcp;
     SocketSysConfig udp;
     SocketSysConfig logger;
+    SocketSysConfig node;
 
     //deivce config
     DeviceSysConfig rtc;
@@ -100,6 +101,7 @@ public:
     const SocketSysConfig *gettcp()     {return &(parameter.tcp);}
     const SocketSysConfig *getudp()     {return &(parameter.udp);}
     const SocketSysConfig *getlogger()  {return &(parameter.logger);}
+    const SocketSysConfig *getnode()    {return &(parameter.node);}
     const DeviceSysConfig *getrtc()     {return &(parameter.rtc);}
     const DeviceSysConfig *geticmSpi()  {return &(parameter.icmSpi);}
     const DeviceSysConfig *getapI2c()   {return &(parameter.apI2c);}

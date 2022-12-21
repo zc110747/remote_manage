@@ -60,5 +60,7 @@ _Pragma("once")
 #define DEFAULT_UDP_PORT            8001
 #define DEFAULT_LOGGER_IPADDR       DEFAULT_IPADDRESS
 #define DEFAULT_LOGGER_PORT         8002
+#define DEFAULT_NODE_IPADDR         DEFAULT_IPADDRESS
+#define DEFAULT_NODE_PORT           8003
 #define DEFAULT_DOWNLOAD_PATH       "/tmp/download/"
 

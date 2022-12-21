@@ -21,19 +21,20 @@
 #include "driver.hpp"
 #include "asio_server.hpp"
 
-static asio_server logger_server;
+static AsioServer logger_server;
 
 //asio server test ok
 void LoggerManage::asio_server_run()
 {
     const SocketSysConfig *pSocketConfig = SystemConfig::getInstance()->getlogger();
-    
+    cmdProcess LoggerCmdProcess;
+
     try
     {
-        logger_server.init(pSocketConfig->ipaddr, std::to_string(pSocketConfig->port), [](char* ptr, int length){
-            if(cmdProcess::getInstance()->parseData(ptr, length))
+        logger_server.init(pSocketConfig->ipaddr, std::to_string(pSocketConfig->port), [&LoggerCmdProcess](char* ptr, int length){
+            if(LoggerCmdProcess.parseData(ptr, length))
             {
-                cmdProcess::getInstance()->ProcessData();
+                LoggerCmdProcess.ProcessData();
             }
         });
         logger_server.run();

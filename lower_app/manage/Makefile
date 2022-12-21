@@ -10,8 +10,8 @@
 # the executables
 #HOST = arm-linux-gnueabihf-
 #CPU = arm-
-HOST=
-CPU=x86-
+HOST =
+CPU = x86-
 CC = $(HOST)g++
 CFLAGS := -O3 -std=c++17 -fno-strict-aliasing -lrt 
 
@@ -24,6 +24,8 @@ objects = 	main.o \
 			module/CalcCrc16.o  \
 			module/TimeManage.o \
 			module/FIFOManage.o \
+			module/asio_server.o \
+			module/cmdProcess.o  \
 			driver/rtc.o \
 			driver/beep.o \
 			driver/led.o \
@@ -32,8 +34,8 @@ objects = 	main.o \
 			driver/deviceBase.o \
 			driver/driver.o \
 			logger/logger.o \
-			logger/cmdProcess.o \
-			logger/asio_server.o 
+			node_process/node_process.o
+
 
 clear_dobject = *.d .*.o.d \
 				module/*.d module/.*.o.d \
@@ -41,7 +43,8 @@ clear_dobject = *.d .*.o.d \
 				event/*.d event/.*.o.d \
 				lib/*.d lib/.*.o.d \
 				logger/*.d logger/.*.o.d \
-				remote/*.d remote/.*.o.d 
+				remote/*.d remote/.*.o.d \
+				node_process/*.d node_process/.*.o.
 
 include_path = -I remote/ 			\
 				-I driver/ 			\
@@ -52,7 +55,9 @@ include_path = -I remote/ 			\
 				-I lib/asio/include		\
 				-I logger/ 			\
 				-I module/tools/ \
-				-I event/			
+				-I event/		\
+				-I node_process/		
+				
 lib = lib/$(CPU)libjsoncpp.a
 
 # This is the file name of the executables and path where 
