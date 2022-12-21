@@ -42,8 +42,7 @@ function engine_process(request, response)
         }
         else 
         {
-            // @ts-ignore
-            console.log("invalid pathname ".concat(pathname));
+            console.log(`invalid pathname:${pathname}`);
             response.statusCode = 404;
             response.end("404 not found");
         }
@@ -51,7 +50,7 @@ function engine_process(request, response)
     }
     else
     {
-        console.log("not invalid static request");
+        console.log("Not Static Request");
     }
     
     return false;
