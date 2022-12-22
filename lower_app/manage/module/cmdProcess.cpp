@@ -34,6 +34,7 @@ const static std::map<std::string, CmdFormat_t> CmdMapM = {
     {"!readdev",    CmdReadDev},
     {"!setdev",     CmdSetDev},
     {"!setlevel",   cmdSetLevel},
+    {"!connect",    CmdConnect},
     {"!?",          CmdGetHelp},
     {"!help",       CmdGetHelp},
 };
@@ -130,6 +131,11 @@ bool cmdProcess::ProcessData()
                     level = 5;
                 LoggerManage::getInstance()->setlevel((LOG_LEVEL)level);
                 PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Set Logger Level:%d!", level);
+            }
+            break;
+        case CmdConnect:
+            {
+                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Connect with Remote Success!");
             }
             break;
         case CmdGetHelp:

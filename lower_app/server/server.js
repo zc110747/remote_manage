@@ -21,8 +21,9 @@ let netInfo = {
     web_port: 5056,
     socket_port: 5057 
 };
-
-const filepath = "config.json"
+//for internal link, need use loopback host
+const local_ipaddr = "127.0.0.1"; 
+const filepath = "config.json";
 
 function server_process(fileContents)
 {
@@ -50,7 +51,7 @@ function server_process(fileContents)
     }); 
 
     //启动客户端, 建立和服务器通讯
-    sock_m.socket_connect(netInfo.ipaddr, netInfo.socket_port);
+    sock_m.socket_connect(local_ipaddr, netInfo.socket_port);
 }
 
 function start_server()

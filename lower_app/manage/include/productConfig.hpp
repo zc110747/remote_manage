@@ -35,6 +35,7 @@ _Pragma("once")
 
 //默认设备ID
 #define DEVICE_ID                       0x01
+#define LOCAL_HOST                      "127.0.0.1"
 
 /*****************Default System Config******************/
 #define SYSTM_CONFIG_ON             1

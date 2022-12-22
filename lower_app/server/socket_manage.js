@@ -31,7 +31,7 @@ function socket_connect(ipaddr, port)
         client.connect(port, ipaddr, ()=>{
             console .log('client connected!');
             is_connect = true;
-            client.write("conenct\n");
+            client.write("!connect");
         });
     }, client_timewait);
 } 

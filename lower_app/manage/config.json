@@ -1,10 +1,10 @@
 {
         "led":{
-                "init":1,
+                "init":0,
                 "dev":"/dev/led"
         },
         "beep":{
-                "init":1,
+                "init":0,
                 "dev":"/dev/beep"
         },
         "serial":{
@@ -15,7 +15,7 @@
                 "dev":"/dev/ttymxc2"
         },
         "socket":{
-                "ipaddr":"192.168.113.1"
+                "ipaddr":"192.168.2.99"
         },
         "tcp":{
                 "port":15057

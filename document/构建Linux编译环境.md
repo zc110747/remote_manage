@@ -57,8 +57,15 @@ ln -sf libstdc++.so.6.0.28 libstdc++.so.6
 
 对于嵌入式linux，第一步就是下载交叉编译工具，具体如下.  
 编译工具:arm-linux-gnueabihf-gcc/arm-linux-gnueabihf-g++  
-下载目录:https://releases.linaro.org/components/toolchain/binaries/7.5-2019.12/arm-linux-gnueabihf/  
-下载linux平台下软件gcc-linaro-7.5.0-2019.  12-i686_arm-linux-gnueabihf.tar.xz，解压到上面的install目录下.  
+下载目录:  
+```bash
+https://releases.linaro.org/components/toolchain/binaries/7.5-2019.12/arm-linux-gnueabihf/ 
+``` 
+下载linux平台下软件
+```bash
+gcc-linaro-7.5.0-2019.12-i686_arm-linux-gnueabihf.tar.xz
+```
+解压到上面的install目录下.  
 对于普通用户，可在/etc/profile中通过export命令添加, 需要重启后生效或者执行source /etc/profile在当前环境下生效.  
 
 ```bash
@@ -85,7 +92,7 @@ make V=1 ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j12
 如果编译中显示缺少文件，基本上是上面提到的部分库未安装，找到安装即可.  
 编译目录下的**uboot.bin**即用到的boot文件.  
 
-### linux的编译
+### linux内核编译
 
 linux的编译也类似, 这里也直接用开发板提供的内核.  
 

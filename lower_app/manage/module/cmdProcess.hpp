@@ -28,6 +28,7 @@ typedef enum
     CmdSetDev,
     cmdSetLevel,
     CmdGetHelp,
+    CmdConnect,
 }CmdFormat_t;
 
 class cmdProcess
