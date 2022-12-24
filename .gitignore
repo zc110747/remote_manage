@@ -3,6 +3,13 @@
 
 *.o
 *.d
+*.cmd
+*.mod.c
+*.mod.o
+*.mod
+*.order
+*.symvers
+
 lower_app/server/node/node_modules
 lower_app/manage/lib/asio
 upper_app/manage_tool/manage_tool.pro.user
