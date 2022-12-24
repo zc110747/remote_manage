@@ -43,9 +43,10 @@ _Pragma("once")
 #define DEFAULT_CONFIG_FILE         "config.json"
 
 #define DEFAULT_LED_INIT            SYSTM_CONFIG_OFF
-#define DEFALUT_LED_DEV             "/dev/led"        
+#define DEFAULT_LED_DEV             "/dev/led"        
 #define DEFAULT_BEEP_INIT           SYSTM_CONFIG_OFF
-#define DEFALUT_BEEP_DEV            "/dev/beep"   
+#define DEFAULT_BEEP_DEV            "/dev/beep"   
+#define DEFAULT_KEY_DEV             "/dev/key"
 #define DEFAULT_SERIAL_BAUD         115200
 #define DEFAULT_SERIAL_DATABITS     8
 #define DEFAULT_SERIAL_STOPBITS     1

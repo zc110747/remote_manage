@@ -26,11 +26,9 @@
 
 class deviceBase
 {
-private:
-    std::string devicePathM;
-
 protected:
     int DeviceFdM;
+    std::string devicePathM;
 
 public:
     deviceBase();

@@ -41,6 +41,7 @@ bool DriverManage::init()
     ret &= APDevice::getInstance()->open(O_RDONLY);
     ret &= ICMDevice::getInstance()->open(O_RDONLY);
     ret &= RTCDevice::getInstance()->open(O_RDONLY);
+    ret &= KEY::getInstance()->open(O_RDWR | O_NDELAY);
 
     if(ret)
     {

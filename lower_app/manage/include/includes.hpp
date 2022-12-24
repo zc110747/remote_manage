@@ -28,6 +28,8 @@ _Pragma("once")
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/time.h>
+#include <signal.h>
+
 
 //c++ interface
 #include <new>

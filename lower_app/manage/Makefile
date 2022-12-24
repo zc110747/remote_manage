@@ -29,6 +29,7 @@ objects = 	main.o \
 			driver/rtc.o \
 			driver/beep.o \
 			driver/led.o \
+			driver/key.o \
 			driver/spi_icm.o \
 			driver/i2c_ap.o \
 			driver/deviceBase.o \

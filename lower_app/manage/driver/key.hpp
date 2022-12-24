@@ -3,10 +3,10 @@
 //  All Rights Reserved
 //
 //  Name:
-//      driver.hpp
+//      key.hpp
 //
 //  Purpose:
-//      驱动管理模块，用于初始化开启所有硬件使用的外设
+//      KEY管理驱动，输入的硬件特性
 //
 // Author:
 //     @听心跳的声音
@@ -18,23 +18,17 @@
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
-#include "led.hpp"
-#include "beep.hpp"
-#include "i2c_ap.hpp"
-#include "spi_icm.hpp"
-#include "rtc.hpp"
-#include "key.hpp"
+#include "deviceBase.hpp"
 
-class DriverManage
+class KEY:public deviceBase
 {
 private:
-    static DriverManage* pInstance;
+    uint32_t keyvalue;
+    static KEY *pInstance;
 
 public:
-    DriverManage() = default;
-    ~DriverManage() = delete;
-    bool init();
-    void release();
-    static DriverManage* getInstance();
-};
+    using deviceBase::deviceBase;
 
+    static KEY *getInstance();
+    bool open(int flags);
+};

@@ -58,6 +58,7 @@ typedef struct
     //io config
     IoSysConfig led; 
     IoSysConfig beep;   
+    DeviceSysConfig key;
 
     //serial config
     SerialSysConfig serial;
@@ -97,6 +98,7 @@ public:
 public:
     const IoSysConfig *getled()         {return &(parameter.led);}
     const IoSysConfig *getbeep()        {return &(parameter.beep);}
+    const DeviceSysConfig *getkey()     {return &(parameter.key);}
     const SerialSysConfig *getserial()  {return &(parameter.serial);}
     const SocketSysConfig *gettcp()     {return &(parameter.tcp);}
     const SocketSysConfig *getudp()     {return &(parameter.udp);}

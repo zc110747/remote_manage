@@ -1,5 +1,5 @@
 #嵌入式linux服务器ip地址(需要修改)，需要支持ssh，上传到/tmp/目录下
-#REMOTE_IPADDRESS=192.168.2.99
+REMOTE_IPADDRESS=192.168.2.99
 KERNELDIR=/home/center/application/Project/linux/
 
 #asio库以压缩包形式进行上传,首次使用需要解压

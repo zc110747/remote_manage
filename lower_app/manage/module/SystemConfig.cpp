@@ -73,6 +73,8 @@ bool SystemConfig::init(const char* path)
         parameter.beep.init = root["beep"]["init"].asInt();
         parameter.beep.dev = root["beep"]["dev"].asString();
 
+        parameter.key.dev = root["key"]["dev"].asString();
+
         parameter.serial.baud = root["serial"]["baud"].asInt();
         parameter.serial.dataBits = root["serial"]["dataBits"].asInt();;
         parameter.serial.stopBits = root["serial"]["stopBits"].asInt();;
@@ -108,10 +110,12 @@ bool SystemConfig::init(const char* path)
 void SystemConfig::default_init() noexcept
 {
     parameter.led.init = DEFAULT_LED_INIT;
-    parameter.led.dev = DEFALUT_LED_DEV;
+    parameter.led.dev = DEFAULT_LED_DEV;
 
     parameter.beep.init = DEFAULT_BEEP_INIT;
-    parameter.beep.dev = DEFALUT_BEEP_DEV;
+    parameter.beep.dev = DEFAULT_BEEP_DEV;
+
+    parameter.key.dev = DEFAULT_KEY_DEV;
 
     parameter.serial.baud = DEFAULT_SERIAL_BAUD;
     parameter.serial.dataBits = DEFAULT_SERIAL_DATABITS;

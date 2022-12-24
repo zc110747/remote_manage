@@ -17,8 +17,8 @@
 //      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
 #include "led.hpp"
-#include "../logger/logger.hpp"
-#include "../driver/rtc.hpp"
+#include "logger.hpp"
+#include "rtc.hpp"
 
 ledTheOne* ledTheOne::pInstance = nullptr;
 ledTheOne* ledTheOne::getInstance()
