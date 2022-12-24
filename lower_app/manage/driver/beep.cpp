@@ -18,25 +18,7 @@
 /////////////////////////////////////////////////////////////////////////////
 #include "beep.hpp"
 
-beepTheOne* beepTheOne::pInstance = nullptr;
-beepTheOne* beepTheOne::getInstance()
+void BEEP::test()
 {
-    if(pInstance == nullptr)
-    {
-        pInstance = new(std::nothrow) beepTheOne(SystemConfig::getInstance()->getbeep()->dev);
-        if(pInstance == NULL)
-        {
-            //To Do something(may logger)
-        }
-    }
-    return pInstance;
-}
 
-void beepTheOne::release()
-{
-    if(pInstance != nullptr)
-    {
-        delete pInstance;
-        pInstance = nullptr;
-    }
 }

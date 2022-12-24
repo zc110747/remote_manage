@@ -24,11 +24,9 @@ class KEY:public deviceBase
 {
 private:
     uint32_t keyvalue;
-    static KEY *pInstance;
-
+    
 public:
     using deviceBase::deviceBase;
-
-    static KEY *getInstance();
-    bool open(int flags);
+    virtual bool init(const std::string &DevicePath, int flags) override;
+    bool register_func(std::function<void(int)> func);
 };

@@ -21,17 +21,13 @@
 
 #include "deviceBase.hpp"
 
-class beepTheOne:public IoBase
+class BEEP:public IoBase
 {
-private:
-    static beepTheOne* pInstance;
-
 public:
     //consturctor
     using IoBase::IoBase;
 
-    static beepTheOne* getInstance();
-    void release();
+    void test();
 };
 
 #endif

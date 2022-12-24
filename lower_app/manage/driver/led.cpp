@@ -18,32 +18,8 @@
 /////////////////////////////////////////////////////////////////////////////
 #include "led.hpp"
 #include "logger.hpp"
-#include "rtc.hpp"
 
-ledTheOne* ledTheOne::pInstance = nullptr;
-ledTheOne* ledTheOne::getInstance()
-{
-    if(pInstance == nullptr)
-    {
-        pInstance = new(std::nothrow) ledTheOne(SystemConfig::getInstance()->getled()->dev);
-        if(pInstance == NULL)
-        {
-            //To Do something(may logger)
-        }
-    }
-    return pInstance;
-}
-
-void ledTheOne::release()
-{
-    if(pInstance != nullptr)
-    {
-        delete pInstance;
-        pInstance = nullptr;
-    }
-}
-
-void ledTheOne::test()
+void LED::test()
 {
     bool ret = true;
 

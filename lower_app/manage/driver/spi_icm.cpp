@@ -18,21 +18,7 @@
 /////////////////////////////////////////////////////////////////////////////
 #include "spi_icm.hpp"
 
-ICMDevice* ICMDevice::pInstance = nullptr;
-ICMDevice* ICMDevice::getInstance()
+void ICMDevice::test()
 {
-    if(pInstance == nullptr)
-    {
-       pInstance = new(std::nothrow) ICMDevice(SystemConfig::getInstance()->geticmSpi()->dev); 
-    }
-    return pInstance;
-}
-
-void ICMDevice::release()
-{
-    if(pInstance != nullptr)
-    {
-        delete pInstance;
-        pInstance = nullptr;
-    }
+    
 }

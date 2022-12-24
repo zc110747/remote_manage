@@ -33,14 +33,9 @@ typedef struct
 
 class ICMDevice : public InfoBase<ICM_INFO>
 {
-private:
-    static ICMDevice *pInstance;
-
 public:
     //constructor
     using InfoBase::InfoBase;
-
-    static ICMDevice *getInstance();
-    void release();
+    void test();
 };
 

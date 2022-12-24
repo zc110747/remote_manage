@@ -29,13 +29,8 @@ typedef struct _SApInfo
 
 class APDevice:public InfoBase<AP_INFO>
 {
-private:
-    static APDevice *pInstance;
-
 public:
     //constructor
     using InfoBase::InfoBase;
-
-    static APDevice *getInstance();
-    void release();
+    void test();
 };

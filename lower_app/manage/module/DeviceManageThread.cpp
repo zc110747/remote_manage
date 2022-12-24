@@ -83,24 +83,28 @@ namespace NAMESPACE_DEVICE
 
     void DeviceManageThread::update()
     {
-        if(ledTheOne::getInstance()->readIoStatus())
+        auto led_ptr = DriverManage::getInstance()->getLed0();
+        if(led_ptr->readIoStatus())
         {
-            inter_info.led_io = ledTheOne::getInstance()->getIoStatus();
+            inter_info.led_io = led_ptr->getIoStatus();
         }
 
-        if(beepTheOne::getInstance()->readIoStatus())
+        auto beep_ptr = DriverManage::getInstance()->getBeep0();
+        if(beep_ptr->readIoStatus())
         {
-            inter_info.beep_io = ledTheOne::getInstance()->getIoStatus();
+            inter_info.beep_io = beep_ptr->getIoStatus();
         }
 
-        if(APDevice::getInstance()->readInfo())
+        auto ap_dev_ptr = DriverManage::getInstance()->getApDev0();
+        if(ap_dev_ptr->readInfo())
         {
-            inter_info.ap_info = APDevice::getInstance()->getInfo();
+            inter_info.ap_info = ap_dev_ptr->getInfo();
         }
 
-        if(ICMDevice::getInstance()->readInfo())
+        auto icm_dev_ptr = DriverManage::getInstance()->getIcmDev0();
+        if(icm_dev_ptr->readInfo())
         {
-            inter_info.icm_info = ICMDevice::getInstance()->getInfo();
+            inter_info.icm_info = icm_dev_ptr->getInfo();
         }
 
         if(inter_info != outer_info)
@@ -123,10 +127,16 @@ namespace NAMESPACE_DEVICE
         switch (device)
         {
         case EVENT_HADWARE_LED:
-            ledTheOne::getInstance()->writeIoStatus(action);
+            {
+                auto led_ptr = DriverManage::getInstance()->getLed0();
+                led_ptr->writeIoStatus(action);
+            }
             break;
         case EVENT_HADWARE_BEEP:
-            beepTheOne::getInstance()->writeIoStatus(action);
+            {
+                auto beep_ptr=DriverManage::getInstance()->getBeep0();
+                beep_ptr->writeIoStatus(action);
+            }
             break;
         default:
             PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Invalid Device:%d!", device);

@@ -35,19 +35,36 @@ DriverManage* DriverManage::getInstance()
 bool DriverManage::init()
 {
     bool ret = true;
+    SystemConfig *pConfig = SystemConfig::getInstance();
 
-    ret &= ledTheOne::getInstance()->open(O_RDWR | O_NDELAY);
-    ret &= beepTheOne::getInstance()->open(O_RDWR | O_NDELAY);
-    ret &= APDevice::getInstance()->open(O_RDONLY);
-    ret &= ICMDevice::getInstance()->open(O_RDONLY);
+    ret &= led_0.init(pConfig->getled()->dev, O_RDWR | O_NDELAY);
+    ret &= beep_0.init(pConfig->getbeep()->dev, O_RDWR | O_NDELAY);
+    ret &= ap_dev_0.init(pConfig->getapI2c()->dev, O_RDONLY);
+    ret &= icm_dev_0.init(pConfig->geticmSpi()->dev, O_RDONLY);
     ret &= RTCDevice::getInstance()->open(O_RDONLY);
-    ret &= KEY::getInstance()->open(O_RDWR | O_NDELAY);
+    ret &= key_0.init(pConfig->getkey()->dev, O_RDWR | O_NDELAY);
 
     if(ret)
     {
-        ledTheOne::getInstance()->writeIoStatus(SystemConfig::getInstance()->getled()->init);
-        beepTheOne::getInstance()->writeIoStatus(SystemConfig::getInstance()->getbeep()->init);
-        PRINT_LOG(LOG_ERROR, 0, "Device DriverManage Init Success!");
+        led_0.writeIoStatus(pConfig->getled()->init);
+        beep_0.writeIoStatus(pConfig->getbeep()->init);
+        key_0.register_func([this](int fd){
+            int err = 0;
+            unsigned int keyvalue = 0;
+            static uint8_t status = 0;
+
+            err = ::read(fd, &keyvalue, sizeof(keyvalue));
+            if(err < 0) {
+            	/* 读取错误 */
+            } else {
+            	if(keyvalue == 1)
+                {
+                    getLed0()->writeIoStatus(status);
+                    status = status==0?1:0;
+                }
+            }
+        });
+        PRINT_LOG(LOG_INFO, 0, "Device DriverManage Init Success!");
     }
     
     return ret;
@@ -55,10 +72,6 @@ bool DriverManage::init()
 
 void DriverManage::release()
 {
-    ledTheOne::getInstance()->release();
-    beepTheOne::getInstance()->release();
-    APDevice::getInstance()->release();
-    ICMDevice::getInstance()->release();
     RTCDevice::getInstance()->release();
 }
 

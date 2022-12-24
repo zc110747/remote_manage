@@ -18,25 +18,7 @@
 /////////////////////////////////////////////////////////////////////////////
 #include "i2c_ap.hpp"
 
-APDevice* APDevice::pInstance = nullptr;
-APDevice* APDevice::getInstance()
+void APDevice::test()
 {
-    if(pInstance == nullptr)
-    {
-        pInstance = new(std::nothrow) APDevice(SystemConfig::getInstance()->getapI2c()->dev);
-        if(pInstance == NULL)
-        {
-            //To Do something(may logger)
-        }
-    }
-    return pInstance;
-}
-
-void APDevice::release()
-{
-    if(pInstance != nullptr)
-    {
-        delete pInstance;
-        pInstance = nullptr;
-    }
+    
 }

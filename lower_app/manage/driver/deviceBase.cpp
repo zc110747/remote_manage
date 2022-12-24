@@ -53,6 +53,12 @@ bool deviceBase::open(int flags)
     return true;
 }
 
+bool deviceBase::init(const std::string &DevicePath, int flags)
+{
+    devicePathM = DevicePath;
+    return open(flags);
+}
+
 void deviceBase::close()
 {
     if(DeviceFdM != 1)
@@ -78,7 +84,7 @@ bool IoBase::readIoStatus()
     return ret;
 }
 
-bool IoBase::writeIoStatus(uint8_t status)
+bool IoBase::writeIoStatus(uint8_t status) 
 {
     bool ret = false;
     ssize_t nSize;

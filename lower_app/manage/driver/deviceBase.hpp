@@ -36,6 +36,7 @@ public:
         ~deviceBase();
     virtual bool open(int flags);
     virtual void close();
+    virtual bool init(const std::string &DevicePath, int flags);
 
 public:
     int getfd() { return DeviceFdM; }

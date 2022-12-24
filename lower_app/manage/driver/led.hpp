@@ -20,16 +20,9 @@ _Pragma("once")
 
 #include "deviceBase.hpp"
 
-class ledTheOne: public IoBase
+class LED: public IoBase
 {
-private:
-    static ledTheOne *pInstance;
-
 public:
     using IoBase::IoBase;
-
-    static ledTheOne* getInstance();
-    void release();
-
     void test();
 };

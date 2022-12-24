@@ -29,6 +29,11 @@ class DriverManage
 {
 private:
     static DriverManage* pInstance;
+    LED led_0;
+    BEEP beep_0;
+    APDevice ap_dev_0;
+    ICMDevice icm_dev_0;
+    KEY key_0;
 
 public:
     DriverManage() = default;
@@ -36,5 +41,12 @@ public:
     bool init();
     void release();
     static DriverManage* getInstance();
+
+public:
+    LED *getLed0()          {return &led_0;}
+    BEEP *getBeep0()        {return &beep_0;}
+    APDevice *getApDev0()   {return &ap_dev_0;}
+    ICMDevice *getIcmDev0() {return &icm_dev_0;}
+    KEY *getKey0()          {return &key_0;}
 };
 
