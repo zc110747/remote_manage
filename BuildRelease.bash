@@ -1,6 +1,6 @@
 #嵌入式linux服务器ip地址(需要修改)，需要支持ssh，上传到/tmp/目录下
 #REMOTE_IPADDRESS=192.168.2.99
-#KERNELDIR=/home/center/application/Project/linux/
+KERNELDIR=/home/center/application/Project/linux/
 
 #asio库以压缩包形式进行上传,首次使用需要解压
 if [ ! -d "lower_app/manage/lib/asio/" ]; then
@@ -14,36 +14,40 @@ fi
 
 #compiler linux driver
 #compiler 
-echo "start bulid kernal driver"
-cd kernal_mod/led/
-make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
-mv kernal_led.ko ../../demo/driver/
-make clean
-cd ../../
+if [ -d "$KERNELDIR" ]; then
+    echo "start bulid kernal driver"
+    cd kernal_mod/led/
+    make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
+    mv kernal_led.ko ../../demo/driver/
+    make clean
+    cd ../../
 
-cd kernal_mod/beep/
-make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
-mv kernal_beep.ko ../../demo/driver/
-make clean
-cd ../../
+    cd kernal_mod/beep/
+    make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
+    mv kernal_beep.ko ../../demo/driver/
+    make clean
+    cd ../../
 
-cd kernal_mod/i2c_ap/
-make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
-mv kernal_i2c_ap.ko ../../demo/driver/
-make clean
-cd ../../
+    cd kernal_mod/i2c_ap/
+    make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
+    mv kernal_i2c_ap.ko ../../demo/driver/
+    make clean
+    cd ../../
 
-cd kernal_mod/spi_icm/
-make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
-mv kernal_spi_icm.ko ../../demo/driver/
-make clean
-cd ../../
+    cd kernal_mod/spi_icm/
+    make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
+    mv kernal_spi_icm.ko ../../demo/driver/
+    make clean
+    cd ../../
 
-cd kernal_mod/key/
-make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
-mv kernal_key.ko ../../demo/driver/
-make clean
-cd ../../
+    cd kernal_mod/key/
+    make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
+    mv kernal_key.ko ../../demo/driver/
+    make clean
+    cd ../../
+else
+    echo "without linux kernal, not build kernal module"
+fi
 
 #覆盖配置文件
 cp -f demo/config.json lower_app/manage/config.json

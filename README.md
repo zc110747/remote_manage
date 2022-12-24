@@ -20,6 +20,7 @@
 
 ```bash
 export REMOTE_IPADDRESS=192.168.2.99
+sudo chmod 777 BuildRelease.bash
 ./BuildRelease.bash
 ```
 
@@ -36,6 +37,7 @@ ifconfig lo netmask 255.255.255.0
 在嵌入式linux平台, 在上传目录下直接执行  
 
 ```bash
+sudo chmod 777 startApp
 ./startApp  
 ```
 
