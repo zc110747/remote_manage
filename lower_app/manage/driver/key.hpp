@@ -6,7 +6,7 @@
 //      key.hpp
 //
 //  Purpose:
-//      KEY管理驱动，输入的硬件特性
+//      按键管理模块,处理按键的初始化和注册回调事件
 //
 // Author:
 //     @听心跳的声音
@@ -14,7 +14,7 @@
 //  Assumptions:
 //
 //  Revision History:
-//      12/19/2022   Create New Version	
+//      12/24/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
@@ -27,6 +27,10 @@ private:
     
 public:
     using deviceBase::deviceBase;
+
+    //key初始化函数，输入文件描述符和支持flags
     virtual bool init(const std::string &DevicePath, int flags) override;
+
+    //注册按键执行的回调事件，当按键触发后调用
     bool register_func(std::function<void(int)> func);
 };

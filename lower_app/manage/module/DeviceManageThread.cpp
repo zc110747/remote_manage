@@ -172,6 +172,20 @@ namespace NAMESPACE_DEVICE
             Event event(DEVICE_ID_TIME_UPDATE_PREOID);
             sendMessage(reinterpret_cast<char *>(&event), sizeof(event));
         });
+        
+        DriverManage::getInstance()->getKey0()->register_func([this](int fd){
+            unsigned int keyvalue = 0;
+            static uint8_t status = 0;
+
+            if(::read(fd, &keyvalue, sizeof(keyvalue)) >= 0)
+            {
+                if(keyvalue == 1)
+                {
+                    sendHardProcessMsg(0, status);
+                    status = status==0?1:0;
+                }
+            }
+        });
 
         for(;;)
         {

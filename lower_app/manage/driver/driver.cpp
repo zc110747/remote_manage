@@ -48,22 +48,6 @@ bool DriverManage::init()
     {
         led_0.writeIoStatus(pConfig->getled()->init);
         beep_0.writeIoStatus(pConfig->getbeep()->init);
-        key_0.register_func([this](int fd){
-            int err = 0;
-            unsigned int keyvalue = 0;
-            static uint8_t status = 0;
-
-            err = ::read(fd, &keyvalue, sizeof(keyvalue));
-            if(err < 0) {
-            	/* 读取错误 */
-            } else {
-            	if(keyvalue == 1)
-                {
-                    getLed0()->writeIoStatus(status);
-                    status = status==0?1:0;
-                }
-            }
-        });
         PRINT_LOG(LOG_INFO, 0, "Device DriverManage Init Success!");
     }
     

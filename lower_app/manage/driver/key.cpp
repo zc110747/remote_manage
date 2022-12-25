@@ -6,7 +6,7 @@
 //      key.cpp
 //
 //  Purpose:
-//      KEY管理驱动，输入的硬件特性
+//      按键管理模块,处理按键的初始化和注册回调事件
 //
 // Author:
 //     @听心跳的声音
@@ -14,7 +14,7 @@
 //  Assumptions:
 //
 //  Revision History:
-//      12/19/2022   Create New Version	
+//      12/24/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
 
 #include <map>
@@ -22,7 +22,7 @@
 #include "logger.hpp"
 #include "includes.hpp"
 
-std::map<int, std::function<void(int)>> FuncList;
+static std::map<int, std::function<void(int)>> FuncList;
 
 static void sigio_signal_func(int signum)
 {
