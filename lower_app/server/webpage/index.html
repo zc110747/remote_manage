@@ -3,24 +3,59 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <title>device mange</title>
-        <script type="importmap">
-            {
-              "imports": {
-                "vue": "./js/vue.esm-browser.js",
-                "axios": "./js/axios.js"
-              }
-            }
-        </script>
         <link href="css/global.css" rel="stylesheet" type="text/css" />
     </head>
     <body>
         <div id="app" class="segregate">
-            <button @click.native="dev_set('led', 'on')">LED ON</button>
-            <button @click.native="dev_set('led', 'off')">LED OFF</button>
-            <button @click.native="dev_set('beep', 'on')">BEEP ON</button>
-            <button @click.native="dev_set('beep', 'off')">BEEP OFF</button>
+            <div id= "menu_block">
+                <div class="menu"><a @click="changeShow(0)"><span name="Lan">设备配置</span></a></div>
+                <div class="menu"><a @click="changeShow(1)"><span name="Lan">当前状态</span></a></div>
+            </div>
+            <div id="info_block" v-if="isShow">
+                <table style="border-width: 1px; padding: 0px; margin: 0px; border-spacing: 6px;">
+                    <tr>
+                        <td><span>LED Config:</span></td>
+                        <td><button class="btnCss" @click.native="dev_set('led', 'on')">LED ON</button></td>
+                        <td><button class="btnCss" @click.native="dev_set('led', 'off')">LED OFF</button></td>
+                    </tr>
+                    <tr>
+                        <td><span>BEEP Config:</span></td>
+                        <td><button class="btnCss" @click.native="dev_set('beep', 'on')">BEEP ON</button></td>
+                        <td><button class="btnCss" @click.native="dev_set('beep', 'off')">BEEP OFF</button></td>
+                    <tr>
+                    <tr>
+                        <td><span>Logger Message:</span></td>
+                        <td><span>{{ message }}</span></td>
+                    </tr>
+                </table>
+            </div>
+            <div id="info_block" v-if="!isShow">
+                <table style="border-width: 1px; padding: 0px; margin: 0px; border-spacing: 8px;">
+                    <tr>
+                        <td><span>LED-STAT:</span></td>
+                        <td><span>{{ ledstatus }}</span></td>
+                    </tr>
+                    <tr>
+                        <td><span>BEEP-STAT:</span></td>
+                        <td><span>{{ beepstatus }}</span></td>
+                    <tr>
+                    <tr>
+                        <td><span>AP-STAT:</span></td>
+                        <td><span>x-{{ apx }}, y-{{ apy }}, z-{{ apz }}</span></td>
+                    <tr>
+                    <tr>
+                        <td><span>ICM-GYRO:</span></td>
+                        <td><span>x-{{ gypox }}, y-{{ gypoy }}, z-{{ gypoz }}</span></td>
+                    <tr>
+                    <tr>
+                        <td><span>ICM-ACCEL:</span></td>
+                        <td><span>x-{{ accelx }}, y-{{ accely }}, z-{{ accelz }}</span></td>
+                    <tr>
+                </table>
+            </div>
         </div>
     </body>
     <script src="js/axios.js"></script>
+    <script src="js/vue.global.js"></script>
     <script type="module" src="js/main.js"></script>
 </html>
