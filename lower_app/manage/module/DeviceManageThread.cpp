@@ -19,6 +19,7 @@
 #include "DeviceManageThread.hpp"
 #include "driver.hpp"
 #include "TimeManage.hpp"
+#include "CenterUnit.hpp"
 
 namespace NAMESPACE_DEVICE
 {
@@ -104,13 +105,17 @@ namespace NAMESPACE_DEVICE
         auto icm_dev_ptr = DriverManage::getInstance()->getIcmDev0();
         if(icm_dev_ptr->readInfo())
         {
-            inter_info.icm_info = icm_dev_ptr->getInfo();
+            icm_dev_ptr->ConvertInfo();
+            inter_info.icm_info = icm_dev_ptr->getConvertInfo();
         }
 
         if(inter_info != outer_info)
         {
-            std::lock_guard lock{mut};
-            outer_info = inter_info;
+            {
+                std::lock_guard lock{mut};
+                outer_info = inter_info;
+            }
+            CenterUnit::getInstance()->informHwUpdate();
         }
     }
 

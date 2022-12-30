@@ -66,5 +66,7 @@ bool KEY::register_func(std::function<void(int)> func)
     {
         FuncList.insert(std::make_pair(DeviceFdM, func));
         PRINT_LOG(LOG_INFO, 0, "key register, totol:%d!", FuncList.size());
+        return true;
     }
+    return false;
 }

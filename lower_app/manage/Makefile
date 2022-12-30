@@ -35,7 +35,8 @@ objects = 	main.o \
 			driver/deviceBase.o \
 			driver/driver.o \
 			logger/logger.o \
-			node_process/node_process.o
+			node_process/node_process.o \
+			center/CenterUnit.o
 
 
 clear_dobject = *.d .*.o.d \
@@ -57,8 +58,9 @@ include_path = -I remote/ 			\
 				-I logger/ 			\
 				-I module/tools/ \
 				-I event/		\
-				-I node_process/		
-				
+				-I node_process/ \
+				-I center/
+								
 lib = lib/$(CPU)libjsoncpp.a
 
 # This is the file name of the executables and path where 

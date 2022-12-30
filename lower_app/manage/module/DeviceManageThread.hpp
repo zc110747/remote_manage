@@ -28,6 +28,7 @@ _Pragma("once")
 #define DEVICE_ID_TIME_UPDATE_PREOID    0x0001
 #define DEVICE_ID_HARDWARE_CHANGE       0x0002
 
+#define WORKFLOW_ID_HARDWARE_UPDATE     0x1001
 
 //process hardware chage
 #define EVENT_HADWARE_LED               0x00

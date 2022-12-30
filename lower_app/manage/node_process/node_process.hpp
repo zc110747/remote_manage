@@ -19,13 +19,18 @@
 _Pragma("once")
 
 #include "includes.hpp"
+#include "logger.hpp"
+#include "modules.hpp"
 
 class NodeProcess final
 {
 private:
     static NodeProcess*  pInstance;
     std::thread node_thread;
-    
+    cmdProcess NodeProcessCmd;
+
+    void ProcessCallback();
+
 public:
     NodeProcess() = default;
     ~NodeProcess() = delete;
@@ -34,4 +39,6 @@ public:
     bool init();
     void run();
     bool send(char *pbuffer, int size);
+
+    void SendStatusBuffer(NAMESPACE_DEVICE::DeviceReadInfo &info);
 };

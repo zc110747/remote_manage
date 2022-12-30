@@ -66,7 +66,7 @@ public:
 template<typename T>
 class InfoBase:public deviceBase
 {
-private:
+protected:
     union{
         char buffer[MAX_INFO_SIZE];
         T info;

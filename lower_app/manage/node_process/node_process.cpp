@@ -19,7 +19,6 @@
 
 #include "node_process.hpp"
 #include "asio_server.hpp"
-#include "logger.hpp"
 #include "modules.hpp"
 
 NodeProcess*  NodeProcess::pInstance = nullptr;
@@ -41,14 +40,17 @@ static AsioServer node_server;
 void NodeProcess::run()
 {
     const SocketSysConfig *pSocketConfig = SystemConfig::getInstance()->getnode();
-    cmdProcess NodeProcessCmd;
 
     try
     {
-        node_server.init(pSocketConfig->ipaddr, std::to_string(pSocketConfig->port), [&NodeProcessCmd](char* ptr, int length){
+        node_server.init(pSocketConfig->ipaddr, std::to_string(pSocketConfig->port), [this](char* ptr, int length){
             if(NodeProcessCmd.parseData(ptr, length))
             {
+                //用于处理命令，告知应用
                 NodeProcessCmd.ProcessData();
+
+                //用于处理应答信息
+                ProcessCallback();
             }
         });
         node_server.run();
@@ -78,4 +80,56 @@ bool NodeProcess::send(char *pbuffer, int size)
         ret = true;
     }
     return ret;
+}
+
+//!status led=ON;BEEP=OFF;IR=1;ALS=1;PS=1;gypox=0;gypoz=0;gypoz=0
+void NodeProcess::SendStatusBuffer(NAMESPACE_DEVICE::DeviceReadInfo &info)
+{
+    char buffer[1024] = {0};
+    int CurrentIndex = 0;
+    int size;
+
+    memset(buffer, 0, sizeof(buffer));
+    size = sprintf(&buffer[0], "!status ");
+    CurrentIndex += size;
+    size = sprintf(&buffer[CurrentIndex], "LED=%s;", info.led_io==0?"OFF":"ON");
+    CurrentIndex += size;
+    size = sprintf(&buffer[CurrentIndex], "BEEP=%s;", info.beep_io==0?"OFF":"ON");
+    CurrentIndex += size;
+    size = sprintf(&buffer[CurrentIndex], "IR=%d;", info.ap_info.ir);
+    CurrentIndex += size;
+    size = sprintf(&buffer[CurrentIndex], "ALS=%d;", info.ap_info.als);
+    CurrentIndex += size;
+    size = sprintf(&buffer[CurrentIndex], "PS=%d;", info.ap_info.ps);
+    CurrentIndex += size;
+    size = sprintf(&buffer[CurrentIndex], "gypox=%.2f;", info.icm_info.gyro_x_act);
+    CurrentIndex += size;
+    size = sprintf(&buffer[CurrentIndex], "gypoy=%.2f;", info.icm_info.gyro_y_act);
+    CurrentIndex += size;
+    size = sprintf(&buffer[CurrentIndex], "gypoz=%.2f;", info.icm_info.gyro_z_act);
+    CurrentIndex += size;
+    size = sprintf(&buffer[CurrentIndex], "accelx=%.2f;", info.icm_info.accel_x_act);
+    CurrentIndex += size;
+    size = sprintf(&buffer[CurrentIndex], "accely=%.2f;", info.icm_info.accel_y_act);
+    CurrentIndex += size;
+    size = sprintf(&buffer[CurrentIndex], "accelz=%.2f;", info.icm_info.accel_z_act);
+    CurrentIndex += size;
+    size = sprintf(&buffer[CurrentIndex], "temp=%.2f", info.icm_info.temp_act);
+    CurrentIndex += size;
+    buffer[CurrentIndex] = '\0';
+
+    //send '\0' for string finished
+    send(buffer, CurrentIndex+1);
+}
+
+
+void NodeProcess::ProcessCallback()
+{
+    switch(NodeProcessCmd.getCurrentFormat())
+    {
+        case CmdSetDev:
+            auto info = NAMESPACE_DEVICE::DeviceManageThread::getInstance()->getDeviceInfo();
+            SendStatusBuffer(info);
+            break;
+    }
 }

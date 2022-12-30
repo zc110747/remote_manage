@@ -20,6 +20,7 @@
 /////////////////////////////////////////////////////////////////////////////
 #include "CenterUnit.hpp"
 #include "logger.hpp"
+#include "node_process.hpp"
 #include <new>
 
 CenterUnit* CenterUnit::getInstance()
@@ -35,7 +36,61 @@ CenterUnit* CenterUnit::getInstance()
     return pInstance;
 }
 
-void CenterUnit::init()
+void CenterUnit::informHwUpdate()
 {
+    Event event(WORKFLOW_ID_HARDWARE_UPDATE);
+    pCenterFiFo->write(reinterpret_cast<char *>(&event), sizeof(event));
+}
+
+bool CenterUnit::EventProcess(Event *pEvent)
+{
+    uint16_t id = pEvent->getId();
+    switch(id)
+    {
+    case WORKFLOW_ID_HARDWARE_UPDATE:
+        {
+            auto info = NAMESPACE_DEVICE::DeviceManageThread::getInstance()->getDeviceInfo();
+            NodeProcess::getInstance()->SendStatusBuffer(info);
+        }
+        break;
+
+    default:
+        PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Invalid Device Command:%d!", id);
+        break;
+    }
+    return true;
+}
+
+void CenterUnit::run()
+{
+    char buffer[1024];
+    int size;
     
+    for(;;)
+    {
+        size = pCenterFiFo->read(buffer, READ_BUFFER_SIZE);
+        if(size > 0)
+        {
+            PRINT_LOG(LOG_DEBUG, xGetCurrentTicks(), "CenterUnit Command, %d!", size);
+            EventProcess(reinterpret_cast<Event *>(buffer));
+        }
+        else
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        }
+    }
+}
+
+bool CenterUnit::init()
+{
+    //clear thread
+    std::thread(std::bind(&CenterUnit::run, this)).detach();
+    
+    pCenterFiFo = new(std::nothrow) FIFOMessage(CENTER_UNIT_FIFO, S_FIFO_WORK_MODE);
+    if(pCenterFiFo == nullptr)
+    {
+        return false;
+    }
+    
+    return pCenterFiFo->Create();
 }

@@ -20,6 +20,8 @@
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
+#include "modules.hpp"
+
 #define CENTER_UNIT_FIFO    "/tmp/CenterUnit.fifo"
 
 class CenterUnit final
@@ -32,10 +34,15 @@ public:
     virtual ~CenterUnit()=delete;
 
     static CenterUnit* getInstance();
-    void init();
+    bool init();
     void run();
+    
+    //内部事件
+    void informHwUpdate();
 
 private:
     static inline CenterUnit* pInstance = nullptr;
     FIFOMessage *pCenterFiFo{nullptr};
+
+    bool EventProcess(Event *pEvent);
 };

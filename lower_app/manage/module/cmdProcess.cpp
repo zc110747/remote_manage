@@ -95,14 +95,14 @@ bool cmdProcess::ProcessData()
                         info.ap_info.ir,
                         info.ap_info.als,
                         info.ap_info.ps);
-                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "ICMInfo, gx,gy,gz:%d,%d,%d;ax,ay,az:%d,%d,%d;temp:%d!",
-                        info.icm_info.gyro_x_adc,
-                        info.icm_info.gyro_y_adc,
-                        info.icm_info.gyro_z_adc,
-                        info.icm_info.accel_x_adc,
-                        info.icm_info.accel_y_adc,
-                        info.icm_info.accel_z_adc,
-                        info.icm_info.temp_adc);
+                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "ICMInfo, gx,gy,gz:%.2f,%.2f,%.2f;ax,ay,az:%.2f,%.2f,%.2f;temp:%.2f!",
+                        info.icm_info.gyro_x_act,
+                        info.icm_info.gyro_y_act,
+                        info.icm_info.gyro_z_act,
+                        info.icm_info.accel_x_act,
+                        info.icm_info.accel_y_act,
+                        info.icm_info.accel_z_act,
+                        info.icm_info.temp_act);
             }  
             break;
         case CmdGetOS:

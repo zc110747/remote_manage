@@ -43,5 +43,9 @@ public:
     bool init();
     bool parseData(char *ptr, int size);
     bool ProcessData();
+
+    CmdFormat_t getCurrentFormat(){
+        return formatM;
+    }
 };
 

@@ -49,21 +49,27 @@ function dynamic_engine_process(request, response)
     let Query = url.parse(request.url);
     let is_process_ok = false;
 
-    if(Query.pathname && Query.query)
+    if(Query.pathname)
     {
         let action = Query.pathname.slice(1);
-        console.log(action + " " + Query.query);
+        //console.log(action + " " + Query.query);
+        response.setHeader('Content-Type', 'application/json;charset=utf-8');
         switch(action)
         {
             case 'axiosDeviceSet':
                 is_process_ok = device_set_process(Query.query);
+                response.end("ack " + (is_process_ok?"ok":"false"));
+                break;
+            case 'axiosDeviceGet':
+                let devInfo = sock_m.device_info;
+                response.end(JSON.stringify(devInfo))
                 break;
             default:
                 break;
         }
     }
 
-    response.end("ack " + (is_process_ok?"ok":"false"));
+
 }
 
 module.exports.dynamic_engine_process = dynamic_engine_process;

@@ -12,6 +12,7 @@ html body{
     margin-top:20px;
     padding-left:40px;
     width:600px;
+    height: 250px;
     font-size: 14px;
 }
 
@@ -45,6 +46,13 @@ html body{
     width:80px;
     text-align: center;
     background-color: #DFDFDF;
+}
+
+.tableList{
+    border-width: 1px;
+    padding: 0px;
+    margin: 0px;
+    border-spacing: 4px;
 }
 
 #menu_block{  

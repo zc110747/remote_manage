@@ -50,7 +50,7 @@ function engine_process(request, response)
     }
     else
     {
-        console.log("Not Static Request");
+        //console.log("Not Static Request");
     }
     
     return false;

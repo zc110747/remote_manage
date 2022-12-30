@@ -6,52 +6,58 @@
         <link href="css/global.css" rel="stylesheet" type="text/css" />
     </head>
     <body>
-        <div id="app" class="segregate">
-            <div id= "menu_block">
-                <div class="menu"><a @click="changeShow(0)"><span name="Lan">设备配置</span></a></div>
-                <div class="menu"><a @click="changeShow(1)"><span name="Lan">当前状态</span></a></div>
+        <div id="app">
+            <div class="segregate">
+                <div id= "menu_block">
+                    <div class="menu"><a @click="changeShow(0)"><span name="Lan">设备配置</span></a></div>
+                    <div class="menu"><a @click="changeShow(1)"><span name="Lan">当前状态</span></a></div>
+                </div>
+                <div id="info_block" v-if="isShow">
+                    <table class="tableList">
+                        <tr>
+                            <td><span>LED Config:</span></td>
+                            <td><button class="btnCss" @click.native="dev_set('led', 'on')">LED ON</button></td>
+                            <td><button class="btnCss" @click.native="dev_set('led', 'off')">LED OFF</button></td>
+                        </tr>
+                        <tr>
+                            <td><span>BEEP Config:</span></td>
+                            <td><button class="btnCss" @click.native="dev_set('beep', 'on')">BEEP ON</button></td>
+                            <td><button class="btnCss" @click.native="dev_set('beep', 'off')">BEEP OFF</button></td>
+                        <tr>
+                    </table>
+                </div>
+                <div id="info_block" v-if="!isShow">
+                    <table class="tableList">
+                        <tr>
+                            <td><span>LED-STAT:</span></td>
+                            <td><span>{{ deviceInfo.led }}</span></td>
+                        </tr>
+                        <tr>
+                            <td><span>BEEP-STAT:</span></td>
+                            <td><span>{{ deviceInfo.beep }}</span></td>
+                        <tr>
+                        <tr>
+                            <td><span>AP-STAT:</span></td>
+                            <td><span>ir-{{ deviceInfo.ir }}, als-{{ deviceInfo.als }}, ps-{{ deviceInfo.ps }}</span></td>
+                        <tr>
+                        <tr>
+                            <td><span>ICM-GYRO:</span></td>
+                            <td><span>x-{{ deviceInfo.gypox }}, y-{{ deviceInfo.gypoy }}, z-{{ deviceInfo.gypoz }}</span></td>
+                        <tr>
+                        <tr>
+                            <td><span>ICM-ACCEL:</span></td>
+                            <td><span>x-{{ deviceInfo.accelx }}, y-{{ deviceInfo.accely }}, z-{{ deviceInfo.accelz }}</span></td>
+                        <tr>
+                        <tr>
+                            <td><span>ICM-TEMP:</span></td>
+                            <td><span>{{ deviceInfo.temp }}</span></td>
+                        <tr>
+                    </table>
+                </div>
             </div>
-            <div id="info_block" v-if="isShow">
-                <table style="border-width: 1px; padding: 0px; margin: 0px; border-spacing: 6px;">
-                    <tr>
-                        <td><span>LED Config:</span></td>
-                        <td><button class="btnCss" @click.native="dev_set('led', 'on')">LED ON</button></td>
-                        <td><button class="btnCss" @click.native="dev_set('led', 'off')">LED OFF</button></td>
-                    </tr>
-                    <tr>
-                        <td><span>BEEP Config:</span></td>
-                        <td><button class="btnCss" @click.native="dev_set('beep', 'on')">BEEP ON</button></td>
-                        <td><button class="btnCss" @click.native="dev_set('beep', 'off')">BEEP OFF</button></td>
-                    <tr>
-                    <tr>
-                        <td><span>Logger Message:</span></td>
-                        <td><span>{{ message }}</span></td>
-                    </tr>
-                </table>
-            </div>
-            <div id="info_block" v-if="!isShow">
-                <table style="border-width: 1px; padding: 0px; margin: 0px; border-spacing: 8px;">
-                    <tr>
-                        <td><span>LED-STAT:</span></td>
-                        <td><span>{{ ledstatus }}</span></td>
-                    </tr>
-                    <tr>
-                        <td><span>BEEP-STAT:</span></td>
-                        <td><span>{{ beepstatus }}</span></td>
-                    <tr>
-                    <tr>
-                        <td><span>AP-STAT:</span></td>
-                        <td><span>x-{{ apx }}, y-{{ apy }}, z-{{ apz }}</span></td>
-                    <tr>
-                    <tr>
-                        <td><span>ICM-GYRO:</span></td>
-                        <td><span>x-{{ gypox }}, y-{{ gypoy }}, z-{{ gypoz }}</span></td>
-                    <tr>
-                    <tr>
-                        <td><span>ICM-ACCEL:</span></td>
-                        <td><span>x-{{ accelx }}, y-{{ accely }}, z-{{ accelz }}</span></td>
-                    <tr>
-                </table>
+            <div style="padding-left:45px;">
+                <span>Logger Message:</span>
+                <span>{{ message }}</span>
             </div>
         </div>
     </body>
