@@ -51,16 +51,7 @@ public:
     //constructor
     using InfoBase::InfoBase;
     void test();
-    void ConvertInfo(void)
-    {
-        icm_info.gyro_x_act = (float)(data.info.gyro_x_adc)/16.4;
-        icm_info.gyro_y_act = (float)(data.info.gyro_y_adc)/16.4;
-        icm_info.gyro_z_act = (float)(data.info.gyro_z_adc)/16.4;
-        icm_info.accel_x_act = (float)(data.info.accel_x_adc)/2048;
-        icm_info.accel_y_act = (float)(data.info.accel_y_adc)/2048;
-        icm_info.accel_z_act = (float)(data.info.accel_z_adc)/2048;
-        icm_info.temp_act = ((float)(data.info.temp_adc) - 25 ) / 326.8 + 25;
-    }
+    void ConvertInfo(void);
 
     ICM_INFO getConvertInfo(){
         return icm_info;

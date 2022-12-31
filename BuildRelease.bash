@@ -1,5 +1,5 @@
 #嵌入式linux服务器ip地址(需要修改)，需要支持ssh，上传到/tmp/目录下
-REMOTE_IPADDRESS=192.168.2.99
+#REMOTE_IPADDRESS=192.168.2.99
 KERNELDIR=/home/center/application/Project/linux/
 
 #asio库以压缩包形式进行上传,首次使用需要解压
@@ -56,7 +56,7 @@ cp -f demo/config.json lower_app/server/config.json
 #编译程序, 并拷贝到输出目录下
 #如果报错, 需要使用较新的编译器, 参考document/构建Linux编程环境.md的说明
 cd lower_app/manage/
-make
+make -j4
 cd ../../
 cp lower_app/Executables/app_demo demo/
 
