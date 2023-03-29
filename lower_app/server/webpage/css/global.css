@@ -48,6 +48,10 @@ html body{
     background-color: #DFDFDF;
 }
 
+[v-cloak]{
+    display:none;
+}
+
 .tableList{
     border-width: 1px;
     padding: 0px;
