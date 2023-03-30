@@ -20,7 +20,7 @@
 /////////////////////////////////////////////////////////////////////////////
 #include "CenterUnit.hpp"
 #include "logger.hpp"
-#include "node_process.hpp"
+#include "InternalProcess.hpp"
 #include <new>
 
 CenterUnit* CenterUnit::getInstance()
@@ -50,7 +50,7 @@ bool CenterUnit::EventProcess(Event *pEvent)
     case WORKFLOW_ID_HARDWARE_UPDATE:
         {
             auto info = NAMESPACE_DEVICE::DeviceManageThread::getInstance()->getDeviceInfo();
-            NodeProcess::getInstance()->SendStatusBuffer(info);
+            InterProcess::getInstance()->SendStatusBuffer(info);
         }
         break;
 
@@ -86,7 +86,7 @@ bool CenterUnit::init()
     //clear thread
     std::thread(std::bind(&CenterUnit::run, this)).detach();
     
-    pCenterFiFo = new(std::nothrow) FIFOMessage(CENTER_UNIT_FIFO, S_FIFO_WORK_MODE);
+    pCenterFiFo = new(std::nothrow) FIFOManage(CENTER_UNIT_FIFO, S_FIFO_WORK_MODE);
     if(pCenterFiFo == nullptr)
     {
         return false;

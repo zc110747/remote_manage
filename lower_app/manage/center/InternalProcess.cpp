@@ -3,7 +3,7 @@
 //  All Rights Reserved
 //
 //  Name:
-//      node_process.cpp
+//      InternalProcess.cpp
 //
 //  Purpose:
 //      支持node转换接口的服务器处理
@@ -17,19 +17,19 @@
 //      12/20/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
 
-#include "node_process.hpp"
+#include "InternalProcess.hpp"
 #include "asio_server.hpp"
 #include "modules.hpp"
 
-NodeProcess*  NodeProcess::pInstance = nullptr;
-NodeProcess* NodeProcess::getInstance()
+InterProcess*  InterProcess::pInstance = nullptr;
+InterProcess* InterProcess::getInstance()
 {
     if(pInstance == nullptr)
     {
-        pInstance = new(std::nothrow) NodeProcess();
+        pInstance = new(std::nothrow) InterProcess();
         if(pInstance == nullptr)
         {
-            PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "NodeProcess new error!");
+            PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "InterProcess new error!");
         }
     }
     return pInstance;
@@ -37,17 +37,17 @@ NodeProcess* NodeProcess::getInstance()
 
 static AsioServer node_server;
 
-void NodeProcess::run()
+void InterProcess::run()
 {
     const SocketSysConfig *pSocketConfig = SystemConfig::getInstance()->getnode();
 
     try
     {
         node_server.init(pSocketConfig->ipaddr, std::to_string(pSocketConfig->port), [this](char* ptr, int length){
-            if(NodeProcessCmd.parseData(ptr, length))
+            if(InterProcessCmd.parseData(ptr, length))
             {
                 //用于处理命令，告知应用
-                NodeProcessCmd.ProcessData();
+                InterProcessCmd.ProcessData();
 
                 //用于处理应答信息
                 ProcessCallback();
@@ -61,29 +61,34 @@ void NodeProcess::run()
     }
 }
 
-bool NodeProcess::init()
+bool InterProcess::init()
 {
-    node_thread = std::thread(std::bind(&NodeProcess::run, this));
+    node_thread = std::thread(std::bind(&InterProcess::run, this));
     node_thread.detach();
 
     return true;
 }
 
-bool NodeProcess::send(char *pbuffer, int size)
+bool InterProcess::send(char *pbuffer, int size)
 {
     bool ret = false;
-    auto session_ptr = node_server.get_valid_session();
+    
+    auto session_list =  node_server.get_session_list();
 
-    if(session_ptr != nullptr)
+    //数据发送到所有连接的端口
+    for(const auto session:session_list)
     {
-        session_ptr->do_write(pbuffer, size);
-        ret = true;
+        if(session != nullptr)
+        {
+            session->do_write(pbuffer, size);
+            ret = true;
+        }
     }
     return ret;
 }
 
 //!status led=ON;BEEP=OFF;IR=1;ALS=1;PS=1;gypox=0;gypoz=0;gypoz=0
-void NodeProcess::SendStatusBuffer(NAMESPACE_DEVICE::DeviceReadInfo &info)
+void InterProcess::SendStatusBuffer(NAMESPACE_DEVICE::DeviceReadInfo &info)
 {
     char buffer[1024] = {0};
     int CurrentIndex = 0;
@@ -125,9 +130,9 @@ void NodeProcess::SendStatusBuffer(NAMESPACE_DEVICE::DeviceReadInfo &info)
 }
 
 
-void NodeProcess::ProcessCallback()
+void InterProcess::ProcessCallback()
 {
-    switch(NodeProcessCmd.getCurrentFormat())
+    switch(InterProcessCmd.getCurrentFormat())
     {
         case CmdSetDev:
             auto info = NAMESPACE_DEVICE::DeviceManageThread::getInstance()->getDeviceInfo();

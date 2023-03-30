@@ -18,12 +18,11 @@
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
-#include "logger.hpp"
-#include "driver.hpp"
+#include "includes.hpp"
 
 #define S_FIFO_WORK_MODE               (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)  
 
-class FIFOMessage final
+class FIFOManage final
 {
 private:
     std::string  fifoM;
@@ -32,8 +31,8 @@ private:
     int writefdM;
 
 public:
-    FIFOMessage(const std::string& fstr, int mode);
-    ~FIFOMessage();
+    FIFOManage(const std::string& fstr, int mode);
+    ~FIFOManage();
 
     //创建并打开FIFO
     bool Create(void);                   

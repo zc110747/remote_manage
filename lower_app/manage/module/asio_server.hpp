@@ -64,6 +64,10 @@ public:
         return current_Session;
     }
 
+    const std::set<ShareSessionPointer>& get_session_list() {
+      return set_;
+    }
+
     void run(char *pbuf, int size)
     {
       handler_(pbuf, size);
@@ -169,6 +173,11 @@ public:
 
     void run(){
         io_context_.run();
+    }
+
+    const std::set<ShareSessionPointer>& get_session_list()
+    {
+        return group.get_session_list();
     }
 
     ShareSessionPointer get_valid_session()

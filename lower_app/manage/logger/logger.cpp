@@ -54,7 +54,7 @@ void LoggerManage::logger_tx_run()
 
     while(1)
     {
-        len = ::read(read_fd(), &message, sizeof(message));
+        len = pLoggerFIFO->read((char *)&message, sizeof(message));
         if(len > 0)
         {
             auto session_ptr = logger_server.get_valid_session();
@@ -94,63 +94,32 @@ LoggerManage* LoggerManage::getInstance()
     return pInstance;
 }
 
-bool LoggerManage::createfifo()
-{
-    unlink(LOGGER_FIFO_PATH);
-
-    if(mkfifo(LOGGER_FIFO_PATH, (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) < 0){
-        PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Logger Fifo Create error!");
-        return false;
-    }
-
-    readfd = open(LOGGER_FIFO_PATH, O_RDWR, 0);
-    if(readfd == -1)
-    {
-        return false;
-    }
-
-    writefd = open(LOGGER_FIFO_PATH, O_RDWR, 0);
-    if(writefd == -1)
-    {
-        close(readfd);
-        return false;
-    }
-    return true;
-}
-
 char memoryBuffer[LOGGER_MESSAGE_BUFFER_SIZE+1];
 bool LoggerManage::init()
 {
-    bool ret = true;
-    int nErr;
-
     pNextMemoryBuffer = memoryBuffer;
     pEndMemoryBuffer = &memoryBuffer[LOGGER_MESSAGE_BUFFER_SIZE];
 
-    createfifo();
+    //init and Create logger fifo, must before thread run.
+    pLoggerFIFO = new(std::nothrow) FIFOManage(LOGGER_FIFO_PATH, S_FIFO_WORK_MODE);
+    if(pLoggerFIFO == nullptr)
+        return false;
+    if(!pLoggerFIFO->Create())
+        return false;
 
+    //init thread for logger
     m_TxThread = std::thread(std::bind(&LoggerManage::logger_tx_run, this));
     m_TxThread.detach();
     m_AsioServerThread = std::thread(std::bind(&LoggerManage::asio_server_run, this));
     m_AsioServerThread.detach();
-    return ret;
+
+    return true;
 }
 
 void LoggerManage::release()
 {
     is_thread_work = false;
-    
-    if(readfd != - 1)
-    {
-        close(readfd);
-        readfd = -1;
-    }
-
-    if(writefd == -1)
-    {
-        close(writefd);   
-        writefd = -1;
-    }
+    pLoggerFIFO->Release();
 }
 
 char *LoggerManage::getMemoryBuffer(uint16_t size)
@@ -234,10 +203,11 @@ int LoggerManage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...
     }
     else
     {
-        len = ::write(writefd, &message, sizeof(message));
+        
+        len = pLoggerFIFO->write((char *)&message, sizeof(message));
         if(len<=0)
         {
-            PRINT_NOW("%s label3 error\n", __func__);
+            PRINT_NOW("%s lable3 error\n", __func__);
         }
         else
         {

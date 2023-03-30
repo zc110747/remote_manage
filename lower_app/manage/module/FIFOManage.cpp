@@ -17,21 +17,23 @@
 //      12/19/2022   Add explian and update structure.
 /////////////////////////////////////////////////////////////////////////////
 #include "FIFOManage.hpp"
+#include "logger.hpp"
+//#include "driver.hpp"
 
-FIFOMessage::FIFOMessage(const std::string& fstr, int mode){
+FIFOManage::FIFOManage(const std::string& fstr, int mode){
     fifoM = std::move(fstr);
     modeM = mode;
     readfdM = -1;
     writefdM = -1;
 }
 
-FIFOMessage::~FIFOMessage()
+FIFOManage::~FIFOManage()
 {
     Release();
     fifoM.clear();
 }
 
-bool FIFOMessage::Create(void){
+bool FIFOManage::Create(void){
     
     //delete fifo
     unlink(fifoM.c_str());
@@ -42,8 +44,9 @@ bool FIFOMessage::Create(void){
         return false;
     }
 
-    writefdM = open(fifoM.c_str(), O_RDWR);
+    //for Read, need open as O_RDWR, otherwise will block
     readfdM = open(fifoM.c_str(), O_RDWR);
+    writefdM = open(fifoM.c_str(), O_WRONLY);
 
     if(writefdM < 0 || readfdM < 0)
     {
@@ -55,7 +58,7 @@ bool FIFOMessage::Create(void){
     return true;
 }                      
 
-void FIFOMessage::Release(){
+void FIFOManage::Release(){
 
     if(writefdM >= 0)
     {
@@ -70,7 +73,7 @@ void FIFOMessage::Release(){
     }
 }       
 
-int FIFOMessage::read(char *buf, int bufsize){
+int FIFOManage::read(char *buf, int bufsize){
     int readbytes = -1;
     if(readfdM >= 0)
     {
@@ -84,7 +87,7 @@ int FIFOMessage::read(char *buf, int bufsize){
     return readbytes;
 }              
 
-int FIFOMessage::write(char *buf, int bufsize){
+int FIFOManage::write(char *buf, int bufsize){
     int writebytes = -1;
     if(writefdM >= 0)
     {

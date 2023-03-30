@@ -8,10 +8,10 @@
 
 # This is object should be build and will link to generate
 # the executables
-HOST = arm-linux-gnueabihf-
-CPU = arm-
+#HOST = arm-linux-gnueabihf-
+#CPU = arm-
 #HOST =
-#CPU = x86-
+CPU = x86-
 CC = $(HOST)g++
 CFLAGS := -O3 -std=c++17 -fno-strict-aliasing -lrt 
 
@@ -19,7 +19,6 @@ objects = 	main.o \
 			remote/SocketTcpThread.o 	 \
 			remote/SocketUdpThread.o 	 \
 			remote/UartThread.o 		 \
-			module/DeviceManageThread.o   \
 			module/SystemConfig.o \
 			module/CalcCrc16.o  \
 			module/TimeManage.o \
@@ -35,7 +34,8 @@ objects = 	main.o \
 			driver/deviceBase.o \
 			driver/driver.o \
 			logger/logger.o \
-			node_process/node_process.o \
+			center/InternalProcess.o \
+			center/DeviceManageThread.o   \
 			center/CenterUnit.o
 
 
@@ -58,7 +58,6 @@ include_path = -I remote/ 			\
 				-I logger/ 			\
 				-I module/tools/ \
 				-I event/		\
-				-I node_process/ \
 				-I center/
 								
 lib = lib/$(CPU)libjsoncpp.a

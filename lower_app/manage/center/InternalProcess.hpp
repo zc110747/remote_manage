@@ -22,20 +22,20 @@ _Pragma("once")
 #include "logger.hpp"
 #include "modules.hpp"
 
-class NodeProcess final
+class InterProcess final
 {
 private:
-    static NodeProcess*  pInstance;
+    static InterProcess*  pInstance;
     std::thread node_thread;
-    cmdProcess NodeProcessCmd;
+    cmdProcess InterProcessCmd;
 
     void ProcessCallback();
 
 public:
-    NodeProcess() = default;
-    ~NodeProcess() = delete;
+    InterProcess() = default;
+    ~InterProcess() = delete;
 
-    static NodeProcess* getInstance();
+    static InterProcess* getInstance();
     bool init();
     void run();
     bool send(char *pbuffer, int size);

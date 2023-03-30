@@ -37,12 +37,12 @@ bool DriverManage::init()
     bool ret = true;
     SystemConfig *pConfig = SystemConfig::getInstance();
 
-    ret &= led_0.init(pConfig->getled()->dev, O_RDWR | O_NDELAY);
-    ret &= beep_0.init(pConfig->getbeep()->dev, O_RDWR | O_NDELAY);
-    ret &= ap_dev_0.init(pConfig->getapI2c()->dev, O_RDONLY);
-    ret &= icm_dev_0.init(pConfig->geticmSpi()->dev, O_RDONLY);
-    ret &= RTCDevice::getInstance()->open(O_RDONLY);
-    ret &= key_0.init(pConfig->getkey()->dev, O_RDWR | O_NDELAY);
+    ret &= led_0.init(pConfig->getled()->dev, O_RDWR | O_NONBLOCK);
+    ret &= beep_0.init(pConfig->getbeep()->dev, O_RDWR | O_NONBLOCK);
+    ret &= ap_dev_0.init(pConfig->getapI2c()->dev, O_RDONLY | O_NONBLOCK);
+    ret &= icm_dev_0.init(pConfig->geticmSpi()->dev, O_RDONLY | O_NONBLOCK);
+    ret &= RTCDevice::getInstance()->open(O_RDONLY | O_NONBLOCK);
+    ret &= key_0.init(pConfig->getkey()->dev, O_RDWR | O_NONBLOCK);
 
     if(ret)
     {

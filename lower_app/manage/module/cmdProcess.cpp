@@ -118,7 +118,7 @@ bool cmdProcess::ProcessData()
             break;
         case CmdSetDev:
             {
-                uint8_t device = 0, action = 0;
+                uint32_t device = 0, action = 0;
                 sscanf(pDataM, "%d,%d", &device, &action);
                 PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "SetDev:%d, %d!", device, action);
                 NAMESPACE_DEVICE::DeviceManageThread::getInstance()->sendHardProcessMsg(device, action);

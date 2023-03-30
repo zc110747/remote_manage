@@ -1,22 +1,22 @@
 <mxfile host="65bd71144e">
     <diagram id="THwRe8l1qz1Dv6zU9-bd" name="主框架">
-        <mxGraphModel dx="956" dy="711" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="533" dy="484" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
-                <mxCell id="67" value="" style="group" parent="1" vertex="1" connectable="0">
-                    <mxGeometry x="27" y="257" width="795" height="612" as="geometry"/>
+                <mxCell id="67" value="" style="group;movable=0;resizable=0;rotatable=0;deletable=0;editable=0;connectable=0;" parent="1" vertex="1" connectable="0">
+                    <mxGeometry x="31" y="179" width="795" height="612" as="geometry"/>
                 </mxCell>
-                <mxCell id="39" value="" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;dashed=1;align=left;fillColor=#f5f5f5;strokeColor=#666666;gradientColor=#b3b3b3;" parent="67" vertex="1">
+                <mxCell id="39" value="" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;dashed=1;align=left;fillColor=#f5f5f5;strokeColor=#666666;gradientColor=#b3b3b3;movable=0;resizable=0;rotatable=0;deletable=0;editable=0;connectable=0;" parent="67" vertex="1">
                     <mxGeometry x="52" y="7.3" width="711" height="527.7" as="geometry"/>
                 </mxCell>
                 <mxCell id="17" value="" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;fillColor=#f5f5f5;gradientColor=#b3b3b3;strokeColor=#666666;fontColor=#000000;" parent="67" vertex="1">
-                    <mxGeometry x="452.58936745022015" y="40.796524701873935" width="294.40958852608173" height="407.9965247018739" as="geometry"/>
+                    <mxGeometry x="452.59" y="56" width="294.41" height="357" as="geometry"/>
                 </mxCell>
                 <mxCell id="9" value="&lt;br&gt;&lt;br&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;fillColor=#f5f5f5;gradientColor=#b3b3b3;strokeColor=#666666;fontColor=#000000;" parent="67" vertex="1">
                     <mxGeometry x="188.7364028841329" y="142.79652470187392" width="214.74044061433875" height="206.04" as="geometry"/>
                 </mxCell>
-                <mxCell id="7" value="访问客户端(QT)" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;fillColor=#f5f5f5;gradientColor=#b3b3b3;strokeColor=#666666;fontColor=#000000;" parent="67" vertex="1">
+                <mxCell id="7" value="访问服务器(QT)" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;fillColor=#f5f5f5;gradientColor=#b3b3b3;strokeColor=#666666;fontColor=#000000;" parent="67" vertex="1">
                     <mxGeometry x="283.1066413603894" y="157.07652470187392" width="115.55539405255895" height="61.199999999999996" as="geometry"/>
                 </mxCell>
                 <mxCell id="8" value="Web应用(BS)" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;fillColor=#f5f5f5;gradientColor=#b3b3b3;strokeColor=#666666;fontColor=#000000;" parent="67" vertex="1">
@@ -32,16 +32,16 @@
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="15" value="界面管理(QT)" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;fillColor=#f5f5f5;gradientColor=#b3b3b3;strokeColor=#666666;fontColor=#000000;" parent="67" vertex="1">
-                    <mxGeometry x="460.2993566745539" y="48.959999999999994" width="280.69960768748047" height="56.10173764906303" as="geometry"/>
+                    <mxGeometry x="460.3" y="64" width="280.7" height="41.06" as="geometry"/>
                 </mxCell>
                 <mxCell id="16" value="驱动接口" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;fillColor=#f5f5f5;gradientColor=#b3b3b3;strokeColor=#666666;fontColor=#000000;" parent="67" vertex="1">
-                    <mxGeometry x="461" y="393" width="195" height="37.27" as="geometry"/>
+                    <mxGeometry x="531" y="315" width="95" height="86" as="geometry"/>
                 </mxCell>
                 <mxCell id="19" value="外部管理模块" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;fillColor=#f5f5f5;gradientColor=#b3b3b3;strokeColor=#666666;fontColor=#000000;" parent="67" vertex="1">
-                    <mxGeometry x="664.9990705813129" y="312.7768313458262" width="75.99989378072148" height="114.68483816013628" as="geometry"/>
+                    <mxGeometry x="633" y="316" width="108" height="84" as="geometry"/>
                 </mxCell>
                 <mxCell id="21" value="主框架" style="text;html=1;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontColor=#000000;" parent="67" vertex="1">
-                    <mxGeometry x="452.59196003918925" y="10.2" width="57.777697026279476" height="30.599999999999998" as="geometry"/>
+                    <mxGeometry x="452.59196003918925" y="25.4" width="57.777697026279476" height="30.599999999999998" as="geometry"/>
                 </mxCell>
                 <mxCell id="27" value="设备0" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;fillColor=#f5f5f5;gradientColor=#b3b3b3;strokeColor=#666666;fontColor=#000000;" parent="67" vertex="1">
                     <mxGeometry x="529.6255560788873" y="485.841465076661" width="53.92585055786085" height="27.54" as="geometry"/>
@@ -91,23 +91,32 @@
                         <mxPoint x="534.4436974930852" y="224.4" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="120" value="node服务器" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;fillColor=#f5f5f5;gradientColor=#b3b3b3;strokeColor=#666666;fontColor=#000000;" parent="67" vertex="1">
-                    <mxGeometry x="460" y="250.92" width="72" height="106.08" as="geometry"/>
+                <mxCell id="120" value="node&lt;br&gt;服务器" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;fillColor=#f5f5f5;gradientColor=#b3b3b3;strokeColor=#666666;fontColor=#000000;" parent="67" vertex="1">
+                    <mxGeometry x="459" y="119" width="65" height="102" as="geometry"/>
                 </mxCell>
-                <mxCell id="121" value="本地服务器&lt;br&gt;(串口，网络)" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;fillColor=#f5f5f5;gradientColor=#b3b3b3;strokeColor=#666666;fontColor=#000000;" parent="67" vertex="1">
-                    <mxGeometry x="460.29565297602653" y="114.24" width="123.25908698939622" height="129.54" as="geometry"/>
+                <mxCell id="121" value="C/S&lt;br&gt;客户端" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;fillColor=#f5f5f5;gradientColor=#b3b3b3;strokeColor=#666666;fontColor=#000000;" parent="67" vertex="1">
+                    <mxGeometry x="458" y="315" width="68" height="85" as="geometry"/>
                 </mxCell>
-                <mxCell id="122" value="外设管理模块" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;fillColor=#f5f5f5;gradientColor=#b3b3b3;strokeColor=#666666;fontColor=#000000;" parent="67" vertex="1">
-                    <mxGeometry x="591.26" y="313.14" width="66.74" height="75.86" as="geometry"/>
+                <mxCell id="150" value="" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;fillColor=#f5f5f5;gradientColor=#b3b3b3;strokeColor=#666666;fontColor=#000000;dashed=1;" parent="67" vertex="1">
+                    <mxGeometry x="529" y="116.28" width="212" height="188.7" as="geometry"/>
                 </mxCell>
-                <mxCell id="150" value="核心管理模块" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;fillColor=#f5f5f5;gradientColor=#b3b3b3;strokeColor=#666666;fontColor=#000000;" parent="67" vertex="1">
-                    <mxGeometry x="593.1891709445549" y="116.27999999999999" width="147.80979341747948" height="188.69826235093697" as="geometry"/>
+                <mxCell id="9CbvyaeR47D9kKdJCnXj-150" value="Internal通讯模块" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;fillColor=#f5f5f5;gradientColor=#b3b3b3;strokeColor=#666666;fontColor=#000000;" parent="67" vertex="1">
+                    <mxGeometry x="535" y="120.28" width="69.08" height="100.72" as="geometry"/>
                 </mxCell>
-                <mxCell id="9CbvyaeR47D9kKdJCnXj-150" value="node交互模块" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;fillColor=#f5f5f5;gradientColor=#b3b3b3;strokeColor=#666666;fontColor=#000000;" parent="67" vertex="1">
-                    <mxGeometry x="539.26" y="250.92" width="43.74" height="138.08" as="geometry"/>
+                <mxCell id="151" value="Web" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;fillColor=#f5f5f5;gradientColor=#b3b3b3;strokeColor=#666666;fontColor=#000000;" parent="67" vertex="1">
+                    <mxGeometry x="465" y="194" width="54" height="22" as="geometry"/>
                 </mxCell>
-                <mxCell id="151" value="前端网页" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;fillColor=#f5f5f5;gradientColor=#b3b3b3;strokeColor=#666666;fontColor=#000000;" vertex="1" parent="67">
-                    <mxGeometry x="460" y="361.84" width="72" height="27.16" as="geometry"/>
+                <mxCell id="122" value="外设管理&lt;br&gt;模块" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;fillColor=#f5f5f5;gradientColor=#b3b3b3;strokeColor=#666666;fontColor=#000000;" parent="67" vertex="1">
+                    <mxGeometry x="534" y="226" width="92" height="71.56" as="geometry"/>
+                </mxCell>
+                <mxCell id="153" value="核心模块" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;dashed=1;fontSize=17;" vertex="1" parent="67">
+                    <mxGeometry x="633" y="163" width="91" height="24" as="geometry"/>
+                </mxCell>
+                <mxCell id="154" value="logger&lt;br&gt;服务器" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;fillColor=#f5f5f5;gradientColor=#b3b3b3;strokeColor=#666666;fontColor=#000000;" vertex="1" parent="67">
+                    <mxGeometry x="458" y="226" width="67.63" height="79.01" as="geometry"/>
+                </mxCell>
+                <mxCell id="155" value="数据管理模块" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;fillColor=#f5f5f5;gradientColor=#b3b3b3;strokeColor=#666666;fontColor=#000000;" vertex="1" parent="67">
+                    <mxGeometry x="630" y="226" width="108" height="71.56" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>

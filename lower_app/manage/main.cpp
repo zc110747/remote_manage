@@ -23,7 +23,7 @@
 #include "Semaphore.hpp"
 #include "driver.hpp"
 #include "TimeManage.hpp"
-#include "node_process.hpp"
+#include "InternalProcess.hpp"
 #include "CenterUnit.hpp"
 
 //internal data
@@ -134,7 +134,7 @@ static bool system_init(int is_default, const char* path)
 	ret &= UartThreadManage::getInstance()->init();
 	ret &= TcpThreadManage::getInstance()->init();
 	ret &= UdpThreadManage::getInstance()->init();
-	ret &= NodeProcess::getInstance()->init();
+	ret &= InterProcess::getInstance()->init();
 	ret &= TimeManage::getInstance()->init();
 	ret &= CenterUnit::getInstance()->init();
 

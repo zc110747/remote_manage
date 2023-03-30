@@ -18,6 +18,7 @@
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
+#include "FIFOManage.hpp"
 #include "productConfig.hpp"
 #include "cmdProcess.hpp"
 #include "timer.hpp"
@@ -60,8 +61,7 @@ private:
 
     //fd
     LOG_MESSAGE message;
-    int readfd{-1};
-    int writefd{-1};
+    FIFOManage *pLoggerFIFO{nullptr};
 
     static LoggerManage *pInstance;
     
@@ -86,7 +86,6 @@ public:
     static LoggerManage *getInstance();
 
     void setThreadWork()            {set_thread_work = true;}
-    int read_fd()                   {return readfd;}
     void setlevel(LOG_LEVEL level)  {log_level = level;}
     LOG_LEVEL getlevel()            {return log_level;} 
 };

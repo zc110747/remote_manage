@@ -31,8 +31,8 @@ _Pragma("once")
 #define WORKFLOW_ID_HARDWARE_UPDATE     0x1001
 
 //process hardware chage
-#define EVENT_HADWARE_LED               0x00
-#define EVENT_HADWARE_BEEP              0x01
+#define EVENT_DEVICE_LED               0x00
+#define EVENT_DEVICE_BEEP              0x01
 
 #define DEVICE_MESSAGE_FIFO             "/tmp/dev.fifo"
 #define READ_BUFFER_SIZE                1024
@@ -77,7 +77,7 @@ namespace NAMESPACE_DEVICE
         DeviceReadInfo outer_info;
         std::mutex mut;
         static DeviceManageThread* pInstance;
-        FIFOMessage *pDevFIFO{nullptr};
+        FIFOManage *pDevFIFO{nullptr};
 
         void run();
         bool EventProcess(Event *pEvent);

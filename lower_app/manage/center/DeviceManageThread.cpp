@@ -46,7 +46,7 @@ namespace NAMESPACE_DEVICE
         //clear thread
         std::thread(std::bind(&DeviceManageThread::run, this)).detach();
         
-        pDevFIFO = new(std::nothrow) FIFOMessage(DEVICE_MESSAGE_FIFO, S_FIFO_WORK_MODE);
+        pDevFIFO = new(std::nothrow) FIFOManage(DEVICE_MESSAGE_FIFO, S_FIFO_WORK_MODE);
         if(pDevFIFO == nullptr)
         {
             return false;
@@ -133,13 +133,13 @@ namespace NAMESPACE_DEVICE
 
         switch (device)
         {
-        case EVENT_HADWARE_LED:
+        case EVENT_DEVICE_LED:
             {
                 auto led_ptr = DriverManage::getInstance()->getLed0();
                 led_ptr->writeIoStatus(action);
             }
             break;
-        case EVENT_HADWARE_BEEP:
+        case EVENT_DEVICE_BEEP:
             {
                 auto beep_ptr=DriverManage::getInstance()->getBeep0();
                 beep_ptr->writeIoStatus(action);
@@ -180,6 +180,7 @@ namespace NAMESPACE_DEVICE
             sendMessage(reinterpret_cast<char *>(&event), sizeof(event));
         });
         
+        //register action for key process
         DriverManage::getInstance()->getKey0()->register_func([this](int fd){
             unsigned int keyvalue = 0;
             static uint8_t status = 0;
@@ -188,7 +189,7 @@ namespace NAMESPACE_DEVICE
             {
                 if(keyvalue == 1)
                 {
-                    sendHardProcessMsg(0, status);
+                    sendHardProcessMsg(EVENT_DEVICE_LED, status);
                     status = status==0?1:0;
                 }
             }

@@ -42,7 +42,7 @@ public:
 
 private:
     static inline CenterUnit* pInstance = nullptr;
-    FIFOMessage *pCenterFiFo{nullptr};
+    FIFOManage *pCenterFiFo{nullptr};
 
     bool EventProcess(Event *pEvent);
 };
