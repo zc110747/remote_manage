@@ -24,7 +24,7 @@
 #include "driver.hpp"
 #include "TimeManage.hpp"
 #include "InternalProcess.hpp"
-#include "CenterUnit.hpp"
+#include "CenterManage.hpp"
 
 //internal data
 static int nConfigDefault = 0;
@@ -136,7 +136,7 @@ static bool system_init(int is_default, const char* path)
 	ret &= UdpThreadManage::getInstance()->init();
 	ret &= InterProcess::getInstance()->init();
 	ret &= TimeManage::getInstance()->init();
-	ret &= CenterUnit::getInstance()->init();
+	ret &= CenterManage::getInstance()->init();
 
 	return ret;
 }

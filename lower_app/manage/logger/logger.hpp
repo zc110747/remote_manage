@@ -25,7 +25,6 @@ _Pragma("once")
 
 #define LOGGER_MAX_BUFFER_SIZE      256
 #define LOGGER_MESSAGE_BUFFER_SIZE  16384
-#define LOGGER_FIFO_PATH            "/tmp/logger.fifo"
 
 typedef enum
 {

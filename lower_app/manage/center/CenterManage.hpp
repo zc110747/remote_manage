@@ -3,7 +3,7 @@
 //  All Rights Reserved
 //
 //  Name:
-//      CenterUnit.cpp
+//      CenterManage.cpp
 //
 //  Purpose:
 //      核心管理模块，用于接收所有模块的数据，进行管理并分发
@@ -22,18 +22,16 @@ _Pragma("once")
 
 #include "modules.hpp"
 
-#define CENTER_UNIT_FIFO    "/tmp/CenterUnit.fifo"
-
-class CenterUnit final
+class CenterManage final
 {
 public:
-    CenterUnit()=default;
+    CenterManage()=default;
 
     //单例模式不允许复制和释放
-    CenterUnit(const CenterUnit&)=delete;
-    virtual ~CenterUnit()=delete;
+    CenterManage(const CenterManage&)=delete;
+    virtual ~CenterManage()=delete;
 
-    static CenterUnit* getInstance();
+    static CenterManage* getInstance();
     bool init();
     void run();
     
@@ -41,7 +39,7 @@ public:
     void informHwUpdate();
 
 private:
-    static inline CenterUnit* pInstance = nullptr;
+    static inline CenterManage* pInstance = nullptr;
     FIFOManage *pCenterFiFo{nullptr};
 
     bool EventProcess(Event *pEvent);

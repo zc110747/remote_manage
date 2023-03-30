@@ -35,7 +35,7 @@ InterProcess* InterProcess::getInstance()
     return pInstance;
 }
 
-static AsioServer node_server;
+static AsioServer InterServer;
 
 void InterProcess::run()
 {
@@ -43,7 +43,7 @@ void InterProcess::run()
 
     try
     {
-        node_server.init(pSocketConfig->ipaddr, std::to_string(pSocketConfig->port), [this](char* ptr, int length){
+        InterServer.init(pSocketConfig->ipaddr, std::to_string(pSocketConfig->port), [this](char* ptr, int length){
             if(InterProcessCmd.parseData(ptr, length))
             {
                 //用于处理命令，告知应用
@@ -53,7 +53,7 @@ void InterProcess::run()
                 ProcessCallback();
             }
         });
-        node_server.run();
+        InterServer.run();
     }
     catch (std::exception& e)
     {
@@ -73,7 +73,7 @@ bool InterProcess::send(char *pbuffer, int size)
 {
     bool ret = false;
     
-    auto session_list =  node_server.get_session_list();
+    auto session_list =  InterServer.get_session_list();
 
     //数据发送到所有连接的端口
     for(const auto session:session_list)

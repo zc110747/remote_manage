@@ -3,7 +3,7 @@
 //  All Rights Reserved
 //
 //  Name:
-//      CenterUnit.cpp
+//      CenterManage.cpp
 //
 //  Purpose:
 //      核心管理模块，用于接收所有模块的数据，进行管理并分发
@@ -18,16 +18,16 @@
 //  Revision History:
 //      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
-#include "CenterUnit.hpp"
+#include "CenterManage.hpp"
 #include "logger.hpp"
 #include "InternalProcess.hpp"
 #include <new>
 
-CenterUnit* CenterUnit::getInstance()
+CenterManage* CenterManage::getInstance()
 {
     if(pInstance == nullptr)
     {
-        pInstance = new(std::nothrow) CenterUnit;
+        pInstance = new(std::nothrow) CenterManage;
         if(pInstance == nullptr)
         {
              PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "DeviceManageThread new error!");
@@ -36,13 +36,13 @@ CenterUnit* CenterUnit::getInstance()
     return pInstance;
 }
 
-void CenterUnit::informHwUpdate()
+void CenterManage::informHwUpdate()
 {
     Event event(WORKFLOW_ID_HARDWARE_UPDATE);
     pCenterFiFo->write(reinterpret_cast<char *>(&event), sizeof(event));
 }
 
-bool CenterUnit::EventProcess(Event *pEvent)
+bool CenterManage::EventProcess(Event *pEvent)
 {
     uint16_t id = pEvent->getId();
     switch(id)
@@ -61,7 +61,7 @@ bool CenterUnit::EventProcess(Event *pEvent)
     return true;
 }
 
-void CenterUnit::run()
+void CenterManage::run()
 {
     char buffer[1024];
     int size;
@@ -71,7 +71,7 @@ void CenterUnit::run()
         size = pCenterFiFo->read(buffer, READ_BUFFER_SIZE);
         if(size > 0)
         {
-            PRINT_LOG(LOG_DEBUG, xGetCurrentTicks(), "CenterUnit Command, %d!", size);
+            PRINT_LOG(LOG_DEBUG, xGetCurrentTicks(), "CenterManage Command, %d!", size);
             EventProcess(reinterpret_cast<Event *>(buffer));
         }
         else
@@ -81,10 +81,10 @@ void CenterUnit::run()
     }
 }
 
-bool CenterUnit::init()
+bool CenterManage::init()
 {
     //clear thread
-    std::thread(std::bind(&CenterUnit::run, this)).detach();
+    std::thread(std::bind(&CenterManage::run, this)).detach();
     
     pCenterFiFo = new(std::nothrow) FIFOManage(CENTER_UNIT_FIFO, S_FIFO_WORK_MODE);
     if(pCenterFiFo == nullptr)

@@ -19,7 +19,7 @@
 #include "DeviceManageThread.hpp"
 #include "driver.hpp"
 #include "TimeManage.hpp"
-#include "CenterUnit.hpp"
+#include "CenterManage.hpp"
 
 namespace NAMESPACE_DEVICE
 {
@@ -117,7 +117,7 @@ namespace NAMESPACE_DEVICE
                 std::lock_guard lock{mut};
                 outer_info = inter_info;
             }
-            CenterUnit::getInstance()->informHwUpdate();
+            CenterManage::getInstance()->informHwUpdate();
         }
     }
 

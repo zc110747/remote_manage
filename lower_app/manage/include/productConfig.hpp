@@ -18,6 +18,11 @@
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
+//------------------------- FIFO List ------------------------------
+#define LOGGER_FIFO_PATH            "/tmp/logger.fifo"              //logger服务模块
+#define DEVICE_MESSAGE_FIFO         "/tmp/device_manage.fifo"        //设备管理模块
+#define CENTER_UNIT_FIFO            "/tmp/center_manage.fifo"
+
 //------------------------- Global Defined --------------------------
 #define UART_MODULE_ON                  1
 #define SOCKET_TCP_MODULE_ON            1

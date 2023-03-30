@@ -36,7 +36,7 @@ objects = 	main.o \
 			logger/logger.o \
 			center/InternalProcess.o \
 			center/DeviceManageThread.o   \
-			center/CenterUnit.o
+			center/CenterManage.o
 
 
 clear_dobject = *.d .*.o.d \
@@ -45,8 +45,7 @@ clear_dobject = *.d .*.o.d \
 				event/*.d event/.*.o.d \
 				lib/*.d lib/.*.o.d \
 				logger/*.d logger/.*.o.d \
-				remote/*.d remote/.*.o.d \
-				node_process/*.d node_process/.*.o.
+				remote/*.d remote/.*.o.d 
 
 include_path = -I remote/ 			\
 				-I driver/ 			\
