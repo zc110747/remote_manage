@@ -83,8 +83,6 @@ bool SystemConfig::init(const char* path)
 
         parameter.tcp.ipaddr = root["socket"]["ipaddr"].asString();
         parameter.tcp.port = root["tcp"]["port"].asInt();
-        parameter.udp.ipaddr = root["socket"]["ipaddr"].asString();
-        parameter.udp.port = root["udp"]["port"].asInt();
         parameter.logger.ipaddr = root["socket"]["ipaddr"].asString();
         parameter.logger.port = root["logger"]["port"].asInt();
         parameter.node.ipaddr = LOCAL_HOST;
@@ -125,8 +123,6 @@ void SystemConfig::default_init() noexcept
 
     parameter.tcp.ipaddr = DEFAULT_TCP_IPADDR;
     parameter.tcp.port = DEFAULT_TCP_PORT;
-    parameter.udp.ipaddr = DEFAULT_UDP_IPADDR;
-    parameter.udp.port = DEFAULT_UDP_PORT;
     parameter.logger.ipaddr = DEFAULT_LOGGER_IPADDR;
     parameter.logger.port = DEFAULT_LOGGER_PORT;
     parameter.node.ipaddr = LOCAL_HOST;
@@ -151,7 +147,6 @@ std::ostream& operator<<(std::ostream& os, const SystemConfig& config)
     <<parameter->serial.parity<<"\n";
 
     os<<"tcp:"<<parameter->tcp.ipaddr<<" "<<parameter->tcp.port<<"\n";
-    os<<"udp:"<<parameter->udp.ipaddr<<" "<<parameter->udp.port<<"\n";
     os<<"logger:"<<parameter->logger.ipaddr<<" "<<parameter->logger.port<<"\n";
     os<<"node:"<<parameter->node.ipaddr<<" "<<parameter->node.port<<"\n";
     os<<"rtc:"<<parameter->rtc.dev<<"\n";

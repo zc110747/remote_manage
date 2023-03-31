@@ -110,9 +110,9 @@ bool cmdProcess::ProcessData()
                 auto pSysConfig = SystemConfig::getInstance();
                 auto pVersion = pSysConfig->getversion();
                 PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "FW_Version:%d, %d, %d, %d", pVersion[0], pVersion[1], pVersion[2], pVersion[3]);
-                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Sokcet Ipaddress:%s", pSysConfig->getudp()->ipaddr.c_str());
-                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Port TCP:%d, UDP: %d, LOGGER:%d ", 
-                    pSysConfig->gettcp()->port, pSysConfig->getudp()->port, pSysConfig->getlogger()->port);
+                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Sokcet Ipaddress:%s", pSysConfig->gettcp()->ipaddr.c_str());
+                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Port TCP:%d, LOGGER:%d ", 
+                    pSysConfig->gettcp()->port, pSysConfig->getlogger()->port);
                 PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Logger Level:%d ", (int)LoggerManage::getInstance()->getlevel());
             }
             break;

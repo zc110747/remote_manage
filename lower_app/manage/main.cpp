@@ -133,7 +133,6 @@ static bool system_init(int is_default, const char* path)
 	ret &= NAMESPACE_DEVICE::DeviceManageThread::getInstance()->init();
 	ret &= UartThreadManage::getInstance()->init();
 	ret &= TcpThreadManage::getInstance()->init();
-	ret &= UdpThreadManage::getInstance()->init();
 	ret &= InterProcess::getInstance()->init();
 	ret &= TimeManage::getInstance()->init();
 	ret &= CenterManage::getInstance()->init();

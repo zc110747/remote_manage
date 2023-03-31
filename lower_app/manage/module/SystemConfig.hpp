@@ -65,7 +65,6 @@ typedef struct
 
     //socket config
     SocketSysConfig tcp;
-    SocketSysConfig udp;
     SocketSysConfig logger;
     SocketSysConfig node;
 
@@ -101,7 +100,6 @@ public:
     const DeviceSysConfig *getkey()     {return &(parameter.key);}
     const SerialSysConfig *getserial()  {return &(parameter.serial);}
     const SocketSysConfig *gettcp()     {return &(parameter.tcp);}
-    const SocketSysConfig *getudp()     {return &(parameter.udp);}
     const SocketSysConfig *getlogger()  {return &(parameter.logger);}
     const SocketSysConfig *getnode()    {return &(parameter.node);}
     const DeviceSysConfig *getrtc()     {return &(parameter.rtc);}
