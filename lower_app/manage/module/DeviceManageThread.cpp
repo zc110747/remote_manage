@@ -107,6 +107,8 @@ namespace NAMESPACE_DEVICE
         {
             icm_dev_ptr->ConvertInfo();
             inter_info.icm_info = icm_dev_ptr->getConvertInfo();
+            inter_info.angle = icm_dev_ptr->getAngle();
+            //PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "Angle:%d!", icm_dev_ptr->getAngle());
         }
 
         if(inter_info != outer_info)

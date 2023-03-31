@@ -45,6 +45,7 @@ namespace NAMESPACE_DEVICE
         uint8_t   beep_io; 
         AP_INFO   ap_info;
         ICM_INFO  icm_info;
+        int32_t   angle;
 
         //for compare, need clear before to avoid fill by align.
         bool operator != (const DeviceReadInfo& dev_info)

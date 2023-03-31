@@ -38,7 +38,7 @@ typedef struct
     float gyro_z_act;     /*陀螺仪z轴角速度*/ 
     float accel_x_act;    /*加速度计x轴加速度*/
     float accel_y_act;    /*加速度计y轴加速度*/
-    float accel_z_act;    /*加速度计z轴加速度*/
+    float accel_z_act;    /*加速度计z轴加速度*/     
     float temp_act;       /*温度信息*/
 }ICM_INFO;
 
@@ -46,6 +46,7 @@ class ICMDevice : public InfoBase<ICM_ADC_INFO>
 {
 private:
     ICM_INFO icm_info;
+    int32_t angle{0};
 
 public:
     //constructor
@@ -55,6 +56,10 @@ public:
 
     ICM_INFO getConvertInfo(){
         return icm_info;
+    }
+
+    int32_t getAngle(){
+        return angle;
     }
 };
 

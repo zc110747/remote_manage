@@ -114,7 +114,9 @@ void NodeProcess::SendStatusBuffer(NAMESPACE_DEVICE::DeviceReadInfo &info)
     CurrentIndex += size;
     size = sprintf(&buffer[CurrentIndex], "accelz=%.2f;", info.icm_info.accel_z_act);
     CurrentIndex += size;
-    size = sprintf(&buffer[CurrentIndex], "temp=%.2f", info.icm_info.temp_act);
+    size = sprintf(&buffer[CurrentIndex], "temp=%.2f;", info.icm_info.temp_act);
+    CurrentIndex += size;
+    size = sprintf(&buffer[CurrentIndex], "angle=%d", info.angle);
     CurrentIndex += size;
     buffer[CurrentIndex] = '\0';
 
