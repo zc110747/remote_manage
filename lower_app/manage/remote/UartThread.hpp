@@ -22,24 +22,24 @@ _Pragma("once")
 
 #define UART_MAX_BUFFER_SIZE     		512
 
-class CUartProtocolInfo:public CProtocolInfo<void>
+class CUartProtocolInfo:public CProtocolInfo
 {
 public:
-	using CProtocolInfo<void>::CProtocolInfo;
+	using CProtocolInfo::CProtocolInfo;
 
 	/*串口的通讯读接口*/
-	int DeviceRead(int nFd, uint8_t *pDataStart, uint16_t nDataSize, void *output = nullptr)
+	int DeviceRead(int fd, uint8_t *pDataStart, uint16_t nDataSize)
 	{
 		int ret;
-		ret= read(nFd, pDataStart, nDataSize);
+		ret= read(fd, pDataStart, nDataSize);
 		return ret;
 	}
 
 	/*串口的通讯写接口*/
-	int DeviceWrite(int nFd, uint8_t *pDataStart, uint16_t nDataSize, void *input = nullptr)
+	int DeviceWrite(int fd, uint8_t *pDataStart, uint16_t nDataSize)
 	{
 		int ret;
-		ret = write(nFd, pDataStart, nDataSize);
+		ret = write(fd, pDataStart, nDataSize);
 		return ret;
 	}
 };
@@ -68,7 +68,6 @@ public:
 	void release();
 
 	static UartThreadManage* getInstance();
-	CUartProtocolInfo* getProtocolInfo() {return pProtocolInfo;}
 	int getComfd()	{return nComFd;}
 };
 

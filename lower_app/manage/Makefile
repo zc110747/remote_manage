@@ -18,6 +18,7 @@ CFLAGS := -O3 -std=c++17 -fno-strict-aliasing -lrt
 objects = 	main.o \
 			remote/SocketTcpThread.o 	 \
 			remote/UartThread.o 		 \
+			remote/Protocol.o			 \
 			module/SystemConfig.o \
 			module/CalcCrc16.o  \
 			module/TimeManage.o \

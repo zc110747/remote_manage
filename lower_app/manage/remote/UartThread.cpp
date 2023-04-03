@@ -37,20 +37,13 @@ void UartThreadManage::run()
 {
 	int nFlag;
 	int size;
-	auto *pProtocolInfo = getProtocolInfo();
 
 	PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "UART Thread start!");
 	for(;;)
 	{	   
-		nFlag = pProtocolInfo->CheckRxBuffer(nComFd, false);
-		if(nFlag == RT_OK)
+		if(pProtocolInfo->CheckRxFrame())
 		{
-			pProtocolInfo->ExecuteCommand(nComFd);
-			pProtocolInfo->SendTxBuffer(nComFd);
-		}
-		else
-		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			pProtocolInfo->ProcessRxFrame();
 		}
 	}
 }
@@ -76,7 +69,7 @@ bool UartThreadManage::init()
 	}
 
 	//创建UART协议管理对象
-	pProtocolInfo = new CUartProtocolInfo(nRxCacheBuffer, nTxCacheBuffer, UART_MAX_BUFFER_SIZE);
+	pProtocolInfo = new CUartProtocolInfo(nComFd);
 	
 	std::thread(std::bind(&UartThreadManage::run, this)).detach();
 	PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "UartThreadManage init success!");

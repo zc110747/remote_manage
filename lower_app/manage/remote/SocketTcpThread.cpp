@@ -150,35 +150,20 @@ static void *SocketTcpDataProcessThread(void *arg)
     std::unique_ptr<uint8_t[]> nRxCacheBuffer(new uint8_t[SOCKET_BUFFER_SIZE]);
     std::unique_ptr<uint8_t[]> nTxCacheBuffer(new uint8_t[SOCKET_BUFFER_SIZE]);
 
-    auto pTcpProtocolInfo = new CTcpProtocolInfo(nRxCacheBuffer.get(), 
-                            nTxCacheBuffer.get(), SOCKET_BUFFER_SIZE);
+    auto pTcpProtocolInfo = new CTcpProtocolInfo(client_fd);
 
     FD_ZERO(&read_set);
     FD_SET(client_fd ,&read_set);
 
     for(;;)
     {	   
-		nFlag = pTcpProtocolInfo->CheckRxBuffer(client_fd, false, &size);
-		if(nFlag == RT_OK)
+        if(pTcpProtocolInfo->CheckRxFrame())
         {
-			pTcpProtocolInfo->ExecuteCommand(client_fd);
-            pTcpProtocolInfo->SendTxBuffer(client_fd, &size);
-            if(!pTcpProtocolInfo->GetFileUploadStatus())
-                break;
-		}
-        else if(nFlag == RT_FAIL)
-        {
-            /*判断是否有数据可读取, 不可读则退出*/
-            struct timeval client_timeout = {0, 100};
-
-            nFlag = select(client_fd, &read_set, NULL, NULL, &client_timeout);
-            if(nFlag < 0){
-                break;
-            }
+            pTcpProtocolInfo->ProcessRxFrame();
         }
         else
         {
-            break;
+            //do nothing
         }
 	}
 

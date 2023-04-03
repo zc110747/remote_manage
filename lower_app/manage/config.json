@@ -1,43 +1,54 @@
 {
-        "led":{
-                "init":0,
-                "dev":"/dev/led"
-        },
-        "beep":{
-                "init":0,
-                "dev":"/dev/beep"
-        },
-        "key":{
-                "dev":"/dev/key"
-        },
-        "serial":{
-                "baud":115200,
-                "dataBits":8,  
-                "StopBits":1,
-                "parity":"n",
-                "dev":"/dev/ttymxc2"
-        },
-        "socket":{
-                "ipaddr":"192.168.2.99"
-        },
-        "tcp":{
-                "port":15057
-        },
-        "logger":{
-                "port":15059
-        },
-        "node":{
-                "web_port":15060,
-                "socket_port":15061 
-        },
-        "rtc":{
-                "dev":"/dev/rtc0"
-        },
-        "icmSpi":{
-                "dev":"/dev/icm20608"
-        },
-        "apI2c":{
-                "dev":"/dev/ap3216"
-        },
-        "downloadpath":"/home/manage/download/"
+	"apI2c" : 
+	{
+		"dev" : "/dev/ap3216"
+	},
+	"beep" : 
+	{
+		"dev" : "/dev/beep",
+		"init" : 0
+	},
+	"downloadpath" : "/home/manage/download/",
+	"icmSpi" : 
+	{
+		"dev" : "/dev/icm20608"
+	},
+	"key" : 
+	{
+		"dev" : "/dev/key"
+	},
+	"led" : 
+	{
+		"dev" : "/dev/led",
+		"init" : 0
+	},
+	"logger" : 
+	{
+		"port" : 15059
+	},
+	"node" : 
+	{
+		"socket_port" : 15061,
+		"web_port" : 8004
+	},
+	"rtc" : 
+	{
+		"dev" : "/dev/rtc0"
+	},
+	"serial" : 
+	{
+		"StopBits" : 0,
+		"baud" : 115200,
+		"dataBits" : 8,
+		"dev" : "/dev/ttymxc2",
+		"parity" : "n"
+	},
+	"socket" : 
+	{
+		"ipaddr" : "192.168.2.99"
+	},
+	"tcp" : 
+	{
+		"port" : 15057
+	}
 }

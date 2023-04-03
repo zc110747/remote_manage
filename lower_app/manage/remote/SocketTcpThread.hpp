@@ -23,13 +23,13 @@ _Pragma("once")
 
 #define SOCKET_BUFFER_SIZE		1200
 
-class CTcpProtocolInfo:public CProtocolInfo<void>
+class CTcpProtocolInfo:public CProtocolInfo
 {
 public:
-	using CProtocolInfo<void>::CProtocolInfo;
+	using CProtocolInfo::CProtocolInfo;
 
 	/*TCP Socket数据读取接口*/
-	int DeviceRead(int nFd, uint8_t *pDataStart, uint16_t nDataSize, void* output = nullptr)
+	int DeviceRead(int nFd, uint8_t *pDataStart, uint16_t nDataSize)
 	{
 		int ret;
 		ret = recv(nFd, pDataStart, nDataSize, 0);
@@ -37,7 +37,7 @@ public:
 	}
 
 	/*TCP Socket数据写入接口*/
-	int DeviceWrite(int nFd, uint8_t *pDataStart, uint16_t nDataSize, void* input = nullptr)
+	int DeviceWrite(int nFd, uint8_t *pDataStart, uint16_t nDataSize)
 	{
 		int ret;
 		ret = send(nFd, pDataStart, nDataSize, 0);

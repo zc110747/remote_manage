@@ -21,6 +21,7 @@
 /////////////////////////////////////////////////////////////////////////////
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include "SystemConfig.hpp"
 
 //const默认内部链接的, 需要在初始化地方加上const
@@ -46,6 +47,9 @@ bool SystemConfig::init(const char* path)
 {
     Json::Value root;
     std::ifstream ifs;
+
+    filePath.clear();
+    filePath.assign(path);
 
     //before init, need default init
     default_init();
@@ -127,6 +131,9 @@ void SystemConfig::default_init() noexcept
     parameter.logger.port = DEFAULT_LOGGER_PORT;
     parameter.node.ipaddr = LOCAL_HOST;
     parameter.node.port = DEFAULT_NODE_PORT;
+    parameter.web_node.ipaddr = LOCAL_HOST;
+    parameter.web_node.port = DEFAULT_NODE_WEB_PORT;
+
     parameter.rtc.dev = DEFAULT_RTC_DEV;
     parameter.icmSpi.dev = DEFAULT_ICMSPI_DEV; 
     parameter.apI2c.dev = DEFAULT_API2C_DEV;
@@ -135,10 +142,52 @@ void SystemConfig::default_init() noexcept
     memcpy(parameter.version, fw_version, 4);
 }
 
+void SystemConfig::SaveConfigFile()
+{
+    Json::Value root;
+
+    //gpio
+    root["led"]["dev"] = parameter.led.dev;
+    root["led"]["init"] = parameter.led.init;
+    root["beep"]["dev"] = parameter.beep.dev;
+    root["beep"]["init"] = parameter.beep.init;
+    root["key"]["dev"] = parameter.key.dev;
+
+    root["serial"]["baud"] = parameter.serial.baud;
+    root["serial"]["dataBits"] = parameter.serial.dataBits;
+    root["serial"]["StopBits"] = parameter.serial.stopBits;
+    root["serial"]["parity"] = parameter.serial.parity;
+    root["serial"]["dev"] = parameter.serial.dev;
+
+    root["socket"]["ipaddr"] = parameter.tcp.ipaddr;
+    root["tcp"]["port"] = parameter.tcp.port;
+    root["logger"]["port"] = parameter.logger.port;
+
+    root["node"]["socket_port"] = parameter.node.port;
+    root["node"]["web_port"] = parameter.web_node.port;
+    root["rtc"]["dev"] = parameter.rtc.dev;
+    root["icmSpi"]["dev"] = parameter.icmSpi.dev;
+    root["apI2c"]["dev"] = parameter.apI2c.dev;
+    root["downloadpath"] = parameter.downloadpath;
+
+    Json::StreamWriterBuilder swb;
+    std::shared_ptr<Json::StreamWriter> sw(swb.newStreamWriter());
+
+    std::stringstream str;
+    sw->write(root, &str);
+    auto s = str.str();
+    
+    std::ofstream fstr;
+    fstr.open(filePath.c_str(), std::ios::out);
+    fstr.write(s.c_str(), s.size());
+    fstr.close();
+}
+
 std::ostream& operator<<(std::ostream& os, const SystemConfig& config)
 {
     const SystemParamter* parameter = &(config.parameter);
 
+    os<<"filepath:"<<config.getFilePath()<<"\n";
     os<<"led:"<<parameter->led.dev<<" "<<parameter->led.init<<"\n";
     os<<"beep:"<<parameter->beep.dev<<" "<<parameter->beep.init<<"\n";
     
