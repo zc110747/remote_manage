@@ -36,8 +36,10 @@ public:
     void run();
     
     //内部事件
-    void informHwUpdate();
-
+    int sendInternalHwRefresh();
+    
+    //外部事件
+    int sendDeviceConfig(uint8_t device, uint8_t action);
 private:
     static inline CenterManage* pInstance = nullptr;
     FIFOManage *pCenterFiFo{nullptr};

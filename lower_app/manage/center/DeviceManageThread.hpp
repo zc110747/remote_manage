@@ -25,10 +25,13 @@ _Pragma("once")
 #include "event.hpp"
 
 //interal event
+//device event
 #define DEVICE_ID_TIME_UPDATE_PREOID    0x0001
 #define DEVICE_ID_HARDWARE_CHANGE       0x0002
 
-#define WORKFLOW_ID_HARDWARE_UPDATE     0x1001
+//workflow event
+#define WORKFLOW_ID_INTER_DATA_REFRESH  0x1001    //更新内部数据
+#define WORKFLOW_ID_HARDWARE_CHANGE     0x1002    //硬件数据更新
 
 //process hardware chage
 #define EVENT_DEVICE_LED                0x00

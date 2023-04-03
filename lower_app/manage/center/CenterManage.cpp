@@ -21,8 +21,10 @@
 #include "CenterManage.hpp"
 #include "logger.hpp"
 #include "InternalProcess.hpp"
+#include "DeviceManageThread.hpp"
 #include <new>
 
+using NAMESPACE_DEVICE::DeviceManageThread;
 CenterManage* CenterManage::getInstance()
 {
     if(pInstance == nullptr)
@@ -36,10 +38,19 @@ CenterManage* CenterManage::getInstance()
     return pInstance;
 }
 
-void CenterManage::informHwUpdate()
+int CenterManage::sendInternalHwRefresh()
 {
-    Event event(WORKFLOW_ID_HARDWARE_UPDATE);
-    pCenterFiFo->write(reinterpret_cast<char *>(&event), sizeof(event));
+    Event event(WORKFLOW_ID_INTER_DATA_REFRESH);
+    return pCenterFiFo->write(reinterpret_cast<char *>(&event), sizeof(event));
+}
+
+int CenterManage::sendDeviceConfig(uint8_t device, uint8_t action)
+{
+    EventBufMessage event(WORKFLOW_ID_HARDWARE_CHANGE);
+
+    event.getData().buffer[0] = device;
+    event.getData().buffer[0] = device;
+    return pCenterFiFo->write(reinterpret_cast<char *>(&event), sizeof(event));
 }
 
 bool CenterManage::EventProcess(Event *pEvent)
@@ -47,13 +58,20 @@ bool CenterManage::EventProcess(Event *pEvent)
     uint16_t id = pEvent->getId();
     switch(id)
     {
-    case WORKFLOW_ID_HARDWARE_UPDATE:
+    case WORKFLOW_ID_INTER_DATA_REFRESH:
         {
-            auto info = NAMESPACE_DEVICE::DeviceManageThread::getInstance()->getDeviceInfo();
+            auto info = DeviceManageThread::getInstance()->getDeviceInfo();
             InterProcess::getInstance()->SendStatusBuffer(info);
         }
         break;
 
+    case WORKFLOW_ID_HARDWARE_CHANGE:
+        {
+            auto *pMessage = static_cast<EventBufMessage *>(pEvent);
+            DeviceManageThread::getInstance()->sendHardProcessMsg
+                (pMessage->getData().buffer[0], pMessage->getData().buffer[1]);
+        }
+        break;
     default:
         PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Invalid Device Command:%d!", id);
         break;

@@ -117,7 +117,7 @@ namespace NAMESPACE_DEVICE
                 std::lock_guard lock{mut};
                 outer_info = inter_info;
             }
-            CenterManage::getInstance()->informHwUpdate();
+            CenterManage::getInstance()->sendInternalHwRefresh();
         }
     }
 
