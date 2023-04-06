@@ -3,7 +3,7 @@
 //  All Rights Reserved
 //
 //  Name:
-//      cmdProcess.cpp
+//      cmd_process.cpp
 //
 //  Purpose:
 //      用于支持命令行处理的接口, 包含字符串处理和事件触发
@@ -17,7 +17,7 @@
 //      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
 
-#include "cmdProcess.hpp"
+#include "cmd_process.hpp"
 #include "logger.hpp"
 #include "DeviceManageThread.hpp"
 
@@ -47,7 +47,7 @@ const static std::map<CmdFormat_t, std::string> CmdHelpMapM = {
     {CmdGetHelp, "!? ## !help"},
 };
 
-bool cmdProcess::parseData(char *ptr, int size)
+bool cmd_process::parseData(char *ptr, int size)
 {
     if(ptr[0] != '!')
     {
@@ -80,7 +80,7 @@ bool cmdProcess::parseData(char *ptr, int size)
     return true;
 }
 
-bool cmdProcess::ProcessData()
+bool cmd_process::ProcessData()
 {
     bool ret = true;
     switch(formatM)

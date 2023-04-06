@@ -8,13 +8,13 @@
 #include "ui_mainwindow.h"
 #include "protocol.h"
 
-class CUdpSocketInfo:public QWidget, public CProtocolInfo
+class CUdpSocketInfo:public QWidget, public protocol_info
 {
     Q_OBJECT
 
 public:
     CUdpSocketInfo(uint8_t *pRxBuffer, uint8_t *pTxBuffer, int nMaxBufSize):
-        CProtocolInfo(pRxBuffer, pTxBuffer, nMaxBufSize){
+        protocol_info(pRxBuffer, pTxBuffer, nMaxBufSize){
         m_pSemphore = new QSemaphore(0);
     }
     ~CUdpSocketInfo()

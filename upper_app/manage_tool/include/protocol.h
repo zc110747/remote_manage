@@ -123,23 +123,23 @@ private:
     QMutex *m_qLockMutex;
 };
 
-class CProtocolInfo
+class protocol_info
 {
 public:
-    CProtocolInfo(uint8_t *pRxBuffer, uint8_t *pTxBuffer, uint8_t nMaxBufSize){
+    protocol_info(uint8_t *pRxBuffer, uint8_t *pTxBuffer, uint8_t nMaxBufSize){
         m_pRxBuffer = pRxBuffer;
         m_pRxDataBuffer = &pRxBuffer[RECV_DATA_HEAD];
         m_pTxBuffer = pTxBuffer;
         m_MaxBufSize = nMaxBufSize;
         m_pQueue = new CProtocolQueue();
     };
-    ~CProtocolInfo(){
+    ~protocol_info(){
         delete  m_pQueue;
         m_pQueue = nullptr;
     };
 
     int CreateSendBuffer(uint8_t nId, uint16_t nSize, uint8_t *pStart, bool bWriteThrough);
-    uint16_t CrcCalculate(uint8_t *pStart, int nSize);
+    uint16_t calculate_crc(uint8_t *pStart, int nSize);
     uint16_t GetId(void){
         return m_nId;
     }

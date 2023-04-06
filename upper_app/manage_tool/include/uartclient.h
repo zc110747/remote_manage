@@ -7,13 +7,13 @@
 #include "protocol.h"
 #include "qextserialport/qextserialport.h"
 
-class CUartProtocolInfo:public QWidget, public CProtocolInfo
+class CUartProtocolInfo:public QWidget, public protocol_info
 {
     Q_OBJECT
 
 public:
     CUartProtocolInfo(uint8_t *pRxBuffer, uint8_t *pTxBuffer, int nMaxBufSize):
-        CProtocolInfo(pRxBuffer, pTxBuffer, nMaxBufSize){
+        protocol_info(pRxBuffer, pTxBuffer, nMaxBufSize){
     }
     ~CUartProtocolInfo(){
     }

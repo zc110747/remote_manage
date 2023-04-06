@@ -3,7 +3,7 @@
 //  All Rights Reserved
 //
 //  Name:
-//      Protocol.hpp
+//      protocol.hpp
 //
 //  Purpose:
 //      用于处理协议定义的接口
@@ -19,11 +19,13 @@
 _Pragma("once")
 
 #include "modules.hpp"
+#include "FIFOManage.hpp"
 
 /**************************************************************************
 * Global Macro Definition
 ***************************************************************************/
 #define RX_BUFFER_SIZE			1024
+#define TX_BUFFER_SIZE			1024
 #define DEFAULT_CRC_VALUE		0xFFFF
 
 #define BIG_ENDING         		0
@@ -44,33 +46,46 @@ typedef enum
 	ROTOCOL_FRAME_FINISHED,
 }ENUM_PROTOCOL_STATUS;
 
-class CProtocolInfo
+class protocol_info
 {
-private:
-	uint8_t  m_RxBuffer[RX_BUFFER_SIZE];    //接收数据缓存
-	uint16_t m_RxBufSize{0};	   			//接收数据长度
-	uint32_t m_RxTimeout; 					//超时时间
-	ENUM_PROTOCOL_STATUS rxStatus;
-	
-	int do_fd{-1};							//处理硬件的fd接口
-
 public:  
-	CProtocolInfo(int fd)
-	{
-		memset(m_RxBuffer, 0, RX_BUFFER_SIZE);
-		m_RxTimeout = 0;
-		rxStatus = PROTOCOL_FRAME_EMPTY;
-		
-		do_fd = fd;
-	};
-	~CProtocolInfo(void){}
+	/// Construct and create rx/tx fifo for protocol process
+	/**
+	 * @param rx_fifo a fifo path for protocol rx process
+	 *
+	 * @param tx_fifo a fifo path for protocol tx process
+	 */
+	protocol_info(const std::string &rx_fifo, const std::string &tx_fifo);
+	~protocol_info(void);
 
-	bool CheckRxFrame();     
-	void ProcessRxFrame();	
-	uint16_t CrcCalculate(uint8_t *pdata, uint16_t size);
+	bool init();
 
-	virtual int DeviceRead(int fd, uint8_t *data, uint16_t size)=0;  
-	virtual int DeviceWrite(int fd, uint8_t *pDataStart, uint16_t nDataSize)=0;
+	//protocol rx process
+	int write_rx_fifo(char*, uint16_t);
+	int read_rx_fifo(char*, uint16_t);
+	ENUM_PROTOCOL_STATUS check_rx_frame(uint8_t);    
+	void process_rx_frame();	
+	void clear_rx_info();
+
+	//protocol tx process
+	int read_tx_fifo(char *, uint16_t);
+	int write_tx_fifo(char *, uint16_t);
+
+	//calculate crc16
+	uint16_t calculate_crc(uint8_t*, uint16_t);
+
+private:
+	//protocol rx buffer process
+	uint8_t  rx_buffer_[RX_BUFFER_SIZE];   
+	uint16_t rx_buffer_size_{0};	   			
+	uint32_t rx_timeout_; 					
+	ENUM_PROTOCOL_STATUS rx_status_;
+	
+	FIFOManage *rx_fifo_ptr_;
+	std::string rx_fifo_path;
+	
+	FIFOManage *tx_fifo_ptr_;
+	std::string tx_fifo_path_;
 };
 
 /**************************************************************************

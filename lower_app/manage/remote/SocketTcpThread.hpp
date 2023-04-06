@@ -18,44 +18,30 @@
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
-#include <sys/socket.h>
-#include "Protocol.hpp"
+#include "protocol.hpp"
 
 #define SOCKET_BUFFER_SIZE		1200
-
-class CTcpProtocolInfo:public CProtocolInfo
-{
-public:
-	using CProtocolInfo::CProtocolInfo;
-
-	/*TCP Socket数据读取接口*/
-	int DeviceRead(int nFd, uint8_t *pDataStart, uint16_t nDataSize)
-	{
-		int ret;
-		ret = recv(nFd, pDataStart, nDataSize, 0);
-		return ret;
-	}
-
-	/*TCP Socket数据写入接口*/
-	int DeviceWrite(int nFd, uint8_t *pDataStart, uint16_t nDataSize)
-	{
-		int ret;
-		ret = send(nFd, pDataStart, nDataSize, 0);
-		return ret;
-	}
-};
 
 class TcpThreadManage
 {
 private:
 	pthread_t	tid;
 	static TcpThreadManage* pInstance;
-	std::thread m_thread;
+	std::thread m_server_thread;
+	std::thread m_rx_thread;
+	std::thread m_tx_thread;
+
 public:
 	TcpThreadManage() = default;
 	~TcpThreadManage() = delete;
 
 	bool init();
+	void tcp_server_run();
+	void tcp_rx_run();
+	void tcp_tx_run();
 	static TcpThreadManage* getInstance();
+
+public:
+	protocol_info* protocol_info_ptr_;
 };
 

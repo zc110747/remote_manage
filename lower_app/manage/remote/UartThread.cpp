@@ -41,17 +41,12 @@ void UartThreadManage::run()
 	PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "UART Thread start!");
 	for(;;)
 	{	   
-		if(pProtocolInfo->CheckRxFrame())
-		{
-			pProtocolInfo->ProcessRxFrame();
-		}
+
 	}
 }
 
 bool UartThreadManage::init()
 {
-#if UART_MODULE_ON == 1
-
 	auto pSerialConfig = SystemConfig::getInstance()->getserial();
 
 	if((nComFd = open(pSerialConfig->dev.c_str(), O_RDWR|O_NOCTTY|O_NDELAY))<0)
@@ -67,13 +62,9 @@ bool UartThreadManage::init()
 			return false;
 		}
 	}
-
-	//创建UART协议管理对象
-	pProtocolInfo = new CUartProtocolInfo(nComFd);
 	
-	std::thread(std::bind(&UartThreadManage::run, this)).detach();
+	//std::thread(std::bind(&UartThreadManage::run, this)).detach();
 	PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "UartThreadManage init success!");
-#endif
 	return true;
 }
 
@@ -179,13 +170,6 @@ int UartThreadManage::set_opt(int nBaud, int nDataBits, std::string cParity, int
 
 void UartThreadManage::release()
 {
-	//clear protocol interface
-	if(pProtocolInfo != nullptr)
-	{
-		delete pProtocolInfo;
-		pProtocolInfo = nullptr;
-	}
-
 	if(nComFd >= 0)
 	{
 		close(nComFd);

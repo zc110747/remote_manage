@@ -3,7 +3,7 @@
 //  All Rights Reserved
 //
 //  Name:
-//      cmdProcess.hpp
+//      cmd_process.hpp
 //
 //  Purpose:
 //      用于支持命令行处理的接口, 包含字符串处理和事件触发
@@ -31,14 +31,14 @@ typedef enum
     CmdConnect,
 }CmdFormat_t;
 
-class cmdProcess
+class cmd_process
 {
 private:
     char *pDataM;
     CmdFormat_t formatM;
 
 public:
-    cmdProcess() = default;
+    cmd_process() = default;
     
     bool init();
     bool parseData(char *ptr, int size);

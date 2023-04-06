@@ -18,38 +18,16 @@
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
-#include "Protocol.hpp"
+#include "protocol.hpp"
 
 #define UART_MAX_BUFFER_SIZE     		512
-
-class CUartProtocolInfo:public CProtocolInfo
-{
-public:
-	using CProtocolInfo::CProtocolInfo;
-
-	/*串口的通讯读接口*/
-	int DeviceRead(int fd, uint8_t *pDataStart, uint16_t nDataSize)
-	{
-		int ret;
-		ret= read(fd, pDataStart, nDataSize);
-		return ret;
-	}
-
-	/*串口的通讯写接口*/
-	int DeviceWrite(int fd, uint8_t *pDataStart, uint16_t nDataSize)
-	{
-		int ret;
-		ret = write(fd, pDataStart, nDataSize);
-		return ret;
-	}
-};
 
 class UartThreadManage
 {
 private:
 	//device info
 	int nComFd{-1};
-	CUartProtocolInfo *pProtocolInfo;
+	protocol_info *pProtocolInfo;
 
 	//message buffer
 	uint8_t nRxCacheBuffer[UART_MAX_BUFFER_SIZE];

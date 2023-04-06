@@ -29,50 +29,18 @@ _Pragma("once")
 
 class Session;
 using ShareSessionPointer = std::shared_ptr<Session>;
-class SessionMessage
+class session_group
 {
 public:
-    void init(std::function<void(char* ptr, int size)> handler)
-    {
-        set_.clear();
-        handler_ = handler;
-    }
-
-    void join(ShareSessionPointer Session_)
-    {
-        std::lock_guard<std::mutex> lock(mut_);
-        set_.insert(Session_);
-    }
-
-    void leave(ShareSessionPointer Session_)
-    {
-        std::lock_guard<std::mutex> lock(mut_);
-        set_.erase(Session_);
-    }
-
-    ShareSessionPointer get_session()
-    {
-        ShareSessionPointer current_Session;
-
-        {
-            std::lock_guard<std::mutex> lock(mut_);
-            if(set_.size() == 0)
-                current_Session = nullptr;
-            else
-                current_Session = *set_.begin(); //only send message to first Session
-        }
-        return current_Session;
-    }
-
-    const std::set<ShareSessionPointer>& get_session_list() {
-      return set_;
-    }
-
-    void run(char *pbuf, int size)
-    {
-      handler_(pbuf, size);
-    }
-
+    void init(std::function<void(char* ptr, int size)>);
+    void do_write(char *buffer, int size);
+    void join(ShareSessionPointer Session_);
+    void leave(ShareSessionPointer Session_);
+    ShareSessionPointer get_session();
+    const std::set<ShareSessionPointer>& get_session_list();
+    void run(char *pbuf, int size);
+    bool is_valid();
+    
 private:
     std::mutex mut_;
     std::set<ShareSessionPointer> set_;
@@ -82,7 +50,7 @@ private:
 class Session : public std::enable_shared_from_this<Session>
 {
 public:
-  Session(asio::ip::tcp::socket socket, SessionMessage& group)
+  Session(asio::ip::tcp::socket socket, session_group& group)
     : socket_(std::move(socket)),
       group_(group)
   {
@@ -157,9 +125,8 @@ private:
   asio::ip::tcp::socket socket_;
   enum { max_length = 1024 };
   char data_[max_length];
-  SessionMessage& group_;
+  session_group& group_;
 };
-
 
 class AsioServer
 {
@@ -196,10 +163,20 @@ public:
       }
     }
 
+    bool is_valid()
+    {
+      return group.is_valid();
+    }
+
+    void do_write(char *buffer, int size)
+    {
+      group.do_write(buffer, size);
+    }
+
     void init(const std::string& address, const std::string& port, std::function<void(char* ptr, int size)> handler);
 private:
     void do_accept();
     asio::io_context io_context_;
     asio::ip::tcp::acceptor acceptor_;
-    SessionMessage group;
+    session_group group;
 };

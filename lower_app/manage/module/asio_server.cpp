@@ -59,3 +59,65 @@ void AsioServer::do_accept()
         do_accept();
       });
 }
+
+
+//session_group
+void session_group::init(std::function<void(char* ptr, int size)> handler)
+{
+  set_.clear();
+  handler_ = handler;
+}
+
+void session_group::join(ShareSessionPointer Session_)
+{
+  std::lock_guard<std::mutex> lock(mut_);
+  set_.insert(Session_);
+}
+
+void session_group::leave(ShareSessionPointer Session_)
+{
+  std::lock_guard<std::mutex> lock(mut_);
+  set_.erase(Session_);
+}
+
+ShareSessionPointer session_group::get_session()
+{
+    ShareSessionPointer current_Session;
+
+    {
+        std::lock_guard<std::mutex> lock(mut_);
+        if(set_.size() == 0)
+            current_Session = nullptr;
+        else
+            current_Session = *set_.begin(); //only send message to first Session
+    }
+    return current_Session;
+}
+
+const std::set<ShareSessionPointer>& session_group::get_session_list() 
+{
+  return set_;
+}
+
+void session_group::run(char *pbuf, int size)
+{
+  handler_(pbuf, size);
+}
+
+bool session_group::is_valid()
+{
+  if(set_.size() != 0)
+    return true;
+  return false;
+}
+
+void session_group::do_write(char *buffer, int size)
+{
+  std::lock_guard<std::mutex> lock(mut_);
+  if(set_.size() != 0)
+  {
+    ShareSessionPointer session_ptr = *set_.begin();  
+    session_ptr->do_write(buffer, size);
+  }
+}
+

@@ -23,10 +23,9 @@ _Pragma("once")
 #define DEVICE_MESSAGE_FIFO         "/tmp/device_manage.fifo"        //设备管理模块
 #define CENTER_UNIT_FIFO            "/tmp/center_manage.fifo"
 
-//------------------------- Global Defined --------------------------
-#define UART_MODULE_ON                  1
-#define SOCKET_TCP_MODULE_ON            1
-#define SOCKET_UDP_MODULE_ON            1
+//socket fifo
+#define SOCKET_TCP_RX_FIFO          "/tmp/socket_rx.fifo"
+#define SOCKET_TCP_TX_FIFO          "/tmp/socket_tx.fifo"
 
 /*返回状态*/
 #define RT_INVALID_MQ_SIZE              -4

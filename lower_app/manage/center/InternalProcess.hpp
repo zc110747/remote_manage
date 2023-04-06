@@ -27,7 +27,7 @@ class InterProcess final
 private:
     static InterProcess*  pInstance;
     std::thread node_thread;
-    cmdProcess InterProcessCmd;
+    cmd_process InterProcessCmd;
 
     void ProcessCallback();
 

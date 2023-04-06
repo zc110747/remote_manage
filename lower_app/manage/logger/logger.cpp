@@ -27,14 +27,14 @@ static AsioServer logger_server;
 void LoggerManage::asio_server_run()
 {
     const SocketSysConfig *pSocketConfig = SystemConfig::getInstance()->getlogger();
-    cmdProcess LoggerCmdProcess;
+    cmd_process Loggercmd_process;
 
     try
     {
-        logger_server.init(pSocketConfig->ipaddr, std::to_string(pSocketConfig->port), [&LoggerCmdProcess](char* ptr, int length){
-            if(LoggerCmdProcess.parseData(ptr, length))
+        logger_server.init(pSocketConfig->ipaddr, std::to_string(pSocketConfig->port), [&Loggercmd_process](char* ptr, int length){
+            if(Loggercmd_process.parseData(ptr, length))
             {
-                LoggerCmdProcess.ProcessData();
+                Loggercmd_process.ProcessData();
             }
         });
         logger_server.run();
@@ -57,10 +57,9 @@ void LoggerManage::logger_tx_run()
         len = pLoggerFIFO->read((char *)&message, sizeof(message));
         if(len > 0)
         {
-            auto session_ptr = logger_server.get_valid_session();
-            if(session_ptr != nullptr)
+            if(logger_server.is_valid())
             {
-                session_ptr->do_write(message.ptr, message.length);
+                logger_server.do_write(message.ptr, message.length);
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
             else

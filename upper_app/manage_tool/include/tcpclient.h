@@ -9,13 +9,13 @@
 #include "ui_mainwindow.h"
 #include "protocol.h"
 
-class CTcpSocketInfo:public QWidget, public CProtocolInfo
+class CTcpSocketInfo:public QWidget, public protocol_info
 {
     Q_OBJECT
 
 public:
     CTcpSocketInfo(uint8_t *pRxBuffer, uint8_t *pTxBuffer, int nMaxBufSize):
-        CProtocolInfo(pRxBuffer, pTxBuffer, nMaxBufSize){
+        protocol_info(pRxBuffer, pTxBuffer, nMaxBufSize){
         m_pSemphore = new QSemaphore(0);
     }
     ~CTcpSocketInfo()

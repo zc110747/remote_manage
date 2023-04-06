@@ -18,13 +18,13 @@ CFLAGS := -O3 -std=c++17 -fno-strict-aliasing -lrt
 objects = 	main.o \
 			remote/SocketTcpThread.o 	 \
 			remote/UartThread.o 		 \
-			remote/Protocol.o			 \
+			remote/protocol.o			 \
 			module/SystemConfig.o \
 			module/CalcCrc16.o  \
 			module/TimeManage.o \
 			module/FIFOManage.o \
 			module/asio_server.o \
-			module/cmdProcess.o  \
+			module/cmd_process.o  \
 			driver/rtc.o \
 			driver/beep.o \
 			driver/led.o \

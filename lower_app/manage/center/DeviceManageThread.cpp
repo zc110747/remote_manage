@@ -200,7 +200,7 @@ namespace NAMESPACE_DEVICE
             size = pDevFIFO->read(buffer, READ_BUFFER_SIZE);
             if(size > 0)
             {
-                PRINT_LOG(LOG_DEBUG, xGetCurrentTicks(), "Device Command, %d!", size);
+                PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Device Command, %d!", size);
                 EventProcess(reinterpret_cast<Event *>(buffer));
             }
             else
