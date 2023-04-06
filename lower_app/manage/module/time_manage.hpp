@@ -3,7 +3,7 @@
 //  All Rights Reserved
 //
 //  Name:
-//      TimeManage.hpp
+//      time_manage.hpp
 //
 //  Purpose:
 //      时间管理模块, 支持注册周期性触发的事件
@@ -75,11 +75,11 @@ private:
     uint32_t TickCompare;
 };
 
-class TimeManage
+class time_manage
 {
 public:
-    static TimeManage *getInstance();
-    TimeManage(): ticks(0){
+    static time_manage *getInstance();
+    time_manage(): ticks(0){
     }
 
     bool init(uint32_t timeInterval = TIME_INTERVAL);
@@ -88,7 +88,7 @@ public:
     uint32_t get_current_ticks() {return ticks;}
 private:
     void run();
-    static TimeManage *pInstance;
+    static time_manage *pInstance;
     DeviceManage::Timer time;
     std::vector<TimeAction> VecWork;
     std::mutex mt;

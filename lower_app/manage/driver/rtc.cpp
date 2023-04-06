@@ -20,7 +20,7 @@
 #include <sys/ioctl.h>
 
 RTCDevice::RTCDevice(const std::string &DevicePath)
-:deviceBase(DevicePath)
+:device_base(DevicePath)
 {
     TimeStart = getCurrentSecond();
 }
@@ -35,7 +35,7 @@ RTCDevice* RTCDevice::getInstance()
 {
     if(pInstance == nullptr)
     {
-        pInstance = new(std::nothrow) RTCDevice(SystemConfig::getInstance()->getrtc()->dev);
+        pInstance = new(std::nothrow) RTCDevice(system_config::getInstance()->getrtc()->dev);
         if(pInstance == NULL)
         {
             //To Do something(may logger)

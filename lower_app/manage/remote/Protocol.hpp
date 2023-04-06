@@ -19,7 +19,7 @@
 _Pragma("once")
 
 #include "modules.hpp"
-#include "FIFOManage.hpp"
+#include "fifo_manage.hpp"
 
 /**************************************************************************
 * Global Macro Definition
@@ -81,10 +81,10 @@ private:
 	uint32_t rx_timeout_; 					
 	ENUM_PROTOCOL_STATUS rx_status_;
 	
-	FIFOManage *rx_fifo_ptr_;
+	fifo_manage *rx_fifo_ptr_;
 	std::string rx_fifo_path;
 	
-	FIFOManage *tx_fifo_ptr_;
+	fifo_manage *tx_fifo_ptr_;
 	std::string tx_fifo_path_;
 };
 

@@ -18,15 +18,15 @@
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
-#include "deviceBase.hpp"
+#include "device_base.hpp"
 
-class KEY:public deviceBase
+class KEY:public device_base
 {
 private:
     uint32_t keyvalue;
     
 public:
-    using deviceBase::deviceBase;
+    using device_base::device_base;
 
     //key初始化函数，输入文件描述符和支持flags
     virtual bool init(const std::string &DevicePath, int flags) override;

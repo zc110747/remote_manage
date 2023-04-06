@@ -25,10 +25,10 @@ _Pragma("once")
 #include "rtc.hpp"
 #include "key.hpp"
 
-class DriverManage
+class driver_manage
 {
 private:
-    static DriverManage* pInstance;
+    static driver_manage* pInstance;
     LED led_0;
     BEEP beep_0;
     APDevice ap_dev_0;
@@ -36,11 +36,11 @@ private:
     KEY key_0;
 
 public:
-    DriverManage() = default;
-    ~DriverManage() = delete;
+    driver_manage() = default;
+    ~driver_manage() = delete;
     bool init();
     void release();
-    static DriverManage* getInstance();
+    static driver_manage* getInstance();
 
 public:
     LED *getLed0()          {return &led_0;}

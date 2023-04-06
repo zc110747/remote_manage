@@ -3,10 +3,10 @@
 //  All Rights Reserved
 //
 //  Name:
-//      deviceBase.cpp
+//      device_base.cpp
 //
 //  Purpose:
-//      封装的设备底层接口，基类为deviceBase, 支持open/close
+//      封装的设备底层接口，基类为device_base, 支持open/close
 //      IOBase主要封装IO支持的接口, open, read, write, close
 //      InfoBase主要封装支持特定外设的接口, 可以读取内部信息
 //
@@ -18,29 +18,29 @@
 //  Revision History:
 //      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
-#include "deviceBase.hpp"
+#include "device_base.hpp"
 
 using std::string;
 
-deviceBase::deviceBase()
+device_base::device_base()
 {
     devicePathM.clear();
     DeviceFdM = -1;
 }
 
-deviceBase::deviceBase(const string &DevicePath)
+device_base::device_base(const string &DevicePath)
 {
     devicePathM = DevicePath;
     DeviceFdM = -1;
 }
 
-deviceBase::~deviceBase()
+device_base::~device_base()
 {
     devicePathM.clear();
     close();
 }
 
-bool deviceBase::open(int flags)
+bool device_base::open(int flags)
 {
     DeviceFdM = ::open(devicePathM.c_str(), flags);
     if(DeviceFdM == -1)
@@ -53,13 +53,13 @@ bool deviceBase::open(int flags)
     return true;
 }
 
-bool deviceBase::init(const std::string &DevicePath, int flags)
+bool device_base::init(const std::string &DevicePath, int flags)
 {
     devicePathM = DevicePath;
     return open(flags);
 }
 
-void deviceBase::close()
+void device_base::close()
 {
     if(DeviceFdM != 1)
     {

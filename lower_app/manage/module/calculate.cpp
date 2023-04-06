@@ -3,10 +3,10 @@
 //  All Rights Reserved
 //
 //  Name:
-//      CalcCrc16.cpp
+//      calculate.cpp
 //
 //  Purpose:
-//   	计算CRC16的值
+//   	算法实现模块:crc-16
 //
 // Author:
 //     @听心跳的声音

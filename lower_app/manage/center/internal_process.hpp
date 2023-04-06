@@ -22,23 +22,23 @@ _Pragma("once")
 #include "logger.hpp"
 #include "modules.hpp"
 
-class InterProcess final
+class internal_process final
 {
 private:
-    static InterProcess*  pInstance;
+    static internal_process*  pInstance;
     std::thread node_thread;
-    cmd_process InterProcessCmd;
+    cmd_process internal_processCmd;
 
     void ProcessCallback();
 
 public:
-    InterProcess() = default;
-    ~InterProcess() = delete;
+    internal_process() = default;
+    ~internal_process() = delete;
 
-    static InterProcess* getInstance();
+    static internal_process* getInstance();
     bool init();
     void run();
     bool send(char *pbuffer, int size);
 
-    void SendStatusBuffer(NAMESPACE_DEVICE::DeviceReadInfo &info);
+    void SendStatusBuffer(NAMESPACE_DEVICE::device_read_info &info);
 };

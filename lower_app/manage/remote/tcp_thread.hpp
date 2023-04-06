@@ -3,7 +3,7 @@
 //  All Rights Reserved
 //
 //  Name:
-//      SocketTcpThread.hpp
+//      tcp_thread.hpp
 //
 //  Purpose:
 //      TCP协议执行模块，目前设计为同步模式，后续会修改
@@ -22,26 +22,23 @@ _Pragma("once")
 
 #define SOCKET_BUFFER_SIZE		1200
 
-class TcpThreadManage
+class tcp_thread_manage
 {
-private:
-	pthread_t	tid;
-	static TcpThreadManage* pInstance;
-	std::thread m_server_thread;
-	std::thread m_rx_thread;
-	std::thread m_tx_thread;
-
 public:
-	TcpThreadManage() = default;
-	~TcpThreadManage() = delete;
+	tcp_thread_manage() = default;
+	~tcp_thread_manage() = delete;
 
 	bool init();
 	void tcp_server_run();
 	void tcp_rx_run();
 	void tcp_tx_run();
-	static TcpThreadManage* getInstance();
+	static tcp_thread_manage* getInstance();
 
-public:
+private:
+	static tcp_thread_manage* pInstance;
+	std::thread m_server_thread;
+	std::thread m_rx_thread;
+	std::thread m_tx_thread;
 	protocol_info* protocol_info_ptr_;
 };
 

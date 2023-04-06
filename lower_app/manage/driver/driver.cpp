@@ -18,12 +18,12 @@
 /////////////////////////////////////////////////////////////////////////////
 #include "driver.hpp"
 
-DriverManage* DriverManage::pInstance = nullptr;
-DriverManage* DriverManage::getInstance()
+driver_manage* driver_manage::pInstance = nullptr;
+driver_manage* driver_manage::getInstance()
 {
     if(pInstance == nullptr)
     {
-        pInstance = new(std::nothrow) DriverManage;
+        pInstance = new(std::nothrow) driver_manage;
         if(pInstance == nullptr)
         {
             //do something
@@ -32,10 +32,10 @@ DriverManage* DriverManage::getInstance()
     return pInstance;
 }
 
-bool DriverManage::init()
+bool driver_manage::init()
 {
     bool ret = true;
-    SystemConfig *pConfig = SystemConfig::getInstance();
+    system_config *pConfig = system_config::getInstance();
 
     ret &= led_0.init(pConfig->getled()->dev, O_RDWR | O_NONBLOCK);
     ret &= beep_0.init(pConfig->getbeep()->dev, O_RDWR | O_NONBLOCK);
@@ -48,13 +48,13 @@ bool DriverManage::init()
     {
         led_0.writeIoStatus(pConfig->getled()->init);
         beep_0.writeIoStatus(pConfig->getbeep()->init);
-        PRINT_LOG(LOG_INFO, 0, "Device DriverManage Init Success!");
+        PRINT_LOG(LOG_INFO, 0, "Device driver_manage Init Success!");
     }
     
     return ret;
 }
 
-void DriverManage::release()
+void driver_manage::release()
 {
     RTCDevice::getInstance()->release();
 }

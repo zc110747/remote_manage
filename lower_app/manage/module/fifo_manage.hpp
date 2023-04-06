@@ -3,7 +3,7 @@
 //  All Rights Reserved
 //
 //  Name:
-//      FIFOManage.hpp
+//      fifo_manage.hpp
 //
 //  Purpose:
 //      FIFO管理接口，用于提供外部，支持创建读写的接口
@@ -22,27 +22,27 @@ _Pragma("once")
 
 #define S_FIFO_WORK_MODE               (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)  
 
-class FIFOManage final
+class fifo_manage final
 {
-private:
-    std::string  fifoM;
-    int modeM;
-    int readfdM;
-    int writefdM;
-
 public:
-    FIFOManage(const std::string& fstr, int mode);
-    ~FIFOManage();
+    fifo_manage(const std::string& fstr, int mode);
+    ~fifo_manage();
 
     //创建并打开FIFO
-    bool Create(void);                   
+    bool create(void);                   
 
     //关闭FIFO并释放资源
-    void Release();   
+    void release();   
     
     //等待FIFO数据接收
     int read(char *buf, int bufsize);
 
     //向FIFO中写入数据
     int write(char *buf, int bufsize);
+
+private:
+    std::string  fifo_;
+    int mode_;
+    int readfd_;
+    int writefd_;
 };

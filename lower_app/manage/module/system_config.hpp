@@ -3,7 +3,7 @@
 //  All Rights Reserved
 //
 //  Name:
-//      SystemConfig.hpp
+//      system_config.hpp
 //
 //  Purpose:
 //      系统信息配置组件，主要实现如下功能
@@ -79,20 +79,20 @@ typedef struct
     uint8_t version[4];
 }SystemParamter;
 
-class SystemConfig
+class system_config
 {
-    friend std::ostream& operator<<(std::ostream&, const SystemConfig&);
+    friend std::ostream& operator<<(std::ostream&, const system_config&);
 
 private:
-    static SystemConfig *pInstance;
+    static system_config *pInstance;
     SystemParamter parameter;
     std::string filePath;
 
 public:
-    SystemConfig() = default;
-    ~SystemConfig() = delete;
+    system_config() = default;
+    ~system_config() = delete;
 
-    static SystemConfig* getInstance();
+    static system_config* getInstance();
     bool init(const char* path);
     void default_init() noexcept;
     void SaveConfigFile();             //保存Config的文件     

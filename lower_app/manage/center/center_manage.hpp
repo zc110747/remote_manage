@@ -3,7 +3,7 @@
 //  All Rights Reserved
 //
 //  Name:
-//      CenterManage.cpp
+//      center_manage.cpp
 //
 //  Purpose:
 //      核心管理模块，用于接收所有模块的数据，进行管理并分发
@@ -22,16 +22,16 @@ _Pragma("once")
 
 #include "modules.hpp"
 
-class CenterManage final
+class center_manage final
 {
 public:
-    CenterManage()=default;
+    center_manage()=default;
 
     //单例模式不允许复制和释放
-    CenterManage(const CenterManage&)=delete;
-    virtual ~CenterManage()=delete;
+    center_manage(const center_manage&)=delete;
+    virtual ~center_manage()=delete;
 
-    static CenterManage* getInstance();
+    static center_manage* getInstance();
     bool init();
     void run();
     
@@ -41,8 +41,8 @@ public:
     //外部事件
     int sendDeviceConfig(uint8_t device, uint8_t action);
 private:
-    static inline CenterManage* pInstance = nullptr;
-    FIFOManage *pCenterFiFo{nullptr};
+    static inline center_manage* pInstance = nullptr;
+    fifo_manage *pCenterFiFo{nullptr};
 
     bool EventProcess(Event *pEvent);
 };

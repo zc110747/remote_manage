@@ -16,24 +16,24 @@
 //  Revision History:
 //      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
-#include "UartThread.hpp"
+#include "uart_thread.hpp"
 #include <sys/termios.h>
 
-UartThreadManage* UartThreadManage::pInstance = nullptr;
-UartThreadManage* UartThreadManage::getInstance()
+uart_thread_manage* uart_thread_manage::pInstance = nullptr;
+uart_thread_manage* uart_thread_manage::getInstance()
 {
 	if(pInstance == nullptr)
 	{
-		pInstance = new(std::nothrow) UartThreadManage();
+		pInstance = new(std::nothrow) uart_thread_manage();
 		if(pInstance == nullptr)
 		{
-			PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "UartThreadManage new failed!");
+			PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "uart_thread_manage new failed!");
 		}
 	}
 	return pInstance;
 }
 
-void UartThreadManage::run()
+void uart_thread_manage::run()
 {
 	int nFlag;
 	int size;
@@ -45,9 +45,9 @@ void UartThreadManage::run()
 	}
 }
 
-bool UartThreadManage::init()
+bool uart_thread_manage::init()
 {
-	auto pSerialConfig = SystemConfig::getInstance()->getserial();
+	auto pSerialConfig = system_config::getInstance()->getserial();
 
 	if((nComFd = open(pSerialConfig->dev.c_str(), O_RDWR|O_NOCTTY|O_NDELAY))<0)
 	{	
@@ -63,12 +63,12 @@ bool UartThreadManage::init()
 		}
 	}
 	
-	//std::thread(std::bind(&UartThreadManage::run, this)).detach();
-	PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "UartThreadManage init success!");
+	//std::thread(std::bind(&uart_thread_manage::run, this)).detach();
+	PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "uart_thread_manage init success!");
 	return true;
 }
 
-int UartThreadManage::set_opt(int nBaud, int nDataBits, std::string cParity, int nStopBits)
+int uart_thread_manage::set_opt(int nBaud, int nDataBits, std::string cParity, int nStopBits)
 {
 	struct termios newtio;
 	struct termios oldtio;
@@ -168,7 +168,7 @@ int UartThreadManage::set_opt(int nBaud, int nDataBits, std::string cParity, int
 	return 0;
 }
 
-void UartThreadManage::release()
+void uart_thread_manage::release()
 {
 	if(nComFd >= 0)
 	{

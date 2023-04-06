@@ -26,7 +26,7 @@ static AsioServer logger_server;
 //asio server test ok
 void LoggerManage::asio_server_run()
 {
-    const SocketSysConfig *pSocketConfig = SystemConfig::getInstance()->getlogger();
+    const SocketSysConfig *pSocketConfig = system_config::getInstance()->getlogger();
     cmd_process Loggercmd_process;
 
     try
@@ -100,10 +100,10 @@ bool LoggerManage::init()
     pEndMemoryBuffer = &memoryBuffer[LOGGER_MESSAGE_BUFFER_SIZE];
 
     //init and Create logger fifo, must before thread run.
-    pLoggerFIFO = new(std::nothrow) FIFOManage(LOGGER_FIFO_PATH, S_FIFO_WORK_MODE);
+    pLoggerFIFO = new(std::nothrow) fifo_manage(LOGGER_FIFO_PATH, S_FIFO_WORK_MODE);
     if(pLoggerFIFO == nullptr)
         return false;
-    if(!pLoggerFIFO->Create())
+    if(!pLoggerFIFO->create())
         return false;
 
     //init thread for logger
@@ -118,7 +118,7 @@ bool LoggerManage::init()
 void LoggerManage::release()
 {
     is_thread_work = false;
-    pLoggerFIFO->Release();
+    pLoggerFIFO->release();
 }
 
 char *LoggerManage::getMemoryBuffer(uint16_t size)

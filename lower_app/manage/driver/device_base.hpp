@@ -3,10 +3,10 @@
 //  All Rights Reserved
 //
 //  Name:
-//      deviceBase.hpp
+//      device_base.hpp
 //
 //  Purpose:
-//      封装的设备底层接口，基类为deviceBase, 支持open/close
+//      封装的设备底层接口，基类为device_base, 支持open/close
 //      IOBase主要封装IO支持的接口, open, read, write, close
 //      InfoBase主要封装支持特定外设的接口, 可以读取内部信息
 //
@@ -18,22 +18,22 @@
 //  Revision History:
 //      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
-#ifndef __DEVICEBASE_HPP
-#define __DEVICEBASE_HPP
+#ifndef __device_base_HPP
+#define __device_base_HPP
 
 #include "../include/productConfig.hpp"
-#include "SystemConfig.hpp"
+#include "system_config.hpp"
 
-class deviceBase
+class device_base
 {
 protected:
     int DeviceFdM;
     std::string devicePathM;
 
 public:
-    deviceBase();
-    deviceBase(const std::string &DevicePath);
-        ~deviceBase();
+    device_base();
+    device_base(const std::string &DevicePath);
+        ~device_base();
     virtual bool open(int flags);
     virtual void close();
     virtual bool init(const std::string &DevicePath, int flags);
@@ -43,14 +43,14 @@ public:
     const std::string &getDevicePath() {return devicePathM;}
 };
 
-class IoBase:public deviceBase
+class IoBase:public device_base
 {
 private:
     std::atomic<uint8_t> IoStatus{0};
 
 public:
     //constructor
-    using deviceBase::deviceBase;
+    using device_base::device_base;
 
     //io read/write
     bool readIoStatus();
@@ -64,7 +64,7 @@ public:
 
 #define MAX_INFO_SIZE   48
 template<typename T>
-class InfoBase:public deviceBase
+class InfoBase:public device_base
 {
 protected:
     union{
@@ -74,7 +74,7 @@ protected:
 
 public:
     //constructor
-    using deviceBase::deviceBase;
+    using device_base::device_base;
 
     bool readInfo()
     {

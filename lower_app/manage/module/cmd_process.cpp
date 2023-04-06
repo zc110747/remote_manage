@@ -19,7 +19,7 @@
 
 #include "cmd_process.hpp"
 #include "logger.hpp"
-#include "DeviceManageThread.hpp"
+#include "device_manage.hpp"
 
 /*
 !readdev    [index] #index=[0~3 led,beep,ap,icm]
@@ -87,7 +87,7 @@ bool cmd_process::ProcessData()
     {
         case CmdReadDev:
             { 
-                auto info = NAMESPACE_DEVICE::DeviceManageThread::getInstance()->getDeviceInfo();
+                auto info = NAMESPACE_DEVICE::device_manage::getInstance()->getDeviceInfo();
                 
                 PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "LedStatus:%d!", info.led_io);
                 PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "beepStatus:%d!", info.beep_io);
@@ -107,7 +107,7 @@ bool cmd_process::ProcessData()
             break;
         case CmdGetOS:
             {
-                auto pSysConfig = SystemConfig::getInstance();
+                auto pSysConfig = system_config::getInstance();
                 auto pVersion = pSysConfig->getversion();
                 PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "FW_Version:%d, %d, %d, %d", pVersion[0], pVersion[1], pVersion[2], pVersion[3]);
                 PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Sokcet Ipaddress:%s", pSysConfig->gettcp()->ipaddr.c_str());
@@ -121,7 +121,7 @@ bool cmd_process::ProcessData()
                 uint32_t device = 0, action = 0;
                 sscanf(pDataM, "%d,%d", &device, &action);
                 PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "SetDev:%d, %d!", device, action);
-                NAMESPACE_DEVICE::DeviceManageThread::getInstance()->sendHardProcessMsg(device, action);
+                NAMESPACE_DEVICE::device_manage::getInstance()->sendHardProcessMsg(device, action);
             }
             break;
         case cmdSetLevel:

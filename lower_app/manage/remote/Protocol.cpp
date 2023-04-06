@@ -42,17 +42,17 @@ protocol_info::~protocol_info(void)
 bool protocol_info::init()
 {
 	//rx fifo
-	rx_fifo_ptr_ = new(std::nothrow) FIFOManage(rx_fifo_path, S_FIFO_WORK_MODE);
+	rx_fifo_ptr_ = new(std::nothrow) fifo_manage(rx_fifo_path, S_FIFO_WORK_MODE);
 	if(rx_fifo_ptr_ == nullptr)
 		return false;
-	if(!rx_fifo_ptr_->Create())
+	if(!rx_fifo_ptr_->create())
 		return false;
 	
 	//tx fifo
-	tx_fifo_ptr_ = new(std::nothrow) FIFOManage(tx_fifo_path_, S_FIFO_WORK_MODE);
+	tx_fifo_ptr_ = new(std::nothrow) fifo_manage(tx_fifo_path_, S_FIFO_WORK_MODE);
 	if(tx_fifo_ptr_ == nullptr)
 		return false;
-	if(!tx_fifo_ptr_->Create())
+	if(!tx_fifo_ptr_->create())
 		return false;
 
 	return true;

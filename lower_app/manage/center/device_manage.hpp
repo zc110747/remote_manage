@@ -3,7 +3,7 @@
 //  All Rights Reserved
 //
 //  Name:
-//      DeviceManageThread.hpp
+//      device_manage.hpp
 //
 //  Purpose:
 //   	进行设备的管理，周期性的读取硬件信息, 并能够处理外部事件来控制硬件
@@ -18,7 +18,7 @@
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
-#include "FIFOManage.hpp"
+#include "fifo_manage.hpp"
 #include "driver.hpp"
 #include <type_traits>
 #include <cstring>
@@ -40,7 +40,7 @@ _Pragma("once")
 
 namespace NAMESPACE_DEVICE
 {
-    struct DeviceReadInfo
+    struct device_read_info
     {
         uint8_t   led_io;
         uint8_t   beep_io; 
@@ -49,9 +49,9 @@ namespace NAMESPACE_DEVICE
         int32_t   angle;
 
         //for compare, need clear before to avoid fill by align.
-        bool operator != (const DeviceReadInfo& dev_info)
+        bool operator != (const device_read_info& dev_info)
         {
-            static_assert(std::is_trivial_v<DeviceReadInfo>, "Not Allow C memory process!");
+            static_assert(std::is_trivial_v<device_read_info>, "Not Allow C memory process!");
 
             if(memcmp((char *)this, (char *)&dev_info, size()) != 0)
                 return true;
@@ -60,7 +60,7 @@ namespace NAMESPACE_DEVICE
 
         void clear()
         {
-            static_assert(std::is_trivial_v<DeviceReadInfo>, "Not Allow C memory process!");
+            static_assert(std::is_trivial_v<device_read_info>, "Not Allow C memory process!");
 
             memset((char *)this, 0, size());
         }
@@ -71,14 +71,14 @@ namespace NAMESPACE_DEVICE
         }
     };
 
-    class DeviceManageThread
+    class device_manage
     {
     private:
-        DeviceReadInfo inter_info;
-        DeviceReadInfo outer_info;
+        device_read_info inter_info;
+        device_read_info outer_info;
         std::mutex mut;
-        static DeviceManageThread* pInstance;
-        FIFOManage *pDevFIFO{nullptr};
+        static device_manage* pInstance;
+        fifo_manage *pDevFIFO{nullptr};
 
         void run();
         bool EventProcess(Event *pEvent);
@@ -87,12 +87,12 @@ namespace NAMESPACE_DEVICE
         void HardProcess(Event *pEvent);
 
     public:
-        DeviceManageThread() = default;
-        virtual ~DeviceManageThread() = delete; //单例模式不允许删除 
+        device_manage() = default;
+        virtual ~device_manage() = delete; //单例模式不允许删除 
 
         bool init();
-        DeviceReadInfo getDeviceInfo();
-        static DeviceManageThread* getInstance();
+        device_read_info getDeviceInfo();
+        static device_manage* getInstance();
 
         
     public:

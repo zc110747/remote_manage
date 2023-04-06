@@ -16,14 +16,14 @@
 //  Revision History:
 //      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
-#include "SocketTcpThread.hpp"
+#include "tcp_thread.hpp"
 #include "asio_server.hpp"
 
 static AsioServer socket_tcp_server;
 
-void TcpThreadManage::tcp_server_run()
+void tcp_thread_manage::tcp_server_run()
 {
-    const SocketSysConfig *pSocketConfig = SystemConfig::getInstance()->gettcp();
+    const SocketSysConfig *pSocketConfig = system_config::getInstance()->gettcp();
     
     try
     {
@@ -34,12 +34,12 @@ void TcpThreadManage::tcp_server_run()
     }
     catch (std::exception& e)
     {
-        PRINT_LOG(LOG_DEBUG, xGetCurrentTicks(), "TcpThreadManage, Exception:%s", e.what());
+        PRINT_LOG(LOG_DEBUG, xGetCurrentTicks(), "tcp_thread_manage, Exception:%s", e.what());
     }
 }
 
 
-void TcpThreadManage::tcp_rx_run()
+void tcp_thread_manage::tcp_rx_run()
 {
     char data;
     ENUM_PROTOCOL_STATUS status;
@@ -67,7 +67,7 @@ void TcpThreadManage::tcp_rx_run()
     }
 }
 
-void TcpThreadManage::tcp_tx_run()
+void tcp_thread_manage::tcp_tx_run()
 {
     ENUM_PROTOCOL_STATUS status;
     int size;
@@ -83,13 +83,13 @@ void TcpThreadManage::tcp_tx_run()
     }
 }
 
-bool TcpThreadManage::init()
+bool tcp_thread_manage::init()
 {
-    m_server_thread = std::thread(std::bind(&TcpThreadManage::tcp_server_run, this));
+    m_server_thread = std::thread(std::bind(&tcp_thread_manage::tcp_server_run, this));
     m_server_thread.detach();
-    m_rx_thread = std::thread(std::bind(&TcpThreadManage::tcp_rx_run, this));
+    m_rx_thread = std::thread(std::bind(&tcp_thread_manage::tcp_rx_run, this));
     m_rx_thread.detach();
-    // m_tx_thread = std::thread(std::bind(&TcpThreadManage::tcp_tx_run, this));
+    // m_tx_thread = std::thread(std::bind(&tcp_thread_manage::tcp_tx_run, this));
     // m_tx_thread.detach();
 
     protocol_info_ptr_ = new(std::nothrow) protocol_info(SOCKET_TCP_RX_FIFO, SOCKET_TCP_TX_FIFO);
@@ -102,12 +102,12 @@ bool TcpThreadManage::init()
 }
 
 
-TcpThreadManage* TcpThreadManage::pInstance = nullptr;
-TcpThreadManage* TcpThreadManage::getInstance()
+tcp_thread_manage* tcp_thread_manage::pInstance = nullptr;
+tcp_thread_manage* tcp_thread_manage::getInstance()
 {
     if(pInstance == nullptr)
     {
-        pInstance = new(std::nothrow) TcpThreadManage;
+        pInstance = new(std::nothrow) tcp_thread_manage;
         if(pInstance == nullptr)
         {
             PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Tcp thread manage new failed!");

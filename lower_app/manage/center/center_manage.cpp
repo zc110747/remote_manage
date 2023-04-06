@@ -3,7 +3,7 @@
 //  All Rights Reserved
 //
 //  Name:
-//      CenterManage.cpp
+//      center_manage.cpp
 //
 //  Purpose:
 //      核心管理模块，用于接收所有模块的数据，进行管理并分发
@@ -18,33 +18,33 @@
 //  Revision History:
 //      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
-#include "CenterManage.hpp"
+#include "center_manage.hpp"
 #include "logger.hpp"
-#include "InternalProcess.hpp"
-#include "DeviceManageThread.hpp"
+#include "internal_process.hpp"
+#include "device_manage.hpp"
 #include <new>
 
-using NAMESPACE_DEVICE::DeviceManageThread;
-CenterManage* CenterManage::getInstance()
+using NAMESPACE_DEVICE::device_manage;
+center_manage* center_manage::getInstance()
 {
     if(pInstance == nullptr)
     {
-        pInstance = new(std::nothrow) CenterManage;
+        pInstance = new(std::nothrow) center_manage;
         if(pInstance == nullptr)
         {
-             PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "DeviceManageThread new error!");
+             PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "device_manage new error!");
         }
     }
     return pInstance;
 }
 
-int CenterManage::sendInternalHwRefresh()
+int center_manage::sendInternalHwRefresh()
 {
     Event event(WORKFLOW_ID_INTER_DATA_REFRESH);
     return pCenterFiFo->write(reinterpret_cast<char *>(&event), sizeof(event));
 }
 
-int CenterManage::sendDeviceConfig(uint8_t device, uint8_t action)
+int center_manage::sendDeviceConfig(uint8_t device, uint8_t action)
 {
     EventBufMessage event(WORKFLOW_ID_HARDWARE_CHANGE);
 
@@ -53,22 +53,22 @@ int CenterManage::sendDeviceConfig(uint8_t device, uint8_t action)
     return pCenterFiFo->write(reinterpret_cast<char *>(&event), sizeof(event));
 }
 
-bool CenterManage::EventProcess(Event *pEvent)
+bool center_manage::EventProcess(Event *pEvent)
 {
     uint16_t id = pEvent->getId();
     switch(id)
     {
     case WORKFLOW_ID_INTER_DATA_REFRESH:
         {
-            auto info = DeviceManageThread::getInstance()->getDeviceInfo();
-            InterProcess::getInstance()->SendStatusBuffer(info);
+            auto info = device_manage::getInstance()->getDeviceInfo();
+            internal_process::getInstance()->SendStatusBuffer(info);
         }
         break;
 
     case WORKFLOW_ID_HARDWARE_CHANGE:
         {
             auto *pMessage = static_cast<EventBufMessage *>(pEvent);
-            DeviceManageThread::getInstance()->sendHardProcessMsg
+            device_manage::getInstance()->sendHardProcessMsg
                 (pMessage->getData().buffer[0], pMessage->getData().buffer[1]);
         }
         break;
@@ -79,7 +79,7 @@ bool CenterManage::EventProcess(Event *pEvent)
     return true;
 }
 
-void CenterManage::run()
+void center_manage::run()
 {
     char buffer[1024];
     int size;
@@ -89,7 +89,7 @@ void CenterManage::run()
         size = pCenterFiFo->read(buffer, READ_BUFFER_SIZE);
         if(size > 0)
         {
-            PRINT_LOG(LOG_DEBUG, xGetCurrentTicks(), "CenterManage Command, %d!", size);
+            PRINT_LOG(LOG_DEBUG, xGetCurrentTicks(), "center_manage Command, %d!", size);
             EventProcess(reinterpret_cast<Event *>(buffer));
         }
         else
@@ -99,16 +99,16 @@ void CenterManage::run()
     }
 }
 
-bool CenterManage::init()
+bool center_manage::init()
 {
     //clear thread
-    std::thread(std::bind(&CenterManage::run, this)).detach();
+    std::thread(std::bind(&center_manage::run, this)).detach();
     
-    pCenterFiFo = new(std::nothrow) FIFOManage(CENTER_UNIT_FIFO, S_FIFO_WORK_MODE);
+    pCenterFiFo = new(std::nothrow) fifo_manage(CENTER_UNIT_FIFO, S_FIFO_WORK_MODE);
     if(pCenterFiFo == nullptr)
     {
         return false;
     }
     
-    return pCenterFiFo->Create();
+    return pCenterFiFo->create();
 }

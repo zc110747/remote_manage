@@ -3,7 +3,7 @@
 //  All Rights Reserved
 //
 //  Name:
-//      SystemConfig.cpp
+//      system_config.cpp
 //
 //  Purpose:
 //      系统信息配置组件，主要实现如下功能
@@ -22,18 +22,18 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
-#include "SystemConfig.hpp"
+#include "system_config.hpp"
 
 //const默认内部链接的, 需要在初始化地方加上const
 const uint8_t fw_version[4] = {
     #include "../verion.txt"
 };
-SystemConfig* SystemConfig::pInstance = nullptr;
-SystemConfig* SystemConfig::getInstance()
+system_config* system_config::pInstance = nullptr;
+system_config* system_config::getInstance()
 {
     if(pInstance == nullptr)
     {
-        pInstance = new(std::nothrow) SystemConfig();
+        pInstance = new(std::nothrow) system_config();
         if(pInstance == nullptr)
         {
             //to do error process
@@ -43,7 +43,7 @@ SystemConfig* SystemConfig::getInstance()
 }
 
 [[nodiscard]]
-bool SystemConfig::init(const char* path)
+bool system_config::init(const char* path)
 {
     Json::Value root;
     std::ifstream ifs;
@@ -109,7 +109,7 @@ bool SystemConfig::init(const char* path)
     return true;
 }
 
-void SystemConfig::default_init() noexcept
+void system_config::default_init() noexcept
 {
     parameter.led.init = DEFAULT_LED_INIT;
     parameter.led.dev = DEFAULT_LED_DEV;
@@ -142,7 +142,7 @@ void SystemConfig::default_init() noexcept
     memcpy(parameter.version, fw_version, 4);
 }
 
-void SystemConfig::SaveConfigFile()
+void system_config::SaveConfigFile()
 {
     Json::Value root;
 
@@ -183,7 +183,7 @@ void SystemConfig::SaveConfigFile()
     fstr.close();
 }
 
-std::ostream& operator<<(std::ostream& os, const SystemConfig& config)
+std::ostream& operator<<(std::ostream& os, const system_config& config)
 {
     const SystemParamter* parameter = &(config.parameter);
 

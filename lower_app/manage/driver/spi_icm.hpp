@@ -18,7 +18,7 @@
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
-#include "deviceBase.hpp"
+#include "device_base.hpp"
 
 typedef struct
 {

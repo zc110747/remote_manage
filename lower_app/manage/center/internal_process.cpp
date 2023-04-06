@@ -17,19 +17,19 @@
 //      12/20/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
 
-#include "InternalProcess.hpp"
+#include "internal_process.hpp"
 #include "asio_server.hpp"
 #include "modules.hpp"
 
-InterProcess*  InterProcess::pInstance = nullptr;
-InterProcess* InterProcess::getInstance()
+internal_process*  internal_process::pInstance = nullptr;
+internal_process* internal_process::getInstance()
 {
     if(pInstance == nullptr)
     {
-        pInstance = new(std::nothrow) InterProcess();
+        pInstance = new(std::nothrow) internal_process();
         if(pInstance == nullptr)
         {
-            PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "InterProcess new error!");
+            PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "internal_process new error!");
         }
     }
     return pInstance;
@@ -37,17 +37,17 @@ InterProcess* InterProcess::getInstance()
 
 static AsioServer InterServer;
 
-void InterProcess::run()
+void internal_process::run()
 {
-    const SocketSysConfig *pSocketConfig = SystemConfig::getInstance()->getnode();
+    const SocketSysConfig *pSocketConfig = system_config::getInstance()->getnode();
 
     try
     {
         InterServer.init(pSocketConfig->ipaddr, std::to_string(pSocketConfig->port), [this](char* ptr, int length){
-            if(InterProcessCmd.parseData(ptr, length))
+            if(internal_processCmd.parseData(ptr, length))
             {
                 //用于处理命令，告知应用
-                InterProcessCmd.ProcessData();
+                internal_processCmd.ProcessData();
 
                 //用于处理应答信息
                 ProcessCallback();
@@ -61,15 +61,15 @@ void InterProcess::run()
     }
 }
 
-bool InterProcess::init()
+bool internal_process::init()
 {
-    node_thread = std::thread(std::bind(&InterProcess::run, this));
+    node_thread = std::thread(std::bind(&internal_process::run, this));
     node_thread.detach();
 
     return true;
 }
 
-bool InterProcess::send(char *pbuffer, int size)
+bool internal_process::send(char *pbuffer, int size)
 {
     bool ret = false;
     
@@ -88,7 +88,7 @@ bool InterProcess::send(char *pbuffer, int size)
 }
 
 //!status led=ON;BEEP=OFF;IR=1;ALS=1;PS=1;gypox=0;gypoz=0;gypoz=0
-void InterProcess::SendStatusBuffer(NAMESPACE_DEVICE::DeviceReadInfo &info)
+void internal_process::SendStatusBuffer(NAMESPACE_DEVICE::device_read_info &info)
 {
     char buffer[1024] = {0};
     int CurrentIndex = 0;
@@ -130,12 +130,12 @@ void InterProcess::SendStatusBuffer(NAMESPACE_DEVICE::DeviceReadInfo &info)
 }
 
 
-void InterProcess::ProcessCallback()
+void internal_process::ProcessCallback()
 {
-    switch(InterProcessCmd.getCurrentFormat())
+    switch(internal_processCmd.getCurrentFormat())
     {
         case CmdSetDev:
-            auto info = NAMESPACE_DEVICE::DeviceManageThread::getInstance()->getDeviceInfo();
+            auto info = NAMESPACE_DEVICE::device_manage::getInstance()->getDeviceInfo();
             SendStatusBuffer(info);
             break;
     }

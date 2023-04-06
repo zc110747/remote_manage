@@ -19,7 +19,7 @@
 #ifndef _INCLUDE_BEEP_H
 #define _INCLUDE_BEEP_H
 
-#include "deviceBase.hpp"
+#include "device_base.hpp"
 
 class BEEP:public IoBase
 {

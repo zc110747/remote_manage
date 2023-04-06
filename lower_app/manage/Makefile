@@ -16,13 +16,13 @@ CC = $(HOST)g++
 CFLAGS := -O3 -std=c++17 -fno-strict-aliasing -lrt 
 
 objects = 	main.o \
-			remote/SocketTcpThread.o 	 \
-			remote/UartThread.o 		 \
+			remote/tcp_thread.o 	 \
+			remote/uart_thread.o 		 \
 			remote/protocol.o			 \
-			module/SystemConfig.o \
-			module/CalcCrc16.o  \
-			module/TimeManage.o \
-			module/FIFOManage.o \
+			module/system_config.o \
+			module/calculate.o  \
+			module/time_manage.o \
+			module/fifo_manage.o \
 			module/asio_server.o \
 			module/cmd_process.o  \
 			driver/rtc.o \
@@ -31,12 +31,12 @@ objects = 	main.o \
 			driver/key.o \
 			driver/spi_icm.o \
 			driver/i2c_ap.o \
-			driver/deviceBase.o \
+			driver/device_base.o \
 			driver/driver.o \
 			logger/logger.o \
-			center/InternalProcess.o \
-			center/DeviceManageThread.o   \
-			center/CenterManage.o
+			center/internal_process.o \
+			center/device_manage.o   \
+			center/center_manage.o
 
 
 clear_dobject = *.d .*.o.d \

@@ -18,7 +18,7 @@
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
-#include "FIFOManage.hpp"
+#include "fifo_manage.hpp"
 #include "productConfig.hpp"
 #include "cmd_process.hpp"
 #include "timer.hpp"
@@ -60,7 +60,7 @@ private:
 
     //fd
     LOG_MESSAGE message;
-    FIFOManage *pLoggerFIFO{nullptr};
+    fifo_manage *pLoggerFIFO{nullptr};
 
     static LoggerManage *pInstance;
     

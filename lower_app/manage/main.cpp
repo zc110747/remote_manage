@@ -22,9 +22,9 @@
 #include "remote.hpp"
 #include "Semaphore.hpp"
 #include "driver.hpp"
-#include "TimeManage.hpp"
-#include "InternalProcess.hpp"
-#include "CenterManage.hpp"
+#include "time_manage.hpp"
+#include "internal_process.hpp"
+#include "center_manage.hpp"
 
 //internal data
 static int nConfigDefault = 0;
@@ -103,8 +103,8 @@ int main(int argc, char* argv[])
 		}
 	}
 	
-	DriverManage::getInstance()->release();
-	UartThreadManage::getInstance()->release();
+	driver_manage::getInstance()->release();
+	uart_thread_manage::getInstance()->release();
 	PRINT_NOW("Process app_demo stop, error:%s\n", strerror(errno));
 	return result;
 }
@@ -119,23 +119,23 @@ static bool system_init(int is_default, const char* path)
 	//选中配置文件
 	if(is_default == 0)
 	{
-		SystemConfig::getInstance()->init(path);
+		system_config::getInstance()->init(path);
 	}
 	else
 	{
-		SystemConfig::getInstance()->default_init();
+		system_config::getInstance()->default_init();
 		PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "System Config use default!");
 	}
-	std::cout<<*(SystemConfig::getInstance())<<std::endl;
+	std::cout<<*(system_config::getInstance())<<std::endl;
 
 	ret &= LoggerManage::getInstance()->init();
-	ret &= DriverManage::getInstance()->init();
-	ret &= NAMESPACE_DEVICE::DeviceManageThread::getInstance()->init();
-	//ret &= UartThreadManage::getInstance()->init();
-	ret &= TcpThreadManage::getInstance()->init();
-	ret &= InterProcess::getInstance()->init();
-	ret &= TimeManage::getInstance()->init();
-	ret &= CenterManage::getInstance()->init();
+	ret &= driver_manage::getInstance()->init();
+	ret &= NAMESPACE_DEVICE::device_manage::getInstance()->init();
+	//ret &= uart_thread_manage::getInstance()->init();
+	ret &= tcp_thread_manage::getInstance()->init();
+	ret &= internal_process::getInstance()->init();
+	ret &= time_manage::getInstance()->init();
+	ret &= center_manage::getInstance()->init();
 
 	return ret;
 }

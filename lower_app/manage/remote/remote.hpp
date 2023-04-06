@@ -18,5 +18,5 @@
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
-#include "SocketTcpThread.hpp"
-#include "UartThread.hpp"
+#include "tcp_thread.hpp"
+#include "uart_thread.hpp"

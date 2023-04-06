@@ -3,7 +3,7 @@
 //  All Rights Reserved
 //
 //  Name:
-//      TimeManage.cpp
+//      time_manage.cpp
 //
 //  Purpose:
 //      时间管理模块, 支持注册周期性触发的事件
@@ -16,25 +16,25 @@
 //  Revision History:
 //      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
-#include "TimeManage.hpp"
+#include "time_manage.hpp"
 #include "logger.hpp"
 
-TimeManage *TimeManage::pInstance = nullptr;
+time_manage *time_manage::pInstance = nullptr;
 
-TimeManage *TimeManage::getInstance()
+time_manage *time_manage::getInstance()
 {
     if(pInstance == nullptr)
     {
-        pInstance = new(std::nothrow) TimeManage();
+        pInstance = new(std::nothrow) time_manage();
         if(pInstance == nullptr)
         {
-            PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "TimeManage new error!");
+            PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "time_manage new error!");
         }
     }
     return pInstance;
 }
 
-void TimeManage::run()
+void time_manage::run()
 {
     auto iter = VecWork.begin();  
 
@@ -56,7 +56,7 @@ void TimeManage::run()
     }
 }
 
-bool TimeManage::registerWork(uint32_t id, uint32_t time, uint32_t count, std::function<void()> func)
+bool time_manage::registerWork(uint32_t id, uint32_t time, uint32_t count, std::function<void()> func)
 {
     auto iter = VecWork.begin();  
     TimeAction work(id, time, count, func);   
@@ -67,7 +67,7 @@ bool TimeManage::registerWork(uint32_t id, uint32_t time, uint32_t count, std::f
     return true;
 }
 
-bool TimeManage::removeWork(uint32_t id)
+bool time_manage::removeWork(uint32_t id)
 {
     auto iter = VecWork.begin();  
 
@@ -87,15 +87,15 @@ bool TimeManage::removeWork(uint32_t id)
     return true;
 }
 
-bool TimeManage::init(uint32_t timeInterval)
+bool time_manage::init(uint32_t timeInterval)
 {
     peroid = timeInterval;
-    time.start(timeInterval, std::bind(&TimeManage::run, this));
+    time.start(timeInterval, std::bind(&time_manage::run, this));
 
     return true;
 }
 
 uint32_t xGetCurrentTicks(void)
 {
-    return TimeManage::getInstance()->get_current_ticks();
+    return time_manage::getInstance()->get_current_ticks();
 }

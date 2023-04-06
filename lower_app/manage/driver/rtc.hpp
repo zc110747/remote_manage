@@ -18,10 +18,10 @@
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
-#include "deviceBase.hpp"
+#include "device_base.hpp"
 #include <linux/rtc.h>
 
-class RTCDevice:public deviceBase
+class RTCDevice:public device_base
 {
 private:
     struct rtc_time rtcTimeM{0};
