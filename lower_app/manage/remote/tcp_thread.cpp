@@ -80,27 +80,34 @@ void tcp_thread_manage::tcp_tx_run()
         {
             socket_tcp_server.do_write(buffer, size);
         }
+        else
+        {
+            //do nothing
+        }
     }
 }
 
 bool tcp_thread_manage::init()
 {
-    m_server_thread = std::thread(std::bind(&tcp_thread_manage::tcp_server_run, this));
-    m_server_thread.detach();
-    m_rx_thread = std::thread(std::bind(&tcp_thread_manage::tcp_rx_run, this));
-    m_rx_thread.detach();
-    // m_tx_thread = std::thread(std::bind(&tcp_thread_manage::tcp_tx_run, this));
-    // m_tx_thread.detach();
-
-    protocol_info_ptr_ = new(std::nothrow) protocol_info(SOCKET_TCP_RX_FIFO, SOCKET_TCP_TX_FIFO);
+    //must creat fifo before thread start
+    protocol_info_ptr_ = new(std::nothrow) protocol_info(SOCKET_TCP_RX_FIFO, SOCKET_TCP_TX_FIFO,  [](char *ptr, int size){
+        socket_tcp_server.do_write(ptr, size);
+    });
     if(protocol_info_ptr_ == nullptr)
         return false;
     if(!protocol_info_ptr_->init())
         return false;
 
+    m_server_thread = std::thread(std::bind(&tcp_thread_manage::tcp_server_run, this));
+    m_server_thread.detach();
+    m_rx_thread = std::thread(std::bind(&tcp_thread_manage::tcp_rx_run, this));
+    m_rx_thread.detach();
+    m_tx_thread = std::thread(std::bind(&tcp_thread_manage::tcp_tx_run, this));
+    m_tx_thread.detach();
+
+    PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "tcp thread init success!");
     return true;
 }
-
 
 tcp_thread_manage* tcp_thread_manage::pInstance = nullptr;
 tcp_thread_manage* tcp_thread_manage::getInstance()

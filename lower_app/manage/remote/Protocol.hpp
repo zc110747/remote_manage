@@ -7,6 +7,14 @@
 //
 //  Purpose:
 //      用于处理协议定义的接口
+//      协议接收和处理接口
+//		数据格式
+//		数据头: 0x5A 0x5B
+//		序列号: 2Byte -> 0~65536
+//      功能域:	1Byte -> bit7 ack, all 0 means data
+//		长度:	1Byte
+//		数据:	DATA
+//      CRC:	2Byte -- 计算从序列号起始到数据末尾
 //
 // Author:
 //     	@听心跳的声音
@@ -27,6 +35,20 @@ _Pragma("once")
 #define RX_BUFFER_SIZE			1024
 #define TX_BUFFER_SIZE			1024
 #define DEFAULT_CRC_VALUE		0xFFFF
+
+#define PROTOCOL_HEAD_SIZE		2
+#define PROTOCOL_SEQU_SIZE		2
+#define PROTOCOL_FUNCTION_SIZE	1
+#define PROTOCOL_LENGTH_SIZE	1
+#define PROTOCOL_CRC_SIZE		2
+
+//上述长度的累加
+#define PROTOCOL_FRAME_LENGHT	8
+#define MAX_TX_BUFFER_LENGTH	(255+PROTOCOL_FRAME_LENGHT+1)
+
+//function bit
+#define FUNCTION_ACK			1<<7
+
 
 #define BIG_ENDING         		0
 #if BIG_ENDING	
@@ -55,7 +77,7 @@ public:
 	 *
 	 * @param tx_fifo a fifo path for protocol tx process
 	 */
-	protocol_info(const std::string &rx_fifo, const std::string &tx_fifo);
+	protocol_info(const std::string &rx_fifo, const std::string &tx_fifo, std::function<void(char* ptr, int size)> lambda);
 	~protocol_info(void);
 
 	bool init();
@@ -70,6 +92,9 @@ public:
 	//protocol tx process
 	int read_tx_fifo(char *, uint16_t);
 	int write_tx_fifo(char *, uint16_t);
+	uint16_t create_output_frame(char *pOut, char *pIn, uint16_t len);
+	int send_data(char *pIntput, uint16_t len);
+	void send_func_data(uint16_t sequence, uint8_t func);
 
 	//calculate crc16
 	uint16_t calculate_crc(uint8_t*, uint16_t);
@@ -81,11 +106,14 @@ private:
 	uint32_t rx_timeout_; 					
 	ENUM_PROTOCOL_STATUS rx_status_;
 	
-	fifo_manage *rx_fifo_ptr_;
+	fifo_manage *rx_fifo_ptr_{nullptr};
 	std::string rx_fifo_path;
 	
-	fifo_manage *tx_fifo_ptr_;
+	fifo_manage *tx_fifo_ptr_{nullptr};
 	std::string tx_fifo_path_;
+	std::function<void(char* ptr, int size)> handler_;
+	
+	uint16_t sequence_num{0};
 };
 
 /**************************************************************************

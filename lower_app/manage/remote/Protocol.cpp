@@ -6,11 +6,6 @@
 //      Protocol.cpp
 //
 //  Purpose:
-//      协议接收和处理接口
-//		数据格式
-//		数据头: 0x5A 0x5B
-//		序列号: 0~255
-//		功能位: bit7:数据包/同步包 
 //
 // Author:
 //     	@听心跳的声音
@@ -26,10 +21,11 @@
 
 const uint8_t PACKED_HEAD[] = {0x5a, 0x5b};
 
-protocol_info::protocol_info(const std::string &rx_fifo, const std::string &tx_fifo)
+protocol_info::protocol_info(const std::string &rx_fifo, const std::string &tx_fifo, std::function<void(char* ptr, int size)> lambda)
 {
 	rx_fifo_path = rx_fifo;
 	tx_fifo_path_ = tx_fifo;
+	handler_ = lambda;
 
 	memset(rx_buffer_, 0, RX_BUFFER_SIZE);
 	rx_timeout_ = 0;
@@ -103,12 +99,12 @@ ENUM_PROTOCOL_STATUS protocol_info::check_rx_frame(uint8_t data)
 	else
 	{
 		rx_buffer_[rx_buffer_size_++] = data;
-		if(rx_buffer_size_ >= 6)
+		if(rx_buffer_size_ >= 5)
 		{
-			len = rx_buffer_[3];
+			len = rx_buffer_[4];
 			
 			//接收长度符合协议
-			if(rx_buffer_size_ == len+6)
+			if(rx_buffer_size_ == len+PROTOCOL_FRAME_LENGHT)
 			{
 				uint16_t crc_calc, crc_value;
 				crc_value = (rx_buffer_[rx_buffer_size_-1]<<8) | rx_buffer_[rx_buffer_size_-2];
@@ -131,8 +127,28 @@ ENUM_PROTOCOL_STATUS protocol_info::check_rx_frame(uint8_t data)
 
 void protocol_info::process_rx_frame()
 {
+	uint8_t rx_func = rx_buffer_[4];
+	uint16_t sequence_num = (((uint16_t)rx_buffer_[2])<<8) | rx_buffer_[3];
 	
+	//empty data
+	if(rx_buffer_size_ == PROTOCOL_FRAME_LENGHT)
+	{
+		if(rx_func == FUNCTION_ACK)
+		{
+			//for support retry
+		}
+		else if(rx_func == 0) //empty headbeats packetage
+		{
+			//recall ack
+			send_func_data(sequence_num, FUNCTION_ACK);
+		}
+	}
+	else if(rx_func == 0)
+	{
+		//recall ack
+		send_func_data(sequence_num, FUNCTION_ACK);
 
+	}
 }
 
 void protocol_info::clear_rx_info()
@@ -151,6 +167,63 @@ int protocol_info::write_tx_fifo(char *buf, uint16_t size)
 	return tx_fifo_ptr_->write(buf, size);
 }
 
+int protocol_info::send_data(char *pIntput, uint16_t len)
+{
+	char tx_buffer[MAX_TX_BUFFER_LENGTH];
+	uint16_t tx_size;
+
+	tx_size = create_output_frame(tx_buffer, pIntput, len);
+	if(tx_size > 0)
+	{
+		write_tx_fifo(tx_buffer, tx_size);
+	}
+	
+	return tx_size;
+}
+
+void protocol_info::send_func_data(uint16_t sequence, uint8_t func)
+{
+	char buffer[64];
+	uint8_t size = 0;
+	uint16_t crc_check;
+
+	buffer[size++] = PACKED_HEAD[0];
+	buffer[size++] = PACKED_HEAD[1];
+	buffer[size++] = sequence>>8;
+	buffer[size++] = sequence&0xff;
+	buffer[size++] = func;  //Data数据， function功能为0
+	buffer[size++] = 0;
+
+	crc_check = calculate_crc((uint8_t *)&buffer[2], size-2);
+	buffer[size++] = crc_check>>8;
+	buffer[size++] = crc_check&0xff;
+	
+	//send data
+	handler_(buffer, size);
+}
+
+uint16_t protocol_info::create_output_frame(char *pOutput, char *pInput, uint16_t len)
+{
+	uint16_t size = 0;
+	uint16_t crc_check;
+
+	sequence_num++;
+
+	pOutput[size++] = PACKED_HEAD[0];
+	pOutput[size++] = PACKED_HEAD[1];
+	pOutput[size++] = sequence_num>>8;
+	pOutput[size++] = sequence_num&0xff;
+	pOutput[size++] = 0;  //Data数据， function功能为0
+	pOutput[size++] = len;
+
+	memcpy(&pOutput[size], pInput, len);
+	size += len;
+
+	crc_check = calculate_crc((uint8_t *)&pOutput[2], size-2);
+	pOutput[size++] = crc_check>>8;
+	pOutput[size++] = crc_check&0xff;
+	return size;
+}
 
 uint16_t protocol_info::calculate_crc(uint8_t *pdata, uint16_t size)
 {
