@@ -80,7 +80,6 @@ public:
     bool init();
     void release();
 
-    bool createfifo();
     int print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...);
     static LoggerManage *get_instance();
 
