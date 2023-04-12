@@ -26,21 +26,40 @@
 
 class device_base
 {
-protected:
-    int device_fd_;
-    std::string device_path_;
-
 public:
+    /// - constructor.
     device_base();
+
+    /// - copy constructor.
     device_base(const std::string &DevicePath);
-        ~device_base();
-    virtual bool open(int flags);
-    virtual void close();
+
+    /// -- destructor
+    ~device_base();
+
+
     virtual bool init(const std::string &DevicePath, int flags);
 
-public:
     int getfd() { return device_fd_; }
     const std::string &getDevicePath() {return device_path_;}
+
+    /// \brief open
+    /// - open the device.
+    /// \return Wheather initialization is success or failed.
+    virtual bool open(int flags);
+
+    /// \brief open
+    /// - open the device.
+    /// \return Wheather initialization is success or failed.
+    virtual void close();
+
+protected:
+    /// \brief device_fd_
+    /// - the device id when open the device.
+    int device_fd_;
+
+    /// \brief device_path_
+    /// - the device path in system
+    std::string device_path_;
 };
 
 class io_base:public device_base

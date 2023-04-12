@@ -20,9 +20,9 @@ _Pragma("once")
 
 #include "device_base.hpp"
 
-class LED: public io_base
+class led_device: public io_base
 {
 public:
+    //consturctor
     using io_base::io_base;
-    void test();
 };

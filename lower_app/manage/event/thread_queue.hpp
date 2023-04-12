@@ -29,14 +29,14 @@ namespace EVENT
     {
     private:
         std::queue<T> Queue_;
-        std::mutex  mut;
+        std::mutex  mut_;
         Semaphore Semaphore_;
         
     public:
         void QueueSend(T& Object)
         {
             {
-                std::unique_lock<std::mutex> lock(mut);
+                std::unique_lock<std::mutex> lock(mut_);
                 Queue_.push(Object);
             }
 
@@ -49,7 +49,7 @@ namespace EVENT
 
             if(Semaphore_.wait(timeout))
             {
-                std::unique_lock<std::mutex> lock(mut);
+                std::unique_lock<std::mutex> lock(mut_);
                 if(Queue_.size() != 0)
                 {
                     Object = Queue_.front();

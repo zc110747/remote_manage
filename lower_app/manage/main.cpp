@@ -103,7 +103,6 @@ int main(int argc, char* argv[])
 		}
 	}
 	
-	driver_manage::getInstance()->release();
 	uart_thread_manage::getInstance()->release();
 	PRINT_NOW("Process app_demo stop, error:%s\n", strerror(errno));
 	return result;

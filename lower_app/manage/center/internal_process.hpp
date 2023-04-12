@@ -28,7 +28,7 @@ public:
 	/// - constructor.
     internal_process() = default;
 
-    /// - destructor, delete not allow for .
+    /// - destructor, delete not allow for singleton pattern.
     ~internal_process() = delete;
 
     /// \brief getInstance
@@ -43,20 +43,20 @@ public:
 
     /// \brief update_device_status
     /// - This method is used to update the device info to other interface.
-    /// convert to string "!status led=ON;BEEP=OFF;IR=1;ALS=1;PS=1;gypox=0;gypoz=0;gypoz=0"
+    /// convert to string "!status led=ON;BEEP=OFF;IR=1;ALS=1;PS=1;gypox=0;gypoz=0;gypoz=0".
     /// \param info - object of the device info.
     void update_device_status(const NAMESPACE_DEVICE::device_read_info &info);
     
 private:
     /// \brief run
-    /// - This method is used for thread run the main workflow.
+    /// - This method is used for thread run the internal process.
     void run();
 
     /// \brief send
     /// - This method is used to send data to all connected interface.
     /// \param pbuffer - buffer point to the start of the send buffer.
     /// \param size - size need to send.
-    /// \return wheather already send the buffer success
+    /// \return wheather already send the buffer success.
     bool send(char *pbuffer, int size);
 
     /// \brief process_info_callback
@@ -66,11 +66,11 @@ private:
 
 private:
     /// \brief pInstance
-    /// - object used to implement the singleton pattern
+    /// - object used to implement the singleton pattern.
     static internal_process*  pInstance;
 
     /// \brief node_thread_
-    /// - object used to saved thread information used to process
+    /// - object used to saved thread information used to process.
     /// node communication.
     std::thread node_thread_;
 

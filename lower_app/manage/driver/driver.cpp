@@ -41,7 +41,7 @@ bool driver_manage::init()
     ret &= beep_0.init(pConfig->getbeep()->dev, O_RDWR | O_NONBLOCK);
     ret &= ap3216_dev_.init(pConfig->getapI2c()->dev, O_RDONLY | O_NONBLOCK);
     ret &= icm20608_dev_.init(pConfig->geticmSpi()->dev, O_RDONLY | O_NONBLOCK);
-    ret &= RTCDevice::getInstance()->open(O_RDONLY | O_NONBLOCK);
+    ret &= rtc_dev_.init(pConfig->getrtc()->dev,  O_RDONLY | O_NONBLOCK);
     ret &= key_0.init(pConfig->getkey()->dev, O_RDWR | O_NONBLOCK);
 
     if(ret)
@@ -52,11 +52,6 @@ bool driver_manage::init()
     }
     
     return ret;
-}
-
-void driver_manage::release()
-{
-    RTCDevice::getInstance()->release();
 }
 
 

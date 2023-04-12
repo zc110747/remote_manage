@@ -25,26 +25,55 @@ _Pragma("once")
 class center_manage final
 {
 public:
+    /// - constructor.
     center_manage()=default;
-
-    //单例模式不允许复制和释放
     center_manage(const center_manage&)=delete;
+
+    /// - destructor, delete not allow for singleton pattern.
     virtual ~center_manage()=delete;
 
+    /// \brief getInstance
+    /// - This method is used to get the pattern of the class.
+    /// \return the singleton pattern point of the object.
     static center_manage* getInstance();
+
+    /// \brief init
+    /// - This method is used to init the object.
+    /// \return Wheather initialization is success or failed.
     bool init();
-    void run();
-    
+
+    /// \brief send_message
+    /// - This method is used to send message for center manage.
+    /// \return Number of the message already send.
     int send_message(Event *pMsg, uint16_t size);
 
-    //内部事件
-    int sendInternalHwRefresh();
+    /// \brief send_hardware_update_message
+    /// - This method is used to trigger the device hardware update to other process.
+    /// \return Number of the message already send.
+    int send_hardware_update_message();
     
-    //外部事件
-    int sendDeviceConfig(uint8_t device, uint8_t action);
-private:
-    static inline center_manage* pInstance = nullptr;
-    fifo_manage *pCenterFiFo{nullptr};
+    /// \brief send_hardware_config_message
+    /// - This method is used to trigger the device hardware config message.
+    /// \return Number of the message already send.
+    int send_hardware_config_message(uint8_t device, uint8_t action);
 
-    bool EventProcess(Event *pEvent);
+private:
+    /// \brief run
+    /// - This method is used for thread run the center management.
+    void run();
+
+    /// \brief process_event
+    /// - This method is used to process the event for center management.
+    /// \param pEvent - the point of the event to process.
+    /// \return wheather event process success or fail.
+    bool process_event(Event *pEvent);
+
+private:
+    /// \brief pInstance
+    /// - object used to implement the singleton pattern.
+    static inline center_manage* pInstance = nullptr;
+
+    /// \brief center_fifo_point_
+    /// - fifo point used for the center management.
+    fifo_manage *center_fifo_point_{nullptr};
 };

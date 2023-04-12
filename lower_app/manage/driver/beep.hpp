@@ -21,13 +21,11 @@
 
 #include "device_base.hpp"
 
-class BEEP:public io_base
+class beep_device:public io_base
 {
 public:
     //consturctor
     using io_base::io_base;
-
-    void test();
 };
 
 #endif

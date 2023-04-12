@@ -19,7 +19,7 @@
 
 #include "cmd_process.hpp"
 #include "logger.hpp"
-#include "device_manage.hpp"
+#include "center_manage.hpp"
 
 /*
 !readdev    [index] #index=[0~3 led,beep,ap,icm]
@@ -121,7 +121,7 @@ bool cmd_process::ProcessData()
                 uint32_t device = 0, action = 0;
                 sscanf(pDataM, "%d,%d", &device, &action);
                 PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "SetDev:%d, %d!", device, action);
-                NAMESPACE_DEVICE::device_manage::getInstance()->send_device_message(device, action);
+                center_manage::getInstance()->send_hardware_config_message(device, action);
             }
             break;
         case cmdSetLevel:

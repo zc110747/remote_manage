@@ -26,8 +26,6 @@ objects = 	main.o \
 			module/asio_server.o \
 			module/cmd_process.o  \
 			driver/rtc.o \
-			driver/beep.o \
-			driver/led.o \
 			driver/key.o \
 			driver/spi_icm.o \
 			driver/i2c_ap.o \

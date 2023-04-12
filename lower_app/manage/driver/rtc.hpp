@@ -21,23 +21,23 @@ _Pragma("once")
 #include "device_base.hpp"
 #include <linux/rtc.h>
 
-class RTCDevice:public device_base
+class rtc_device:public device_base
 {
-private:
-    struct rtc_time rtcTimeM{0};
-    static RTCDevice* pInstance;
-    uint64_t TimeStart{0};
-
 public:
-    RTCDevice(const std::string &DevicePath);
-    ~RTCDevice();
+    // - constructor
+    using device_base::device_base;
 
-    bool updateTime();
-    static RTCDevice* getInstance();
-    void release();
+    bool update_rtc_time();
 
-    int getCurrentSecond();
+    int get_current_second();
+
+    bool init(const std::string &DevicePath, int flags);
+
     struct rtc_time* getRtcTime() {return &rtcTimeM;}
     uint64_t getStartTime() {return TimeStart;}
+
+private:
+    struct rtc_time rtcTimeM{0};
+    uint64_t TimeStart{0};
 };
 

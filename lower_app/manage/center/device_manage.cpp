@@ -40,19 +40,19 @@ namespace NAMESPACE_DEVICE
     bool device_manage::init()
     {   
         //init the info
-        inter_info.clear();
-        outer_info.clear();
+        inter_info_.clear();
+        outer_info_.clear();
 
         //clear thread
         std::thread(std::bind(&device_manage::run, this)).detach();
         
-        pDevFIFO = new(std::nothrow) fifo_manage(DEVICE_MESSAGE_FIFO, S_FIFO_WORK_MODE);
-        if(pDevFIFO == nullptr)
+        device_fifo_point_ = new(std::nothrow) fifo_manage(DEVICE_MESSAGE_FIFO, S_FIFO_WORK_MODE);
+        if(device_fifo_point_ == nullptr)
         {
             return false;
         }
         
-        return pDevFIFO->create();
+        return device_fifo_point_->create();
     }
 
     int device_manage::send_device_message(uint8_t device, uint8_t action)
@@ -67,7 +67,7 @@ namespace NAMESPACE_DEVICE
 
     int device_manage::send_message(char* pEvent, int size)
     {
-        return pDevFIFO->write(pEvent, size);
+        return device_fifo_point_->write(pEvent, size);
     }
     
     device_read_info device_manage::get_device_info()
@@ -75,8 +75,8 @@ namespace NAMESPACE_DEVICE
         device_read_info info;
 
         {
-            std::lock_guard lock{mut};
-            info = outer_info;
+            std::lock_guard lock{mut_};
+            info = outer_info_;
         }
         
         return info;
@@ -87,41 +87,41 @@ namespace NAMESPACE_DEVICE
         auto led_ptr = driver_manage::getInstance()->getLed0();
         if(led_ptr->readIoStatus())
         {
-            inter_info.led_io_ = led_ptr->getIoStatus();
+            inter_info_.led_io_ = led_ptr->getIoStatus();
         }
 
         auto beep_ptr = driver_manage::getInstance()->getBeep0();
         if(beep_ptr->readIoStatus())
         {
-            inter_info.beep_io_ = beep_ptr->getIoStatus();
+            inter_info_.beep_io_ = beep_ptr->getIoStatus();
         }
 
         auto ap_dev_ptr = driver_manage::getInstance()->get_ap3126_dev();
         if(ap_dev_ptr->readInfo())
         {
-            inter_info.ap_info_ = ap_dev_ptr->getInfo();
+            inter_info_.ap_info_ = ap_dev_ptr->getInfo();
         }
 
         auto icm_dev_ptr = driver_manage::getInstance()->getIcmDev0();
         if(icm_dev_ptr->readInfo())
         {
             icm_dev_ptr->ConvertInfo();
-            inter_info.icm_info_ = icm_dev_ptr->getConvertInfo();
-            inter_info.angle_ = icm_dev_ptr->getAngle();
+            inter_info_.icm_info_ = icm_dev_ptr->getConvertInfo();
+            inter_info_.angle_ = icm_dev_ptr->getAngle();
             //PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "Angle:%d!", icm_dev_ptr->getAngle());
         }
 
-        if(inter_info != outer_info)
+        if(inter_info_ != outer_info_)
         {
             {
-                std::lock_guard lock{mut};
-                outer_info = inter_info;
+                std::lock_guard lock{mut_};
+                outer_info_ = inter_info_;
             }
-            center_manage::getInstance()->sendInternalHwRefresh();
+            center_manage::getInstance()->send_hardware_update_message();
         }
     }
 
-    void device_manage::HardProcess(Event *pEvent)
+    void device_manage::process_hardware(Event *pEvent)
     {
         EventBufMessage *pHardEvent = static_cast<EventBufMessage *>(pEvent);
         auto data = pHardEvent->getData();
@@ -151,7 +151,7 @@ namespace NAMESPACE_DEVICE
         }
     }
 
-    bool device_manage::EventProcess(Event *pEvent)
+    bool device_manage::process_event(Event *pEvent)
     {
         uint16_t id = pEvent->getId();
         switch(id)
@@ -160,7 +160,7 @@ namespace NAMESPACE_DEVICE
             update();
             break;
         case DEVICE_ID_HARDWARE_CHANGE:
-            HardProcess(pEvent);
+            process_hardware(pEvent);
             break;
         default:
             PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Invalid Device Command:%d!", id);
@@ -197,11 +197,11 @@ namespace NAMESPACE_DEVICE
 
         for(;;)
         {
-            size = pDevFIFO->read(buffer, READ_BUFFER_SIZE);
+            size = device_fifo_point_->read(buffer, READ_BUFFER_SIZE);
             if(size > 0)
             {
                 PRINT_LOG(LOG_DEBUG, xGetCurrentTicks(), "Device Command, %d!", size);
-                EventProcess(reinterpret_cast<Event *>(buffer));
+                process_event(reinterpret_cast<Event *>(buffer));
             }
             else
             {

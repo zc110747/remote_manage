@@ -19,41 +19,7 @@
 #include "rtc.hpp"
 #include <sys/ioctl.h>
 
-RTCDevice::RTCDevice(const std::string &DevicePath)
-:device_base(DevicePath)
-{
-    TimeStart = getCurrentSecond();
-}
-
-RTCDevice::~RTCDevice()
-{
-
-}
-
-RTCDevice* RTCDevice::pInstance = nullptr;
-RTCDevice* RTCDevice::getInstance()
-{
-    if(pInstance == nullptr)
-    {
-        pInstance = new(std::nothrow) RTCDevice(system_config::getInstance()->getrtc()->dev);
-        if(pInstance == NULL)
-        {
-            //To Do something(may logger)
-        }
-    }
-    return pInstance;
-}
-
-void RTCDevice::release()
-{
-    if(pInstance != nullptr)
-    {
-        delete pInstance;
-        pInstance = nullptr;
-    }
-}
-
-bool RTCDevice::updateTime()
+bool rtc_device::update_rtc_time()
 {
     bool ret = false;
 
@@ -84,15 +50,23 @@ bool RTCDevice::updateTime()
     return ret;
 }
 
-int RTCDevice::getCurrentSecond()
+bool rtc_device::init(const std::string &DevicePath, int flags)
+{
+    device_base::init(DevicePath, flags);
+    TimeStart = get_current_second();
+}
+
+int rtc_device::get_current_second()
 {
     uint64_t second;
 
-    updateTime();
-    
-    second += rtcTimeM.tm_hour*3600;
-    second += rtcTimeM.tm_min*60;
-    second += rtcTimeM.tm_sec;
+    if(update_rtc_time())
+    {
+        second += rtcTimeM.tm_hour*3600;
+        second += rtcTimeM.tm_min*60;
+        second += rtcTimeM.tm_sec;
+    }
+
     return second-TimeStart;
 }
 

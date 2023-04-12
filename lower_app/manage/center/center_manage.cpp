@@ -40,16 +40,16 @@ center_manage* center_manage::getInstance()
 
 int center_manage::send_message(Event *pMsg, uint16_t size)
 {
-    return pCenterFiFo->write(reinterpret_cast<char *>(pMsg), size);
+    return center_fifo_point_->write(reinterpret_cast<char *>(pMsg), size);
 }
 
-int center_manage::sendInternalHwRefresh()
+int center_manage::send_hardware_update_message()
 {
-    Event event(WORKFLOW_ID_INTER_DATA_REFRESH);
+    Event event(WORKFLOW_ID_HARDWARE_UPDATE);
     return send_message(&event, sizeof(event));
 }
 
-int center_manage::sendDeviceConfig(uint8_t device, uint8_t action)
+int center_manage::send_hardware_config_message(uint8_t device, uint8_t action)
 {
     EventBufMessage event(WORKFLOW_ID_HARDWARE_CHANGE);
 
@@ -58,12 +58,12 @@ int center_manage::sendDeviceConfig(uint8_t device, uint8_t action)
     return send_message(&event, sizeof(event));
 }
 
-bool center_manage::EventProcess(Event *pEvent)
+bool center_manage::process_event(Event *pEvent)
 {
     uint16_t id = pEvent->getId();
     switch(id)
     {
-    case WORKFLOW_ID_INTER_DATA_REFRESH:
+    case WORKFLOW_ID_HARDWARE_UPDATE:
         {
             auto info = device_manage::getInstance()->get_device_info();
             internal_process::getInstance()->update_device_status(info);
@@ -91,11 +91,11 @@ void center_manage::run()
     
     for(;;)
     {
-        size = pCenterFiFo->read(buffer, READ_BUFFER_SIZE);
+        size = center_fifo_point_->read(buffer, READ_BUFFER_SIZE);
         if(size > 0)
         {
             PRINT_LOG(LOG_DEBUG, xGetCurrentTicks(), "center_manage Command, %d!", size);
-            EventProcess(reinterpret_cast<Event *>(buffer));
+            process_event(reinterpret_cast<Event *>(buffer));
         }
         else
         {
@@ -109,11 +109,11 @@ bool center_manage::init()
     //clear thread
     std::thread(std::bind(&center_manage::run, this)).detach();
     
-    pCenterFiFo = new(std::nothrow) fifo_manage(CENTER_UNIT_FIFO, S_FIFO_WORK_MODE);
-    if(pCenterFiFo == nullptr)
+    center_fifo_point_ = new(std::nothrow) fifo_manage(CENTER_UNIT_FIFO, S_FIFO_WORK_MODE);
+    if(center_fifo_point_ == nullptr)
     {
         return false;
     }
     
-    return pCenterFiFo->create();
+    return center_fifo_point_->create();
 }

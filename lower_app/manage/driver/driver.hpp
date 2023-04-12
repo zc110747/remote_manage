@@ -29,10 +29,11 @@ class driver_manage
 {
 private:
     static driver_manage* pInstance;
-    LED led_0;
-    BEEP beep_0;
+    led_device led_0;
+    beep_device beep_0;
     ap_device ap3216_dev_;
     icm_device icm20608_dev_;
+    rtc_device rtc_dev_;
     KEY key_0;
 
 public:
@@ -43,8 +44,8 @@ public:
     static driver_manage* getInstance();
 
 public:
-    LED *getLed0()          {return &led_0;}
-    BEEP *getBeep0()        {return &beep_0;}
+    led_device *getLed0()          {return &led_0;}
+    beep_device *getBeep0()        {return &beep_0;}
     ap_device *get_ap3126_dev()   {return &ap3216_dev_;}
     icm_device *getIcmDev0() {return &icm20608_dev_;}
     KEY *getKey0()          {return &key_0;}
