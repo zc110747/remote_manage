@@ -59,8 +59,8 @@ namespace NAMESPACE_DEVICE
     {
         EventBufMessage ebufMsg(DEVICE_ID_HARDWARE_CHANGE);
 
-        ebufMsg.getData().buffer[0] = device;
-        ebufMsg.getData().buffer[1] = action;
+        ebufMsg.get_data().buffer[0] = device;
+        ebufMsg.get_data().buffer[1] = action;
 
         return send_message(reinterpret_cast<char *>(&ebufMsg), sizeof(ebufMsg));
     }
@@ -75,7 +75,7 @@ namespace NAMESPACE_DEVICE
         device_read_info info;
 
         {
-            std::lock_guard lock{mut_};
+            std::lock_guard lock{mutex_};
             info = outer_info_;
         }
         
@@ -114,7 +114,7 @@ namespace NAMESPACE_DEVICE
         if(inter_info_ != outer_info_)
         {
             {
-                std::lock_guard lock{mut_};
+                std::lock_guard lock{mutex_};
                 outer_info_ = inter_info_;
             }
             center_manage::get_instance()->send_hardware_update_message();
@@ -124,7 +124,7 @@ namespace NAMESPACE_DEVICE
     void device_manage::process_hardware(Event *pEvent)
     {
         EventBufMessage *pHardEvent = static_cast<EventBufMessage *>(pEvent);
-        auto data = pHardEvent->getData();
+        auto data = pHardEvent->get_data();
 
         uint8_t device = data.buffer[0];
         uint8_t action = data.buffer[1];
@@ -153,7 +153,7 @@ namespace NAMESPACE_DEVICE
 
     bool device_manage::process_event(Event *pEvent)
     {
-        uint16_t id = pEvent->getId();
+        uint16_t id = pEvent->get_id();
         switch(id)
         {
         case DEVICE_ID_TIME_UPDATE_PREOID:
@@ -189,8 +189,8 @@ namespace NAMESPACE_DEVICE
             {
                 if(keyvalue == 1)
                 {
-                    send_device_message(EVENT_DEVICE_LED, status);
                     status = status==0?1:0;
+                    send_device_message(EVENT_DEVICE_LED, status);
                 }
             }
         });

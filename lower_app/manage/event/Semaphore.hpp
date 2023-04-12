@@ -3,7 +3,7 @@
 //  All Rights Reserved
 //
 //  Name:
-//      Semaphore.hpp
+//      semaphore.hpp
 //
 //  Purpose:
 //      信号量, 用于线程间通讯的触发, 支持长等待和超时模式
@@ -23,48 +23,71 @@ _Pragma("once")
 
 namespace EVENT
 {
-    class Semaphore
+    class semaphore
     {
     public:
-        Semaphore(int count = 0):wakeups(count) {}
-            virtual ~Semaphore() {}
+        //constructor
+        semaphore(int count = 0):wakeups_(count) {}
+
+        //destructor
+        virtual ~semaphore() {}
         
+        /// \brief signal
+        /// - This method is used to trigger signal.
         void signal()
         {
-            std::lock_guard<std::mutex> lock(mt);
-            ++wakeups;
-            cv.notify_one();
+            std::lock_guard<std::mutex> lock(mutex_);
+            ++wakeups_;
+            cv_.notify_one();
         }
         
+        /// \brief wait
+        /// - This method is used to wait signal with timeout.
+        /// \param timeout - signal timeout
+        /// \return wheather success wait the singal
         bool wait(uint32_t timeout)
         {
             bool ret;
 
-            std::unique_lock<std::mutex> lock(mt);
-            ret = cv.wait_for(lock, std::chrono::milliseconds(timeout), [this]()->bool{
-                return wakeups > 0;
+            std::unique_lock<std::mutex> lock(mutex_);
+            ret = cv_.wait_for(lock, std::chrono::milliseconds(timeout), [this]()->bool{
+                return wakeups_ > 0;
             });
             if(ret)
-                --wakeups;
+                --wakeups_;
             
             return ret;
         }
 
+        /// \brief wait
+        /// - This method is used to wait signal forever.
+        /// \return wheather success wait the singal
         bool wait()
         {
-            std::unique_lock<std::mutex> lock(mt);
+            std::unique_lock<std::mutex> lock(mutex_);
+            
             //在这一步释放了lock, 同时进行解锁
-            cv.wait(lock, [this]()->bool{
-                return wakeups > 0;
+            cv_.wait(lock, [this]()->bool{
+                return wakeups_ > 0;
             });
-            --wakeups;
+
+            --wakeups_;
+
             return true;
         }
 
     private:
-        std::mutex mt;
-        std::condition_variable cv;
-        int wakeups;
+        /// \brief mutex_
+        /// - the mutex to protect signal.
+        std::mutex mutex_;
+
+        /// \brief cv_
+        /// - signal process object.
+        std::condition_variable cv_;
+
+        /// \brief wakeups_
+        /// - signal protect data.
+        int wakeups_;
     };
 }
 

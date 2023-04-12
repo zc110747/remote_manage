@@ -70,13 +70,13 @@ void session_group::init(std::function<void(char* ptr, int size)> handler)
 
 void session_group::join(ShareSessionPointer Session_)
 {
-  std::lock_guard<std::mutex> lock(mut_);
+  std::lock_guard<std::mutex> lock(mutex_);
   set_.insert(Session_);
 }
 
 void session_group::leave(ShareSessionPointer Session_)
 {
-  std::lock_guard<std::mutex> lock(mut_);
+  std::lock_guard<std::mutex> lock(mutex_);
   set_.erase(Session_);
 }
 
@@ -85,7 +85,7 @@ ShareSessionPointer session_group::get_session()
     ShareSessionPointer current_Session;
 
     {
-        std::lock_guard<std::mutex> lock(mut_);
+        std::lock_guard<std::mutex> lock(mutex_);
         if(set_.size() == 0)
             current_Session = nullptr;
         else
@@ -113,7 +113,7 @@ bool session_group::is_valid()
 
 void session_group::do_write(char *buffer, int size)
 {
-  std::lock_guard<std::mutex> lock(mut_);
+  std::lock_guard<std::mutex> lock(mutex_);
   if(set_.size() != 0)
   {
     ShareSessionPointer session_ptr = *set_.begin();  

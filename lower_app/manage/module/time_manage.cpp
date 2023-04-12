@@ -41,7 +41,7 @@ void time_manage::run()
     //计数
     ticks += peroid;
 
-    std::lock_guard<std::mutex> lock{mt};
+    std::lock_guard<std::mutex> lock{mutex_};
     while(iter != VecWork.end())
     {
         if(iter->ActionCount == 0)
@@ -61,7 +61,7 @@ bool time_manage::registerWork(uint32_t id, uint32_t time, uint32_t count, std::
     auto iter = VecWork.begin();  
     TimeAction work(id, time, count, func);   
     
-    std::lock_guard<std::mutex> lock{mt};
+    std::lock_guard<std::mutex> lock{mutex_};
     VecWork.push_back(work);
 
     return true;
@@ -71,7 +71,7 @@ bool time_manage::removeWork(uint32_t id)
 {
     auto iter = VecWork.begin();  
 
-    std::lock_guard<std::mutex> lock{mt};
+    std::lock_guard<std::mutex> lock{mutex_};
     while(iter != VecWork.end())
     {
         if(iter->Id == id)

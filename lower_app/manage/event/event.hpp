@@ -23,38 +23,52 @@ _Pragma("once")
 
 class Event
 {
-private:
-    uint16_t _id;
-
 public:
-    Event():_id(0){
+    /// - constructor
+    Event():id_(0){
         static_assert(std::is_trivially_copyable_v<Event>, "Not Allow C memory process");
     }
-    Event(uint16_t id):_id(id){
+    
+    /// - constructor
+    Event(uint16_t id):id_(id){
         static_assert(std::is_trivially_copyable_v<Event>, "Not Allow C memory process");
     }
 
-    void setId(uint16_t id){
-        _id = id;
-    }
-    uint16_t getId(){
-        return _id;
-    }
+    /// \brief set_id
+    /// - This method is used to set the id
+    void set_id(uint16_t id)    { id_ = id; }
+
+    /// \brief get_id
+    /// - This method is used to get the id.
+    /// \return the id of the event.   
+    uint16_t get_id()           { return id_;}
+
+private:
+    /// \brief id_
+    /// - the id of event.
+    uint16_t id_;
 };
 
 template<typename T>
 class EventExtend:public Event
 {
-private:
-    T _data;
-
 public:
+    //constructor
     using Event::Event;
-    T &getData()
+
+    /// \brief get_data
+    /// - This method is used to get the data.
+    /// \return the data of the event.   
+    T &get_data()
     {
         static_assert(std::is_trivially_copyable_v<EventExtend>, "Not Allow C memory process");
-        return _data;
+        return data_;
     }
+
+private:
+    /// \brief data_
+    /// - the data of event.
+    T data_;
 };
 
 template<int N>

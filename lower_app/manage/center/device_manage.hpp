@@ -165,9 +165,9 @@ namespace NAMESPACE_DEVICE
         /// - extend info used to compare and update the device info.
         device_read_info outer_info_;
 
-        /// \brief mut_
+        /// \brief mutex_
         /// - mutex used to protect the update for outer_info_.
-        std::mutex mut_;
+        std::mutex mutex_;
 
         /// \brief device_fifo_point_
         /// - fifo point used for the device management.

@@ -42,7 +42,7 @@ public:
     bool is_valid();
     
 private:
-    std::mutex mut_;
+    std::mutex mutex_;
     std::set<ShareSessionPointer> set_;
     std::function<void(char* ptr, int size)> handler_;
 };

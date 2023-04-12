@@ -53,14 +53,14 @@ int center_manage::send_hardware_config_message(uint8_t device, uint8_t action)
 {
     EventBufMessage event(WORKFLOW_ID_HARDWARE_CHANGE);
 
-    event.getData().buffer[0] = device;
-    event.getData().buffer[1] = action;
+    event.get_data().buffer[0] = device;
+    event.get_data().buffer[1] = action;
     return send_message(&event, sizeof(event));
 }
 
 bool center_manage::process_event(Event *pEvent)
 {
-    uint16_t id = pEvent->getId();
+    uint16_t id = pEvent->get_id();
     switch(id)
     {
     case WORKFLOW_ID_HARDWARE_UPDATE:
@@ -74,7 +74,7 @@ bool center_manage::process_event(Event *pEvent)
         {
             auto *pMessage = static_cast<EventBufMessage *>(pEvent);
             device_manage::get_instance()->send_device_message
-                (pMessage->getData().buffer[0], pMessage->getData().buffer[1]);
+                (pMessage->get_data().buffer[0], pMessage->get_data().buffer[1]);
         }
         break;
     default:

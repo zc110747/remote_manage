@@ -20,7 +20,7 @@
 /////////////////////////////////////////////////////////////////////////////
 #include "modules.hpp"
 #include "remote.hpp"
-#include "Semaphore.hpp"
+#include "semaphore.hpp"
 #include "driver.hpp"
 #include "time_manage.hpp"
 #include "internal_process.hpp"
@@ -29,7 +29,7 @@
 //internal data
 static int nConfigDefault = 0;
 static std::string sConfigFile(DEFAULT_CONFIG_FILE);
-static EVENT::Semaphore global_exit_sem(0);
+static EVENT::semaphore global_exit_sem(0);
 
 //internal function
 static bool system_init(int is_default, const char* path);

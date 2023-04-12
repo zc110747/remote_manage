@@ -91,7 +91,7 @@ private:
     static time_manage *pInstance;
     DeviceManage::Timer time;
     std::vector<TimeAction> VecWork;
-    std::mutex mt;
+    std::mutex mutex_;
     std::atomic<uint32_t> ticks;
     uint32_t peroid;
 };
