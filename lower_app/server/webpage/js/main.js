@@ -24,7 +24,7 @@ Vue.createApp({
                 accely:"0",
                 accelz:"0",
                 temp:"0",
-                angle_:"0",
+                angle:"0",
             }
         }   
     },
