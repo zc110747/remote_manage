@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
 		}
 	}
 	
-	uart_thread_manage::getInstance()->release();
+	uart_thread_manage::get_instance()->release();
 	PRINT_NOW("Process app_demo stop, error:%s\n", strerror(errno));
 	return result;
 }
@@ -118,23 +118,23 @@ static bool system_init(int is_default, const char* path)
 	//选中配置文件
 	if(is_default == 0)
 	{
-		system_config::getInstance()->init(path);
+		system_config::get_instance()->init(path);
 	}
 	else
 	{
-		system_config::getInstance()->default_init();
+		system_config::get_instance()->default_init();
 		PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "System Config use default!");
 	}
-	std::cout<<*(system_config::getInstance())<<std::endl;
+	std::cout<<*(system_config::get_instance())<<std::endl;
 
-	ret &= LoggerManage::getInstance()->init();
-	ret &= driver_manage::getInstance()->init();
-	ret &= NAMESPACE_DEVICE::device_manage::getInstance()->init();
-	//ret &= uart_thread_manage::getInstance()->init();
-	ret &= tcp_thread_manage::getInstance()->init();
-	ret &= internal_process::getInstance()->init();
-	ret &= time_manage::getInstance()->init();
-	ret &= center_manage::getInstance()->init();
+	ret &= LoggerManage::get_instance()->init();
+	ret &= driver_manage::get_instance()->init();
+	ret &= NAMESPACE_DEVICE::device_manage::get_instance()->init();
+	//ret &= uart_thread_manage::get_instance()->init();
+	ret &= tcp_thread_manage::get_instance()->init();
+	ret &= internal_process::get_instance()->init();
+	ret &= time_manage::get_instance()->init();
+	ret &= center_manage::get_instance()->init();
 
 	return ret;
 }

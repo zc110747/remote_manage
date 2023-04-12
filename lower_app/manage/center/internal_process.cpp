@@ -22,7 +22,7 @@
 #include "modules.hpp"
 
 internal_process*  internal_process::pInstance = nullptr;
-internal_process* internal_process::getInstance()
+internal_process* internal_process::get_instance()
 {
     if(pInstance == nullptr)
     {
@@ -39,7 +39,7 @@ static asio_server InterServer;
 
 void internal_process::run()
 {
-    const SocketSysConfig *pSocketConfig = system_config::getInstance()->getnode();
+    const SocketSysConfig *pSocketConfig = system_config::get_instance()->getnode();
 
     try
     {
@@ -134,7 +134,7 @@ void internal_process::process_info_callback()
     switch(cmd_process_.getCurrentFormat())
     {
         case CmdSetDev:
-            auto info = NAMESPACE_DEVICE::device_manage::getInstance()->get_device_info();
+            auto info = NAMESPACE_DEVICE::device_manage::get_instance()->get_device_info();
             update_device_status(info);
             break;
     }

@@ -32,9 +32,9 @@ bool rtc_device::update_rtc_time()
 
     if(p != NULL)
     {
-        rtcTimeM.tm_sec = p->tm_sec;
-        rtcTimeM.tm_min = p->tm_min;
-        rtcTimeM.tm_hour = p->tm_hour;
+        rtc_time_.tm_sec = p->tm_sec;
+        rtc_time_.tm_min = p->tm_min;
+        rtc_time_.tm_hour = p->tm_hour;
         ret = true;
     }
 #else
@@ -42,7 +42,7 @@ bool rtc_device::update_rtc_time()
 
     if(device_fd_>=0)
     {
-        retval = ioctl(device_fd_, RTC_RD_TIME, &rtcTimeM);
+        retval = ioctl(device_fd_, RTC_RD_TIME, &rtc_time_);
         if(retval >= 0)
             ret = true;
     }
@@ -52,21 +52,22 @@ bool rtc_device::update_rtc_time()
 
 bool rtc_device::init(const std::string &DevicePath, int flags)
 {
-    device_base::init(DevicePath, flags);
-    TimeStart = get_current_second();
+    start_time_ = get_current_time();
+
+    return device_base::init(DevicePath, flags);
 }
 
-int rtc_device::get_current_second()
+int rtc_device::get_current_time()
 {
     uint64_t second;
 
     if(update_rtc_time())
     {
-        second += rtcTimeM.tm_hour*3600;
-        second += rtcTimeM.tm_min*60;
-        second += rtcTimeM.tm_sec;
+        second += rtc_time_.tm_hour*3600;
+        second += rtc_time_.tm_min*60;
+        second += rtc_time_.tm_sec;
     }
 
-    return second-TimeStart;
+    return second-start_time_;
 }
 

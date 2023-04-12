@@ -8,10 +8,10 @@
 
 # This is object should be build and will link to generate
 # the executables
-#HOST = arm-linux-gnueabihf-
-#CPU = arm-
+HOST = arm-linux-gnueabihf-
+CPU = arm-
 #HOST =
-CPU = x86-
+#CPU = x86-
 CC = $(HOST)g++
 CFLAGS := -O3 -std=c++17 -fno-strict-aliasing -lrt 
 
@@ -28,7 +28,6 @@ objects = 	main.o \
 			driver/rtc.o \
 			driver/key.o \
 			driver/spi_icm.o \
-			driver/i2c_ap.o \
 			driver/device_base.o \
 			driver/driver.o \
 			logger/logger.o \

@@ -92,7 +92,7 @@ public:
     system_config() = default;
     ~system_config() = delete;
 
-    static system_config* getInstance();
+    static system_config* get_instance();
     bool init(const char* path);
     void default_init() noexcept;
     void SaveConfigFile();             //保存Config的文件     

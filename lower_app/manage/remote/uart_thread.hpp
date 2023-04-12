@@ -45,7 +45,7 @@ public:
 	int set_opt(int, int, std::string, int);
 	void release();
 
-	static uart_thread_manage* getInstance();
+	static uart_thread_manage* get_instance();
 	int getComfd()	{return nComFd;}
 };
 

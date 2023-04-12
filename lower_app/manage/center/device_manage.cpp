@@ -24,7 +24,7 @@
 namespace NAMESPACE_DEVICE
 {
     device_manage* device_manage::pInstance = nullptr;
-    device_manage* device_manage::getInstance()
+    device_manage* device_manage::get_instance()
     {
         if(pInstance == nullptr)
         {
@@ -84,31 +84,31 @@ namespace NAMESPACE_DEVICE
 
     void device_manage::update()
     {
-        auto led_ptr = driver_manage::getInstance()->getLed0();
-        if(led_ptr->readIoStatus())
+        auto led_ptr = driver_manage::get_instance()->get_led_zero();
+        if(led_ptr->read_io_status())
         {
-            inter_info_.led_io_ = led_ptr->getIoStatus();
+            inter_info_.led_io_ = led_ptr->get_io_status();
         }
 
-        auto beep_ptr = driver_manage::getInstance()->getBeep0();
-        if(beep_ptr->readIoStatus())
+        auto beep_ptr = driver_manage::get_instance()->get_beep_zero();
+        if(beep_ptr->read_io_status())
         {
-            inter_info_.beep_io_ = beep_ptr->getIoStatus();
+            inter_info_.beep_io_ = beep_ptr->get_io_status();
         }
 
-        auto ap_dev_ptr = driver_manage::getInstance()->get_ap3126_dev();
-        if(ap_dev_ptr->readInfo())
+        auto ap_dev_ptr = driver_manage::get_instance()->get_ap3126_dev();
+        if(ap_dev_ptr->read_info())
         {
-            inter_info_.ap_info_ = ap_dev_ptr->getInfo();
+            inter_info_.ap_info_ = ap_dev_ptr->get_info();
         }
 
-        auto icm_dev_ptr = driver_manage::getInstance()->getIcmDev0();
-        if(icm_dev_ptr->readInfo())
+        auto icm_dev_ptr = driver_manage::get_instance()->get_icm20608_dev();
+        if(icm_dev_ptr->read_info())
         {
-            icm_dev_ptr->ConvertInfo();
-            inter_info_.icm_info_ = icm_dev_ptr->getConvertInfo();
-            inter_info_.angle_ = icm_dev_ptr->getAngle();
-            //PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "Angle:%d!", icm_dev_ptr->getAngle());
+            icm_dev_ptr->calculate_angle();
+            inter_info_.icm_info_ = icm_dev_ptr->get_icm_info();
+            inter_info_.angle_ = icm_dev_ptr->get_angle();
+            //PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "Angle:%d!", icm_dev_ptr->get_angle());
         }
 
         if(inter_info_ != outer_info_)
@@ -117,7 +117,7 @@ namespace NAMESPACE_DEVICE
                 std::lock_guard lock{mut_};
                 outer_info_ = inter_info_;
             }
-            center_manage::getInstance()->send_hardware_update_message();
+            center_manage::get_instance()->send_hardware_update_message();
         }
     }
 
@@ -135,14 +135,14 @@ namespace NAMESPACE_DEVICE
         {
         case EVENT_DEVICE_LED:
             {
-                auto led_ptr = driver_manage::getInstance()->getLed0();
-                led_ptr->writeIoStatus(action);
+                auto led_ptr = driver_manage::get_instance()->get_led_zero();
+                led_ptr->write_io_status(action);
             }
             break;
         case EVENT_DEVICE_BEEP:
             {
-                auto beep_ptr=driver_manage::getInstance()->getBeep0();
-                beep_ptr->writeIoStatus(action);
+                auto beep_ptr=driver_manage::get_instance()->get_beep_zero();
+                beep_ptr->write_io_status(action);
             }
             break;
         default:
@@ -175,13 +175,13 @@ namespace NAMESPACE_DEVICE
         char buffer[READ_BUFFER_SIZE];
 
         PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "device_manage start!");
-        time_manage::getInstance()->registerWork(0, TIME_TICK(1000), TIME_ACTION_ALWAYS, [&](){
+        time_manage::get_instance()->registerWork(0, TIME_TICK(1000), TIME_ACTION_ALWAYS, [&](){
             Event event(DEVICE_ID_TIME_UPDATE_PREOID);
             send_message(reinterpret_cast<char *>(&event), sizeof(event));
         });
         
         //register action for key process
-        driver_manage::getInstance()->getKey0()->register_func([this](int fd){
+        driver_manage::get_instance()->get_key_zero()->register_func([this](int fd){
             unsigned int keyvalue = 0;
             static uint8_t status = 0;
 

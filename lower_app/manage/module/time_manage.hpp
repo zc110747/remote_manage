@@ -78,7 +78,7 @@ private:
 class time_manage
 {
 public:
-    static time_manage *getInstance();
+    static time_manage *get_instance();
     time_manage(): ticks(0){
     }
 

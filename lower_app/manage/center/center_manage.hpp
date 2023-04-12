@@ -32,10 +32,10 @@ public:
     /// - destructor, delete not allow for singleton pattern.
     virtual ~center_manage()=delete;
 
-    /// \brief getInstance
+    /// \brief get_instance
     /// - This method is used to get the pattern of the class.
     /// \return the singleton pattern point of the object.
-    static center_manage* getInstance();
+    static center_manage* get_instance();
 
     /// \brief init
     /// - This method is used to init the object.

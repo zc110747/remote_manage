@@ -31,10 +31,10 @@ public:
     /// - destructor, delete not allow for singleton pattern.
     ~internal_process() = delete;
 
-    /// \brief getInstance
+    /// \brief get_instance
     /// - This method is used to get the pattern of the class.
     /// \return the singleton pattern point of the object.
-    static internal_process* getInstance();
+    static internal_process* get_instance();
 
     /// \brief init
     /// - This method is used to init the object.

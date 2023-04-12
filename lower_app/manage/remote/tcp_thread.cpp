@@ -23,7 +23,7 @@ static asio_server socket_tcp_server;
 
 void tcp_thread_manage::tcp_server_run()
 {
-    const SocketSysConfig *pSocketConfig = system_config::getInstance()->gettcp();
+    const SocketSysConfig *pSocketConfig = system_config::get_instance()->gettcp();
     PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "tcp info:%s:%d", pSocketConfig->ipaddr.c_str(), pSocketConfig->port);
     try
     {
@@ -111,7 +111,7 @@ bool tcp_thread_manage::init()
 }
 
 tcp_thread_manage* tcp_thread_manage::pInstance = nullptr;
-tcp_thread_manage* tcp_thread_manage::getInstance()
+tcp_thread_manage* tcp_thread_manage::get_instance()
 {
     if(pInstance == nullptr)
     {

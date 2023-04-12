@@ -82,7 +82,7 @@ public:
 
     bool createfifo();
     int print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...);
-    static LoggerManage *getInstance();
+    static LoggerManage *get_instance();
 
     void setThreadWork()            {set_thread_work = true;}
     void setlevel(LOG_LEVEL level)  {log_level = level;}
@@ -90,4 +90,4 @@ public:
 };
 
 #define PRINT_NOW(...)    { printf(__VA_ARGS__); fflush(stdout);}
-#define PRINT_LOG(level, time, fmt, ...) do{ LoggerManage::getInstance()->print_log(level, time, fmt, ##__VA_ARGS__); }while(0);
+#define PRINT_LOG(level, time, fmt, ...) do{ LoggerManage::get_instance()->print_log(level, time, fmt, ##__VA_ARGS__); }while(0);

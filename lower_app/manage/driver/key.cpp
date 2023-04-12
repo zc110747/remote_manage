@@ -32,7 +32,7 @@ static void sigio_signal_func(int signum)
     }
 }
 
-bool KEY::init(const std::string &DevicePath, int flags)
+bool key_device::init(const std::string &DevicePath, int flags)
 {
     static bool is_first_run = true;
     device_path_ = DevicePath;
@@ -60,7 +60,7 @@ bool KEY::init(const std::string &DevicePath, int flags)
     return true;
 }
 
-bool KEY::register_func(std::function<void(int)> func)
+bool key_device::register_func(std::function<void(int)> func)
 {
     if(device_fd_ >= 0)
     {

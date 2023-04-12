@@ -27,17 +27,30 @@ public:
     // - constructor
     using device_base::device_base;
 
-    bool update_rtc_time();
-
-    int get_current_second();
-
+    /// \brief init
+    /// - This method is used to init the object.
+    /// \param DevicePath - path of the system device.
+    /// \param flags - flags process the device.
+    /// \return Wheather initialize is success or failed.
     bool init(const std::string &DevicePath, int flags);
 
-    struct rtc_time* getRtcTime() {return &rtcTimeM;}
-    uint64_t getStartTime() {return TimeStart;}
+    /// \brief update_rtc_time
+    /// - This method is used to update the rtc time.
+    /// \return Wheather time update is success or failed.
+    bool update_rtc_time();
 
+    /// \brief get_current_time
+    /// - This method is used to get current time from start.
+    /// \return The time from the start.
+    int get_current_time();
+    
 private:
-    struct rtc_time rtcTimeM{0};
-    uint64_t TimeStart{0};
+    /// \brief rtc_time_
+    /// - rtc time struct data.
+    struct rtc_time rtc_time_{0};
+
+    /// \brief start_time_
+    /// - the time when init, used to calculate seconds.
+    uint64_t start_time_{0};
 };
 

@@ -29,7 +29,7 @@ const uint8_t fw_version[4] = {
     #include "../verion.txt"
 };
 system_config* system_config::pInstance = nullptr;
-system_config* system_config::getInstance()
+system_config* system_config::get_instance()
 {
     if(pInstance == nullptr)
     {

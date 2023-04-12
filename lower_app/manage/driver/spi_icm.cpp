@@ -19,17 +19,12 @@
 #include "spi_icm.hpp"
 #include <math.h>
 
-void icm_device::test()
-{
-    
-}
-
 #define ANGLE_LIST_SIZE 3
 
 uint8_t AngleIndex = 0;
 double AngleList[ANGLE_LIST_SIZE];
 
-void icm_device::ConvertInfo(void)
+void icm_device::calculate_angle(void)
 {
     double min, max, sumx;
 

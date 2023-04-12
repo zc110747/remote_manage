@@ -26,7 +26,7 @@ static asio_server logger_server;
 //asio server test ok
 void LoggerManage::asio_server_run()
 {
-    const SocketSysConfig *pSocketConfig = system_config::getInstance()->getlogger();
+    const SocketSysConfig *pSocketConfig = system_config::get_instance()->getlogger();
     cmd_process Loggercmd_process;
 
     try
@@ -80,7 +80,7 @@ void LoggerManage::logger_tx_run()
 }
 
 LoggerManage* LoggerManage::pInstance = nullptr;
-LoggerManage* LoggerManage::getInstance()
+LoggerManage* LoggerManage::get_instance()
 {
     if(pInstance == nullptr)
     {

@@ -36,23 +36,33 @@ public:
     /// -- destructor
     ~device_base();
 
-
+    /// \brief init
+    /// - init the device.
+    /// \param DevicePath - path of the system device.
+    /// \param flags - flags process the device.
+    /// \return Wheather initialize is success or failed.
     virtual bool init(const std::string &DevicePath, int flags);
 
+    /// \brief getfd
+    /// - get current device fd.
+    /// \return the device fd of current device. 
     int getfd() { return device_fd_; }
+
+    /// \brief getDevicePath
+    /// - get current device path.
+    /// \return the path of current device. 
     const std::string &getDevicePath() {return device_path_;}
 
+protected:
     /// \brief open
     /// - open the device.
-    /// \return Wheather initialization is success or failed.
+    /// \return Wheather open is success or failed.
     virtual bool open(int flags);
 
-    /// \brief open
-    /// - open the device.
-    /// \return Wheather initialization is success or failed.
+    /// \brief close
+    /// - close the device.
     virtual void close();
 
-protected:
     /// \brief device_fd_
     /// - the device id when open the device.
     int device_fd_;
@@ -64,38 +74,59 @@ protected:
 
 class io_base:public device_base
 {
-private:
-    std::atomic<uint8_t> status_{0};
-
 public:
     //constructor
     using device_base::device_base;
 
-    //io read/write
-    bool readIoStatus();
-    bool writeIoStatus(uint8_t status);
+    /// \brief read_io_status
+    /// - read io status.
+    /// \return wheather read is success or fail.
+    bool read_io_status();
+
+    /// \brief write_io_status
+    /// - write io status.
+    /// \param status - the write io status.
+    /// \return wheather write is success or fail 
+    bool write_io_status(uint8_t status);
+
+    /// \brief on
+    /// - set the i/o status on.
+    /// \return wheather set is success or fail 
     bool on();
+
+    /// \brief off
+    /// - set the i/o status off.
+    /// \return wheather set is success or fail 
     bool off();
+
+    /// \brief trigger
+    /// - reserved the i/o status.
+    /// \return wheather reserved is success or fail 
     bool trigger();
     
-    uint8_t getIoStatus()  {return status_;}
+    /// \brief get_io_status
+    /// - return the current i/o status.
+    /// \return current i/o status
+    uint8_t get_io_status()  {return status_;}
+
+private:
+    /// \brief status_
+    /// - The io work status.
+    std::atomic<uint8_t> status_{0};
 };
 
 #define MAX_INFO_SIZE   48
 template<typename T>
 class info_base:public device_base
 {
-protected:
-    union{
-        char buffer[MAX_INFO_SIZE];
-        T info;
-    }data;
-
 public:
     //constructor
     using device_base::device_base;
 
-    bool readInfo()
+    /// \brief read_info
+    /// - read the device information.
+    /// \return wheather read information is success or fail 
+    bool read_info()
     {
         bool ret = false;
         ssize_t nSize;
@@ -118,7 +149,18 @@ public:
         return ret;
     }
 
-    T getInfo() {return data.info;}
+    /// \brief get_info
+    /// - get the device information.
+    /// \return the device infomation
+    T get_info() {return data.info;}
+
+protected:
+    /// \brief data
+    /// - The information of the device.
+    union{
+        char buffer[MAX_INFO_SIZE];
+        T info;
+    }data;
 };
 
 #endif

@@ -19,7 +19,7 @@
 #include "driver.hpp"
 
 driver_manage* driver_manage::pInstance = nullptr;
-driver_manage* driver_manage::getInstance()
+driver_manage* driver_manage::get_instance()
 {
     if(pInstance == nullptr)
     {
@@ -35,19 +35,19 @@ driver_manage* driver_manage::getInstance()
 bool driver_manage::init()
 {
     bool ret = true;
-    system_config *pConfig = system_config::getInstance();
+    system_config *pConfig = system_config::get_instance();
 
-    ret &= led_0.init(pConfig->getled()->dev, O_RDWR | O_NONBLOCK);
-    ret &= beep_0.init(pConfig->getbeep()->dev, O_RDWR | O_NONBLOCK);
+    ret &= led_zero_.init(pConfig->getled()->dev, O_RDWR | O_NONBLOCK);
+    ret &= beep_zero_.init(pConfig->getbeep()->dev, O_RDWR | O_NONBLOCK);
     ret &= ap3216_dev_.init(pConfig->getapI2c()->dev, O_RDONLY | O_NONBLOCK);
     ret &= icm20608_dev_.init(pConfig->geticmSpi()->dev, O_RDONLY | O_NONBLOCK);
     ret &= rtc_dev_.init(pConfig->getrtc()->dev,  O_RDONLY | O_NONBLOCK);
-    ret &= key_0.init(pConfig->getkey()->dev, O_RDWR | O_NONBLOCK);
+    ret &= key_zero_.init(pConfig->getkey()->dev, O_RDWR | O_NONBLOCK);
 
     if(ret)
     {
-        led_0.writeIoStatus(pConfig->getled()->init);
-        beep_0.writeIoStatus(pConfig->getbeep()->init);
+        led_zero_.write_io_status(pConfig->getled()->init);
+        beep_zero_.write_io_status(pConfig->getbeep()->init);
         PRINT_LOG(LOG_INFO, 0, "Device driver_manage Init Success!");
     }
     

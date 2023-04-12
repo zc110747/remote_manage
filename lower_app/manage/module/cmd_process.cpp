@@ -87,7 +87,7 @@ bool cmd_process::ProcessData()
     {
         case CmdReadDev:
             { 
-                auto info = NAMESPACE_DEVICE::device_manage::getInstance()->get_device_info();
+                auto info = NAMESPACE_DEVICE::device_manage::get_instance()->get_device_info();
                 
                 PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "LedStatus:%d!", info.led_io_);
                 PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "beepStatus:%d!", info.beep_io_);
@@ -107,13 +107,13 @@ bool cmd_process::ProcessData()
             break;
         case CmdGetOS:
             {
-                auto pSysConfig = system_config::getInstance();
+                auto pSysConfig = system_config::get_instance();
                 auto pVersion = pSysConfig->getversion();
                 PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "FW_Version:%d, %d, %d, %d", pVersion[0], pVersion[1], pVersion[2], pVersion[3]);
                 PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Sokcet Ipaddress:%s", pSysConfig->gettcp()->ipaddr.c_str());
                 PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Port TCP:%d, LOGGER:%d ", 
                     pSysConfig->gettcp()->port, pSysConfig->getlogger()->port);
-                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Logger Level:%d ", (int)LoggerManage::getInstance()->getlevel());
+                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Logger Level:%d ", (int)LoggerManage::get_instance()->getlevel());
             }
             break;
         case CmdSetDev:
@@ -121,7 +121,7 @@ bool cmd_process::ProcessData()
                 uint32_t device = 0, action = 0;
                 sscanf(pDataM, "%d,%d", &device, &action);
                 PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "SetDev:%d, %d!", device, action);
-                center_manage::getInstance()->send_hardware_config_message(device, action);
+                center_manage::get_instance()->send_hardware_config_message(device, action);
             }
             break;
         case cmdSetLevel:
@@ -129,7 +129,7 @@ bool cmd_process::ProcessData()
                 uint8_t level = pDataM[0] - '0';
                 if(level > 5)
                     level = 5;
-                LoggerManage::getInstance()->setlevel((LOG_LEVEL)level);
+                LoggerManage::get_instance()->setlevel((LOG_LEVEL)level);
                 PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Set Logger Level:%d!", level);
             }
             break;

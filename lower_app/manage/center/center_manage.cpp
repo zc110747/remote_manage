@@ -25,7 +25,7 @@
 #include <new>
 
 using NAMESPACE_DEVICE::device_manage;
-center_manage* center_manage::getInstance()
+center_manage* center_manage::get_instance()
 {
     if(pInstance == nullptr)
     {
@@ -54,7 +54,7 @@ int center_manage::send_hardware_config_message(uint8_t device, uint8_t action)
     EventBufMessage event(WORKFLOW_ID_HARDWARE_CHANGE);
 
     event.getData().buffer[0] = device;
-    event.getData().buffer[0] = device;
+    event.getData().buffer[1] = action;
     return send_message(&event, sizeof(event));
 }
 
@@ -65,15 +65,15 @@ bool center_manage::process_event(Event *pEvent)
     {
     case WORKFLOW_ID_HARDWARE_UPDATE:
         {
-            auto info = device_manage::getInstance()->get_device_info();
-            internal_process::getInstance()->update_device_status(info);
+            auto info = device_manage::get_instance()->get_device_info();
+            internal_process::get_instance()->update_device_status(info);
         }
         break;
 
     case WORKFLOW_ID_HARDWARE_CHANGE:
         {
             auto *pMessage = static_cast<EventBufMessage *>(pEvent);
-            device_manage::getInstance()->send_device_message
+            device_manage::get_instance()->send_device_message
                 (pMessage->getData().buffer[0], pMessage->getData().buffer[1]);
         }
         break;

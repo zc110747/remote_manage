@@ -32,5 +32,4 @@ class ap_device:public info_base<ap_info>
 public:
     //constructor
     using info_base::info_base;
-    void test();
 };

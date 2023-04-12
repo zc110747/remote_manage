@@ -68,7 +68,7 @@ void device_base::close()
     }
 }
 
-bool io_base::readIoStatus()
+bool io_base::read_io_status()
 {
     bool ret = false;
     ssize_t nSize;
@@ -84,7 +84,7 @@ bool io_base::readIoStatus()
     return ret;
 }
 
-bool io_base::writeIoStatus(uint8_t status) 
+bool io_base::write_io_status(uint8_t status) 
 {
     bool ret = false;
     ssize_t nSize;
@@ -102,19 +102,19 @@ bool io_base::writeIoStatus(uint8_t status)
 
 bool io_base::on()
 {
-    return writeIoStatus(1);
+    return write_io_status(1);
 }
 
 bool io_base::off()
 {
-    return writeIoStatus(0);
+    return write_io_status(0);
 }
 
 bool io_base::trigger()
 {
     bool ret = false;
     
-    if(readIoStatus())
+    if(read_io_status())
     {
         if(status_)
             ret = off();
@@ -123,3 +123,4 @@ bool io_base::trigger()
     }
     return ret;
 }
+

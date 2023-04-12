@@ -32,7 +32,7 @@ public:
 	void tcp_server_run();
 	void tcp_rx_run();
 	void tcp_tx_run();
-	static tcp_thread_manage* getInstance();
+	static tcp_thread_manage* get_instance();
 
 private:
 	static tcp_thread_manage* pInstance;

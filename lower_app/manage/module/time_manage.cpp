@@ -21,7 +21,7 @@
 
 time_manage *time_manage::pInstance = nullptr;
 
-time_manage *time_manage::getInstance()
+time_manage *time_manage::get_instance()
 {
     if(pInstance == nullptr)
     {
@@ -97,5 +97,5 @@ bool time_manage::init(uint32_t timeInterval)
 
 uint32_t xGetCurrentTicks(void)
 {
-    return time_manage::getInstance()->get_current_ticks();
+    return time_manage::get_instance()->get_current_ticks();
 }

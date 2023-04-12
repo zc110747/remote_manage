@@ -103,10 +103,10 @@ namespace NAMESPACE_DEVICE
         /// - destructor, delete not allow for singleton pattern.
         virtual ~device_manage() = delete;
 
-        /// \brief getInstance
+        /// \brief get_instance
         /// - This method is used to get the pattern of the class.
         /// \return the singleton pattern point of the object.
-        static device_manage* getInstance();
+        static device_manage* get_instance();
 
         /// \brief init
         /// - This method is used to init the object.

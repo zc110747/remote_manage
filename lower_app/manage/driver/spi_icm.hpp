@@ -29,7 +29,7 @@ typedef struct
     int accel_y_adc;    /*加速度计y轴加速度*/
     int accel_z_adc;    /*加速度计z轴加速度*/
     int temp_adc;       /*温度信息*/
-}ICM_ADC_INFO;
+}icm_adc_info;
 
 typedef struct
 {
@@ -42,24 +42,32 @@ typedef struct
     float temp_act;       /*温度信息*/
 }icm_info;
 
-class icm_device : public info_base<ICM_ADC_INFO>
+class icm_device : public info_base<icm_adc_info>
 {
-private:
-    icm_info icm_info_;
-    int32_t angle_{0};
-
 public:
     //constructor
     using info_base::info_base;
-    void test();
-    void ConvertInfo(void);
 
-    icm_info getConvertInfo(){
-        return icm_info_;
-    }
+    /// \brief calculate_angle
+    /// - This method is used to calculate the angle.
+    void calculate_angle(void);
 
-    int32_t getAngle(){
-        return angle_;
-    }
+    /// \brief get_icm_info
+    /// - This method is used to get icm info.
+    /// return current icm info.
+    const icm_info& get_icm_info()   { return icm_info_; }
+
+    /// \brief get_icm_info
+    /// - This method is used to get icm info.
+    int32_t get_angle()          { return angle_; }
+
+private:
+    /// \brief icm_info_
+    /// - icm device read information.
+    icm_info icm_info_;
+
+    /// \brief angle_
+    /// - angle data calculate from icm info.
+    int32_t angle_{0};
 };
 

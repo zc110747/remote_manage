@@ -20,17 +20,22 @@ _Pragma("once")
 
 #include "device_base.hpp"
 
-class KEY:public device_base
-{
-private:
-    uint32_t keyvalue;
-    
+class key_device:public device_base
+{  
 public:
+	/// - constructor.
     using device_base::device_base;
 
-    //key初始化函数，输入文件描述符和支持flags
+    /// \brief init
+    /// - This method is used to init the object.
+    /// \param DevicePath - path of the system device.
+    /// \param flags - flags process the device.
+    /// \return Wheather initialize is success or failed.
     virtual bool init(const std::string &DevicePath, int flags) override;
 
-    //注册按键执行的回调事件，当按键触发后调用
+    /// \brief register_func
+    /// - This method is used to register function for key callback.
+    /// \param func - function register for the key.
+    /// \return Wheather register is success or failed.
     bool register_func(std::function<void(int)> func);
 };

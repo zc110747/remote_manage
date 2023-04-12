@@ -20,7 +20,7 @@
 #include <sys/termios.h>
 
 uart_thread_manage* uart_thread_manage::pInstance = nullptr;
-uart_thread_manage* uart_thread_manage::getInstance()
+uart_thread_manage* uart_thread_manage::get_instance()
 {
 	if(pInstance == nullptr)
 	{
@@ -47,7 +47,7 @@ void uart_thread_manage::run()
 
 bool uart_thread_manage::init()
 {
-	auto pSerialConfig = system_config::getInstance()->getserial();
+	auto pSerialConfig = system_config::get_instance()->getserial();
 
 	if((nComFd = open(pSerialConfig->dev.c_str(), O_RDWR|O_NOCTTY|O_NDELAY))<0)
 	{	
