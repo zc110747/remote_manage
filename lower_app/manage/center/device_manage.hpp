@@ -42,11 +42,11 @@ namespace NAMESPACE_DEVICE
 {
     struct device_read_info
     {
-        uint8_t   led_io;
-        uint8_t   beep_io; 
-        AP_INFO   ap_info;
-        ICM_INFO  icm_info;
-        int32_t   angle;
+        uint8_t   led_io_;
+        uint8_t   beep_io_; 
+        ap_info   ap_info_;
+        icm_info  icm_info_;
+        int32_t   angle_;
 
         //for compare, need clear before to avoid fill by align.
         bool operator != (const device_read_info& dev_info)
@@ -73,6 +73,42 @@ namespace NAMESPACE_DEVICE
 
     class device_manage
     {
+    public:
+    	/// - constructor.
+        device_manage() = default;
+
+        /// - destructor, delete not allow for p
+        virtual ~device_manage() = delete;
+
+        /// \brief getInstance
+        /// - This method is used to get the pattern of the class.
+        /// \return the singleton pattern point of the object.
+        static device_manage* getInstance();
+
+        /// \brief init
+        /// - This method is used to init the object.
+        /// \return Wheather initialization is success or failed.
+        bool init();
+
+        /// \brief get_device_info
+        /// - get the infomation of the device, for other thread, need copy.
+        /// \return the information of the device.
+        device_read_info get_device_info();
+
+        /// \brief send_message
+        /// - This method is used to send message for the device management.
+        /// \param pEvent - the point of the event to send.
+        /// \param size - the size of the event to send.
+        /// \return nums of the message already send.
+        int send_message(char* pEvent, int size);
+
+        /// \brief send_device_message
+        /// - This method is used to send device message.
+        /// \param device - the device will manage.
+        /// \param action - the device action .
+        /// \return nums of the message already send.
+        int send_device_message(uint8_t device, uint8_t action);
+
     private:
         device_read_info inter_info;
         device_read_info outer_info;
@@ -86,17 +122,6 @@ namespace NAMESPACE_DEVICE
         void update();
         void HardProcess(Event *pEvent);
 
-    public:
-        device_manage() = default;
-        virtual ~device_manage() = delete; //单例模式不允许删除 
 
-        bool init();
-        device_read_info getDeviceInfo();
-        static device_manage* getInstance();
-
-        
-    public:
-        int sendMessage(char* pEvent, int size);
-        int sendHardProcessMsg(uint8_t device, uint8_t action);
     };
 }

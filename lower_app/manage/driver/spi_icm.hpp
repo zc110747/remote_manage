@@ -40,26 +40,26 @@ typedef struct
     float accel_y_act;    /*加速度计y轴加速度*/
     float accel_z_act;    /*加速度计z轴加速度*/     
     float temp_act;       /*温度信息*/
-}ICM_INFO;
+}icm_info;
 
-class ICMDevice : public InfoBase<ICM_ADC_INFO>
+class icm_device : public info_base<ICM_ADC_INFO>
 {
 private:
-    ICM_INFO icm_info;
-    int32_t angle{0};
+    icm_info icm_info_;
+    int32_t angle_{0};
 
 public:
     //constructor
-    using InfoBase::InfoBase;
+    using info_base::info_base;
     void test();
     void ConvertInfo(void);
 
-    ICM_INFO getConvertInfo(){
-        return icm_info;
+    icm_info getConvertInfo(){
+        return icm_info_;
     }
 
     int32_t getAngle(){
-        return angle;
+        return angle_;
     }
 };
 

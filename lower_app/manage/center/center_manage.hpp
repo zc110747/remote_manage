@@ -35,6 +35,8 @@ public:
     bool init();
     void run();
     
+    int send_message(Event *pMsg, uint16_t size);
+
     //内部事件
     int sendInternalHwRefresh();
     

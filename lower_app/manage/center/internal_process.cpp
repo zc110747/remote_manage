@@ -6,7 +6,7 @@
 //      InternalProcess.cpp
 //
 //  Purpose:
-//      支持node转换接口的服务器处理
+//      用于内部通讯的交互，负责和node服务器，GUI显示等外部进程的交互
 //
 // Author:
 //     @听心跳的声音
@@ -35,7 +35,7 @@ internal_process* internal_process::getInstance()
     return pInstance;
 }
 
-static AsioServer InterServer;
+static asio_server InterServer;
 
 void internal_process::run()
 {
@@ -44,13 +44,13 @@ void internal_process::run()
     try
     {
         InterServer.init(pSocketConfig->ipaddr, std::to_string(pSocketConfig->port), [this](char* ptr, int length){
-            if(internal_processCmd.parseData(ptr, length))
+            if(cmd_process_.parseData(ptr, length))
             {
                 //用于处理命令，告知应用
-                internal_processCmd.ProcessData();
+                cmd_process_.ProcessData();
 
                 //用于处理应答信息
-                ProcessCallback();
+                process_info_callback();
             }
         });
         InterServer.run();
@@ -63,8 +63,8 @@ void internal_process::run()
 
 bool internal_process::init()
 {
-    node_thread = std::thread(std::bind(&internal_process::run, this));
-    node_thread.detach();
+    node_thread_ = std::thread(std::bind(&internal_process::run, this));
+    node_thread_.detach();
 
     return true;
 }
@@ -87,8 +87,7 @@ bool internal_process::send(char *pbuffer, int size)
     return ret;
 }
 
-//!status led=ON;BEEP=OFF;IR=1;ALS=1;PS=1;gypox=0;gypoz=0;gypoz=0
-void internal_process::SendStatusBuffer(NAMESPACE_DEVICE::device_read_info &info)
+void internal_process::update_device_status(const NAMESPACE_DEVICE::device_read_info &info)
 {
     char buffer[1024] = {0};
     int CurrentIndex = 0;
@@ -97,31 +96,31 @@ void internal_process::SendStatusBuffer(NAMESPACE_DEVICE::device_read_info &info
     memset(buffer, 0, sizeof(buffer));
     size = sprintf(&buffer[0], "!status ");
     CurrentIndex += size;
-    size = sprintf(&buffer[CurrentIndex], "LED=%s;", info.led_io==0?"OFF":"ON");
+    size = sprintf(&buffer[CurrentIndex], "LED=%s;", info.led_io_==0?"OFF":"ON");
     CurrentIndex += size;
-    size = sprintf(&buffer[CurrentIndex], "BEEP=%s;", info.beep_io==0?"OFF":"ON");
+    size = sprintf(&buffer[CurrentIndex], "BEEP=%s;", info.beep_io_==0?"OFF":"ON");
     CurrentIndex += size;
-    size = sprintf(&buffer[CurrentIndex], "IR=%d;", info.ap_info.ir);
+    size = sprintf(&buffer[CurrentIndex], "IR=%d;", info.ap_info_.ir);
     CurrentIndex += size;
-    size = sprintf(&buffer[CurrentIndex], "ALS=%d;", info.ap_info.als);
+    size = sprintf(&buffer[CurrentIndex], "ALS=%d;", info.ap_info_.als);
     CurrentIndex += size;
-    size = sprintf(&buffer[CurrentIndex], "PS=%d;", info.ap_info.ps);
+    size = sprintf(&buffer[CurrentIndex], "PS=%d;", info.ap_info_.ps);
     CurrentIndex += size;
-    size = sprintf(&buffer[CurrentIndex], "gypox=%.2f;", info.icm_info.gyro_x_act);
+    size = sprintf(&buffer[CurrentIndex], "gypox=%.2f;", info.icm_info_.gyro_x_act);
     CurrentIndex += size;
-    size = sprintf(&buffer[CurrentIndex], "gypoy=%.2f;", info.icm_info.gyro_y_act);
+    size = sprintf(&buffer[CurrentIndex], "gypoy=%.2f;", info.icm_info_.gyro_y_act);
     CurrentIndex += size;
-    size = sprintf(&buffer[CurrentIndex], "gypoz=%.2f;", info.icm_info.gyro_z_act);
+    size = sprintf(&buffer[CurrentIndex], "gypoz=%.2f;", info.icm_info_.gyro_z_act);
     CurrentIndex += size;
-    size = sprintf(&buffer[CurrentIndex], "accelx=%.2f;", info.icm_info.accel_x_act);
+    size = sprintf(&buffer[CurrentIndex], "accelx=%.2f;", info.icm_info_.accel_x_act);
     CurrentIndex += size;
-    size = sprintf(&buffer[CurrentIndex], "accely=%.2f;", info.icm_info.accel_y_act);
+    size = sprintf(&buffer[CurrentIndex], "accely=%.2f;", info.icm_info_.accel_y_act);
     CurrentIndex += size;
-    size = sprintf(&buffer[CurrentIndex], "accelz=%.2f;", info.icm_info.accel_z_act);
+    size = sprintf(&buffer[CurrentIndex], "accelz=%.2f;", info.icm_info_.accel_z_act);
     CurrentIndex += size;
-    size = sprintf(&buffer[CurrentIndex], "temp=%.2f;", info.icm_info.temp_act);
+    size = sprintf(&buffer[CurrentIndex], "temp=%.2f;", info.icm_info_.temp_act);
     CurrentIndex += size;
-    size = sprintf(&buffer[CurrentIndex], "angle=%d", info.angle);
+    size = sprintf(&buffer[CurrentIndex], "angle_=%d", info.angle_);
     CurrentIndex += size;
     buffer[CurrentIndex] = '\0';
 
@@ -130,13 +129,13 @@ void internal_process::SendStatusBuffer(NAMESPACE_DEVICE::device_read_info &info
 }
 
 
-void internal_process::ProcessCallback()
+void internal_process::process_info_callback()
 {
-    switch(internal_processCmd.getCurrentFormat())
+    switch(cmd_process_.getCurrentFormat())
     {
         case CmdSetDev:
-            auto info = NAMESPACE_DEVICE::device_manage::getInstance()->getDeviceInfo();
-            SendStatusBuffer(info);
+            auto info = NAMESPACE_DEVICE::device_manage::getInstance()->get_device_info();
+            update_device_status(info);
             break;
     }
 }

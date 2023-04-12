@@ -19,7 +19,7 @@
 #include "asio_server.hpp"
 #include "logger.hpp"
 
-void AsioServer::init(const std::string& address, const std::string& port, std::function<void(char* ptr, int size)> handler)
+void asio_server::init(const std::string& address, const std::string& port, std::function<void(char* ptr, int size)> handler)
 {
     //update for rx handler
     group.init(handler);
@@ -38,7 +38,7 @@ void AsioServer::init(const std::string& address, const std::string& port, std::
     do_accept();
 } 
 
-void AsioServer::do_accept()
+void asio_server::do_accept()
 {
   acceptor_.async_accept(
       [this](std::error_code ec, asio::ip::tcp::socket socket)

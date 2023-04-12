@@ -74,9 +74,9 @@ bool RTCDevice::updateTime()
 #else
     int retval;
 
-    if(DeviceFdM>=0)
+    if(device_fd_>=0)
     {
-        retval = ioctl(DeviceFdM, RTC_RD_TIME, &rtcTimeM);
+        retval = ioctl(device_fd_, RTC_RD_TIME, &rtcTimeM);
         if(retval >= 0)
             ret = true;
     }

@@ -38,10 +38,15 @@ center_manage* center_manage::getInstance()
     return pInstance;
 }
 
+int center_manage::send_message(Event *pMsg, uint16_t size)
+{
+    return pCenterFiFo->write(reinterpret_cast<char *>(pMsg), size);
+}
+
 int center_manage::sendInternalHwRefresh()
 {
     Event event(WORKFLOW_ID_INTER_DATA_REFRESH);
-    return pCenterFiFo->write(reinterpret_cast<char *>(&event), sizeof(event));
+    return send_message(&event, sizeof(event));
 }
 
 int center_manage::sendDeviceConfig(uint8_t device, uint8_t action)
@@ -50,7 +55,7 @@ int center_manage::sendDeviceConfig(uint8_t device, uint8_t action)
 
     event.getData().buffer[0] = device;
     event.getData().buffer[0] = device;
-    return pCenterFiFo->write(reinterpret_cast<char *>(&event), sizeof(event));
+    return send_message(&event, sizeof(event));
 }
 
 bool center_manage::EventProcess(Event *pEvent)
@@ -60,15 +65,15 @@ bool center_manage::EventProcess(Event *pEvent)
     {
     case WORKFLOW_ID_INTER_DATA_REFRESH:
         {
-            auto info = device_manage::getInstance()->getDeviceInfo();
-            internal_process::getInstance()->SendStatusBuffer(info);
+            auto info = device_manage::getInstance()->get_device_info();
+            internal_process::getInstance()->update_device_status(info);
         }
         break;
 
     case WORKFLOW_ID_HARDWARE_CHANGE:
         {
             auto *pMessage = static_cast<EventBufMessage *>(pEvent);
-            device_manage::getInstance()->sendHardProcessMsg
+            device_manage::getInstance()->send_device_message
                 (pMessage->getData().buffer[0], pMessage->getData().buffer[1]);
         }
         break;

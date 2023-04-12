@@ -21,7 +21,7 @@
 #include "driver.hpp"
 #include "asio_server.hpp"
 
-static AsioServer logger_server;
+static asio_server logger_server;
 
 //asio server test ok
 void LoggerManage::asio_server_run()
@@ -109,8 +109,8 @@ bool LoggerManage::init()
     //init thread for logger
     m_TxThread = std::thread(std::bind(&LoggerManage::logger_tx_run, this));
     m_TxThread.detach();
-    m_AsioServerThread = std::thread(std::bind(&LoggerManage::asio_server_run, this));
-    m_AsioServerThread.detach();
+    m_asio_serverThread = std::thread(std::bind(&LoggerManage::asio_server_run, this));
+    m_asio_serverThread.detach();
 
     return true;
 }

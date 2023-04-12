@@ -101,13 +101,13 @@ ENUM_PROTOCOL_STATUS protocol_info::check_rx_frame(uint8_t data)
 		rx_buffer_[rx_buffer_size_++] = data;
 		if(rx_buffer_size_ >= 5)
 		{
-			len = rx_buffer_[4];
+			len = rx_buffer_[5];
 			
 			//接收长度符合协议
 			if(rx_buffer_size_ == len+PROTOCOL_FRAME_LENGHT)
 			{
 				uint16_t crc_calc, crc_value;
-				crc_value = (rx_buffer_[rx_buffer_size_-1]<<8) | rx_buffer_[rx_buffer_size_-2];
+				crc_value = (((uint16_t)rx_buffer_[rx_buffer_size_-2])<<8) | rx_buffer_[rx_buffer_size_-1];
 				crc_calc = calculate_crc(&rx_buffer_[2], rx_buffer_size_-4);
 				if(crc_value == crc_calc)
 				{
@@ -116,7 +116,7 @@ ENUM_PROTOCOL_STATUS protocol_info::check_rx_frame(uint8_t data)
 				else
 				{
 					rx_status_ = PROTOCOL_FRAME_EMPTY;
-					PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Console Crc Error:%d, %d", crc_value, crc_calc);
+					PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Console Crc Error:0x%x, 0x%x", crc_value, crc_calc);
 				}
 			}
 		}

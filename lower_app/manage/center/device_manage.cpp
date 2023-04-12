@@ -55,22 +55,22 @@ namespace NAMESPACE_DEVICE
         return pDevFIFO->create();
     }
 
-    int device_manage::sendHardProcessMsg(uint8_t device, uint8_t action)
+    int device_manage::send_device_message(uint8_t device, uint8_t action)
     {
         EventBufMessage ebufMsg(DEVICE_ID_HARDWARE_CHANGE);
 
         ebufMsg.getData().buffer[0] = device;
         ebufMsg.getData().buffer[1] = action;
 
-        return sendMessage(reinterpret_cast<char *>(&ebufMsg), sizeof(ebufMsg));
+        return send_message(reinterpret_cast<char *>(&ebufMsg), sizeof(ebufMsg));
     }
 
-    int device_manage::sendMessage(char* pEvent, int size)
+    int device_manage::send_message(char* pEvent, int size)
     {
         return pDevFIFO->write(pEvent, size);
     }
     
-    device_read_info device_manage::getDeviceInfo()
+    device_read_info device_manage::get_device_info()
     {
         device_read_info info;
 
@@ -87,27 +87,27 @@ namespace NAMESPACE_DEVICE
         auto led_ptr = driver_manage::getInstance()->getLed0();
         if(led_ptr->readIoStatus())
         {
-            inter_info.led_io = led_ptr->getIoStatus();
+            inter_info.led_io_ = led_ptr->getIoStatus();
         }
 
         auto beep_ptr = driver_manage::getInstance()->getBeep0();
         if(beep_ptr->readIoStatus())
         {
-            inter_info.beep_io = beep_ptr->getIoStatus();
+            inter_info.beep_io_ = beep_ptr->getIoStatus();
         }
 
-        auto ap_dev_ptr = driver_manage::getInstance()->getApDev0();
+        auto ap_dev_ptr = driver_manage::getInstance()->get_ap3126_dev();
         if(ap_dev_ptr->readInfo())
         {
-            inter_info.ap_info = ap_dev_ptr->getInfo();
+            inter_info.ap_info_ = ap_dev_ptr->getInfo();
         }
 
         auto icm_dev_ptr = driver_manage::getInstance()->getIcmDev0();
         if(icm_dev_ptr->readInfo())
         {
             icm_dev_ptr->ConvertInfo();
-            inter_info.icm_info = icm_dev_ptr->getConvertInfo();
-            inter_info.angle = icm_dev_ptr->getAngle();
+            inter_info.icm_info_ = icm_dev_ptr->getConvertInfo();
+            inter_info.angle_ = icm_dev_ptr->getAngle();
             //PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "Angle:%d!", icm_dev_ptr->getAngle());
         }
 
@@ -177,7 +177,7 @@ namespace NAMESPACE_DEVICE
         PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "device_manage start!");
         time_manage::getInstance()->registerWork(0, TIME_TICK(1000), TIME_ACTION_ALWAYS, [&](){
             Event event(DEVICE_ID_TIME_UPDATE_PREOID);
-            sendMessage(reinterpret_cast<char *>(&event), sizeof(event));
+            send_message(reinterpret_cast<char *>(&event), sizeof(event));
         });
         
         //register action for key process
@@ -189,7 +189,7 @@ namespace NAMESPACE_DEVICE
             {
                 if(keyvalue == 1)
                 {
-                    sendHardProcessMsg(EVENT_DEVICE_LED, status);
+                    send_device_message(EVENT_DEVICE_LED, status);
                     status = status==0?1:0;
                 }
             }
@@ -200,7 +200,7 @@ namespace NAMESPACE_DEVICE
             size = pDevFIFO->read(buffer, READ_BUFFER_SIZE);
             if(size > 0)
             {
-                PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Device Command, %d!", size);
+                PRINT_LOG(LOG_DEBUG, xGetCurrentTicks(), "Device Command, %d!", size);
                 EventProcess(reinterpret_cast<Event *>(buffer));
             }
             else

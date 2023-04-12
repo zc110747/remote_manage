@@ -19,7 +19,7 @@
 #include "spi_icm.hpp"
 #include <math.h>
 
-void ICMDevice::test()
+void icm_device::test()
 {
     
 }
@@ -29,19 +29,19 @@ void ICMDevice::test()
 uint8_t AngleIndex = 0;
 double AngleList[ANGLE_LIST_SIZE];
 
-void ICMDevice::ConvertInfo(void)
+void icm_device::ConvertInfo(void)
 {
     double min, max, sumx;
 
-    icm_info.gyro_x_act = (float)(data.info.gyro_x_adc)/16.4;
-    icm_info.gyro_y_act = (float)(data.info.gyro_y_adc)/16.4;
-    icm_info.gyro_z_act = (float)(data.info.gyro_z_adc)/16.4;
-    icm_info.accel_x_act = (float)(data.info.accel_x_adc);
-    icm_info.accel_y_act = (float)(data.info.accel_y_adc);
-    icm_info.accel_z_act = (float)(data.info.accel_z_adc);
-    icm_info.temp_act = ((float)(data.info.temp_adc) - 25 ) / 326.8 + 25;
+    icm_info_.gyro_x_act = (float)(data.info.gyro_x_adc)/16.4;
+    icm_info_.gyro_y_act = (float)(data.info.gyro_y_adc)/16.4;
+    icm_info_.gyro_z_act = (float)(data.info.gyro_z_adc)/16.4;
+    icm_info_.accel_x_act = (float)(data.info.accel_x_adc);
+    icm_info_.accel_y_act = (float)(data.info.accel_y_adc);
+    icm_info_.accel_z_act = (float)(data.info.accel_z_adc);
+    icm_info_.temp_act = ((float)(data.info.temp_adc) - 25 ) / 326.8 + 25;
 
-    AngleList[AngleIndex] = -atan2((double)icm_info.accel_x_act, (double)icm_info.accel_z_act)*18000/3.141592653;
+    AngleList[AngleIndex] = -atan2((double)icm_info_.accel_x_act, (double)icm_info_.accel_z_act)*18000/3.141592653;
     if(AngleList[AngleIndex] > 18000)
         AngleList[AngleIndex] -= 36000;
     if(AngleList[AngleIndex] < -18000)
@@ -65,5 +65,5 @@ void ICMDevice::ConvertInfo(void)
             min = AngleList[i];
     }
     sumx = sumx - max - min;
-    angle = ((int32_t)round(sumx/(ANGLE_LIST_SIZE-2)))/100;
+    angle_ = ((int32_t)round(sumx/(ANGLE_LIST_SIZE-2)))/100;
 }

@@ -87,22 +87,22 @@ bool cmd_process::ProcessData()
     {
         case CmdReadDev:
             { 
-                auto info = NAMESPACE_DEVICE::device_manage::getInstance()->getDeviceInfo();
+                auto info = NAMESPACE_DEVICE::device_manage::getInstance()->get_device_info();
                 
-                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "LedStatus:%d!", info.led_io);
-                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "beepStatus:%d!", info.beep_io);
+                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "LedStatus:%d!", info.led_io_);
+                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "beepStatus:%d!", info.beep_io_);
                 PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "ApInfo, ir:%d, als:%d, ps:%d!",
-                        info.ap_info.ir,
-                        info.ap_info.als,
-                        info.ap_info.ps);
+                        info.ap_info_.ir,
+                        info.ap_info_.als,
+                        info.ap_info_.ps);
                 PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "ICMInfo, gx,gy,gz:%.2f,%.2f,%.2f;ax,ay,az:%.2f,%.2f,%.2f;temp:%.2f!",
-                        info.icm_info.gyro_x_act,
-                        info.icm_info.gyro_y_act,
-                        info.icm_info.gyro_z_act,
-                        info.icm_info.accel_x_act,
-                        info.icm_info.accel_y_act,
-                        info.icm_info.accel_z_act,
-                        info.icm_info.temp_act);
+                        info.icm_info_.gyro_x_act,
+                        info.icm_info_.gyro_y_act,
+                        info.icm_info_.gyro_z_act,
+                        info.icm_info_.accel_x_act,
+                        info.icm_info_.accel_y_act,
+                        info.icm_info_.accel_z_act,
+                        info.icm_info_.temp_act);
             }  
             break;
         case CmdGetOS:
@@ -121,7 +121,7 @@ bool cmd_process::ProcessData()
                 uint32_t device = 0, action = 0;
                 sscanf(pDataM, "%d,%d", &device, &action);
                 PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "SetDev:%d, %d!", device, action);
-                NAMESPACE_DEVICE::device_manage::getInstance()->sendHardProcessMsg(device, action);
+                NAMESPACE_DEVICE::device_manage::getInstance()->send_device_message(device, action);
             }
             break;
         case cmdSetLevel:

@@ -128,13 +128,13 @@ private:
   session_group& group_;
 };
 
-class AsioServer
+class asio_server
 {
 public:
-    AsioServer(const AsioServer&) = delete;
-    AsioServer& operator=(const AsioServer&) = delete;
+    asio_server(const asio_server&) = delete;
+    asio_server& operator=(const asio_server&) = delete;
 
-    explicit AsioServer():io_context_(2), acceptor_(io_context_)
+    explicit asio_server():io_context_(2), acceptor_(io_context_)
     {
     }
 

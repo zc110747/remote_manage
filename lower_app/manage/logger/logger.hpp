@@ -55,7 +55,7 @@ private:
     std::atomic<bool> set_thread_work{false};
     bool is_thread_work{false};
     std::thread m_TxThread;
-    std::thread m_AsioServerThread;
+    std::thread m_asio_serverThread;
     std::mutex mutex_;
 
     //fd

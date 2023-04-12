@@ -20,9 +20,9 @@ _Pragma("once")
 
 #include "device_base.hpp"
 
-class LED: public IoBase
+class LED: public io_base
 {
 public:
-    using IoBase::IoBase;
+    using io_base::io_base;
     void test();
 };

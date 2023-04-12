@@ -31,8 +31,8 @@ private:
     static driver_manage* pInstance;
     LED led_0;
     BEEP beep_0;
-    APDevice ap_dev_0;
-    ICMDevice icm_dev_0;
+    ap_device ap3216_dev_;
+    icm_device icm20608_dev_;
     KEY key_0;
 
 public:
@@ -45,8 +45,8 @@ public:
 public:
     LED *getLed0()          {return &led_0;}
     BEEP *getBeep0()        {return &beep_0;}
-    APDevice *getApDev0()   {return &ap_dev_0;}
-    ICMDevice *getIcmDev0() {return &icm_dev_0;}
+    ap_device *get_ap3126_dev()   {return &ap3216_dev_;}
+    icm_device *getIcmDev0() {return &icm20608_dev_;}
     KEY *getKey0()          {return &key_0;}
 };
 

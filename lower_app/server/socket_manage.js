@@ -21,7 +21,7 @@ let DeviceInfo = {
     accely:"0",
     accelz:"0",
     temp:"0",
-    angle:"0",
+    angle_:"0",
 };
 
 function socket_connect(ipaddr, port)

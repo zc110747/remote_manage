@@ -7,8 +7,8 @@
 //
 //  Purpose:
 //      封装的设备底层接口，基类为device_base, 支持open/close
-//      IOBase主要封装IO支持的接口, open, read, write, close
-//      InfoBase主要封装支持特定外设的接口, 可以读取内部信息
+//      io_base主要封装IO支持的接口, open, read, write, close
+//      info_base主要封装支持特定外设的接口, 可以读取内部信息
 //
 // Author:
 //     @听心跳的声音
@@ -24,58 +24,58 @@ using std::string;
 
 device_base::device_base()
 {
-    devicePathM.clear();
-    DeviceFdM = -1;
+    device_path_.clear();
+    device_fd_ = -1;
 }
 
 device_base::device_base(const string &DevicePath)
 {
-    devicePathM = DevicePath;
-    DeviceFdM = -1;
+    device_path_ = DevicePath;
+    device_fd_ = -1;
 }
 
 device_base::~device_base()
 {
-    devicePathM.clear();
+    device_path_.clear();
     close();
 }
 
 bool device_base::open(int flags)
 {
-    DeviceFdM = ::open(devicePathM.c_str(), flags);
-    if(DeviceFdM == -1)
+    device_fd_ = ::open(device_path_.c_str(), flags);
+    if(device_fd_ == -1)
     {
-        PRINT_LOG(LOG_INFO, 0, "open %s device failed!", devicePathM.c_str());
+        PRINT_LOG(LOG_INFO, 0, "open %s device failed!", device_path_.c_str());
         return false;
     }
 
-    PRINT_LOG(LOG_INFO, 0, "open %s device success, fd:%d!", devicePathM.c_str(), DeviceFdM);
+    PRINT_LOG(LOG_INFO, 0, "open %s device success, fd:%d!", device_path_.c_str(), device_fd_);
     return true;
 }
 
 bool device_base::init(const std::string &DevicePath, int flags)
 {
-    devicePathM = DevicePath;
+    device_path_ = DevicePath;
     return open(flags);
 }
 
 void device_base::close()
 {
-    if(DeviceFdM != 1)
+    if(device_fd_ != 1)
     {
-        DeviceFdM = -1;
-        ::close(DeviceFdM);
+        device_fd_ = -1;
+        ::close(device_fd_);
     }
 }
 
-bool IoBase::readIoStatus()
+bool io_base::readIoStatus()
 {
     bool ret = false;
     ssize_t nSize;
 
-    if(DeviceFdM >= 0)
+    if(device_fd_ >= 0)
     {
-        nSize = ::read(DeviceFdM, &IoStatus, 1);  //将数据写入ledBase
+        nSize = ::read(device_fd_, &status_, 1);  //将数据写入ledBase
         if(nSize > 0)
         {
             ret = true;
@@ -84,14 +84,14 @@ bool IoBase::readIoStatus()
     return ret;
 }
 
-bool IoBase::writeIoStatus(uint8_t status) 
+bool io_base::writeIoStatus(uint8_t status) 
 {
     bool ret = false;
     ssize_t nSize;
 
-    if(DeviceFdM >= 0)
+    if(device_fd_ >= 0)
     {
-        nSize = ::write(DeviceFdM, &status, 1);  //将数据写入ledBase
+        nSize = ::write(device_fd_, &status, 1);  //将数据写入ledBase
         if(nSize > 0)
         {
             ret = true;
@@ -100,23 +100,23 @@ bool IoBase::writeIoStatus(uint8_t status)
     return ret;
 }
 
-bool IoBase::on()
+bool io_base::on()
 {
     return writeIoStatus(1);
 }
 
-bool IoBase::off()
+bool io_base::off()
 {
     return writeIoStatus(0);
 }
 
-bool IoBase::trigger()
+bool io_base::trigger()
 {
     bool ret = false;
     
     if(readIoStatus())
     {
-        if(IoStatus)
+        if(status_)
             ret = off();
         else
             ret = on();

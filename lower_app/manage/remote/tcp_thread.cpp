@@ -19,15 +19,16 @@
 #include "tcp_thread.hpp"
 #include "asio_server.hpp"
 
-static AsioServer socket_tcp_server;
+static asio_server socket_tcp_server;
 
 void tcp_thread_manage::tcp_server_run()
 {
     const SocketSysConfig *pSocketConfig = system_config::getInstance()->gettcp();
-    
+    PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "tcp info:%s:%d", pSocketConfig->ipaddr.c_str(), pSocketConfig->port);
     try
     {
         socket_tcp_server.init(pSocketConfig->ipaddr, std::to_string(pSocketConfig->port), [this](char* ptr, int length){
+            PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "TCP RX");
             protocol_info_ptr_->write_rx_fifo(ptr, length);
         });
         socket_tcp_server.run();

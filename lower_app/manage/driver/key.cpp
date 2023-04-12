@@ -35,17 +35,17 @@ static void sigio_signal_func(int signum)
 bool KEY::init(const std::string &DevicePath, int flags)
 {
     static bool is_first_run = true;
-    devicePathM = DevicePath;
+    device_path_ = DevicePath;
 
-    DeviceFdM = ::open(devicePathM.c_str(), flags);
-    if(DeviceFdM < 0)
+    device_fd_ = ::open(device_path_.c_str(), flags);
+    if(device_fd_ < 0)
     {
-        PRINT_LOG(LOG_INFO, 0, "open %s device failed!", devicePathM.c_str());
+        PRINT_LOG(LOG_INFO, 0, "open %s device failed!", device_path_.c_str());
         return false;
     }
     else
     {
-        PRINT_LOG(LOG_INFO, 0, "open %s device success, fd:%d!", devicePathM.c_str(), DeviceFdM);
+        PRINT_LOG(LOG_INFO, 0, "open %s device success, fd:%d!", device_path_.c_str(), device_fd_);
 
         if(is_first_run)
         {
@@ -53,18 +53,18 @@ bool KEY::init(const std::string &DevicePath, int flags)
             signal(SIGIO, sigio_signal_func);
             is_first_run = false;
         }
-        fcntl(DeviceFdM, F_SETOWN, getpid());		/* 设置当前进程接收SIGIO信号 	*/
-        flags = fcntl(DeviceFdM, F_GETFL);			/* 获取当前的进程状态 			*/
-        fcntl(DeviceFdM, F_SETFL, flags | FASYNC);	/* 设置进程启用异步通知功能 	*/	
+        fcntl(device_fd_, F_SETOWN, getpid());		/* 设置当前进程接收SIGIO信号 	*/
+        flags = fcntl(device_fd_, F_GETFL);			/* 获取当前的进程状态 			*/
+        fcntl(device_fd_, F_SETFL, flags | FASYNC);	/* 设置进程启用异步通知功能 	*/	
     }
     return true;
 }
 
 bool KEY::register_func(std::function<void(int)> func)
 {
-    if(DeviceFdM >= 0)
+    if(device_fd_ >= 0)
     {
-        FuncList.insert(std::make_pair(DeviceFdM, func));
+        FuncList.insert(std::make_pair(device_fd_, func));
         PRINT_LOG(LOG_INFO, 0, "key register, totol:%d!", FuncList.size());
         return true;
     }
