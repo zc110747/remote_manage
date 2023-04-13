@@ -121,16 +121,16 @@ bool tcp_thread_manage::init()
     return true;
 }
 
-tcp_thread_manage* tcp_thread_manage::pInstance = nullptr;
+tcp_thread_manage* tcp_thread_manage::instance_pointer_ = nullptr;
 tcp_thread_manage* tcp_thread_manage::get_instance()
 {
-    if(pInstance == nullptr)
+    if(instance_pointer_ == nullptr)
     {
-        pInstance = new(std::nothrow) tcp_thread_manage;
-        if(pInstance == nullptr)
+        instance_pointer_ = new(std::nothrow) tcp_thread_manage;
+        if(instance_pointer_ == nullptr)
         {
             PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Tcp thread manage new failed!");
         }
     }
-    return pInstance;
+    return instance_pointer_;
 }

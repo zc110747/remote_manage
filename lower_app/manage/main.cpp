@@ -40,9 +40,9 @@ static void option_process(int argc, char *argv[])
 	int c;
 
 	//命令行输入说明
-	//if no parameter follow, no ":"
+	//if no parameter_ follow, no ":"
 	//must one paramter follow, one ":"
-	//can be no or one parameter, without space
+	//can be no or one parameter_, without space
 	while ((c = getopt(argc, argv, "vdf:h::")) != -1)
 	{
 		switch (c)

@@ -27,15 +27,15 @@
 using NAMESPACE_DEVICE::device_manage;
 center_manage* center_manage::get_instance()
 {
-    if(pInstance == nullptr)
+    if(instance_pointer_ == nullptr)
     {
-        pInstance = new(std::nothrow) center_manage;
-        if(pInstance == nullptr)
+        instance_pointer_ = new(std::nothrow) center_manage;
+        if(instance_pointer_ == nullptr)
         {
              PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "device_manage new error!");
         }
     }
-    return pInstance;
+    return instance_pointer_;
 }
 
 int center_manage::send_message(Event *pMsg, uint16_t size)

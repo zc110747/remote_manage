@@ -69,7 +69,7 @@ public:
    *                             was successfully parsed.
    * \param      collectComments \c true to collect comment and allow writing
    *                             them back during serialization, \c false to
-   *                             discard comments.  This parameter is ignored
+   *                             discard comments.  This parameter_ is ignored
    *                             if Features::allowComments_ is \c false.
    * \return \c true if the document was successfully parsed, \c false if an
    * error occurred.
@@ -88,7 +88,7 @@ public:
    *                             was successfully parsed.
    * \param      collectComments \c true to collect comment and allow writing
    *                             them back during serialization, \c false to
-   *                             discard comments.  This parameter is ignored
+   *                             discard comments.  This parameter_ is ignored
    *                             if Features::allowComments_ is \c false.
    * \return \c true if the document was successfully parsed, \c false if an
    * error occurred.
@@ -295,7 +295,7 @@ public:
    * Available settings (case-sensitive):
    * - `"collectComments": false or true`
    *   - true to collect comment and allow writing them back during
-   *     serialization, false to discard comments.  This parameter is ignored
+   *     serialization, false to discard comments.  This parameter_ is ignored
    *     if allowComments is false.
    * - `"allowComments": false or true`
    *   - true if comments are allowed.

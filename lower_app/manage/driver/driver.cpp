@@ -18,18 +18,18 @@
 /////////////////////////////////////////////////////////////////////////////
 #include "driver.hpp"
 
-driver_manage* driver_manage::pInstance = nullptr;
+driver_manage* driver_manage::instance_pointer_ = nullptr;
 driver_manage* driver_manage::get_instance()
 {
-    if(pInstance == nullptr)
+    if(instance_pointer_ == nullptr)
     {
-        pInstance = new(std::nothrow) driver_manage;
-        if(pInstance == nullptr)
+        instance_pointer_ = new(std::nothrow) driver_manage;
+        if(instance_pointer_ == nullptr)
         {
             //do something
         }
     }
-    return pInstance;
+    return instance_pointer_;
 }
 
 bool driver_manage::init()

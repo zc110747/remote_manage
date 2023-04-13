@@ -65,9 +65,9 @@ private:
     void process_info_callback();
 
 private:
-    /// \brief pInstance
+    /// \brief instance_pointer_
     /// - object used to implement the singleton pattern.
-    static internal_process*  pInstance;
+    static internal_process*  instance_pointer_;
 
     /// \brief node_thread_
     /// - object used to saved thread information used to process.

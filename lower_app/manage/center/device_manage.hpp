@@ -153,9 +153,9 @@ namespace NAMESPACE_DEVICE
         void process_hardware(Event *pEvent);
 
     private:
-        /// \brief pInstance
+        /// \brief instance_pointer_
         /// - object used to implement the singleton pattern.
-        static device_manage* pInstance;
+        static device_manage* instance_pointer_;
 
         /// \brief inter_info_
         /// - internal info used to store current device info.

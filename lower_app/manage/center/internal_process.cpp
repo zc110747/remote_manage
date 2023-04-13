@@ -21,18 +21,18 @@
 #include "asio_server.hpp"
 #include "modules.hpp"
 
-internal_process*  internal_process::pInstance = nullptr;
+internal_process*  internal_process::instance_pointer_ = nullptr;
 internal_process* internal_process::get_instance()
 {
-    if(pInstance == nullptr)
+    if(instance_pointer_ == nullptr)
     {
-        pInstance = new(std::nothrow) internal_process();
-        if(pInstance == nullptr)
+        instance_pointer_ = new(std::nothrow) internal_process();
+        if(instance_pointer_ == nullptr)
         {
             PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "internal_process new error!");
         }
     }
-    return pInstance;
+    return instance_pointer_;
 }
 
 static asio_server InterServer;
@@ -44,10 +44,10 @@ void internal_process::run()
     try
     {
         InterServer.init(pSocketConfig->ipaddr, std::to_string(pSocketConfig->port), [this](char* ptr, int length){
-            if(cmd_process_.parseData(ptr, length))
+            if(cmd_process_.parse_data(ptr, length))
             {
                 //用于处理命令，告知应用
-                cmd_process_.ProcessData();
+                cmd_process_.process_data();
 
                 //用于处理应答信息
                 process_info_callback();
@@ -131,7 +131,7 @@ void internal_process::update_device_status(const NAMESPACE_DEVICE::device_read_
 
 void internal_process::process_info_callback()
 {
-    switch(cmd_process_.getCurrentFormat())
+    switch(cmd_process_.get_format())
     {
         case CmdSetDev:
             auto info = NAMESPACE_DEVICE::device_manage::get_instance()->get_device_info();

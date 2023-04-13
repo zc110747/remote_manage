@@ -19,18 +19,18 @@
 #include "uart_thread.hpp"
 #include <sys/termios.h>
 
-uart_thread_manage* uart_thread_manage::pInstance = nullptr;
+uart_thread_manage* uart_thread_manage::instance_pointer_ = nullptr;
 uart_thread_manage* uart_thread_manage::get_instance()
 {
-	if(pInstance == nullptr)
+	if(instance_pointer_ == nullptr)
 	{
-		pInstance = new(std::nothrow) uart_thread_manage();
-		if(pInstance == nullptr)
+		instance_pointer_ = new(std::nothrow) uart_thread_manage();
+		if(instance_pointer_ == nullptr)
 		{
 			PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "uart_thread_manage new failed!");
 		}
 	}
-	return pInstance;
+	return instance_pointer_;
 }
 
 #define MAX_BUFFER_SIZE 512

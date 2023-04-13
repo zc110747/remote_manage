@@ -29,7 +29,7 @@
 !getSerial  
 !? or !help
 */
-const static std::map<std::string, CmdFormat_t> CmdMapM = {
+const static std::map<std::string, cmd_format_t> CmdMapM = {
     {"!getos",      CmdGetOS},
     {"!readdev",    CmdReadDev},
     {"!setdev",     CmdSetDev},
@@ -39,7 +39,7 @@ const static std::map<std::string, CmdFormat_t> CmdMapM = {
     {"!help",       CmdGetHelp},
 };
 
-const static std::map<CmdFormat_t, std::string> CmdHelpMapM = {
+const static std::map<cmd_format_t, std::string> CmdHelpMapM = {
     {CmdGetOS,   "!getos"},
     {CmdReadDev, "!readdev"},
     {CmdSetDev,  "!setdev [index],[action]"},
@@ -47,7 +47,7 @@ const static std::map<CmdFormat_t, std::string> CmdHelpMapM = {
     {CmdGetHelp, "!? ## !help"},
 };
 
-bool cmd_process::parseData(char *ptr, int size)
+bool cmd_process::parse_data(char *ptr, int size)
 {
     if(ptr[0] != '!')
     {
@@ -75,15 +75,15 @@ bool cmd_process::parseData(char *ptr, int size)
         return false;
     }
 
-    formatM = CmdMapM.find(strDst)->second;
-    pDataM = pStart+1;
+    cmd_format_ = CmdMapM.find(strDst)->second;
+    cmd_data_pointer_ = pStart+1;
     return true;
 }
 
-bool cmd_process::ProcessData()
+bool cmd_process::process_data()
 {
     bool ret = true;
-    switch(formatM)
+    switch(cmd_format_)
     {
         case CmdReadDev:
             { 
@@ -119,14 +119,14 @@ bool cmd_process::ProcessData()
         case CmdSetDev:
             {
                 uint32_t device = 0, action = 0;
-                sscanf(pDataM, "%d,%d", &device, &action);
+                sscanf(cmd_data_pointer_, "%d,%d", &device, &action);
                 PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "SetDev:%d, %d!", device, action);
                 center_manage::get_instance()->send_hardware_config_message(device, action);
             }
             break;
         case cmdSetLevel:
             { 
-                uint8_t level = pDataM[0] - '0';
+                uint8_t level = cmd_data_pointer_[0] - '0';
                 if(level > 5)
                     level = 5;
                 LoggerManage::get_instance()->set_level((LOG_LEVEL)level);
@@ -154,7 +154,7 @@ bool cmd_process::ProcessData()
 
     if(!ret)
     {
-        PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Invalid Formate:%d, data:%s", formatM, pDataM);
+        PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Invalid Formate:%d, data:%s", cmd_format_, cmd_data_pointer_);
     }
     return ret;
 }

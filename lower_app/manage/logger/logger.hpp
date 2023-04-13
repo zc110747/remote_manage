@@ -61,7 +61,7 @@ public:
     /// \return Wheather initialization is success or failed.
     bool init();
 
-    /// \brief init
+    /// \brief release
     /// - This method is used to release the object.
     /// \return Wheather release is success or failed.
     void release();
@@ -103,9 +103,9 @@ private:
     void update_thread_in_work()  {thread_work_ = true;}
     
 private:
-    /// \brief pInstance
+    /// \brief instance_pointer_
     /// - object used to implement the singleton pattern.
-    static LoggerManage *pInstance;
+    static LoggerManage *instance_pointer_;
 
     /// \brief memory_start_pointer_
     /// - memory point the start to get.

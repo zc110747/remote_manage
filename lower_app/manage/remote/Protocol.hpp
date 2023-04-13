@@ -87,7 +87,7 @@ public:
 	/// \brief read_rx_fifo
     /// - read buffer from rx fifo.
 	/// \param ptr - point for data read from fifo
-	/// \param size - size of the data read from fifo
+	/// \param size - max size of the data can be read.
     /// \return the size of the data already read.
 	int read_rx_fifo(char *ptr, uint16_t size);
 
@@ -100,8 +100,8 @@ public:
 
 	/// \brief read_tx_fifo
     /// - read buffer from tx fifo.
-	/// \param ptr - point for data read from fifo
-	/// \param size - size of the data read from fifo
+	/// \param ptr - point for data read from fifo.
+	/// \param size - max size of the data can be read.
     /// \return the size of the data already read.
 	int read_tx_fifo(char *buf, uint16_t size);
 

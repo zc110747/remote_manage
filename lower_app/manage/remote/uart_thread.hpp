@@ -82,9 +82,9 @@ private:
 	int write_data(char *pbuffer, uint16_t size);
 
 private:
-    /// \brief pInstance
+    /// \brief instance_pointer_
     /// - object used to implement the singleton pattern.
-	static uart_thread_manage* pInstance;
+	static uart_thread_manage* instance_pointer_;
 
     /// \brief com_fd_
     /// - the fd of uart device.

@@ -19,19 +19,19 @@
 #include "time_manage.hpp"
 #include "logger.hpp"
 
-time_manage *time_manage::pInstance = nullptr;
+time_manage *time_manage::instance_pointer_ = nullptr;
 
 time_manage *time_manage::get_instance()
 {
-    if(pInstance == nullptr)
+    if(instance_pointer_ == nullptr)
     {
-        pInstance = new(std::nothrow) time_manage();
-        if(pInstance == nullptr)
+        instance_pointer_ = new(std::nothrow) time_manage();
+        if(instance_pointer_ == nullptr)
         {
             PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "time_manage new error!");
         }
     }
-    return pInstance;
+    return instance_pointer_;
 }
 
 void time_manage::run()

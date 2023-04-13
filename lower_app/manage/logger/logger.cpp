@@ -32,9 +32,9 @@ void LoggerManage::logger_rx_server_run()
     try
     {
         logger_server.init(pSocketConfig->ipaddr, std::to_string(pSocketConfig->port), [&Loggercmd_process](char* ptr, int length){
-            if(Loggercmd_process.parseData(ptr, length))
+            if(Loggercmd_process.parse_data(ptr, length))
             {
-                Loggercmd_process.ProcessData();
+                Loggercmd_process.process_data();
             }
         });
         logger_server.run();
@@ -79,18 +79,18 @@ void LoggerManage::logger_tx_run()
     }
 }
 
-LoggerManage* LoggerManage::pInstance = nullptr;
+LoggerManage* LoggerManage::instance_pointer_ = nullptr;
 LoggerManage* LoggerManage::get_instance()
 {
-    if(pInstance == nullptr)
+    if(instance_pointer_ == nullptr)
     {
-        pInstance = new(std::nothrow) LoggerManage;
-        if(pInstance == nullptr)
+        instance_pointer_ = new(std::nothrow) LoggerManage;
+        if(instance_pointer_ == nullptr)
         {
             //do something
         }
     }
-    return pInstance;
+    return instance_pointer_;
 }
 
 char memoryBuffer[LOGGER_MESSAGE_BUFFER_SIZE+1];

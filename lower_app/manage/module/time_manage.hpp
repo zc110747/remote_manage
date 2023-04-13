@@ -88,7 +88,7 @@ public:
     uint32_t get_current_ticks() {return ticks;}
 private:
     void run();
-    static time_manage *pInstance;
+    static time_manage *instance_pointer_;
     DeviceManage::Timer time;
     std::vector<TimeAction> VecWork;
     std::mutex mutex_;

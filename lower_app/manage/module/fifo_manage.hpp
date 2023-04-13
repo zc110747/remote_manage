@@ -25,24 +25,49 @@ _Pragma("once")
 class fifo_manage final
 {
 public:
+    /// \brief constructor
     fifo_manage(const std::string& fstr, int mode);
+
+    /// \brief destructor
     ~fifo_manage();
 
-    //创建并打开FIFO
+    /// \brief create
+    /// - This method is used to create and open fifo.
+    /// \return Wheather create and open is success or fail.
     bool create(void);                   
-
-    //关闭FIFO并释放资源
-    void release();   
     
-    //等待FIFO数据接收
+    /// \brief read
+    /// - This method is used to read from the fifo.
+    /// \param buf - pointer to the start of read data.
+    /// \param bufsize - max size of the data can be read.
+    /// \return data alread read from the fifo
     int read(char *buf, int bufsize);
 
-    //向FIFO中写入数据
+    /// \brief write
+    /// - This method is used to write to fifo.
+    /// \param buf - pointer to the start of write data.
+    /// \param bufsize -size of the data write to fifo.
+    /// \return data alread write to fifo
     int write(char *buf, int bufsize);
 
+    /// \brief release
+    /// - This method is used to close the fifo already open.
+    void release();   
+
 private:
-    std::string  fifo_;
+    /// \brief fifo_path_
+    /// - the path of fifo for management.
+    std::string  fifo_path_;
+
+    /// \brief mode_
+    /// - the open mode of the fifo
     int mode_;
+
+    /// \brief readfd_
+    /// - the fd of the fifo to read. 
     int readfd_;
+
+    /// \brief writefd_
+    /// - the fd of the fifo to write. 
     int writefd_;
 };

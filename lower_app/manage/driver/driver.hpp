@@ -74,9 +74,9 @@ public:
     icm_device *get_icm20608_dev()  {return &icm20608_dev_;}
 
 private:
-    /// \brief pInstance
+    /// \brief instance_pointer_
     /// - object used to implement the singleton pattern.
-    static driver_manage* pInstance;
+    static driver_manage* instance_pointer_;
 
     /// \brief led_zero_
     /// - led device object.

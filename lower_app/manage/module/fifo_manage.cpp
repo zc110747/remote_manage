@@ -21,7 +21,7 @@
 //#include "driver.hpp"
 
 fifo_manage::fifo_manage(const std::string& fstr, int mode){
-    fifo_ = std::move(fstr);
+    fifo_path_ = std::move(fstr);
     mode_ = mode;
     readfd_ = -1;
     writefd_ = -1;
@@ -30,23 +30,23 @@ fifo_manage::fifo_manage(const std::string& fstr, int mode){
 fifo_manage::~fifo_manage()
 {
     release();
-    fifo_.clear();
+    fifo_path_.clear();
 }
 
 bool fifo_manage::create(void){
     
     //delete fifo
-    unlink(fifo_.c_str());
+    unlink(fifo_path_.c_str());
 
-    if(mkfifo(fifo_.c_str(), mode_) < 0)
+    if(mkfifo(fifo_path_.c_str(), mode_) < 0)
     {
-        PRINT_LOG(LOG_ERROR, xGetCurrentTicks(),  "fifo %s make error!", fifo_.c_str());
+        PRINT_LOG(LOG_ERROR, xGetCurrentTicks(),  "fifo %s make error!", fifo_path_.c_str());
         return false;
     }
 
     //for Read, need open as O_RDWR, otherwise will block
-    readfd_ = open(fifo_.c_str(), O_RDWR);
-    writefd_ = open(fifo_.c_str(), O_WRONLY);
+    readfd_ = open(fifo_path_.c_str(), O_RDWR);
+    writefd_ = open(fifo_path_.c_str(), O_WRONLY);
 
     if(writefd_ < 0 || readfd_ < 0)
     {
@@ -54,7 +54,7 @@ bool fifo_manage::create(void){
         PRINT_LOG(LOG_ERROR, xGetCurrentTicks(),  "fifo open error:%d, %d!", writefd_, readfd_);
         return false;
     }
-    PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "fifo %s open success, fd:%d, %d", fifo_.c_str(), writefd_, readfd_);
+    PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "fifo %s open success, fd:%d, %d", fifo_path_.c_str(), writefd_, readfd_);
     return true;
 }                      
 

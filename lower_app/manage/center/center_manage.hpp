@@ -80,9 +80,9 @@ private:
     bool process_event(Event *pEvent);
 
 private:
-    /// \brief pInstance
+    /// \brief instance_pointer_
     /// - object used to implement the singleton pattern.
-    static inline center_manage* pInstance = nullptr;
+    static inline center_manage* instance_pointer_ = nullptr;
 
     /// \brief center_fifo_point_
     /// - fifo point used for the center management.

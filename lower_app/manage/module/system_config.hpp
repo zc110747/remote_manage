@@ -84,9 +84,9 @@ class system_config
     friend std::ostream& operator<<(std::ostream&, const system_config&);
 
 private:
-    static system_config *pInstance;
-    SystemParamter parameter;
-    std::string filePath;
+    static system_config *instance_pointer_;
+    SystemParamter parameter_;
+    std::string file_path_;
 
 public:
     system_config() = default;
@@ -98,19 +98,19 @@ public:
     void SaveConfigFile();             //保存Config的文件     
 
 public:
-    const std::string getFilePath() const    {return filePath;};
-    const IoSysConfig *getled()             {return &(parameter.led);}
-    const IoSysConfig *getbeep()            {return &(parameter.beep);}
-    const DeviceSysConfig *getkey()         {return &(parameter.key);}
-    const SerialSysConfig *getserial()      {return &(parameter.serial);}
-    const SocketSysConfig *gettcp()         {return &(parameter.tcp);}
-    const SocketSysConfig *getlogger()      {return &(parameter.logger);}
-    const SocketSysConfig *getnode()        {return &(parameter.node);}
-    const DeviceSysConfig *getrtc()         {return &(parameter.rtc);}
-    const DeviceSysConfig *geticmSpi()      {return &(parameter.icmSpi);}
-    const DeviceSysConfig *getapI2c()       {return &(parameter.apI2c);}
-    const JString &getdownloadpath()        {return parameter.downloadpath;}
-    const uint8_t* getversion()             {return parameter.version;}
+    const std::string getFilePath() const    {return file_path_;};
+    const IoSysConfig *getled()             {return &(parameter_.led);}
+    const IoSysConfig *getbeep()            {return &(parameter_.beep);}
+    const DeviceSysConfig *getkey()         {return &(parameter_.key);}
+    const SerialSysConfig *getserial()      {return &(parameter_.serial);}
+    const SocketSysConfig *gettcp()         {return &(parameter_.tcp);}
+    const SocketSysConfig *getlogger()      {return &(parameter_.logger);}
+    const SocketSysConfig *getnode()        {return &(parameter_.node);}
+    const DeviceSysConfig *getrtc()         {return &(parameter_.rtc);}
+    const DeviceSysConfig *geticmSpi()      {return &(parameter_.icmSpi);}
+    const DeviceSysConfig *getapI2c()       {return &(parameter_.apI2c);}
+    const JString &getdownloadpath()        {return parameter_.downloadpath;}
+    const uint8_t* getversion()             {return parameter_.version;}
 };
 
 const uint8_t *get_version();

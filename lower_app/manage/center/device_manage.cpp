@@ -23,18 +23,18 @@
 
 namespace NAMESPACE_DEVICE
 {
-    device_manage* device_manage::pInstance = nullptr;
+    device_manage* device_manage::instance_pointer_ = nullptr;
     device_manage* device_manage::get_instance()
     {
-        if(pInstance == nullptr)
+        if(instance_pointer_ == nullptr)
         {
-            pInstance = new(std::nothrow) device_manage();
-            if(pInstance == nullptr)
+            instance_pointer_ = new(std::nothrow) device_manage();
+            if(instance_pointer_ == nullptr)
             {
                 PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "device_manage new error!");
             }
         }
-        return pInstance;
+        return instance_pointer_;
     }
 
     bool device_manage::init()

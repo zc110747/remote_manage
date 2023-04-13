@@ -62,9 +62,9 @@ private:
 	void tcp_tx_run();
 
 private:
-    /// \brief pInstance
+    /// \brief instance_pointer_
     /// - object used to implement the singleton pattern.
-	static tcp_thread_manage* pInstance;
+	static tcp_thread_manage* instance_pointer_;
 
 	/// \brief tcp_server_thread_
     /// - tcp server thread object. 
