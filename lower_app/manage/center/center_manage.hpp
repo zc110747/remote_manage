@@ -44,8 +44,18 @@ public:
 
     /// \brief send_message
     /// - This method is used to send message for center manage.
+    /// \param pMsg - event message pointer
+    /// \param size - size of the event message
     /// \return Number of the message already send.
     int send_message(Event *pMsg, uint16_t size);
+
+    /// \brief send_message
+    /// - This method is used to send message for center manage.
+    /// \param event_id - event id will be send.
+    /// \param msg_pointer - start pointer for the data message
+    /// \param size - data size for the message
+    /// \return Number of the message already send.
+    int send_message(uint16_t event_id, uint8_t *msg_pointer, uint16_t size);
 
     /// \brief send_hardware_update_message
     /// - This method is used to trigger the device hardware update to other process.
@@ -54,6 +64,7 @@ public:
     
     /// \brief send_hardware_config_message
     /// - This method is used to trigger the device hardware config message.
+    /// \param device - device m
     /// \return Number of the message already send.
     int send_hardware_config_message(uint8_t device, uint8_t action);
 

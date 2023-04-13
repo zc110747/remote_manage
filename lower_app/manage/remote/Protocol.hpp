@@ -9,10 +9,10 @@
 //      用于处理协议定义的接口
 //      协议接收和处理接口
 //		数据格式
-//		数据头: 0x5A 0x5B
-//		序列号: 2Byte -> 0~65536
-//      功能域:	1Byte -> bit7 ack, all 0 means data
-//		长度:	1Byte
+//		数据头(2byte): 0x5A 0x5B                             
+//		序列号(2byte): 0~65536
+//      功能域(1Byte): bit7 ack, all 0 means data
+//		长度  (1Byte): 0~255
 //		数据:	DATA
 //      CRC:	2Byte -- 计算从序列号起始到数据末尾
 //
@@ -81,7 +81,7 @@ public:
 	~protocol_info(void);
 
 	bool init();
-
+	
 	//protocol rx process
 	int write_rx_fifo(char*, uint16_t);
 	int read_rx_fifo(char*, uint16_t);

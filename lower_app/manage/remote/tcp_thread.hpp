@@ -32,8 +32,10 @@ public:
 	void tcp_server_run();
 	void tcp_rx_run();
 	void tcp_tx_run();
-	static tcp_thread_manage* get_instance();
 
+	int send_msg(char *buffer, uint16_t size);
+
+	static tcp_thread_manage* get_instance();
 private:
 	static tcp_thread_manage* pInstance;
 	std::thread m_server_thread;

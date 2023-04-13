@@ -18,6 +18,7 @@
 
 #include "protocol.hpp"
 #include "logger.hpp"
+#include "center_manage.hpp"
 
 const uint8_t PACKED_HEAD[] = {0x5a, 0x5b};
 
@@ -146,8 +147,11 @@ void protocol_info::process_rx_frame()
 	else if(rx_func == 0)
 	{
 		//recall ack
+		uint16_t event_id = 0;
 		send_func_data(sequence_num, FUNCTION_ACK);
 
+		event_id = (((uint16_t)rx_buffer_[6])<<8) | rx_buffer_[7];
+		center_manage::get_instance()->send_message(event_id, &rx_buffer_[8], rx_buffer_[5]-2);
 	}
 }
 

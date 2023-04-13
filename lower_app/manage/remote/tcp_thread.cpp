@@ -28,7 +28,6 @@ void tcp_thread_manage::tcp_server_run()
     try
     {
         socket_tcp_server.init(pSocketConfig->ipaddr, std::to_string(pSocketConfig->port), [this](char* ptr, int length){
-            PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "TCP RX");
             protocol_info_ptr_->write_rx_fifo(ptr, length);
         });
         socket_tcp_server.run();
@@ -38,7 +37,6 @@ void tcp_thread_manage::tcp_server_run()
         PRINT_LOG(LOG_DEBUG, xGetCurrentTicks(), "tcp_thread_manage, Exception:%s", e.what());
     }
 }
-
 
 void tcp_thread_manage::tcp_rx_run()
 {
@@ -68,6 +66,11 @@ void tcp_thread_manage::tcp_rx_run()
     }
 }
 
+int tcp_thread_manage::send_msg(char *buffer, uint16_t size)
+{
+    return protocol_info_ptr_->send_data(buffer, size);
+}
+
 void tcp_thread_manage::tcp_tx_run()
 {
     ENUM_PROTOCOL_STATUS status;
@@ -87,6 +90,7 @@ void tcp_thread_manage::tcp_tx_run()
         }
     }
 }
+
 
 bool tcp_thread_manage::init()
 {
