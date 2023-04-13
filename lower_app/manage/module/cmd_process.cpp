@@ -113,7 +113,7 @@ bool cmd_process::ProcessData()
                 PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Sokcet Ipaddress:%s", pSysConfig->gettcp()->ipaddr.c_str());
                 PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Port TCP:%d, LOGGER:%d ", 
                     pSysConfig->gettcp()->port, pSysConfig->getlogger()->port);
-                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Logger Level:%d ", (int)LoggerManage::get_instance()->getlevel());
+                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Logger Level:%d ", (int)LoggerManage::get_instance()->get_level());
             }
             break;
         case CmdSetDev:
@@ -129,7 +129,7 @@ bool cmd_process::ProcessData()
                 uint8_t level = pDataM[0] - '0';
                 if(level > 5)
                     level = 5;
-                LoggerManage::get_instance()->setlevel((LOG_LEVEL)level);
+                LoggerManage::get_instance()->set_level((LOG_LEVEL)level);
                 PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Set Logger Level:%d!", level);
             }
             break;

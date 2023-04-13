@@ -44,48 +44,104 @@ typedef struct
 
 class LoggerManage final
 {
-private:
-    char *pNextMemoryBuffer;
-    char *pEndMemoryBuffer;
-
-    //logger info
-    LOG_LEVEL log_level{LOG_INFO};
-
-    //thread
-    std::atomic<bool> set_thread_work{false};
-    bool is_thread_work{false};
-    std::thread m_TxThread;
-    std::thread m_asio_serverThread;
-    std::mutex mutex_;
-
-    //fd
-    LOG_MESSAGE message;
-    fifo_manage *pLoggerFIFO{nullptr};
-
-    static LoggerManage *pInstance;
-    
-    void logger_rx_run();
-    void logger_tx_run();
-    void asio_server_run();
-
-private:
-    char *getMemoryBuffer(uint16_t size);
-    void mutex_lock()       {if(is_thread_work) mutex_.lock();}
-    void mutex_unlock()     {if(is_thread_work) mutex_.unlock();}
-
 public:
+    //constructor
     LoggerManage() = default;
+
+    /// - destructor, delete not allow for singleton pattern.
     ~LoggerManage() = delete;
 
-    bool init();
-    void release();
-
-    int print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...);
+    /// \brief get_instance
+    /// - This method is used to get the pattern of the class.
+    /// \return the singleton pattern point of the object.
     static LoggerManage *get_instance();
 
-    void setThreadWork()            {set_thread_work = true;}
-    void setlevel(LOG_LEVEL level)  {log_level = level;}
-    LOG_LEVEL getlevel()            {return log_level;} 
+    /// \brief init
+    /// - This method is used to init the object.
+    /// \return Wheather initialization is success or failed.
+    bool init();
+
+    /// \brief init
+    /// - This method is used to release the object.
+    /// \return Wheather release is success or failed.
+    void release();
+
+    /// \brief print_log
+    /// - This method is print logger info.
+    /// \param level - logger level for the data
+    /// \param time - time when send the data
+    /// \param fmt - pointer to send data
+    /// \return the logger info already send.
+    int print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...);
+
+    /// \brief set_level
+    /// - This method defined the level can set.
+    /// \param level - logger level can send.
+    void set_level(LOG_LEVEL level)  {log_level_ = level;}
+
+    /// \brief get_level
+    /// - This method get the level can send
+    /// \return logger level can send.
+    LOG_LEVEL get_level()            {return log_level_;} 
+
+private:
+    /// \brief logger_tx_run
+    /// - tx thread to process logger info.
+    void logger_tx_run();
+
+    /// \brief logger_rx_server_run
+    /// - rx thread to process logger interface received.
+    void logger_rx_server_run();
+
+    /// \brief get_memory_buffer_pointer
+    /// - get buffer pointer of the memory.
+    /// \param size - size of the memory pointer
+    char *get_memory_buffer_pointer(uint16_t size);
+
+    /// \brief update_thread_in_work
+    /// - update thread already work.
+    void update_thread_in_work()  {thread_work_ = true;}
+    
+private:
+    /// \brief pInstance
+    /// - object used to implement the singleton pattern.
+    static LoggerManage *pInstance;
+
+    /// \brief memory_start_pointer_
+    /// - memory point the start to get.
+    char *memory_start_pointer_;
+
+    /// \brief memory_end_pointer_
+    /// - memory point the end.
+    char *memory_end_pointer_;
+
+    /// \brief log_level_
+    /// - log level defined.
+    LOG_LEVEL log_level_{LOG_INFO};
+    
+    /// \brief thread_work_
+    /// - wheather thread is work.
+    std::atomic<bool> thread_work_{false};
+
+    /// \brief logger_tx_thread_
+    /// - logger tx thread object. 
+    std::thread logger_tx_thread_;
+
+    /// \brief logger_rx_thread_
+    /// - logger rx thread object. 
+    std::thread logger_rx_thread_;
+
+    /// \brief mutex_
+    /// - mutex used to protect output.
+    std::mutex mutex_;
+
+    /// \brief logger_message_
+    /// - message used to save logger information.
+    LOG_MESSAGE logger_message_;
+
+    /// \brief logger_fifo_
+    /// - fifo used for logger manage.
+    fifo_manage *logger_fifo_{nullptr};
 };
 
 #define PRINT_NOW(...)    { printf(__VA_ARGS__); fflush(stdout);}
