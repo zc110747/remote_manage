@@ -62,6 +62,7 @@ function dynamic_engine_process(request, response)
                 break;
             case 'axiosDeviceGet':
                 let devInfo = sock_m.device_info;
+                //console.log(devInfo);
                 response.end(JSON.stringify(devInfo))
                 break;
             default:

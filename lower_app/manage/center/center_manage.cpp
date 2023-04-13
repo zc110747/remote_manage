@@ -21,8 +21,8 @@
 #include "center_manage.hpp"
 #include "logger.hpp"
 #include "internal_process.hpp"
-#include "device_manage.hpp"
 #include "tcp_thread.hpp"
+#include "uart_thread.hpp"
 
 using NAMESPACE_DEVICE::device_manage;
 center_manage* center_manage::get_instance()
@@ -75,6 +75,20 @@ int center_manage::send_hardware_config_message(uint8_t device, uint8_t action)
     return send_message(WORKFLOW_ID_HARDWARE_CHANGE, buffer, 2);
 }
 
+void center_manage::send_remote_device_status(const NAMESPACE_DEVICE::device_read_info &info)
+{
+    char buffer[128];
+    uint16_t size = 0;
+
+    buffer[size++] = TO_REMOTE_UPDATE_STATUS>>8;
+    buffer[size++] = TO_REMOTE_UPDATE_STATUS&0xff;
+
+    size += info.copy_to_buffer(&buffer[size]);
+    
+    tcp_thread_manage::get_instance()->send_msg(buffer, size);
+    uart_thread_manage::get_instance()->send_msg(buffer, size);
+}
+
 bool center_manage::process_event(Event *pEvent)
 {
     uint16_t id = pEvent->get_id();
@@ -84,7 +98,9 @@ bool center_manage::process_event(Event *pEvent)
     {
     case WORKFLOW_ID_HARDWARE_UPDATE:
         {
-            auto info = device_manage::get_instance()->get_device_info();
+            const auto &info = device_manage::get_instance()->get_device_info();
+
+            send_remote_device_status(info);
             internal_process::get_instance()->update_device_status(info);
         }
         break;
@@ -104,6 +120,7 @@ bool center_manage::process_event(Event *pEvent)
     }
     return true;
 }
+
 
 void center_manage::run()
 {

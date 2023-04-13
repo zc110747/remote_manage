@@ -30,8 +30,11 @@ _Pragma("once")
 #define DEVICE_ID_HARDWARE_CHANGE       0x0002
 
 //workflow event
-#define WORKFLOW_ID_HARDWARE_UPDATE  0x1001    //更新内部数据
+#define WORKFLOW_ID_HARDWARE_UPDATE     0x1001    //更新内部数据
 #define WORKFLOW_ID_HARDWARE_CHANGE     0x1002    //硬件数据更新
+
+//to remote event
+#define TO_REMOTE_UPDATE_STATUS         0x2001
 
 //process hardware chage
 #define EVENT_DEVICE_LED                0x00
@@ -82,6 +85,41 @@ namespace NAMESPACE_DEVICE
             static_assert(std::is_trivial_v<device_read_info>, "Not Allow C memory process!");
 
             memset((char *)this, 0, size());
+        }
+
+        uint8_t copy_to_buffer(char *buffer) const
+        {
+            uint8_t size = 0;
+
+            buffer[size++] = led_io_;
+            buffer[size++] = beep_io_;
+
+            buffer[size++] = ap_info_.als>>8;
+            buffer[size++] = ap_info_.als;
+            buffer[size++] = ap_info_.ir>>8;
+            buffer[size++] = ap_info_.ir;
+            buffer[size++] = ap_info_.ps>>8;
+            buffer[size++] = ap_info_.ps;
+
+            int32_t data[8];
+            data[0] = (int32_t)icm_info_.accel_x_act;
+            data[1] = (int32_t)icm_info_.accel_y_act;
+            data[2] = (int32_t)icm_info_.accel_z_act;
+            data[3] = (int32_t)icm_info_.gyro_x_act;
+            data[4] = (int32_t)icm_info_.gyro_y_act;
+            data[5] = (int32_t)icm_info_.gyro_z_act;
+            data[6] = (int32_t)icm_info_.temp_act;
+            data[7] = (int32_t)angle_;
+
+            for(int i=0; i<8; i++)
+            {
+                buffer[size++] = data[i]>>24;
+                buffer[size++] = data[i]>>16;
+                buffer[size++] = data[i]>>8;
+                buffer[size++] = data[i];
+            }
+
+            return size;
         }
 
         /// \brief size

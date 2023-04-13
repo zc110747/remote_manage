@@ -120,7 +120,7 @@ void internal_process::update_device_status(const NAMESPACE_DEVICE::device_read_
     CurrentIndex += size;
     size = sprintf(&buffer[CurrentIndex], "temp=%.2f;", info.icm_info_.temp_act);
     CurrentIndex += size;
-    size = sprintf(&buffer[CurrentIndex], "angle_=%d", info.angle_);
+    size = sprintf(&buffer[CurrentIndex], "angle=%d", info.angle_);
     CurrentIndex += size;
     buffer[CurrentIndex] = '\0';
 

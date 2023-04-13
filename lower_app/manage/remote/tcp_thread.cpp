@@ -68,7 +68,11 @@ void tcp_thread_manage::tcp_rx_run()
 
 int tcp_thread_manage::send_msg(char *buffer, uint16_t size)
 {
-    return tcp_protocol_pointer_->send_data(buffer, size);
+    if(socket_tcp_server.is_valid())
+    {
+        return tcp_protocol_pointer_->send_data(buffer, size);
+    }
+    return -1;
 }
 
 void tcp_thread_manage::tcp_tx_run()
@@ -82,7 +86,10 @@ void tcp_thread_manage::tcp_tx_run()
         size = tcp_protocol_pointer_->read_tx_fifo(buffer, TX_BUFFER_SIZE);
         if(size > 0)
         {
-            socket_tcp_server.do_write(buffer, size);
+            if(socket_tcp_server.is_valid())
+            {
+                socket_tcp_server.do_write(buffer, size);
+            }
         }
         else
         {

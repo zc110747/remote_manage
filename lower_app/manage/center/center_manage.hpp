@@ -64,10 +64,16 @@ public:
     
     /// \brief send_hardware_config_message
     /// - This method is used to trigger the device hardware config message.
-    /// \param device - device m
+    /// \param device - the device need to process
+    /// \param action - action of the device to process
     /// \return Number of the message already send.
     int send_hardware_config_message(uint8_t device, uint8_t action);
 
+    /// \brief send_remote_device_status
+    /// - This method is used to send remote device internal information.
+    /// \param info - the info send to remote device
+    void send_remote_device_status(const NAMESPACE_DEVICE::device_read_info &info);
+    
 private:
     /// \brief run
     /// - This method is used for thread run the center management.

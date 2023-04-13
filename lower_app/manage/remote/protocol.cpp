@@ -148,8 +148,15 @@ void protocol_info::process_rx_frame()
 		uint16_t event_id = 0;
 		send_func_data(sequence_num, FUNCTION_ACK);
 
-		event_id = (((uint16_t)rx_buffer_[6])<<8) | rx_buffer_[7];
-		center_manage::get_instance()->send_message(event_id, &rx_buffer_[8], rx_buffer_[5]-2);
+		if(rx_buffer_[5] >= 2)
+		{
+			event_id = (((uint16_t)rx_buffer_[6])<<8) | rx_buffer_[7];
+			center_manage::get_instance()->send_message(event_id, &rx_buffer_[8], rx_buffer_[5]-2);
+		}
+		else
+		{
+			PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "protocol rx length is too small!");
+		}
 	}
 }
 
