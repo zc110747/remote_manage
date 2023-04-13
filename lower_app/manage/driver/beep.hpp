@@ -24,7 +24,7 @@
 class beep_device:public io_base
 {
 public:
-    //consturctor
+    /// \brief constructor
     using io_base::io_base;
 };
 

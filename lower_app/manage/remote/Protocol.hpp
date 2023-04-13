@@ -49,14 +49,6 @@ _Pragma("once")
 //function bit
 #define FUNCTION_ACK			1<<7
 
-
-#define BIG_ENDING         		0
-#if BIG_ENDING	
-#define LENGTH_CONVERT(val)	(val)
-#else
-#define LENGTH_CONVERT(val) (((val)<<8) |((val)>>8))
-#endif
-
 /**************************************************************************
 * Global Type Definition
 ***************************************************************************/
@@ -71,55 +63,121 @@ typedef enum
 class protocol_info
 {
 public:  
-	/// Construct and create rx/tx fifo for protocol process
-	/**
-	 * @param rx_fifo a fifo path for protocol rx process
-	 *
-	 * @param tx_fifo a fifo path for protocol tx process
-	 */
-	protocol_info(const std::string &rx_fifo, const std::string &tx_fifo, std::function<void(char* ptr, int size)> lambda);
-	~protocol_info(void);
+    /// \brief constructor
+	protocol_info();
 
-	bool init();
+	/// \brief destructor
+	~protocol_info(){};
+
+	/// \brief init
+    /// - This method is used to init the object.
+	/// \param rx_fifo - fifo path for protocol receive
+	/// \param tx_fifo - fifo path for protocol transform
+	/// \param lambda - function for protocol transform internal
+    /// \return Wheather initialization is success or failed.
+	bool init(const std::string &rx_fifo, const std::string &tx_fifo, std::function<void(char* ptr, int size)> lambda);
 	
-	//protocol rx process
-	int write_rx_fifo(char*, uint16_t);
-	int read_rx_fifo(char*, uint16_t);
-	ENUM_PROTOCOL_STATUS check_rx_frame(uint8_t);    
+	/// \brief write_rx_fifo
+    /// - write buffer to rx fifo.
+	/// \param ptr - point for data write to fifo
+	/// \param size - size of the data write to fifo
+    /// \return the size of the data already write.
+	int write_rx_fifo(char *ptr, uint16_t size);
+
+	/// \brief read_rx_fifo
+    /// - read buffer from rx fifo.
+	/// \param ptr - point for data read from fifo
+	/// \param size - size of the data read from fifo
+    /// \return the size of the data already read.
+	int read_rx_fifo(char *ptr, uint16_t size);
+
+	/// \brief write_tx_fifo
+    /// - write buffer to tx fifo.
+	/// \param buf - point for data write to fifo
+	/// \param size - size of the data write to fifo
+    /// \return the size of the data already write.
+	int write_tx_fifo(char *buf, uint16_t size);
+
+	/// \brief read_tx_fifo
+    /// - read buffer from tx fifo.
+	/// \param ptr - point for data read from fifo
+	/// \param size - size of the data read from fifo
+    /// \return the size of the data already read.
+	int read_tx_fifo(char *buf, uint16_t size);
+
+	/// \brief check_rx_frame
+    /// - check the receive data by byte, and verify protocol.
+	/// \param data - one byte receive data to check protocol.
+    /// \return protocol process status for receive.
+	ENUM_PROTOCOL_STATUS check_rx_frame(uint8_t data);    
+
+	/// \brief process_rx_frame
+    /// - process the whole data by protocol.
 	void process_rx_frame();	
+
+	/// \brief clear_rx_info
+    /// - clear the protocol receive infomation for next receive.
 	void clear_rx_info();
 
-	//protocol tx process
-	int read_tx_fifo(char *, uint16_t);
-	int write_tx_fifo(char *, uint16_t);
-	uint16_t create_output_frame(char *pOut, char *pIn, uint16_t len);
+	/// \brief send_data
+    /// - send the data to remote, without func.
+	/// \param pIntput - pointer to the start of send data.
+	/// \param len - size of the data need send.
+    /// \return size of data already send to remote.
 	int send_data(char *pIntput, uint16_t len);
+	
+	/// \brief send_func_data
+    /// - send the data with functional to remote.
+	/// \param sequence - sequence value will back to remote.
+	/// \param func - functional of the data
 	void send_func_data(uint16_t sequence, uint8_t func);
 
-	//calculate crc16
-	uint16_t calculate_crc(uint8_t*, uint16_t);
+private:
+	/// \brief create_output_frame
+    /// - create output buffer by protocol.
+	/// \param pOut - point to outer buffer.
+	/// \param pIn - point to input buffer.
+	/// \param len - size of the input buffer.
+    /// \return the size of the outer buffer.
+	uint16_t create_output_frame(char *pOut, char *pIn, uint16_t len);
+
+	/// \brief calculate_crc
+    /// - calculate the crc16 for the data input.
+	/// \param pdata - point to data for calculate crc16.
+	/// \param size - size of the data for calculate crc16.
+    /// \return the crc16 value of the data.
+	uint16_t calculate_crc(uint8_t *pdata, uint16_t size);
 
 private:
-	//protocol rx buffer process
+	/// \brief rx_buffer_
+    /// - buffer used to save the receive protocol data.
 	uint8_t  rx_buffer_[RX_BUFFER_SIZE];   
-	uint16_t rx_buffer_size_{0};	   			
-	uint32_t rx_timeout_; 					
+
+	/// \brief rx_buffer_size_
+    /// - size of the buffer to save the receive protocol data.
+	uint16_t rx_buffer_size_{0};	
+
+	/// \brief rx_timeout_
+    /// - timeout used to check the receive continuous.
+	uint32_t rx_timeout_;
+
+	/// \brief rx_status_
+    /// - current rx protocol check status.
 	ENUM_PROTOCOL_STATUS rx_status_;
 	
-	fifo_manage *rx_fifo_ptr_{nullptr};
-	std::string rx_fifo_path;
-	
-	fifo_manage *tx_fifo_ptr_{nullptr};
-	std::string tx_fifo_path_;
-	std::function<void(char* ptr, int size)> handler_;
-	
+	/// \brief sequence_num
+    /// - sequence for the send num, will add one every send.
 	uint16_t sequence_num{0};
+
+	/// \brief rx_fifo_ptr_
+    /// - pointer for protocol receive fifo manage.
+	fifo_manage *rx_fifo_ptr_{nullptr};
+
+	/// \brief tx_fifo_ptr_
+    /// - pointer for protocol transform fifo manage.
+	fifo_manage *tx_fifo_ptr_{nullptr};
+
+	/// \brief handler_
+    /// - function used to process send data in protocol.
+	std::function<void(char* ptr, int size)> handler_;
 };
-
-/**************************************************************************
-* Global Variable Declaration
-***************************************************************************/
-
-/**************************************************************************
-* Global Functon Declaration
-***************************************************************************/

@@ -33,23 +33,88 @@ uart_thread_manage* uart_thread_manage::get_instance()
 	return pInstance;
 }
 
-void uart_thread_manage::run()
+#define MAX_BUFFER_SIZE 512
+void uart_thread_manage::uart_server_run()
 {
-	int nFlag;
-	int size;
+	char buffer[MAX_BUFFER_SIZE];
 
-	PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "UART Thread start!");
+	PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "%s start", __func__);
+
+	for(;;)
+	{
+		int size = read(com_fd_, buffer, MAX_BUFFER_SIZE);
+		if(size > 0)
+		{
+			uart_protocol_pointer_->write_rx_fifo(buffer, size);
+		}
+		else
+		{
+			//do nothing
+		}
+	}
+}
+
+void uart_thread_manage::uart_rx_run()
+{
+    char data;
+    ENUM_PROTOCOL_STATUS status;
+
+	PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "%s start", __func__);
+
 	for(;;)
 	{	   
-
+        if(uart_protocol_pointer_->read_rx_fifo(&data, 1) > 0)
+        {
+            status = uart_protocol_pointer_->check_rx_frame(data);
+            if(status == ROTOCOL_FRAME_FINISHED)
+            {
+                //if process, clear data received.
+                uart_protocol_pointer_->process_rx_frame();
+                uart_protocol_pointer_->clear_rx_info();
+            }
+            else if(status == PROTOCOL_FRAME_EMPTY)
+            {
+                uart_protocol_pointer_->clear_rx_info();
+            }
+            else
+            {
+                //in receive, do nothing
+            }
+        }
 	}
+}
+
+void uart_thread_manage::uart_tx_run()
+{
+    ENUM_PROTOCOL_STATUS status;
+    int size;
+    char buffer[TX_BUFFER_SIZE];
+
+	PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "%s start", __func__);
+    while(1)
+    {
+        size = uart_protocol_pointer_->read_tx_fifo(buffer, TX_BUFFER_SIZE);
+        if(size > 0)
+        {
+            write_data(buffer, size);
+        }
+        else
+        {
+            //do nothing
+        }
+    }
+}
+
+int uart_thread_manage::send_msg(char *buffer, uint16_t size)
+{
+    return uart_protocol_pointer_->send_data(buffer, size);
 }
 
 bool uart_thread_manage::init()
 {
 	auto pSerialConfig = system_config::get_instance()->getserial();
 
-	if((nComFd = open(pSerialConfig->dev.c_str(), O_RDWR|O_NOCTTY|O_NDELAY))<0)
+	if((com_fd_ = open(pSerialConfig->dev.c_str(), O_RDWR))<0)
 	{	
 		PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Open Device %s failed!", pSerialConfig->dev.c_str());
 		return false;
@@ -63,9 +128,43 @@ bool uart_thread_manage::init()
 		}
 	}
 	
-	//std::thread(std::bind(&uart_thread_manage::run, this)).detach();
+	uart_protocol_pointer_ = new(std::nothrow) protocol_info();
+	if(uart_protocol_pointer_ == nullptr)
+	{
+		PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "uart_protocol_pointer_ create failed!");
+		return false;
+	}
+	auto ret = uart_protocol_pointer_->init(SERVER_UART_RX_FIFO, SERVER_UART_TX_FIFO, [this](char *ptr, int size){
+		write_data(ptr, size);
+	});
+	if(!ret)
+	{
+		PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "uart_protocol_pointer_ init failed!");
+		return false;
+	}
+
+	uart_server_thread_ = std::thread(std::bind(&uart_thread_manage::uart_server_run, this));
+	uart_server_thread_.detach();
+	uart_rx_thread_ = std::thread(std::bind(&uart_thread_manage::uart_rx_run, this));
+	uart_rx_thread_.detach();
+	uart_tx_thread_ = std::thread(std::bind(&uart_thread_manage::uart_tx_run, this));
+	uart_tx_thread_.detach();
+
 	PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "uart_thread_manage init success!");
 	return true;
+}
+
+int uart_thread_manage::write_data(char *pbuffer, uint16_t size)
+{
+	int send_size = -1;
+
+	if(com_fd_ >= 0)
+	{
+		std::lock_guard lock{mutex_};
+		send_size = ::write(com_fd_, pbuffer, size);
+	}
+
+	return send_size;
 }
 
 int uart_thread_manage::set_opt(int nBaud, int nDataBits, std::string cParity, int nStopBits)
@@ -73,7 +172,7 @@ int uart_thread_manage::set_opt(int nBaud, int nDataBits, std::string cParity, i
 	struct termios newtio;
 	struct termios oldtio;
 
-	if(tcgetattr(nComFd, &oldtio)  !=  0) 
+	if(tcgetattr(com_fd_, &oldtio)  !=  0) 
 	{ 
 		PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Get serial attribute failed!");
 		return -1;
@@ -157,8 +256,8 @@ int uart_thread_manage::set_opt(int nBaud, int nDataBits, std::string cParity, i
 	newtio.c_cc[VTIME]  = 0;
 	newtio.c_cc[VMIN] = 0;
 
-	tcflush(nComFd, TCIFLUSH);
-	if((tcsetattr(nComFd, TCSANOW, &newtio))!=0)
+	tcflush(com_fd_, TCIFLUSH);
+	if((tcsetattr(com_fd_, TCSANOW, &newtio))!=0)
 	{
 		PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Serial Config Error!");
 		return -1;
@@ -170,9 +269,9 @@ int uart_thread_manage::set_opt(int nBaud, int nDataBits, std::string cParity, i
 
 void uart_thread_manage::release()
 {
-	if(nComFd >= 0)
+	if(com_fd_ >= 0)
 	{
-		close(nComFd);
-		nComFd = -1;
+		close(com_fd_);
+		com_fd_ = -1;
 	}
 }

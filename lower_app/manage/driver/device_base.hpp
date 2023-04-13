@@ -27,7 +27,7 @@
 class device_base
 {
 public:
-    /// - constructor.
+    /// \brief constructor
     device_base();
 
     /// - copy constructor.

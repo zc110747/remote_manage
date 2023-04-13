@@ -25,7 +25,7 @@ _Pragma("once")
 class center_manage final
 {
 public:
-    /// - constructor.
+    /// \brief constructor
     center_manage()=default;
     center_manage(const center_manage&)=delete;
 

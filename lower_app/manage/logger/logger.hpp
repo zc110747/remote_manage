@@ -45,10 +45,10 @@ typedef struct
 class LoggerManage final
 {
 public:
-    //constructor
+    /// \brief constructor
     LoggerManage() = default;
 
-    /// - destructor, delete not allow for singleton pattern.
+    /// \brief destructor, delete not allow for singleton pattern.
     ~LoggerManage() = delete;
 
     /// \brief get_instance

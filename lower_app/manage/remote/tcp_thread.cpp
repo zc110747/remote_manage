@@ -28,7 +28,7 @@ void tcp_thread_manage::tcp_server_run()
     try
     {
         socket_tcp_server.init(pSocketConfig->ipaddr, std::to_string(pSocketConfig->port), [this](char* ptr, int length){
-            protocol_info_ptr_->write_rx_fifo(ptr, length);
+            tcp_protocol_pointer_->write_rx_fifo(ptr, length);
         });
         socket_tcp_server.run();
     }
@@ -45,18 +45,18 @@ void tcp_thread_manage::tcp_rx_run()
 
     while(1)
     {
-        if(protocol_info_ptr_->read_rx_fifo(&data, 1) > 0)
+        if(tcp_protocol_pointer_->read_rx_fifo(&data, 1) > 0)
         {
-            status = protocol_info_ptr_->check_rx_frame(data);
+            status = tcp_protocol_pointer_->check_rx_frame(data);
             if(status == ROTOCOL_FRAME_FINISHED)
             {
                 //if process, clear data received.
-                protocol_info_ptr_->process_rx_frame();
-                protocol_info_ptr_->clear_rx_info();
+                tcp_protocol_pointer_->process_rx_frame();
+                tcp_protocol_pointer_->clear_rx_info();
             }
             else if(status == PROTOCOL_FRAME_EMPTY)
             {
-                protocol_info_ptr_->clear_rx_info();
+                tcp_protocol_pointer_->clear_rx_info();
             }
             else
             {
@@ -68,7 +68,7 @@ void tcp_thread_manage::tcp_rx_run()
 
 int tcp_thread_manage::send_msg(char *buffer, uint16_t size)
 {
-    return protocol_info_ptr_->send_data(buffer, size);
+    return tcp_protocol_pointer_->send_data(buffer, size);
 }
 
 void tcp_thread_manage::tcp_tx_run()
@@ -79,7 +79,7 @@ void tcp_thread_manage::tcp_tx_run()
 
     while(1)
     {
-        size = protocol_info_ptr_->read_tx_fifo(buffer, TX_BUFFER_SIZE);
+        size = tcp_protocol_pointer_->read_tx_fifo(buffer, TX_BUFFER_SIZE);
         if(size > 0)
         {
             socket_tcp_server.do_write(buffer, size);
@@ -91,24 +91,31 @@ void tcp_thread_manage::tcp_tx_run()
     }
 }
 
-
 bool tcp_thread_manage::init()
 {
     //must creat fifo before thread start
-    protocol_info_ptr_ = new(std::nothrow) protocol_info(SOCKET_TCP_RX_FIFO, SOCKET_TCP_TX_FIFO,  [](char *ptr, int size){
+    tcp_protocol_pointer_ = new(std::nothrow) protocol_info();
+    if(tcp_protocol_pointer_ == nullptr)
+    {
+        PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "tcp_protocol_pointer_ create failed!");
+        return false;
+    }
+
+    auto ret = tcp_protocol_pointer_->init(SOCKET_TCP_RX_FIFO, SOCKET_TCP_TX_FIFO,  [](char *ptr, int size){
         socket_tcp_server.do_write(ptr, size);
     });
-    if(protocol_info_ptr_ == nullptr)
+    if(!ret)
+    {
+        PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "tcp_protocol_pointer_ init failed!");
         return false;
-    if(!protocol_info_ptr_->init())
-        return false;
+    }
 
-    m_server_thread = std::thread(std::bind(&tcp_thread_manage::tcp_server_run, this));
-    m_server_thread.detach();
-    m_rx_thread = std::thread(std::bind(&tcp_thread_manage::tcp_rx_run, this));
-    m_rx_thread.detach();
-    m_tx_thread = std::thread(std::bind(&tcp_thread_manage::tcp_tx_run, this));
-    m_tx_thread.detach();
+    tcp_server_thread_ = std::thread(std::bind(&tcp_thread_manage::tcp_server_run, this));
+    tcp_server_thread_.detach();
+    tcp_rx_thread_ = std::thread(std::bind(&tcp_thread_manage::tcp_rx_run, this));
+    tcp_rx_thread_.detach();
+    tcp_tx_thread_ = std::thread(std::bind(&tcp_thread_manage::tcp_tx_run, this));
+    tcp_tx_thread_.detach();
 
     PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "tcp thread init success!");
     return true;

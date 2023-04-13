@@ -27,6 +27,10 @@ _Pragma("once")
 #define SOCKET_TCP_RX_FIFO          "/tmp/socket_rx.fifo"
 #define SOCKET_TCP_TX_FIFO          "/tmp/socket_tx.fifo"
 
+//uart fifo
+#define SERVER_UART_RX_FIFO          "/tmp/uart_rx.fifo"
+#define SERVER_UART_TX_FIFO          "/tmp/uart_tx.fifo"
+
 /*返回状态*/
 #define RT_INVALID_MQ_SIZE              -4
 #define RT_INVALID_BUF_SIZE             -3

@@ -25,7 +25,7 @@ _Pragma("once")
 class internal_process final
 {
 public:
-	/// - constructor.
+	/// \brief constructor
     internal_process() = default;
 
     /// - destructor, delete not allow for singleton pattern.

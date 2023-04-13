@@ -24,7 +24,7 @@ _Pragma("once")
 class rtc_device:public device_base
 {
 public:
-    // - constructor
+    /// \brief constructor
     using device_base::device_base;
 
     /// \brief init

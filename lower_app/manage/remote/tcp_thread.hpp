@@ -25,22 +25,61 @@ _Pragma("once")
 class tcp_thread_manage
 {
 public:
+    /// \brief constructor
 	tcp_thread_manage() = default;
+
+	/// \brief destructor, delete not allow for singleton pattern.
 	~tcp_thread_manage() = delete;
 
-	bool init();
-	void tcp_server_run();
-	void tcp_rx_run();
-	void tcp_tx_run();
+    /// \brief get_instance
+    /// - This method is used to get the pattern of the class.
+    /// \return the singleton pattern point of the object.
+	static tcp_thread_manage* get_instance();
 
+    /// \brief init
+    /// - This method is used to init the object.
+    /// \return Wheather initialization is success or failed.
+	bool init();
+
+    /// \brief send_msg
+    /// - this method is used to send data with protocol to remote.
+	/// \param buffer - the buffer of data area to remote.
+	/// \param size - size of data area to remote.
+	/// \return data already send to remote.
 	int send_msg(char *buffer, uint16_t size);
 
-	static tcp_thread_manage* get_instance();
 private:
+    /// \brief tcp_server_run
+    /// - server thread to process tcp received, tranform to rx fifo.
+	void tcp_server_run();
+
+	/// \brief tcp_rx_run
+    /// - read from protocol rx fifo and do protocol management.
+	void tcp_rx_run();
+
+	/// \brief tcp_rx_run
+    /// - read from protocol tx fifo and do write data.
+	void tcp_tx_run();
+
+private:
+    /// \brief pInstance
+    /// - object used to implement the singleton pattern.
 	static tcp_thread_manage* pInstance;
-	std::thread m_server_thread;
-	std::thread m_rx_thread;
-	std::thread m_tx_thread;
-	protocol_info* protocol_info_ptr_;
+
+	/// \brief tcp_server_thread_
+    /// - tcp server thread object. 
+	std::thread tcp_server_thread_;
+
+	/// \brief tcp_rx_thread_
+    /// - tcp rx thread object. 
+	std::thread tcp_rx_thread_;
+
+	/// \brief tcp_tx_thread_
+    /// - tcp tx thread object. 
+	std::thread tcp_tx_thread_;
+
+	/// \brief tcp_protocol_pointer_
+    /// - pointer of the protocol process object for tcp application. 
+	protocol_info* tcp_protocol_pointer_;
 };
 

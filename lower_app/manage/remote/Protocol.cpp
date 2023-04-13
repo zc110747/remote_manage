@@ -22,36 +22,34 @@
 
 const uint8_t PACKED_HEAD[] = {0x5a, 0x5b};
 
-protocol_info::protocol_info(const std::string &rx_fifo, const std::string &tx_fifo, std::function<void(char* ptr, int size)> lambda)
+protocol_info::protocol_info()
 {
-	rx_fifo_path = rx_fifo;
-	tx_fifo_path_ = tx_fifo;
-	handler_ = lambda;
-
 	memset(rx_buffer_, 0, RX_BUFFER_SIZE);
 	rx_timeout_ = 0;
 	rx_status_ = PROTOCOL_FRAME_EMPTY;
 }
-protocol_info::~protocol_info(void)
-{
-}
 
-bool protocol_info::init()
+bool protocol_info::init(
+	const std::string &rx_fifo, 
+	const std::string &tx_fifo, 
+	std::function<void(char* ptr, int size)> lambda
+)
 {
 	//rx fifo
-	rx_fifo_ptr_ = new(std::nothrow) fifo_manage(rx_fifo_path, S_FIFO_WORK_MODE);
+	rx_fifo_ptr_ = new(std::nothrow) fifo_manage(rx_fifo, S_FIFO_WORK_MODE);
 	if(rx_fifo_ptr_ == nullptr)
 		return false;
 	if(!rx_fifo_ptr_->create())
 		return false;
 	
 	//tx fifo
-	tx_fifo_ptr_ = new(std::nothrow) fifo_manage(tx_fifo_path_, S_FIFO_WORK_MODE);
+	tx_fifo_ptr_ = new(std::nothrow) fifo_manage(tx_fifo, S_FIFO_WORK_MODE);
 	if(tx_fifo_ptr_ == nullptr)
 		return false;
 	if(!tx_fifo_ptr_->create())
 		return false;
 
+	handler_ = lambda;
 	return true;
 }
 

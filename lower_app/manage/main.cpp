@@ -130,7 +130,7 @@ static bool system_init(int is_default, const char* path)
 	ret &= LoggerManage::get_instance()->init();
 	ret &= driver_manage::get_instance()->init();
 	ret &= NAMESPACE_DEVICE::device_manage::get_instance()->init();
-	//ret &= uart_thread_manage::get_instance()->init();
+	ret &= uart_thread_manage::get_instance()->init();
 	ret &= tcp_thread_manage::get_instance()->init();
 	ret &= internal_process::get_instance()->init();
 	ret &= time_manage::get_instance()->init();

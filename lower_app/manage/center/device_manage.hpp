@@ -96,7 +96,7 @@ namespace NAMESPACE_DEVICE
     class device_manage
     {
     public:
-    	/// - constructor.
+    	/// \brief constructor
         device_manage() = default;
         device_manage(const device_manage&)=delete;
 

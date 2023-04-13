@@ -24,12 +24,12 @@ _Pragma("once")
 class Event
 {
 public:
-    /// - constructor
+    //// \brief constructor
     Event():id_(0){
         static_assert(std::is_trivially_copyable_v<Event>, "Not Allow C memory process");
     }
     
-    /// - constructor
+    //// \brief constructor
     Event(uint16_t id):id_(id){
         static_assert(std::is_trivially_copyable_v<Event>, "Not Allow C memory process");
     }
