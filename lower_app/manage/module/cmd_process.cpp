@@ -87,7 +87,7 @@ bool cmd_process::process_data()
     {
         case CmdReadDev:
             { 
-                auto info = NAMESPACE_DEVICE::device_manage::get_instance()->get_device_info();
+                auto info = device_manage::get_instance()->get_device_info();
                 
                 PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "LedStatus:%d!", info.led_io_);
                 PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "beepStatus:%d!", info.beep_io_);

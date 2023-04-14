@@ -24,7 +24,6 @@
 #include "tcp_thread.hpp"
 #include "uart_thread.hpp"
 
-using NAMESPACE_DEVICE::device_manage;
 center_manage* center_manage::get_instance()
 {
     if(instance_pointer_ == nullptr)
@@ -75,7 +74,7 @@ int center_manage::send_hardware_config_message(uint8_t device, uint8_t action)
     return send_message(WORKFLOW_ID_HARDWARE_CHANGE, buffer, 2);
 }
 
-void center_manage::send_remote_device_status(const NAMESPACE_DEVICE::device_read_info &info)
+void center_manage::send_remote_device_status(const device_read_info &info)
 {
     char buffer[128];
     uint16_t size = 0;

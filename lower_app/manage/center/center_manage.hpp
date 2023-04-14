@@ -72,7 +72,7 @@ public:
     /// \brief send_remote_device_status
     /// - This method is used to send remote device internal information.
     /// \param info - the info send to remote device
-    void send_remote_device_status(const NAMESPACE_DEVICE::device_read_info &info);
+    void send_remote_device_status(const device_read_info &info);
     
 private:
     /// \brief run

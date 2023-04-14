@@ -45,7 +45,7 @@ public:
     /// - This method is used to update the device info to other interface.
     /// convert to string "!status led=ON;BEEP=OFF;IR=1;ALS=1;PS=1;gypox=0;gypoz=0;gypoz=0".
     /// \param info - object of the device info.
-    void update_device_status(const NAMESPACE_DEVICE::device_read_info &info);
+    void update_device_status(const device_read_info &info);
     
 private:
     /// \brief run

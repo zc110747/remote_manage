@@ -87,7 +87,7 @@ bool internal_process::send(char *pbuffer, int size)
     return ret;
 }
 
-void internal_process::update_device_status(const NAMESPACE_DEVICE::device_read_info &info)
+void internal_process::update_device_status(const device_read_info &info)
 {
     char buffer[1024] = {0};
     int CurrentIndex = 0;
@@ -134,7 +134,7 @@ void internal_process::process_info_callback()
     switch(cmd_process_.get_format())
     {
         case CmdSetDev:
-            auto info = NAMESPACE_DEVICE::device_manage::get_instance()->get_device_info();
+            auto info = device_manage::get_instance()->get_device_info();
             update_device_status(info);
             break;
     }
