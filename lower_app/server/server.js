@@ -31,7 +31,7 @@ function server_process(fileContents)
 
     netInfo.ipaddr = jsonValue.socket.ipaddr;
     netInfo.web_port = jsonValue.node.web_port;
-    netInfo.socket_port = jsonValue.node.socket_port;
+    netInfo.socket_port = jsonValue.socket.internal_port;
 
     //server on process
     server.on('request', function (request, response) {

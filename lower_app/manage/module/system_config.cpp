@@ -71,32 +71,31 @@ bool system_config::init(const char* path)
 
     try
     {
-        parameter_.led.init = root["led"]["init"].asInt();
-        parameter_.led.dev = root["led"]["dev"].asString();
+        parameter_.led.init         = root["device"]["led"]["init"].asInt();
+        parameter_.led.dev          = root["device"]["led"]["path"].asString();
+        parameter_.beep.init        = root["device"]["beep"]["init"].asInt();
+        parameter_.beep.dev         = root["device"]["beep"]["path"].asString();
+        parameter_.key.dev          = root["device"]["key"]["path"].asString();
+        parameter_.serial.baud      = root["device"]["serial"]["baud"].asInt();
+        parameter_.serial.dataBits  = root["device"]["serial"]["dataBits"].asInt();;
+        parameter_.serial.stopBits  = root["device"]["serial"]["stopBits"].asInt();;
+        parameter_.serial.parity    = root["device"]["serial"]["parity"].asString();;
+        parameter_.serial.dev       = root["device"]["serial"]["path"].asString();
+        parameter_.rtc.dev          = root["device"]["rtc"]["path"].asString();
+        parameter_.icmSpi.dev       = root["device"]["icmSpi"]["path"].asString();; 
+        parameter_.apI2c.dev        = root["device"]["apI2c"]["path"].asString();;
 
-        parameter_.beep.init = root["beep"]["init"].asInt();
-        parameter_.beep.dev = root["beep"]["dev"].asString();
+        parameter_.tcp.ipaddr       = root["socket"]["ipaddr"].asString();
+        parameter_.tcp.port         = root["socket"]["tcp_port"].asInt();
+        parameter_.logger.ipaddr    = parameter_.tcp.ipaddr;
+        parameter_.logger.port      = root["socket"]["logger_port"].asInt();
+        parameter_.node.ipaddr      = LOCAL_HOST;
+        parameter_.node.port        = root["socket"]["internal_port"].asInt();
+        parameter_.web_node.port    = root["node"]["web_port"].asInt();
 
-        parameter_.key.dev = root["key"]["dev"].asString();
+        parameter_.downloadpath     = root["filepath"].asString();
 
-        parameter_.serial.baud = root["serial"]["baud"].asInt();
-        parameter_.serial.dataBits = root["serial"]["dataBits"].asInt();;
-        parameter_.serial.stopBits = root["serial"]["stopBits"].asInt();;
-        parameter_.serial.parity = root["serial"]["parity"].asString();;
-        parameter_.serial.dev = root["serial"]["dev"].asString();
-
-        parameter_.tcp.ipaddr = root["socket"]["ipaddr"].asString();
-        parameter_.tcp.port = root["tcp"]["port"].asInt();
-        parameter_.logger.ipaddr = root["socket"]["ipaddr"].asString();
-        parameter_.logger.port = root["logger"]["port"].asInt();
-        parameter_.node.ipaddr = LOCAL_HOST;
-        parameter_.node.port = root["node"]["socket_port"].asInt();
-
-        parameter_.rtc.dev = root["rtc"]["dev"].asString();
-        parameter_.icmSpi.dev = root["icmSpi"]["dev"].asString();; 
-        parameter_.apI2c.dev = root["apI2c"]["dev"].asString();;
-
-        parameter_.downloadpath = root["downloadpath"].asString();
+        //SaveConfigFile();
     }
     catch(const std::exception& e)
     {
@@ -147,28 +146,27 @@ void system_config::SaveConfigFile()
     Json::Value root;
 
     //gpio
-    root["led"]["dev"] = parameter_.led.dev;
-    root["led"]["init"] = parameter_.led.init;
-    root["beep"]["dev"] = parameter_.beep.dev;
-    root["beep"]["init"] = parameter_.beep.init;
-    root["key"]["dev"] = parameter_.key.dev;
+    root["device"]["led"]["init"]           = parameter_.led.init;
+    root["device"]["led"]["path"]           = parameter_.led.dev;
+    root["device"]["beep"]["init"]          = parameter_.beep.init;
+    root["device"]["beep"]["path"]          = parameter_.beep.dev;
+    root["device"]["key"]["path"]           = parameter_.key.dev;
+    root["device"]["serial"]["baud"]        = parameter_.serial.baud;
+    root["device"]["serial"]["dataBits"]    = parameter_.serial.dataBits;
+    root["device"]["serial"]["StopBits"]    = parameter_.serial.stopBits;
+    root["device"]["serial"]["parity"]      = parameter_.serial.parity;
+    root["device"]["serial"]["path"]        = parameter_.serial.dev;
+    root["device"]["rtc"]["path"]           = parameter_.rtc.dev;
+    root["device"]["icmSpi"]["path"]        = parameter_.icmSpi.dev;
+    root["device"]["apI2c"]["path"]         = parameter_.apI2c.dev;
 
-    root["serial"]["baud"] = parameter_.serial.baud;
-    root["serial"]["dataBits"] = parameter_.serial.dataBits;
-    root["serial"]["StopBits"] = parameter_.serial.stopBits;
-    root["serial"]["parity"] = parameter_.serial.parity;
-    root["serial"]["dev"] = parameter_.serial.dev;
-
-    root["socket"]["ipaddr"] = parameter_.tcp.ipaddr;
-    root["tcp"]["port"] = parameter_.tcp.port;
-    root["logger"]["port"] = parameter_.logger.port;
-
-    root["node"]["socket_port"] = parameter_.node.port;
-    root["node"]["web_port"] = parameter_.web_node.port;
-    root["rtc"]["dev"] = parameter_.rtc.dev;
-    root["icmSpi"]["dev"] = parameter_.icmSpi.dev;
-    root["apI2c"]["dev"] = parameter_.apI2c.dev;
-    root["downloadpath"] = parameter_.downloadpath;
+    root["socket"]["ipaddr"]                = parameter_.tcp.ipaddr;
+    root["socket"]["tcp_port"]              = parameter_.tcp.port;
+    root["socket"]["logger_port"]           = parameter_.logger.port;
+    root["socket"]["internal_port"]         = parameter_.node.port;
+    root["node"]["web_port"]                = parameter_.web_node.port;
+    
+    root["filepath"]                        = parameter_.downloadpath;
 
     Json::StreamWriterBuilder swb;
     std::shared_ptr<Json::StreamWriter> sw(swb.newStreamWriter());
