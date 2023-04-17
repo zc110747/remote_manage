@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Sockets;
 using System.Net.WebSockets;
 using System.Text;
@@ -489,5 +490,46 @@ namespace Tools
             WriteBox.Clear();
         }
 
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if (HexProcess.Checked)
+                {
+                    if (WriteBox.Text.Length > 0)
+                    {
+                        byte[] data = Encoding.ASCII.GetBytes(WriteBox.Text);
+                        string result = "";
+
+                        for (int i = 0; i < data.Length; i++)
+                        {
+                            result += String.Format("{0:X}", data[i]);
+                        }
+                        WriteBox.Text = result;
+                    }
+                }
+                else
+                {
+                    string[] strList = WriteBox.Text.Split(" ");
+                    string result = "";
+                    byte[] array = new byte[strList.Length];
+                    for (int i=0; i<strList.Length; i++)
+                    {
+                        if (strList[i].Length > 0)
+                        {
+                            array[i] = (byte)Int32.Parse(strList[i]);
+                        }
+                    }
+
+                    result = System.Text.Encoding.ASCII.GetString(array);
+                    ShowBox.Invoke(AppendString, result);
+                    WriteBox.Text = result;
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowBox.Invoke(AppendString, ex.Message + "\n");
+            }
+        }
     }
 }
