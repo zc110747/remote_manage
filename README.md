@@ -7,7 +7,7 @@
 ## 如何编译执行项目
 
 通过git下载项目后，在remote_manage目录下执行  
-在执行之前，需要修改demo/config.json符合嵌入式Linux的硬件平台的配置，特别是  
+在执行之前，需要修改package/config.json符合嵌入式Linux的硬件平台的配置，特别是  
 
 ```json
 "socket":{
@@ -15,8 +15,7 @@
 },
 ```
 
-必须和嵌入式Linux中ipconfig显示的地址一致.  
-接着执行如下脚本生成包,其中REMOTE_IPADDRESS需要与上面一致  
+其中ipaddr配置项必须和嵌入式Linux中ipconfig显示的地址一致，另外执行如下脚本完项目生成,其中REMOTE_IPADDRESS需要与上面一致  
 
 ```bash
 export REMOTE_IPADDRESS=192.168.2.99
@@ -26,36 +25,31 @@ sudo chmod 777 BuildRelease.bash
 
 下面问题可参考*document/构建Linux编译环境.md*目录下说明  
 1.如果编译失败，应该是g++版本过低，中说明如何更新arm-linux-gnueabihf-g++版本，目前测试通过使用的是7.5.0版本.  
-2.REMOTE_IPADDRESS是通过ssh将文件传送到嵌入式平台，所以需要嵌入式系统支持ssh功能，不支持也可将app_demo, server.tar.bz2, startApp手动拷贝到服务器上执行.  
-3.嵌入式linux平台需要支持node，另外需要支持环回接口即127.0.0.1本地连接,需要rcS文件添加如下端口.  
+2.在编译完成后，通过ssh将打包后文件传送到嵌入式平台，并上传到/tmp目录下，执行SysAppUpdate命令即可实现Code更新.  
+3.嵌入式linux平台需要支持node服务器，可参考server/README.md构建，另外需要支持环回接口即127.0.0.1本地连接, 需要rcS文件添加如下端口.  
 
 ```bash
 ifconfig lo up
 ifconfig lo netmask 255.255.255.0
 ```
 
-在嵌入式linux平台, 在上传目录下直接执行  
-
-```bash
-sudo chmod 777 startApp
-./startApp  
-```
-
-即可运行.  
+在嵌入式linux平台, 执行SysAppStart即可重启应用，并执行。  
 
 ## 项目结构
 
-demo/           	测试代码  
+Build/              编译结构基本框架  
 document/       	设计文档资料说明  
 kernael_mod/     	内核驱动模块  
 lower_app/          嵌入式Linux设备应用实现  
-    -manage/     	主工作流应用，驱动模块处理，logger实现，外设和其它设备接口访问  
-    -gui/        	下位机图形界面，支持状态显示和基本操作(QT)  
-    -server/        支持桌面访问得web服务器(node/js/web)  
-support/        	用于支持应用执行的lib库或者环境  
+    Executables     生成可执行文件目录  
+    manage/         嵌入式数据管理进程(数据处理核心进程)  
+    gui/            嵌入式图形界面开发  
+    server/         web服务器和web网页  
+support/            用于支持应用执行的lib库或者环境  
+package/            编译完成后的打包目录
 upper_app/          PC客户端应用实现  
-    -manage/        用于访问嵌入式设备的桌面客户端(暂定QT)  
-    -loger_tool/    用于支持logger打印的网络调试工具(C#)  
+    manage/         用于访问嵌入式设备的桌面客户端(暂定QT)  
+    loger_tool/     用于支持logger打印的网络调试工具(C#)  
 
 ## 设计文档
 

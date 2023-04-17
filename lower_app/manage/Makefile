@@ -12,7 +12,7 @@
 #CPU = arm-
 HOST =
 CPU = x86-
-CC = $(HOST)g++
+CC = $(HOST)$(APP_COMPILE)
 CFLAGS := -O3 -std=c++17 -fno-strict-aliasing -lrt 
 
 objects = 	main.o \
