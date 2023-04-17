@@ -7,5 +7,8 @@ rm -rf remote_manage* server.tar.bz2
 mv /tmp/remote_manage* ./
 
 #tar the package
-tar -xvf remote_manage*.tar.bz2
+tar -xvf remote_manage*
 tar -xvf server.tar.bz2
+
+#delete invalid file
+rm -rf remote_manage* server.tar.bz2

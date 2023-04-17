@@ -44,7 +44,7 @@
 	"socket" : 
 	{
 		"internal_port" : 15060,
-		"ipaddr" : "192.168.204.1",
+		"ipaddr" : "192.168.2.99",
 		"logger_port" : 15059,
 		"tcp_port" : 15058
 	}

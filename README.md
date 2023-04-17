@@ -6,34 +6,42 @@
 
 ## 如何编译执行项目
 
-通过git下载项目后，在remote_manage目录下执行  
-在执行之前，需要修改package/config.json符合嵌入式Linux的硬件平台的配置，特别是  
-
-```json
-"socket":{
-	"ipaddr":"192.168.2.99"
-},
-```
-
-其中ipaddr配置项必须和嵌入式Linux中ipconfig显示的地址一致，另外执行如下脚本完项目生成,其中REMOTE_IPADDRESS需要与上面一致  
-
+通过git下载项目后，进入remote_manage目录下.  
+1.修改environment/.bashrc下的配置文件.  
+主要修改项如下:  
 ```bash
-export REMOTE_IPADDRESS=192.168.2.99
-sudo chmod 777 BuildRelease.bash
-./BuildRelease.bash
+export ENV_PATH_ROOT="/mnt/d/user_project/git/remote_manage"    #修改为项目下载后的目录
+export ENV_KERNEL_DIR="/home/center/application/project/linux"  #修改为linux解压后目录
+export EMBED_DEVICE_IPADDRESS="192.168.2.99"                    #修改为嵌入式平台的IP地址
 ```
-
-下面问题可参考*document/构建Linux编译环境.md*目录下说明  
+2.将environment/.bashrc复制到系统根目录.  
+```bash
+cp environment/.bashrc /home/freedom
+```
+然后重新Ctrl+ALT+T打开新窗口，如果显示如下，表示脚本加载成功.  
+```bash
+Loading CDE Plugin...
+-------------------------------------------------------------------------
+Load Plugin Success!
+Can use command 'SysHelpCommand' for more helps.
+Update the Plugin by filepath /home/[root]/.bashrc.
+-------------------------------------------------------------------------
+```
+3.使用命令进行编译和上传firmware.  
+```bash
+SysBulidApplication
+SysPushFirmware
+```
+即可完成项目的编译。  
+如果编译报错，可参考*document/构建Linux编译环境.md*目录下说明  
 1.如果编译失败，应该是g++版本过低，中说明如何更新arm-linux-gnueabihf-g++版本，目前测试通过使用的是7.5.0版本.  
-2.在编译完成后，通过ssh将打包后文件传送到嵌入式平台，并上传到/tmp目录下，执行SysAppUpdate命令即可实现Code更新.  
+2.在编译完成后，通过ssh将打包后文件传送到嵌入式平台，并上传到/tmp目录下，执行SysPushFirmware命令即可实现Code更新.  
 3.嵌入式linux平台需要支持node服务器，可参考server/README.md构建，另外需要支持环回接口即127.0.0.1本地连接, 需要rcS文件添加如下端口.  
 
 ```bash
 ifconfig lo up
 ifconfig lo netmask 255.255.255.0
 ```
-
-在嵌入式linux平台, 执行SysAppStart即可重启应用，并执行。  
 
 ## 项目结构
 

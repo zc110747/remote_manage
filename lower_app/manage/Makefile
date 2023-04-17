@@ -8,11 +8,7 @@
 
 # This is object should be build and will link to generate
 # the executables
-#HOST = arm-linux-gnueabihf-
-#CPU = arm-
-HOST =
-CPU = x86-
-CC = $(HOST)$(APP_COMPILE)
+CC = $(COMPILE_APPLICATION)g++
 CFLAGS := -O3 -std=c++17 -fno-strict-aliasing -lrt 
 
 objects = 	main.o \
@@ -56,7 +52,7 @@ include_path = -I remote/ 			\
 				-I event/		\
 				-I center/
 								
-lib = lib/$(CPU)libjsoncpp.a
+lib = lib/$(LIB_APPLICATION)libjsoncpp.a
 
 # This is the file name of the executables and path where 
 # place the executables
