@@ -39,6 +39,8 @@ static void option_process(int argc, char *argv[])
 {
 	int c;
 
+	system_config::get_instance()->update_fw_info();
+
 	//命令行输入说明
 	//if no parameter_ follow, no ":"
 	//must one paramter follow, one ":"
@@ -69,9 +71,8 @@ static void option_process(int argc, char *argv[])
 			case 'v':
 			case 'V':
 				{
-					const uint8_t *pVer = get_version();
-					printf("version: %d.%d.%d.%d\n", 
-						pVer[0], pVer[1], pVer[2], pVer[3]);
+					const auto& info = system_config::get_instance()->get_fw_information();
+					std::cout<<"Firmware Version:"<<info.version<<std::endl;
 					exit(0);	
 				}
 			default:

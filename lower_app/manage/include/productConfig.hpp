@@ -50,6 +50,10 @@ _Pragma("once")
 #define SYSTM_CONFIG_OFF            0
 #define DEFAULT_CONFIG_FILE         "config.json"
 
+#define DEFAULT_FW_INFO_FILE        "version.json"
+#define DEFAULT_FW_AUTHOR           "zc"
+#define DEFAULT_FW_VERSION          "0.0.0.0"
+
 #define DEFAULT_LED_INIT            SYSTM_CONFIG_OFF
 #define DEFAULT_LED_DEV             "/dev/led"        
 #define DEFAULT_BEEP_INIT           SYSTM_CONFIG_OFF

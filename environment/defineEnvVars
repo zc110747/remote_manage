@@ -12,8 +12,9 @@ echo "Load the Env Data..."
 #-------------------------------------------------------------------------------
 export ENV_KERNEL_DIR="/home/center/application/project/linux"
 export EMBED_DEVICE_IPADDRESS="192.168.2.99"
-export FMWARE_VESRION="1.0.0.7"
 export FIRMWARE_CURRENT_PLATFORMS="Linux"
+
+export FMWARE_VESRION="1.0.0.7"
 
 #-------------------------------------------------------------------------------
 # This section defined the word color.

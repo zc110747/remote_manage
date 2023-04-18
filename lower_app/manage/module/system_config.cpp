@@ -24,10 +24,6 @@
 #include <memory>
 #include "system_config.hpp"
 
-//const默认内部链接的, 需要在初始化地方加上const
-const uint8_t fw_version[4] = {
-    #include "../verion.txt"
-};
 system_config* system_config::instance_pointer_ = nullptr;
 system_config* system_config::get_instance()
 {
@@ -105,6 +101,45 @@ bool system_config::init(const char* path)
     }
     
     ifs.close();
+
+    return true;
+}
+
+bool system_config::update_fw_info()
+{
+    Json::Value root;
+    std::ifstream ifs;
+
+    parameter_.information.author = DEFAULT_FW_AUTHOR;
+    parameter_.information.version = DEFAULT_FW_VERSION;
+
+    ifs.open(DEFAULT_FW_INFO_FILE);
+    if(!ifs.is_open())
+    {
+        return false;
+    }
+
+    Json::CharReaderBuilder builder;
+    builder["collectComments"] = true;
+    JSONCPP_STRING errs;
+    if (!parseFromStream(builder, ifs, &root, &errs)) {
+        std::cout << errs << std::endl;
+        return false;
+    }
+
+    try
+    {
+        parameter_.information.author = root["package"]["author"].asString();
+        parameter_.information.version = root["package"]["version"].asString();
+    }
+    catch(const std::exception& e)
+    {
+        ifs.close();
+        std::cerr << e.what() << '\n';
+        return false;
+    }
+    
+    ifs.close();
     return true;
 }
 
@@ -138,7 +173,6 @@ void system_config::default_init() noexcept
     parameter_.apI2c.dev = DEFAULT_API2C_DEV;
 
     parameter_.downloadpath = DEFAULT_DOWNLOAD_PATH;
-    memcpy(parameter_.version, fw_version, 4);
 }
 
 void system_config::SaveConfigFile()
@@ -201,9 +235,4 @@ std::ostream& operator<<(std::ostream& os, const system_config& config)
     os<<"apI2c:"<<parameter_->apI2c.dev<<"\n";
     os<<"downloadpath:"<<parameter_->downloadpath;
     return os;
-}
-
-const uint8_t *get_version()
-{
-    return fw_version;
 }

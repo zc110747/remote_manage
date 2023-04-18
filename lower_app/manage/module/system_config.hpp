@@ -53,6 +53,12 @@ typedef struct
     JString dev;
 }DeviceSysConfig;
 
+typedef struct
+{
+    JString author;
+    JString version;
+}fw_information;
+
 typedef struct 
 {
     //io config
@@ -76,7 +82,7 @@ typedef struct
 
     //path
     JString downloadpath;
-    uint8_t version[4];
+    fw_information information;
 }SystemParamter;
 
 class system_config
@@ -94,6 +100,8 @@ public:
 
     static system_config* get_instance();
     bool init(const char* path);
+    bool update_fw_info();
+
     void default_init() noexcept;
     void SaveConfigFile();             //保存Config的文件     
 
@@ -110,7 +118,5 @@ public:
     const DeviceSysConfig *geticmSpi()      {return &(parameter_.icmSpi);}
     const DeviceSysConfig *getapI2c()       {return &(parameter_.apI2c);}
     const JString &getdownloadpath()        {return parameter_.downloadpath;}
-    const uint8_t* getversion()             {return parameter_.version;}
+    const fw_information& get_fw_information() {return parameter_.information;}
 };
-
-const uint8_t *get_version();

@@ -71,7 +71,9 @@ function SysBuildApplication()
 
 	#覆盖配置文件
 	cp -f $ENV_PATH_PACKAGE/config.json $ENV_PATH_LOWER_APP_MANAGE/config.json
+	cp -f $ENV_PATH_PACKAGE/version.json $ENV_PATH_LOWER_APP_MANAGE/version.json
 	cp -f $ENV_PATH_PACKAGE/config.json $ENV_PATH_LOWER_APP_SERVER/config.json
+	cp -f $ENV_PATH_PACKAGE/version.json $ENV_PATH_LOWER_APP_SERVER/version.json
 
 	#编译程序
 	cd $ENV_PATH_LOWER_APP_MANAGE
