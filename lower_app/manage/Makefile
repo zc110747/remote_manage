@@ -8,7 +8,7 @@
 
 # This is object should be build and will link to generate
 # the executables
-CC = $(COMPILE_APPLICATION)g++
+CC = $(APP_CC_COMPILE)
 CFLAGS := -O3 -std=c++17 -fno-strict-aliasing -lrt 
 
 objects = 	main.o \
@@ -52,7 +52,7 @@ include_path = -I remote/ 			\
 				-I event/		\
 				-I center/
 								
-lib = lib/$(LIB_APPLICATION)libjsoncpp.a
+lib = lib/$(APP_LIB_APPLICATION)libjsoncpp.a
 
 # This is the file name of the executables and path where 
 # place the executables
