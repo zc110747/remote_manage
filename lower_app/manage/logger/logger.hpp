@@ -21,7 +21,7 @@ _Pragma("once")
 #include "fifo_manage.hpp"
 #include "productConfig.hpp"
 #include "cmd_process.hpp"
-#include "timer.hpp"
+#include "time_manage.hpp"
 
 #define LOGGER_MAX_BUFFER_SIZE      256
 #define LOGGER_MESSAGE_BUFFER_SIZE  16384

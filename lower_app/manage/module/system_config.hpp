@@ -89,34 +89,63 @@ class system_config
 {
     friend std::ostream& operator<<(std::ostream&, const system_config&);
 
-private:
-    static system_config *instance_pointer_;
-    SystemParamter parameter_;
-    std::string file_path_;
-
 public:
+    /// \brief constructor
     system_config() = default;
+
+    /// \brief destructor, delete not allow for singleton pattern.
     ~system_config() = delete;
 
+    /// \brief get_instance
+    /// - This method is used to get the pattern of the class.
+    /// \return the singleton pattern point of the object.
     static system_config* get_instance();
+
+    /// \brief init
+    /// - This method is used to init the object.
+    /// \param path - path of the file for config.
+    /// \return Wheather initialization is success or failed.
     bool init(const char* path);
+
+    /// \brief update_fw_info
+    /// - This method is used to update fw information.
     bool update_fw_info();
 
+    /// \brief default_init
+    /// - This method is used to set all data default.
     void default_init() noexcept;
-    void SaveConfigFile();             //保存Config的文件     
+
+    /// \brief save_config_file
+    /// - This method is used to save config file.
+    void save_config_file();
 
 public:
-    const std::string getFilePath() const    {return file_path_;};
-    const IoSysConfig *getled()             {return &(parameter_.led);}
-    const IoSysConfig *getbeep()            {return &(parameter_.beep);}
-    const DeviceSysConfig *getkey()         {return &(parameter_.key);}
-    const SerialSysConfig *getserial()      {return &(parameter_.serial);}
-    const SocketSysConfig *gettcp()         {return &(parameter_.tcp);}
-    const SocketSysConfig *getlogger()      {return &(parameter_.logger);}
-    const SocketSysConfig *getnode()        {return &(parameter_.node);}
-    const DeviceSysConfig *getrtc()         {return &(parameter_.rtc);}
-    const DeviceSysConfig *geticmSpi()      {return &(parameter_.icmSpi);}
-    const DeviceSysConfig *getapI2c()       {return &(parameter_.apI2c);}
-    const JString &getdownloadpath()        {return parameter_.downloadpath;}
-    const fw_information& get_fw_information() {return parameter_.information;}
+    /// \brief get*
+    /// - All This method is used to get internal information.
+    const std::string &get_config_file_path() const {return file_path_;};
+    const IoSysConfig &get_led_config()             {return parameter_.led;}
+    const IoSysConfig &get_beep_config()            {return parameter_.beep;}
+    const DeviceSysConfig &get_key_config()         {return parameter_.key;}
+    const SerialSysConfig &get_serial_config()      {return parameter_.serial;}
+    const SocketSysConfig &get_tcp_config()         {return parameter_.tcp;}
+    const SocketSysConfig &get_logger_config()      {return parameter_.logger;}
+    const SocketSysConfig &get_internal_config()    {return parameter_.node;}
+    const DeviceSysConfig &get_rtc_config()         {return parameter_.rtc;}
+    const DeviceSysConfig &get_icm_config()         {return parameter_.icmSpi;}
+    const DeviceSysConfig &get_ap_config()          {return parameter_.apI2c;}
+    const JString &get_download_path()              {return parameter_.downloadpath;}
+    const fw_information& get_fw_information()      {return parameter_.information;}
+    
+private:
+    /// \brief instance_pointer_
+    /// - object used to implement the singleton pattern.
+    static system_config *instance_pointer_;
+
+    /// \brief parameter_
+    /// - object used to store the system parameter.
+    SystemParamter parameter_;
+
+    /// \brief file_path_
+    /// - object used to store path of config file.
+    std::string file_path_;
 };

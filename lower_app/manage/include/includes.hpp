@@ -44,6 +44,7 @@ _Pragma("once")
 #include <algorithm>
 #include <chrono>
 #include <atomic>
+#include <vector>
 
 #if __cplusplus < 201703
 #error "c++ compiler need newer than g++7, can use 'g++ -v' to see version."

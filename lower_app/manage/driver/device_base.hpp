@@ -75,7 +75,7 @@ protected:
 class io_base:public device_base
 {
 public:
-    //constructor
+    /// \brief constructor
     using device_base::device_base;
 
     /// \brief read_io_status
@@ -120,7 +120,7 @@ template<typename T>
 class info_base:public device_base
 {
 public:
-    //constructor
+    /// \brief constructor
     using device_base::device_base;
 
     /// \brief read_info

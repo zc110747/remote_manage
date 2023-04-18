@@ -86,6 +86,8 @@ struct device_read_info
         memset((char *)this, 0, size());
     }
 
+    /// \brief copy_to_buffer
+    /// - This method is used to convert internal data to buffer
     uint8_t copy_to_buffer(char *buffer) const
     {
         uint8_t size = 0;

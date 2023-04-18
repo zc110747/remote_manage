@@ -26,16 +26,16 @@ void session_group::init(std::function<void(char* ptr, int size)> handler)
   handler_ = handler;
 }
 
-void session_group::join(share_session_pointer Session_)
+void session_group::join(share_session_pointer cur_session)
 {
   std::lock_guard<std::mutex> lock(mutex_);
-  set_.insert(Session_);
+  set_.insert(cur_session);
 }
 
-void session_group::leave(share_session_pointer Session_)
+void session_group::leave(share_session_pointer cur_session)
 {
   std::lock_guard<std::mutex> lock(mutex_);
-  set_.erase(Session_);
+  set_.erase(cur_session);
 }
 
 share_session_pointer session_group::get_session()
@@ -124,23 +124,6 @@ void session::do_write(char *pdate, std::size_t length)
       });
 }
 
-void session::do_write(std::size_t length)
-{
-  auto self(shared_from_this());
-  asio::async_write(socket_, asio::buffer(data_, length),
-      [this, self](std::error_code ec, std::size_t /*length*/)
-      {
-        if(!ec)
-        {
-            //do write callback
-        }
-        else
-        {
-          group_.leave(shared_from_this());
-        }
-      });
-}
-
 void session::do_close()
 {
   socket_.close();
@@ -154,39 +137,39 @@ void asio_server::run()
 
 const std::set<share_session_pointer>& asio_server::get_session_list()
 {
-    return group.get_session_list();
+    return group_.get_session_list();
 }
 
 share_session_pointer asio_server::get_valid_session()
 {
-    return group.get_session();
+    return group_.get_session();
 }
 
-void asio_server::clearSocket()
+void asio_server::close_all_session()
 {
-  auto session = group.get_session();
+  auto session = group_.get_session();
   while(session != nullptr)
   {
       session->do_close();
-      group.leave(session);
-      session = group.get_session();
+      group_.leave(session);
+      session = group_.get_session();
   }
 }
 
 bool asio_server::is_valid()
 {
-  return group.is_valid();
+  return group_.is_valid();
 }
 
 void asio_server::do_write(char *buffer, int size)
 {
-  group.do_write(buffer, size);
+  group_.do_write(buffer, size);
 }
 
 void asio_server::init(const std::string& address, const std::string& port, std::function<void(char* ptr, int size)> handler)
 {
     //update for rx handler
-    group.init(handler);
+    group_.init(handler);
 
     PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "asio_server start, bind:%s:%s!", address.c_str(), port.c_str());
     
@@ -215,8 +198,8 @@ void asio_server::do_accept()
         if (!ec)
         {
             //if accept, close other socket
-            clearSocket();
-            std::make_shared<session>(std::move(socket), group)->start();
+            close_all_session();
+            std::make_shared<session>(std::move(socket), group_)->start();
             PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Connect from client!");
         }
 

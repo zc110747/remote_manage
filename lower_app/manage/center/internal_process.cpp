@@ -39,11 +39,11 @@ static asio_server InterServer;
 
 void internal_process::run()
 {
-    const SocketSysConfig *pSocketConfig = system_config::get_instance()->getnode();
+    const auto& internal_config = system_config::get_instance()->get_internal_config();
 
     try
     {
-        InterServer.init(pSocketConfig->ipaddr, std::to_string(pSocketConfig->port), [this](char* ptr, int length){
+        InterServer.init(internal_config.ipaddr, std::to_string(internal_config.port), [this](char* ptr, int length){
             if(cmd_process_.parse_data(ptr, length))
             {
                 //用于处理命令，告知应用

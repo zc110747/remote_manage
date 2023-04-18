@@ -29,7 +29,7 @@ public:
     center_manage()=default;
     center_manage(const center_manage&)=delete;
 
-    /// - destructor, delete not allow for singleton pattern.
+    /// \brief destructor, delete not allow for singleton pattern.
     virtual ~center_manage()=delete;
 
     /// \brief get_instance

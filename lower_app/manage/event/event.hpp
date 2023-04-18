@@ -24,7 +24,7 @@ _Pragma("once")
 class Event
 {
 public:
-    //// \brief constructor
+    /// \brief constructor
     Event():id_(0){
         static_assert(std::is_trivially_copyable_v<Event>, "Not Allow C memory process");
     }
@@ -53,7 +53,7 @@ template<typename T>
 class EventExtend:public Event
 {
 public:
-    //constructor
+    /// \brief constructor
     using Event::Event;
 
     /// \brief get_data

@@ -174,8 +174,8 @@ void device_manage::run()
     char buffer[READ_BUFFER_SIZE];
 
     PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "device_manage start!");
-    time_manage::get_instance()->registerWork(0, TIME_TICK(1000), TIME_ACTION_ALWAYS, [&](){
-        Event event(DEVICE_ID_TIME_UPDATE_PREOID);
+    time_manage::get_instance()->register_action(DEVICE_ID_TIME_UPDATE_PREOID, TIME_TICK(1000), TIME_ACTION_ALWAYS, [&](int id){
+        Event event(id);
         send_message(reinterpret_cast<char *>(&event), sizeof(event));
     });
     
@@ -199,7 +199,9 @@ void device_manage::run()
         size = device_fifo_point_->read(buffer, READ_BUFFER_SIZE);
         if(size > 0)
         {
-            PRINT_LOG(LOG_DEBUG, xGetCurrentTicks(), "Device Command, %d!", size);
+            PRINT_LOG(LOG_DEBUG, xGetCurrentTicks(), "Device Command, size:%d, id:%d!", 
+                size,
+                reinterpret_cast<Event *>(buffer)->get_id());
             process_event(reinterpret_cast<Event *>(buffer));
         }
         else

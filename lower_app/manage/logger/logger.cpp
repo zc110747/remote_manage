@@ -26,12 +26,12 @@ static asio_server logger_server;
 //asio server test ok
 void LoggerManage::logger_rx_server_run()
 {
-    const SocketSysConfig *pSocketConfig = system_config::get_instance()->getlogger();
+    const auto& socket_config = system_config::get_instance()->get_logger_config();
     cmd_process Loggercmd_process;
 
     try
     {
-        logger_server.init(pSocketConfig->ipaddr, std::to_string(pSocketConfig->port), [&Loggercmd_process](char* ptr, int length){
+        logger_server.init(socket_config.ipaddr, std::to_string(socket_config.port), [&Loggercmd_process](char* ptr, int length){
             if(Loggercmd_process.parse_data(ptr, length))
             {
                 Loggercmd_process.process_data();

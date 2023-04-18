@@ -117,13 +117,27 @@ function SysCleanFirmware()
 }
 alias SysCleanFirmware='SysCleanFirmware'
 
+function SysExecuteFirmware()
+{
+	$ENV_PATH_PACKAGE/app_demo -f $ENV_PATH_PACKAGE/config.json
+}
+alias SysExecuteFirmware='SysExecuteFirmware'
+
+function SysKillFirmware()
+{
+	pkill -9 app_demo
+}
+alias SysKillFirmware='SysKillFirmware'
+
 #显示帮助信息
 function SysHelpCommand()
 {
 	echo 'SysBuildApplication'
 	echo '    Build the Application, package firmware.'
 	echo 'SysPushFirmware'
-	echo '    Push the frimware to remote embed device.'
+	echo '    Push the firmware to remote embed device.'
+	echo 'SysCleanFirmware'
+	echo '    Clean the firmware.'
 	echo 'SysHelpCommand'
 	echo '    Show the help command.'
 }
