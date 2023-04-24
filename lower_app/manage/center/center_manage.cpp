@@ -146,11 +146,11 @@ bool center_manage::init()
     //clear thread
     std::thread(std::bind(&center_manage::run, this)).detach();
     
-    center_fifo_point_ = new(std::nothrow) fifo_manage(CENTER_UNIT_FIFO, S_FIFO_WORK_MODE);
-    if(center_fifo_point_ == nullptr)
+    center_fifo_point_ = std::make_unique<fifo_manage>(CENTER_UNIT_FIFO, S_FIFO_WORK_MODE);
+    if(!center_fifo_point_->create())
     {
         return false;
     }
     
-    return center_fifo_point_->create();
+    return true;
 }

@@ -128,7 +128,7 @@ bool uart_thread_manage::init()
 		}
 	}
 	
-	uart_protocol_pointer_ = new(std::nothrow) protocol_info();
+	uart_protocol_pointer_ = std::make_unique<protocol_info>();
 	if(uart_protocol_pointer_ == nullptr)
 	{
 		PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "uart_protocol_pointer_ create failed!");

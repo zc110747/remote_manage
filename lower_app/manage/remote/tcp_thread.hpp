@@ -80,6 +80,6 @@ private:
 
 	/// \brief tcp_protocol_pointer_
     /// - pointer of the protocol process object for tcp application. 
-	protocol_info* tcp_protocol_pointer_;
+	std::unique_ptr<protocol_info> tcp_protocol_pointer_;
 };
 

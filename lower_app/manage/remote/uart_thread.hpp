@@ -92,7 +92,7 @@ private:
 
 	/// \brief uart_protocol_pointer_
     /// - protocol manage for uart thread.
-	protocol_info *uart_protocol_pointer_;
+	std::unique_ptr<protocol_info> uart_protocol_pointer_;
 
 	/// \brief mutex_
     /// - mutex used to protect com send.

@@ -141,7 +141,7 @@ private:
 
     /// \brief logger_fifo_
     /// - fifo used for logger manage.
-    fifo_manage *logger_fifo_{nullptr};
+    std::unique_ptr<fifo_manage> logger_fifo_{nullptr};
 };
 
 #define PRINT_NOW(...)    { printf(__VA_ARGS__); fflush(stdout);}

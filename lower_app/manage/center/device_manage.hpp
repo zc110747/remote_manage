@@ -210,5 +210,5 @@ private:
 
     /// \brief device_fifo_point_
     /// - fifo point used for the device management.
-    fifo_manage *device_fifo_point_{nullptr};
+    std::unique_ptr<fifo_manage> device_fifo_point_;
 };

@@ -171,11 +171,11 @@ private:
 
 	/// \brief rx_fifo_ptr_
     /// - pointer for protocol receive fifo manage.
-	fifo_manage *rx_fifo_ptr_{nullptr};
+	std::unique_ptr<fifo_manage> rx_fifo_ptr_;
 
 	/// \brief tx_fifo_ptr_
     /// - pointer for protocol transform fifo manage.
-	fifo_manage *tx_fifo_ptr_{nullptr};
+	std::unique_ptr<fifo_manage> tx_fifo_ptr_;
 
 	/// \brief handler_
     /// - function used to process send data in protocol.

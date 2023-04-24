@@ -21,7 +21,6 @@
 #include "time_manage.hpp"
 #include "center_manage.hpp"
 
-
 device_manage* device_manage::instance_pointer_ = nullptr;
 device_manage* device_manage::get_instance()
 {
@@ -45,13 +44,13 @@ bool device_manage::init()
     //clear thread
     std::thread(std::bind(&device_manage::run, this)).detach();
     
-    device_fifo_point_ = new(std::nothrow) fifo_manage(DEVICE_MESSAGE_FIFO, S_FIFO_WORK_MODE);
-    if(device_fifo_point_ == nullptr)
+    device_fifo_point_ = std::make_unique<fifo_manage>(DEVICE_MESSAGE_FIFO, S_FIFO_WORK_MODE);
+    if(!device_fifo_point_->create())
     {
         return false;
     }
     
-    return device_fifo_point_->create();
+    return true;
 }
 
 int device_manage::send_device_message(uint8_t device, uint8_t action)

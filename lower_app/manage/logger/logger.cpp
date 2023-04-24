@@ -100,7 +100,7 @@ bool LoggerManage::init()
     memory_end_pointer_ = &memoryBuffer[LOGGER_MESSAGE_BUFFER_SIZE];
 
     //init and Create logger fifo, must before thread run.
-    logger_fifo_ = new(std::nothrow) fifo_manage(LOGGER_FIFO_PATH, S_FIFO_WORK_MODE);
+    logger_fifo_ = std::make_unique<fifo_manage>(LOGGER_FIFO_PATH, S_FIFO_WORK_MODE);
     if(logger_fifo_ == nullptr)
         return false;
     if(!logger_fifo_->create())
