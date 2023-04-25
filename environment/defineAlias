@@ -99,14 +99,14 @@ function SysBuildApplication()
 alias SysBuildApplication='SysBuildApplication'
 
 #推送项目到嵌入式软件端
-function SysPushFirmware()
+function SysPushFirmware
 {
 	echo filepath:$ENV_PATH_PACKAGE, ipaddress:$EMBED_DEVICE_IPADDRESS
 	scp -r $ENV_PATH_PACKAGE/remote_manage_v$FMWARE_VESRION.tar.bz2 root@$EMBED_DEVICE_IPADDRESS:/tmp/
 }
 alias SysPushFirmware='SysPushFirmware'
 
-function SysCleanFirmware()
+function SysCleanFirmware
 {
 	rm $ENV_PATH_PACKAGE/remote_manage_v$FMWARE_VESRION.tar.bz2
 	cd $ENV_PATH_LOWER_APP_MANAGE
@@ -117,20 +117,73 @@ function SysCleanFirmware()
 }
 alias SysCleanFirmware='SysCleanFirmware'
 
-function SysExecuteFirmware()
+function SysExecuteFirmware
 {
 	$ENV_PATH_PACKAGE/app_demo -f $ENV_PATH_PACKAGE/config.json
 }
 alias SysExecuteFirmware='SysExecuteFirmware'
 
-function SysKillFirmware()
+function SysKillFirmware
 {
 	pkill -9 app_demo
 }
 alias SysKillFirmware='SysKillFirmware'
 
+#将数据写入到文件中
+function SysUpdateConfig
+{
+	truncate -s 0 $ENV_CONFIG_FILE
+	echo "$FIRMWARE_CURRENT_PLATFORMS">$ENV_CONFIG_FILE
+	echo "$FMWARE_VESRION">>$ENV_CONFIG_FILE
+	echo "$EMBED_DEVICE_IPADDRESS">>$ENV_CONFIG_FILE
+	exec bash
+}
+alias SysUpdateConfig='SysUpdateConfig'
+
+#设置嵌入式linux环境
+function SysSetPlatformEmbedLinux
+{
+	export FIRMWARE_CURRENT_PLATFORMS="Embed-Linux"
+	SysUpdateConfig
+}
+alias SysSetPlatformEmbedLinux='SysSetPlatformEmbedLinux'
+
+#设置环境为linux
+function SysSetPlatformLinux
+{
+	export FIRMWARE_CURRENT_PLATFORMS="Linux"
+	SysUpdateConfig
+}
+alias SysSetPlatformLinux='SysSetPlatformLinux'
+
+#设置远端设备ip
+function SysRemoteIpAddress
+{
+	if [ $# -eq 1 ]; then
+		export EMBED_DEVICE_IPADDRESS=$1
+		echo "Set Remote IpAddress is $1"
+		SysUpdateConfig
+	else
+		echo "one parameter about ipaddress need!"
+	fi
+}
+alias SysRemoteIpAddress='SysRemoteIpAddress'
+
+#设置远端设备ip
+function SysSetFirmwareVer
+{
+	if [ $# -eq 1 ]; then
+		export FMWARE_VESRION=$1
+		echo "Set Firmware Version is $1"
+		SysUpdateConfig
+	else
+		echo "one parameter about firmware version need!"
+	fi
+}
+alias SysSetFirmwareVer='SysSetFirmwareVer'
+
 #显示帮助信息
-function SysHelpCommand()
+function SysHelpCommand
 {
 	echo 'SysBuildApplication'
 	echo '    Build the Application, package firmware.'
