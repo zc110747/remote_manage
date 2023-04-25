@@ -12,9 +12,20 @@ echo "Load the Env Data..."
 #-------------------------------------------------------------------------------
 export ENV_KERNEL_DIR="/home/center/application/project/linux"
 export EMBED_DEVICE_IPADDRESS="192.168.2.99"
-export FIRMWARE_CURRENT_PLATFORMS="Embed-Linux"
-
+export FIRMWARE_CURRENT_PLATFORMS="Linux"
 export FMWARE_VESRION="1.0.0.7"
+export ENV_CONFIG_FILE="$ENV_PATH_ENVIRONMENT/EnvConfig.mk"
+
+#-------------------------------------------------------------------------------
+# ProcessConfig.
+#-------------------------------------------------------------------------------
+declare -a array
+while read line; do
+    array+=("$line")
+done < $ENV_CONFIG_FILE
+FIRMWARE_CURRENT_PLATFORMS="${array[0]}"
+FMWARE_VESRION="${array[1]}"
+EMBED_DEVICE_IPADDRESS="${array[2]}"
 
 #-------------------------------------------------------------------------------
 # This section defined the word color.
@@ -67,5 +78,9 @@ export ENV_PATH_UPPER_APP="$ENV_PATH_ROOT/upper_app"
 export ENV_PATH_PACKAGE="$ENV_PATH_ROOT/package"
 export ENV_PATH_KERNAL_MOD="$ENV_PATH_ROOT/kernal_mod"
 
+#-------------------------------------------------------------------------------
+# Env Vars define finish shows
+#-------------------------------------------------------------------------------
 echo "Update Environment Data Success!"
-echo "Current Platform is ${greenText}$FIRMWARE_CURRENT_PLATFORMS.${defText}, Remote IPAdress is ${greenText}$EMBED_DEVICE_IPADDRESS.${defText}"
+echo "Current Platform is ${greenText}$FIRMWARE_CURRENT_PLATFORMS${defText}, Remote IPAdress is ${greenText}$EMBED_DEVICE_IPADDRESS${defText}."
+echo "Current Firmware Version is ${greenText}$FMWARE_VESRION${defText}."

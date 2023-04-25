@@ -16,18 +16,27 @@ echo "Update the Plugin by filepath /home/[root]/.bashrc."
 # This section defines the private config for the program.
 # if download the package, first modify when download.
 #-------------------------------------------------------------------------------
-export ENV_PATH_ROOT="/mnt/d/user_project/git/remote_manage"
+export ENV_PATH_ROOT="/home/center/application/remote_manage/"
+if [ ! -d "$ENV_PATH_ROOT" ]; then 
+    export ENV_PATH_ROOT="/mnt/d/user_project/git/remote_manage"
+fi
+
+echo "Root Path:$ENV_PATH_ROOT"
 export ENV_PATH_ENVIRONMENT="$ENV_PATH_ROOT/environment"
 
 #-------------------------------------------------------------------------------
 # execute the script to init global variable
 #-------------------------------------------------------------------------------
-source $ENV_PATH_ENVIRONMENT/defineEnvVars
+if [ -f "$ENV_PATH_ENVIRONMENT/defineEnvVars" ]; then
+    source $ENV_PATH_ENVIRONMENT/defineEnvVars
+fi
 
 #-------------------------------------------------------------------------------
 # execute the script to init global command
 #-------------------------------------------------------------------------------
-source $ENV_PATH_ENVIRONMENT/defineAlias
+if [ -f "$ENV_PATH_ENVIRONMENT/defineAlias" ]; then
+    source $ENV_PATH_ENVIRONMENT/defineAlias
+fi
 
 #-------------------------------------------------------------------------------
 # end of the bashrc.
