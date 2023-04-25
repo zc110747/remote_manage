@@ -10,11 +10,24 @@ echo "Load the Env Data..."
 # This section defines the internal 
 # Not need Change unless program change.
 #-------------------------------------------------------------------------------
+
+export TFTP_PATH="/home/center/arm_linux/tftp"
+export ENV_CONFIG_FILE="$ENV_PATH_ENVIRONMENT/EnvConfig.mk"
+
 export ENV_KERNEL_DIR="/home/center/application/project/linux"
+export ENV_KERNAL_ZIMAGE="$ENV_KERNEL_DIR/arch/arm/boot/zImage"
+export ENV_KERNAL_DTB="$ENV_KERNEL_DIR/arch/arm/boot/dts/imx6ull-14x14-emmc-4.3-800x480-c.dtb"
+
+export OLD_GCC_PATH=/home/center/install/gcc-arm-old/gcc/bin
+export NEW_GCC_PATH=/home/center/install/gcc-arm/bin/
+export KERNAL_CC=$OLD_GCC_PATH/arm-linux-gnueabihf-
+
+#-------------------------------------------------------------------------------
+# This section defines the default internal config
+#-------------------------------------------------------------------------------
 export EMBED_DEVICE_IPADDRESS="192.168.2.99"
 export FIRMWARE_CURRENT_PLATFORMS="Linux"
 export FMWARE_VESRION="1.0.0.7"
-export ENV_CONFIG_FILE="$ENV_PATH_ENVIRONMENT/EnvConfig.mk"
 
 #-------------------------------------------------------------------------------
 # ProcessConfig.

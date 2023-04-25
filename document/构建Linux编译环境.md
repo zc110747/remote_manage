@@ -31,8 +31,9 @@ sudo apt-get install bc lzop libffi-dev libssl-dev lzop git
 sudo apt-get install libncurses5-dev u-boot-tools openssh-server 
 sudo apt-get install dos2unix gzip libtool flex
 sudo apt-get install build-essential manpages-dev make bison
-sudo apt-get install  software-properties-common binutils gcc-multilib 
+sudo apt-get install software-properties-common binutils gcc-multilib 
 sudo apt-get install libc6-dev-i386
+sudo apt-get install lsb-core lib32stdc++6
 ```
 
 如此，基本完成了Linux平台基础环境的构建.  

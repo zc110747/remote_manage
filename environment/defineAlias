@@ -15,6 +15,7 @@ alias pe="printenv"
 alias se="saveenv"
 
 alias cdr="cd $ENV_PATH_ROOT"
+alias cdk="cd $ENV_KERNEL_DIR"
 alias cdl="cd $ENV_PATH_LOWER_APP"
 alias cdlm="cd $ENV_PATH_LOWER_APP_MANAGE"
 alias cdls="cd $ENV_PATH_LOWER_APP_SERVER"
@@ -181,6 +182,19 @@ function SysSetFirmwareVer
 	fi
 }
 alias SysSetFirmwareVer='SysSetFirmwareVer'
+
+#compare linux keranl
+function SysBuildKernal
+{
+	cd $ENV_KERNEL_DIR
+	make distclean
+	make ARCH=arm CROSS_COMPILE=$KERNAL_CC imx_v7_defconfig
+	make V=1 ARCH=arm CROSS_COMPILE=$KERNAL_CC all -j4
+
+	cp -avf $ENV_KERNAL_ZIMAGE $TFTP_PATH/
+	cp -avf $ENV_KERNAL_DTB $TFTP_PATH/
+}
+alias SysBuildKernal='SysBuildKernal'
 
 #显示帮助信息
 function SysHelpCommand
