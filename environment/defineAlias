@@ -158,7 +158,7 @@ function SysSetPlatformLinux
 alias SysSetPlatformLinux='SysSetPlatformLinux'
 
 #设置远端设备ip
-function SysRemoteIpAddress
+function SysSetRemoteIpAddress
 {
 	if [ $# -eq 1 ]; then
 		export EMBED_DEVICE_IPADDRESS=$1
@@ -168,9 +168,9 @@ function SysRemoteIpAddress
 		echo "one parameter about ipaddress need!"
 	fi
 }
-alias SysRemoteIpAddress='SysRemoteIpAddress'
+alias SysSetRemoteIpAddress='SysSetRemoteIpAddress'
 
-#设置远端设备ip
+#设置fimware的版本号
 function SysSetFirmwareVer
 {
 	if [ $# -eq 1 ]; then
@@ -200,11 +200,21 @@ alias SysBuildKernal='SysBuildKernal'
 function SysHelpCommand
 {
 	echo 'SysBuildApplication'
-	echo '    Build the Application, package firmware.'
+	echo '    Build Application, Package Firmware.'
+	echo 'SysBuildKernal'
+	echo '    Build the Kernal, if exist directory'
+	echo 'SysSetPlatformEmbedLinux'
+	echo '    Set Current Platform to Embed-Linux Complier'
+	echo 'SysSetPlatformLinux'
+	echo '    Set Current Platform to Linux Complier.'
+	echo 'SysSetRemoteIpAddress'
+	echo '    Set the remote ipaddress for command <SysPushFirmware>'
+	echo 'SysSetFirmwareVer'
+	echo '    Set the verison of the firmware when build'
 	echo 'SysPushFirmware'
-	echo '    Push the firmware to remote embed device.'
+	echo '    Push firmware to remote embed device.'
 	echo 'SysCleanFirmware'
-	echo '    Clean the firmware.'
+	echo '    Clean firmware.'
 	echo 'SysHelpCommand'
 	echo '    Show the help command.'
 }
