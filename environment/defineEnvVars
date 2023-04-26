@@ -12,15 +12,23 @@ echo "Load the Env Data..."
 #-------------------------------------------------------------------------------
 
 export TFTP_PATH="/home/center/arm_linux/tftp"
+export NFS_PATH="/home/center/arm_linux/nfs/rootfs"
+
 export ENV_CONFIG_FILE="$ENV_PATH_ENVIRONMENT/EnvConfig.mk"
 
 export ENV_KERNEL_DIR="/home/center/application/project/linux"
 export ENV_KERNAL_ZIMAGE="$ENV_KERNEL_DIR/arch/arm/boot/zImage"
 export ENV_KERNAL_DTB="$ENV_KERNEL_DIR/arch/arm/boot/dts/imx6ull-14x14-emmc-4.3-800x480-c.dtb"
 
+export ENV_BOOT_DIR="/home/center/application/project/uboot"
+export ENV_ROOTFS_DIR="/home/center/application/project/rootfs"
+
 export OLD_GCC_PATH=/home/center/install/gcc-arm-old/gcc/bin
 export NEW_GCC_PATH=/home/center/install/gcc-arm/bin/
+export GCC_LIB=/home/center/install/gcc-arm/arm-linux-gnueabihf
 export KERNAL_CC=$OLD_GCC_PATH/arm-linux-gnueabihf-
+
+export PATH="$PATH:$NEW_GCC_PATH"
 
 #-------------------------------------------------------------------------------
 # This section defines the default internal config

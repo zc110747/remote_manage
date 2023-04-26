@@ -16,6 +16,8 @@ alias se="saveenv"
 
 alias cdr="cd $ENV_PATH_ROOT"
 alias cdk="cd $ENV_KERNEL_DIR"
+alias cdu="cd $ENV_BOOT_DIR"
+alias cdf="cd $ENV_ROOTFS_DIR"
 alias cdl="cd $ENV_PATH_LOWER_APP"
 alias cdlm="cd $ENV_PATH_LOWER_APP_MANAGE"
 alias cdls="cd $ENV_PATH_LOWER_APP_SERVER"
@@ -60,7 +62,7 @@ function SysBuildApplication()
 		cd $ENV_PATH_KERNAL_MOD/spi_icm/
 		make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
 		mv kernal_spi_icm.ko ../../package/driver/
-		make clean
+		make clean$ENV_BOOT_DIR/
 
 		cd $ENV_PATH_KERNAL_MOD/key/
 		make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
@@ -94,7 +96,7 @@ function SysBuildApplication()
 	rm server.tar.bz2
 
 	#回到项目的地址
-	cdr
+	cdr$ENV_BOOT_DIR/
 }
 
 alias SysBuildApplication='SysBuildApplication'
@@ -187,14 +189,58 @@ alias SysSetFirmwareVer='SysSetFirmwareVer'
 function SysBuildKernal
 {
 	cd $ENV_KERNEL_DIR
-	make distclean
-	make ARCH=arm CROSS_COMPILE=$KERNAL_CC imx_v7_defconfig
 	make V=1 ARCH=arm CROSS_COMPILE=$KERNAL_CC all -j4
 
 	cp -avf $ENV_KERNAL_ZIMAGE $TFTP_PATH/
 	cp -avf $ENV_KERNAL_DTB $TFTP_PATH/
 }
 alias SysBuildKernal='SysBuildKernal'
+
+function SysCleanKernal
+{
+	cd $ENV_KERNEL_DIR
+	make distclean
+	make ARCH=arm CROSS_COMPILE=$KERNAL_CC imx_v7_defconfig
+}
+alias SysCleanKernal='SysCleanKernal'
+
+function SysBuildUboot
+{
+	cd $ENV_BOOT_DIR
+	make V=1 ARCH=arm CROSS_COMPILE=$KERNAL_CC all -j4
+
+	cp -avf u-boot.imx $TFTP_PATH/
+}
+alias SysBuildUboot='SysBuildUboot'
+
+function SysCleanUboot
+{
+	cd $ENV_BOOT_DIR
+	make distclean
+	make ARCH=arm CROSS_COMPILE=$KERNAL_CC mx6ull_14x14_evk_emmc_defconfig
+}
+alias SysCleanUboot='SysCleanUboot'
+
+function SysBuildRootfs
+{
+	cd $ENV_ROOTFS_DIR/busybox
+	make&&make install
+
+	cp -ravf $ENV_ROOTFS_DIR/_install/* $NFS_PATH/
+	cd $GCC_LIB/lib
+
+	cp -ravf *so* *.a $NFS_PATH/lib/
+	cd $GCC_LIB/libc/lib
+	cp -ravf *so* *.a $NFS_PATH/lib/
+}
+alias SysBuildRootfs='SysBuildRootfs'
+
+function SysCleanRootfs
+{
+	cd $ENV_ROOTFS_DIR
+	make clean
+}
+alias SysCleanRootfs='SysCleanRootfs'
 
 #显示帮助信息
 function SysHelpCommand
