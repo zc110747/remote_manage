@@ -19,6 +19,7 @@ alias cdk="cd $ENV_KERNEL_DIR"
 alias cdu="cd $ENV_BOOT_DIR"
 alias cdf="cd $ENV_ROOTFS_DIR"
 alias cdl="cd $ENV_PATH_LOWER_APP"
+alias cdn="cd $NFS_PATH"
 alias cdlm="cd $ENV_PATH_LOWER_APP_MANAGE"
 alias cdls="cd $ENV_PATH_LOWER_APP_SERVER"
 
@@ -62,7 +63,7 @@ function SysBuildApplication()
 		cd $ENV_PATH_KERNAL_MOD/spi_icm/
 		make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
 		mv kernal_spi_icm.ko ../../package/driver/
-		make clean$ENV_BOOT_DIR/
+		make clean
 
 		cd $ENV_PATH_KERNAL_MOD/key/
 		make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
@@ -95,8 +96,18 @@ function SysBuildApplication()
 	tar -vcjf remote_manage_v$FMWARE_VESRION.tar.bz2 *
 	rm server.tar.bz2
 
+	#clear the nfs run and copy new code
+	rm -rf $NFS_RUN_PATH/*
+	cd $ENV_PATH_ROOT
+	cp package/app_demo $NFS_RUN_PATH/
+	cp package/config.json $NFS_RUN_PATH/
+	cp package/startApp $NFS_RUN_PATH/
+	cp package/SysUpdate $NFS_RUN_PATH/
+	cp -rf package/driver/ $NFS_RUN_PATH/
+	cp -rf lower_app/server/ $NFS_RUN_PATH/
+
 	#回到项目的地址
-	cdr$ENV_BOOT_DIR/
+	cdr
 }
 
 alias SysBuildApplication='SysBuildApplication'
@@ -241,6 +252,28 @@ function SysCleanRootfs
 	make clean
 }
 alias SysCleanRootfs='SysCleanRootfs'
+
+function SysPackageFirmware
+{
+	if [ ! -d $DST_PATH ]; then
+		mkdir $DST_PATH 
+	fi
+
+	cd $TFTP_PATH
+	cp -rvf * $DST_PATH/
+	
+	cd $DST_PATH/
+	mv u-boot.imx $ENV_KERNAL_BIN
+
+	cd $NFS_PATH
+	rm -rf rootfs.tar.bz2 
+	tar -vcjf rootfs.tar.bz2 *
+	mv rootfs.tar.bz2 $DST_PATH/
+
+	echo "PackFirmware Success, you can find firmware in directory:"
+	echo "$DST_PATH/"
+}
+alias SysPackageFirmware='SysPackageFirmware'
 
 #显示帮助信息
 function SysHelpCommand

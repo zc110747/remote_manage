@@ -101,7 +101,7 @@ void tcp_thread_manage::tcp_tx_run()
 bool tcp_thread_manage::init()
 {
     //must creat fifo before thread start
-    tcp_protocol_pointer_ = std::unique_ptr<protocol_info>();
+    tcp_protocol_pointer_ = std::make_unique<protocol_info>();
     if(tcp_protocol_pointer_ == nullptr)
     {
         PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "tcp_protocol_pointer_ create failed!");

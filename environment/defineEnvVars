@@ -13,12 +13,15 @@ echo "Load the Env Data..."
 
 export TFTP_PATH="/home/center/arm_linux/tftp"
 export NFS_PATH="/home/center/arm_linux/nfs/rootfs"
+export NFS_RUN_PATH="$NFS_PATH/manage/bin"
+export DST_PATH="/home/freedom/Desktop/Firmware"
 
 export ENV_CONFIG_FILE="$ENV_PATH_ENVIRONMENT/EnvConfig.mk"
 
 export ENV_KERNEL_DIR="/home/center/application/project/linux"
 export ENV_KERNAL_ZIMAGE="$ENV_KERNEL_DIR/arch/arm/boot/zImage"
 export ENV_KERNAL_DTB="$ENV_KERNEL_DIR/arch/arm/boot/dts/imx6ull-14x14-emmc-4.3-800x480-c.dtb"
+export ENV_KERNAL_BIN="u-boot-imx6ull-14x14-ddr512-emmc.imx"
 
 export ENV_BOOT_DIR="/home/center/application/project/uboot"
 export ENV_ROOTFS_DIR="/home/center/application/project/rootfs"
