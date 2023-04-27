@@ -2,7 +2,7 @@
 
 ## 项目框架
 
-![image](https://github.com/zc110747/remote_manage/blob/master/document/Image/firmware.jpg)
+![image](https://github.com/zc110747/remote_manage/document/image/firmware.jpg)
 
 ## 如何编译执行项目
 
@@ -10,9 +10,9 @@
 1.修改environment/.bashrc下的配置文件.  
 主要修改项如下:  
 ```bash
-export ENV_PATH_ROOT="/mnt/d/user_project/git/remote_manage"    #修改为项目下载后的目录
-export ENV_KERNEL_DIR="/home/center/application/project/linux"  #修改为linux解压后目录
-export EMBED_DEVICE_IPADDRESS="192.168.2.99"                    #修改为嵌入式平台的IP地址
+export ENV_PATH_ROOT="/mnt/d/user_project/git/remote_manage" 
+export ENV_KERNEL_DIR="/home/center/application/project/linux" 
+export EMBED_DEVICE_IPADDRESS="192.168.2.99"
 ```
 2.将environment/.bashrc复制到系统根目录.  
 ```bash
@@ -25,6 +25,13 @@ Loading CDE Plugin...
 Load Plugin Success!
 Can use command 'SysHelpCommand' for more helps.
 Update the Plugin by filepath /home/[root]/.bashrc.
+Root Path:/mnt/d/user_project/git/remote_manage
+Load the Env Data...
+Update Environment Data Success!
+Current Platform is Embed-Linux, Remote IPAdress is 192.168.1.24.
+Current Firmware Version is 1.0.0.9.
+Update the Alias Command...
+Update the Alias Command Success!
 -------------------------------------------------------------------------
 ```
 3.使用命令进行编译和上传firmware.  
