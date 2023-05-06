@@ -2,7 +2,7 @@
 
 ## 项目框架
 
-![image](https://github.com/zc110747/remote_manage/document/image/firmware.jpg)
+![image](document/image/firmware.jpg)
 
 ## 如何编译执行项目
 1.将项目下载到指定的目录  
