@@ -10,7 +10,6 @@ echo "Load the Env Data..."
 # This section defines the internal 
 # Not need Change unless program change.
 #-------------------------------------------------------------------------------
-
 export TFTP_PATH="/home/center/arm_linux/tftp"
 export NFS_PATH="/home/center/arm_linux/nfs/rootfs"
 export NFS_RUN_PATH="$NFS_PATH/manage/bin"
@@ -36,9 +35,9 @@ export PATH="$PATH:$NEW_GCC_PATH"
 #-------------------------------------------------------------------------------
 # This section defines the default internal config
 #-------------------------------------------------------------------------------
-export EMBED_DEVICE_IPADDRESS="192.168.2.99"
-export FIRMWARE_CURRENT_PLATFORMS="Linux"
-export FMWARE_VESRION="1.0.0.7"
+export EMBED_DEVICE_IPADDRESS=""
+export FIRMWARE_CURRENT_PLATFORMS=""
+export FMWARE_VESRION=""
 
 #-------------------------------------------------------------------------------
 # ProcessConfig.
@@ -58,6 +57,17 @@ readonly defText="$(tput sgr0)"
 readonly redText="$(tput setaf 1)"
 readonly greenText="$(tput setaf 2)"
 readonly yellowText="$(tput setaf 3)"
+readonly limityellowText="$(tput setaf 190)"
+readonly powerblueText="$(tput setaf 153)"
+readonly blueText="$(tput setaf 4)"
+readonly magentaText="$(tput setaf 5)"
+readonly cyanText="$(tput setaf 6)"
+readonly whiteText="$(tput setaf 7)"
+readonly brightText="$(tput bold)"
+readonly blinkText="$(tput blink)"
+readonly reverseText="$(tput smso)"
+readonly underlineText="$(tput smul)"
+
 
 # Now define an global platforms for all the type support
 # Linux：used for PC software
@@ -106,5 +116,6 @@ export ENV_PATH_KERNAL_MOD="$ENV_PATH_ROOT/kernal_mod"
 # Env Vars define finish shows
 #-------------------------------------------------------------------------------
 echo "Update Environment Data Success!"
+echo "Can use command '${greenText}SysHelpCommand${defText}' for more helps."
 echo "Current Platform is ${greenText}$FIRMWARE_CURRENT_PLATFORMS${defText}, Remote IPAdress is ${greenText}$EMBED_DEVICE_IPADDRESS${defText}."
 echo "Current Firmware Version is ${greenText}$FMWARE_VESRION${defText}."

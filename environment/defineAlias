@@ -27,6 +27,8 @@ alias cdls="cd $ENV_PATH_LOWER_APP_SERVER"
 # This section defines the function for program management.
 # The Extend Command for program compiler, package, push.
 #-------------------------------------------------------------------------------
+# 编译项目下应用，包含驱动，下位机的主控，服务器程序，打包成firmware
+# 同时复制到nfs路径下，用于驱动板远程访问
 function SysBuildApplication()
 {
 	echo frimware path:$ENV_PATH_ROOT
@@ -96,31 +98,36 @@ function SysBuildApplication()
 	tar -vcjf remote_manage_v$FMWARE_VESRION.tar.bz2 *
 	rm server.tar.bz2
 
-	#clear the nfs run and copy new code
-	rm -rf $NFS_RUN_PATH/*
-	cd $ENV_PATH_ROOT
-	cp package/app_demo $NFS_RUN_PATH/
-	cp package/config.json $NFS_RUN_PATH/
-	cp package/startApp $NFS_RUN_PATH/
-	cp package/SysUpdate $NFS_RUN_PATH/
-	cp -rf package/driver/ $NFS_RUN_PATH/
-	cp -rf lower_app/server/ $NFS_RUN_PATH/
+	#将编译好的项目复制到nfs目录指定位置
+	#采用nfs启动后即可执行
+	if [ -d $NFS_RUN_PATH ]; then
+		rm -rf $NFS_RUN_PATH/*
+		cd $ENV_PATH_ROOT
+		cp package/app_demo $NFS_RUN_PATH/
+		cp package/config.json $NFS_RUN_PATH/
+		cp package/startApp $NFS_RUN_PATH/
+		cp package/SysUpdate $NFS_RUN_PATH/
+		cp -rf package/driver/ $NFS_RUN_PATH/
+		cp -rf lower_app/server/ $NFS_RUN_PATH/
+	else
+		echo "nfs directory $NFS_RUN_PATH not exist, not copy!"
+	fi
 
-	#回到项目的地址
 	cdr
 }
-
 alias SysBuildApplication='SysBuildApplication'
 
-#推送项目到嵌入式软件端
-function SysPushFirmware
+#将打包好的文件通过ssh推送到嵌入式linux设备端
+#需要嵌入式linux设备端支持ssh服务，且$EMBED_DEVICE_IPADDRESS一致
+function SysPushApplication
 {
 	echo filepath:$ENV_PATH_PACKAGE, ipaddress:$EMBED_DEVICE_IPADDRESS
 	scp -r $ENV_PATH_PACKAGE/remote_manage_v$FMWARE_VESRION.tar.bz2 root@$EMBED_DEVICE_IPADDRESS:/tmp/
 }
-alias SysPushFirmware='SysPushFirmware'
+alias SysPushApplication='SysPushApplication'
 
-function SysCleanFirmware
+#清除firmware，包含编译的中间文件和打包后的firmware.
+function SysCleanApplication
 {
 	rm $ENV_PATH_PACKAGE/remote_manage_v$FMWARE_VESRION.tar.bz2
 	cd $ENV_PATH_LOWER_APP_MANAGE
@@ -129,21 +136,24 @@ function SysCleanFirmware
 	#回到项目的地址
 	cdr
 }
-alias SysCleanFirmware='SysCleanFirmware'
+alias SysCleanApplication='SysCleanApplication'
 
+#执行firmware，仅限于linux环境下编译的应用，主要用于测试
 function SysExecuteFirmware
 {
 	$ENV_PATH_PACKAGE/app_demo -f $ENV_PATH_PACKAGE/config.json
 }
 alias SysExecuteFirmware='SysExecuteFirmware'
 
+#关闭firmware，仅限于linux环境下编译的应用，主要用于测试
 function SysKillFirmware
 {
 	pkill -9 app_demo
 }
 alias SysKillFirmware='SysKillFirmware'
 
-#将数据写入到文件中
+#将配置参数写入到$ENV_CONFIG_FILE，在启动时即可读取
+#一般不单独调用
 function SysUpdateConfig
 {
 	truncate -s 0 $ENV_CONFIG_FILE
@@ -152,9 +162,8 @@ function SysUpdateConfig
 	echo "$EMBED_DEVICE_IPADDRESS">>$ENV_CONFIG_FILE
 	exec bash
 }
-alias SysUpdateConfig='SysUpdateConfig'
 
-#设置嵌入式linux环境
+#设置当前环境为编译嵌入式Linux平台的配置
 function SysSetPlatformEmbedLinux
 {
 	export FIRMWARE_CURRENT_PLATFORMS="Embed-Linux"
@@ -162,7 +171,7 @@ function SysSetPlatformEmbedLinux
 }
 alias SysSetPlatformEmbedLinux='SysSetPlatformEmbedLinux'
 
-#设置环境为linux
+#设置当前环境为编译Linux平台的配置
 function SysSetPlatformLinux
 {
 	export FIRMWARE_CURRENT_PLATFORMS="Linux"
@@ -170,7 +179,7 @@ function SysSetPlatformLinux
 }
 alias SysSetPlatformLinux='SysSetPlatformLinux'
 
-#设置远端设备ip
+#设置嵌入式端设备IP地址，主要配合SysPushApplication使用
 function SysSetRemoteIpAddress
 {
 	if [ $# -eq 1 ]; then
@@ -183,8 +192,8 @@ function SysSetRemoteIpAddress
 }
 alias SysSetRemoteIpAddress='SysSetRemoteIpAddress'
 
-#设置fimware的版本号
-function SysSetFirmwareVer
+#设置打包的firmware的版本号，升级时使用
+function SysSetApplicationVer
 {
 	if [ $# -eq 1 ]; then
 		export FMWARE_VESRION=$1
@@ -194,81 +203,128 @@ function SysSetFirmwareVer
 		echo "one parameter about firmware version need!"
 	fi
 }
-alias SysSetFirmwareVer='SysSetFirmwareVer'
+alias SysSetApplicationVer='SysSetApplicationVer'
 
-#compare linux keranl
+#编译linux内核
+#对于内核目录，需要提前构建好配置定义，此命令仅进行编译
+#因为最新的gcc编译会无法执行，所以指定了$KERNAL_CC对应的编译器
 function SysBuildKernal
 {
-	cd $ENV_KERNEL_DIR
-	make V=1 ARCH=arm CROSS_COMPILE=$KERNAL_CC all -j4
+	if [ -d $ENV_KERNEL_DIR ]; then
+		cd $ENV_KERNEL_DIR
+		make V=1 ARCH=arm CROSS_COMPILE=$KERNAL_CC all -j4
 
-	cp -avf $ENV_KERNAL_ZIMAGE $TFTP_PATH/
-	cp -avf $ENV_KERNAL_DTB $TFTP_PATH/
+		cp -avf $ENV_KERNAL_ZIMAGE $TFTP_PATH/
+		cp -avf $ENV_KERNAL_DTB $TFTP_PATH/
+	else
+		echo "Kernal Directory:$ENV_KERNEL_DIR not exist!"
+	fi
 }
 alias SysBuildKernal='SysBuildKernal'
 
+#清除内核编译
 function SysCleanKernal
 {
-	cd $ENV_KERNEL_DIR
-	make distclean
-	make ARCH=arm CROSS_COMPILE=$KERNAL_CC imx_v7_defconfig
+	if [ -d $ENV_KERNEL_DIR ]; then
+		cd $ENV_KERNEL_DIR
+		make distclean
+		make ARCH=arm CROSS_COMPILE=$KERNAL_CC imx_v7_defconfig
+	else
+		echo "Kernal Directory:$ENV_KERNEL_DIR not exist!"
+	fi
 }
 alias SysCleanKernal='SysCleanKernal'
 
+#编译uboot
+#对于uboot目录，需要提前构建好配置定义，此命令仅进行编译
+#因为最新的gcc编译会无法执行，所以指定了$KERNAL_CC对应的编译器
 function SysBuildUboot
 {
-	cd $ENV_BOOT_DIR
-	make V=1 ARCH=arm CROSS_COMPILE=$KERNAL_CC all -j4
-
-	cp -avf u-boot.imx $TFTP_PATH/
+	if [ -d $ENV_BOOT_DIR ]; then
+		cd $ENV_BOOT_DIR
+		make V=1 ARCH=arm CROSS_COMPILE=$KERNAL_CC all -j4
+		cp -avf u-boot.imx $TFTP_PATH/
+	else
+		echo "uboot directory:$ENV_BOOT_DIR not exist!"
+	fi
 }
 alias SysBuildUboot='SysBuildUboot'
 
+#清除uboot编译
 function SysCleanUboot
 {
-	cd $ENV_BOOT_DIR
-	make distclean
-	make ARCH=arm CROSS_COMPILE=$KERNAL_CC mx6ull_14x14_evk_emmc_defconfig
+	if [ -d $ENV_BOOT_DIR ]; then
+		cd $ENV_BOOT_DIR
+		make distclean
+		make ARCH=arm CROSS_COMPILE=$KERNAL_CC mx6ull_14x14_evk_emmc_defconfig
+	else
+		echo "uboot directory:$ENV_BOOT_DIR not exist!"
+	fi
 }
 alias SysCleanUboot='SysCleanUboot'
 
+#编译rootfs
+#编译后的文件提交到nfs目录下
 function SysBuildRootfs
 {
-	cd $ENV_ROOTFS_DIR/busybox
-	make&&make install
+	if [ -d $ENV_ROOTFS_DIR ]; then
+		cd $ENV_ROOTFS_DIR/busybox
+		make&&make install
 
-	cp -ravf $ENV_ROOTFS_DIR/_install/* $NFS_PATH/
-	cd $GCC_LIB/lib
+		cp -ravf $ENV_ROOTFS_DIR/_install/* $NFS_PATH/
+		cd $GCC_LIB/lib
 
-	cp -ravf *so* *.a $NFS_PATH/lib/
-	cd $GCC_LIB/libc/lib
-	cp -ravf *so* *.a $NFS_PATH/lib/
+		cp -ravf *so* *.a $NFS_PATH/lib/
+		cd $GCC_LIB/libc/lib
+		cp -ravf *so* *.a $NFS_PATH/lib/
+	else
+		echo "rootfs directory:$ENV_ROOTFS_DIR not exist!"
+	fi
 }
 alias SysBuildRootfs='SysBuildRootfs'
 
+#清除文件系统
 function SysCleanRootfs
 {
-	cd $ENV_ROOTFS_DIR
-	make clean
+	if [ -d $ENV_ROOTFS_DIR ]; then
+		cd $ENV_ROOTFS_DIR
+		make clean
+	else
+		echo "rootfs directory:$ENV_ROOTFS_DIR not exist!"
+	fi
 }
 alias SysCleanRootfs='SysCleanRootfs'
 
+#打包内核 firmware包，文件系统到$DST_PATH，对于新的工程环境，命令执行流程
+#SysCleanUboot
+#SysBuildUboot
+#SysCleanKernal
+#SysCleanRootfs
+#SysBuildRootfs
+#SysSetApplicationVer [version]
+#SysBuildApplication
+#SysPackageFirmware
 function SysPackageFirmware
 {
-	if [ ! -d $DST_PATH ]; then
-		mkdir $DST_PATH 
+	if [ -d $TFTP_PATH ]; then
+
+		if [ ! -d $DST_PATH ]; then
+			mkdir $DST_PATH 
+		fi
+
+		cd $TFTP_PATH
+		cp -rvf * $DST_PATH/
+		
+		cd $DST_PATH/
+		mv u-boot.imx $ENV_KERNAL_BIN
 	fi
 
-	cd $TFTP_PATH
-	cp -rvf * $DST_PATH/
-	
-	cd $DST_PATH/
-	mv u-boot.imx $ENV_KERNAL_BIN
-
-	cd $NFS_PATH
-	rm -rf rootfs.tar.bz2 
-	tar -vcjf rootfs.tar.bz2 *
-	mv rootfs.tar.bz2 $DST_PATH/
+	if [ -d $NFS_PATH ]; then
+		cd $NFS_PATH
+		rm -rf rootfs.tar.bz2 
+		tar -vcjf rootfs.tar.bz2 *
+		mv rootfs.tar.bz2 $DST_PATH/
+	fi
 
 	echo "PackFirmware Success, you can find firmware in directory:"
 	echo "$DST_PATH/"
@@ -278,24 +334,42 @@ alias SysPackageFirmware='SysPackageFirmware'
 #显示帮助信息
 function SysHelpCommand
 {
-	echo 'SysBuildApplication'
-	echo '    Build Application, Package Firmware.'
-	echo 'SysBuildKernal'
-	echo '    Build the Kernal, if exist directory'
-	echo 'SysSetPlatformEmbedLinux'
-	echo '    Set Current Platform to Embed-Linux Complier'
-	echo 'SysSetPlatformLinux'
-	echo '    Set Current Platform to Linux Complier.'
-	echo 'SysSetRemoteIpAddress'
-	echo '    Set the remote ipaddress for command <SysPushFirmware>'
-	echo 'SysSetFirmwareVer'
-	echo '    Set the verison of the firmware when build'
-	echo 'SysPushFirmware'
-	echo '    Push firmware to remote embed device.'
-	echo 'SysCleanFirmware'
-	echo '    Clean firmware.'
-	echo 'SysHelpCommand'
-	echo '    Show the help command.'
+	echo "${blueText}SysBuildApplication${defText}"
+	echo "    ${limityellowText}Build Application, Package Firmware."
+	echo "${blueText}SysBuildKernal${defText}"
+	echo "    ${limityellowText}Build the Kernal, if exist kernal directory."
+	echo "${blueText}SysSetPlatformEmbedLinux${defText}"
+	echo "    ${limityellowText}Set Current Platform to Embed-Linux Complier."
+	echo "${blueText}SysSetPlatformLinux${defText}"
+	echo "    ${limityellowText}Set Current Platform to Linux Complier."
+	echo "${blueText}SysSetRemoteIpAddress${defText}"
+	echo "    ${limityellowText}example:${cyanText}SysSetRemoteIpAddress 192.168.0.1."
+	echo "    ${limityellowText}Set the remote ipaddress for command <SysPushApplication>"
+	echo "${blueText}SysSetApplicationVer${defText}"
+	echo "    ${limityellowText}example:${cyanText}SysSetRemoteIpAddress 1.0.0.1."
+	echo "    ${limityellowText}Set the verison of the firmware when build"
+	echo "${blueText}SysBuildApplication${defText}"
+	echo "    ${limityellowText}Build the application, copy to nfs directory, also can push to embed-linux device."
+	echo "${blueText}SysPushApplication${defText}"
+	echo "    ${limityellowText}Push firmware to remote embed-linux device."
+	echo "${blueText}SysCleanApplication${defText}"
+	echo "    ${limityellowText}Clean the app firmware for next."
+	echo "${blueText}SysBuildKernal${defText}"
+	echo "    ${limityellowText}Build the linux kernal, copy to tftp directory, if failed, execute SysCleanKernal first."
+	echo "${blueText}SysCleanKernal${defText}"
+	echo "    ${limityellowText}Clean the kernal compiler data for next."
+	echo "${blueText}SysBuildUboot${defText}"
+	echo "    ${limityellowText}Build the uboot, copy to tftp directory, if failed, execute SysCleanUboot first."
+	echo "${blueText}SysCleanUboot${defText}"
+	echo "    ${limityellowText}Clean the uboot compiler data for next."
+	echo "${blueText}SysBuildRootfs${defText}"
+	echo "    ${limityellowText}build the rootfs, copy to nfs directory, if failed, execut SysCleanRootfs first."
+	echo "${blueText}SysCleanRootfs${defText}"
+	echo "    ${limityellowText}Clean the rootfs compiler data for next."
+	echo "${blueText}SysPackageFirmware${defText}"
+	echo "    ${limityellowText}Package the uboot, kernal, rootfs and application, can use tools download."
+	echo "${blueText}SysHelpCommand${defText}"
+	echo "    ${limityellowText}Show the help command.${defText}"
 }
 alias SysHelpCommand='SysHelpCommand'
 

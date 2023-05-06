@@ -9,7 +9,6 @@ echo
 echo "Loading CDE Plugin..."
 echo "-------------------------------------------------------------------------"
 echo "Load Plugin Success!"
-echo "Can use command 'SysHelpCommand' for more helps."
 echo "Update the Plugin by filepath /home/[root]/.bashrc."
 
 #-------------------------------------------------------------------------------
