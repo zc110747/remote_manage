@@ -33,13 +33,6 @@ public:
     RTCDevice(const std::string &DevicePath);
     ~RTCDevice();
 
-#if __WORK_IN_WSL
-    bool open(int flag){
-        //do nothing
-        return true;
-    }
-#endif
-
     bool updateTime();
     static RTCDevice* getInstance();
     void release();
@@ -49,5 +42,4 @@ public:
     uint64_t getStartTime() {return TimeStart;}
 };
 
-#define xGetCurrentTime()   RTCDevice::getInstance()->getCurrentSecond()
 #endif

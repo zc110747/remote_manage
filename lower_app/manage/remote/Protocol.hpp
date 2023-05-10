@@ -19,10 +19,10 @@
 _Pragma("once")
 
 #include "productConfig.hpp"
-#include "tools/MessageBase.hpp"
-#include "tools/CalcCrc16.hpp"
+#include "CalcCrc16.hpp"
 #include "SystemConfig.hpp"
 #include "DeviceManageThread.hpp"
+#include "FIFOManage.hpp"
 
 /**************************************************************************
 * Global Macro Definition
@@ -126,14 +126,12 @@ public:
 	{
 		uint8_t nCommand;
 		uint16_t nRegIndex, nRxDataSize;
-		DeviceReadInfo read_info;
-	 	MessageBase *pAppMessageInfo;
+		NAMESPACE_DEVICE::DeviceReadInfo read_info;
 		char buf = 1;
 
 		nCommand = m_RxCacheDataPtr[0];
 		m_TxBufSize = 0;
-		read_info = DeviceManageThread::getInstance()->getDeviceInfo();
-		pAppMessageInfo = getMessageInfo(APPLICATION_MESS_INDEX);
+		read_info = NAMESPACE_DEVICE::DeviceManageThread::getInstance()->getDeviceInfo();
 
 		switch (nCommand)
 		{
@@ -156,7 +154,6 @@ public:
 					pName = (char *)&m_RxCacheDataPtr[7];
 					dir_process(path.c_str());
 					m_FileName = path + std::string(pName);
-					//USR_DEBUG("filesize:%d, name:%s, block:%d\n", m_FileSize, m_FileName.c_str(), m_FileBlock);
 					m_FileStream.open(m_FileName);
 					m_isUploadStatus = true;
 					m_TxBufSize = CreateTxBuffer(ACK_OK, 0, NULL);
@@ -174,7 +171,6 @@ public:
 						m_FileStream.open(m_FileName);
 					}
 					m_FileStream.write((char *)&m_RxCacheDataPtr[5], filesize);
-					USR_DEBUG("filesize:%d, block:%d, fileblock:%d\n", filesize, fileblock, m_FileBlock);
 					if(fileblock >= m_FileBlock)
 					{
 						m_isUploadStatus = false;
@@ -266,7 +262,6 @@ public:
 						if(CrcRecv == CrcCacl){
 							if(m_RxCachePtr[3] != DEVICE_ID)
 							{
-								USR_DEBUG("Device ID Error:%d\n", m_RxCachePtr[3]);
 								return RT_INVALID;
 							}
 							m_PacketNum = m_RxCachePtr[4]<<8 | m_RxCachePtr[5];
@@ -274,7 +269,6 @@ public:
 						}
 						else{
 							m_RxBufSize = 0;
-							USR_DEBUG("CRC Check ERROR!. rx_data:%d, r:%d, c:%d\n", m_RxDataSize, CrcRecv, CrcCacl);
 							return RT_INVALID;
 						}
 					}  
@@ -288,7 +282,6 @@ public:
 				{
 					m_RxBufSize = 0;
 					m_RxTimeout = 0;
-					USR_DEBUG("Recv RxTimeout\n");
 					return RT_TIMEOUT;
 				}
 			}		
@@ -305,7 +298,6 @@ public:
 	 */
 	int SendTxBuffer(int nFd, T* input = nullptr)
 	{
-		SystemLogArray(m_TxCachePtr, m_TxBufSize);
 		return DeviceWrite(nFd, m_TxCachePtr, m_TxBufSize, input);
 	}
 	

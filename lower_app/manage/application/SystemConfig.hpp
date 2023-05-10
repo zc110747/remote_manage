@@ -3,19 +3,23 @@
 //  All Rights Reserved
 //
 //  Name:
-//     SystemConfig.hpp
+//      SystemConfigProcess.hpp
 //
 //  Purpose:
-//     SystemConfig Interface.
+//      系统信息配置组件，主要实现如下功能
+//      1.读取配置文件config.json, 赋值到内部配置中，如读取失败则使用默认配置
+//      2.提供接口，允许上位机读取配置信息
+//      3.提供接口，允许上位机写入配置信息，并保存到config.json文件中, 并支持一键复位
 //
 // Author:
-//      Alva Zhange
+//     	Alva Zhange
 //
 //  Assumptions:
 //
 //  Revision History:
-//      7/25/2022   Create New Version
-//////////////////////////////////////////////////////////////////////////////
+//      12/19/2022   Create New Version
+/////////////////////////////////////////////////////////////////////////////
+
 #ifndef _INCLUDE_SYSTEM_CONFIG_HPP
 #define _INCLUDE_SYSTEM_CONFIG_HPP
 
@@ -72,6 +76,7 @@ typedef struct
 
     //path
     JString downloadpath;
+    uint8_t version[4];
 }SystemParamter;
 
 class SystemConfig
@@ -101,5 +106,6 @@ public:
     const DeviceSysConfig *geticmSpi()  {return &(parameter.icmSpi);}
     const DeviceSysConfig *getapI2c()   {return &(parameter.apI2c);}
     const JString &getdownloadpath()    {return parameter.downloadpath;}
+    const uint8_t* getversion()         {return parameter.version;}
 };
 #endif

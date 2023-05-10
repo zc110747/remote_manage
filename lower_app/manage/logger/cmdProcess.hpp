@@ -25,12 +25,11 @@
 #define COMMAND_MAX_SIZE    4
 typedef enum
 {
-    CmReadDev = 0,
-    CmSetDev,
-    CmGetNet,
-    CmGetSer,
-    cmTestDev,
-    CmGetHelp,
+    CmdReadDev = 0,
+    CmdGetOS,
+    CmdSetDev,
+    cmdSetLevel,
+    CmdGetHelp,
 }CmdFormat_t;
 
 class cmdProcess

@@ -4,39 +4,54 @@
 
 ![image](https://github.com/zc110747/remote_manage/blob/master/document/Image/firmware.jpg)
 
+## 如何编译执行项目
+```bash
+cd lower_app/manage/lib/
+tar -xvf asio.tar.bz2
+cd ../
+make
+```
+在执行修改manage目录下的config.json  
+"socket":{  
+		"ipaddr":"192.168.113.1"  
+},  
+其中ipaddr改成本地ip地址, 并复制到../Execute/目录下，并进入目录执行app_demo即可运行下位机.  
+
 ## 项目结构
 
 demo/           	测试代码    
 document/       	设计文档资料说明    
 kernael_mod/     	内核驱动模块  
-lower_app/              嵌入式Linux设备应用实现  
+lower_app/          嵌入式Linux设备应用实现  
 	-manage/     	主工作流应用，驱动模块处理，logger实现，外设和其它设备接口访问  
 	-gui/        	下位机图形界面，支持状态显示和基本操作(QT)  
-	-server/        支持桌面访问得web服务器(node)  
+	-server/        支持桌面访问得web服务器(node/js/web)  
 support/        	用于支持应用执行的lib库或者环境  
-upper_app/              PC客户端应用实现  
+upper_app/          PC客户端应用实现  
 	-manage/        用于访问嵌入式设备的桌面客户端(暂定QT)  
+	-loger_tool/    用于支持logger打印的网络调试工具(C#)
 
 ## 设计文档
 
-参考文档(见document目录下说明), 初步设计包含:
+参考文档(见document目录下说明), 初步设计包含:  
 
-嵌入式Linux端设计
+嵌入式Linux端设计  
 
-1. 嵌入式驱动设备的访问，包含字符型设备，I2C, SPI，串口等访问，包含设备树支持
-2. 支持配置管理，允许通过文件管理设备启动状态(配置文件使用JSON格式)
-3. 基于linux系统API的线程创建，管理，线程间通讯支持
-4. 本地端的通讯处理(Serial, Socket)等，基于自定义协议进行通讯(特殊指令的安全机制)
-5. 内部状态读取更新显示，远端和本地的设置修改
-6. 支持本地和网络的logger打印接口，调试等级显示可调
-7. 访问外部设备的模块接口
+1. 嵌入式驱动设备的访问，包含字符型设备，I2C, SPI，串口等访问，包含设备树支持  
+2. 支持配置管理，允许通过文件管理设备启动状态(配置文件使用JSON格式)  
+3. 基于linux系统API的线程创建，管理，线程间通讯支持  
+4. 本地端的通讯处理(Serial, Socket)等，基于自定义协议进行通讯(特殊指令的安全机制)  
+5. 内部状态读取更新显示，远端和本地的设置修改  
+6. 支持本地和网络的logger打印接口(基于asio设计)，调试等级显示可调  
+7. 访问外部设备的模块接口(基于CAN或者串口的轮询控制接口)  
 
-PC应用端设计
 
-1. 访问Linux端接口，获取内部数据
-2. 操作Linux端设备外设
-3. 控制访问linux管理的远端信息
-4. 其它功能组件
+PC应用端设计  
+
+1. 访问Linux端接口，获取内部数据  
+2. 操作Linux端设备外设  
+3. 控制访问linux管理的远端信息  
+4. 其它功能组件  
 
 ## 硬件适配和兼容性
 
@@ -46,10 +61,18 @@ PC应用端设计
 
 ## 编译环境
 
-嵌入式软件交叉编译工具
+嵌入式软件交叉编译工具  
 	内核模块使用编译工具 - arm-linux-gnueabihf-gcc  
 	manage，gui编译工具 - arm-linux-gnueabihf-g++  
 	server使用node作为运行环境  
-	网页则使用前端技术
-上位机编译工具
-	QT(the newest stable version)
+	网页则使用前端技术  
+上位机编译工具  
+	QT(the newest stable version)  
+logger显示工具  
+	visual studio(the newest stable version)  
+
+## 注意事项  
+  
+### lower_app/manage
+1.编译lowr_app/manage, 需要首先解压lower/manage/lib下的asio.zip到同一目录下  
+2.进入lower_app/manage, 执行make即可编译，默认编译为桌面端，可修改makefile编译嵌入式linux平台  

@@ -50,7 +50,6 @@ class UartThreadManage
 private:
 	//device info
 	int nComFd{-1};
-	std::thread m_thread;
 	CUartProtocolInfo *pProtocolInfo;
 
 	//message buffer
@@ -58,6 +57,8 @@ private:
 	uint8_t nTxCacheBuffer[UART_MAX_BUFFER_SIZE];
 
 	static UartThreadManage* pInstance;
+
+	void run();
 
 public:
 	UartThreadManage() = default;

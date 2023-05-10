@@ -12,7 +12,7 @@ TimeManage *TimeManage::getInstance()
         pInstance = new(std::nothrow) TimeManage();
         if(pInstance == nullptr)
         {
-            PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "TimeManage new error!");
+            PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "TimeManage new error!");
         }
     }
     return pInstance;

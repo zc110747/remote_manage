@@ -4,11 +4,7 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${env.includePath}",
-                "F:/arm-gcc/include",
-                "F:/arm-gcc/arm-linux-gnueabihf/libc/usr/include",
-                "F:/arm-gcc/arm-linux-gnueabihf/libc/usr/include/linux",
-                "C:/Program Files (x86)/Windows Kits/10/Include/10.0.10150.0/ucrt"
+                "${env.includePath}"
             ],
             "defines": [
                 "_DEBUG",

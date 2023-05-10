@@ -19,135 +19,48 @@
 #include <stdarg.h>
 #include "logger.hpp"
 #include "../driver/driver.hpp"
+#include "asio_server.hpp"
 
-char memoryBuffer[LOGGER_MESSAGE_BUFFER_SIZE+1];
+static asio_server logger_server;
 
-static void *loggerSocketThread(void *arg)
+//asio server test ok
+void LoggerManage::asio_server_run()
 {
-    int server_fd;
-    LoggerManage *plogger = static_cast<LoggerManage *>(arg);
-    struct sockaddr_in servaddr, clientaddr;  
-    socklen_t client_sock_len;  
-    int result, is_bind_fail;
     const SocketSysConfig *pSocketConfig = SystemConfig::getInstance()->getlogger();
-    LOG_SOCKET *pSocket = LoggerManage::getInstance()->getsocket();
-
-    memset(&servaddr, 0, sizeof(servaddr));    
-    servaddr.sin_family = AF_INET;     
-    servaddr.sin_addr.s_addr = inet_addr(pSocketConfig->ipaddr.c_str());  
-    servaddr.sin_port = htons(pSocketConfig->port); 
-
-    PRINT_LOG(LOG_INFO, xGetCurrentTime(), "%s start!", __func__);
-    server_fd = socket(PF_INET, SOCK_STREAM, 0);
-    if(server_fd != -1)
+    
+    try
     {
-
-        int one = 1;
-#ifndef WIN32
-        /*Linux平台默认断开后2min内处于Wait Time状态，不允许重新绑定，需要添加配置，允许在该状态下重新绑定*/
-        setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, (void*) &one, (socklen_t)sizeof(one));
-#endif
-
-        do 
-        {
-            result = bind(server_fd, (struct sockaddr *)&servaddr, sizeof(servaddr));
-            if(result == -1)
+        logger_server.init(pSocketConfig->ipaddr, std::to_string(pSocketConfig->port), [](char* ptr, int length){
+            if(cmdProcess::getInstance()->parseData(ptr, length))
             {
-                if(is_bind_fail == 0)
-                {
-                    is_bind_fail = 1;
-                    PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Socket logger bind %s:%d failed!", pSocketConfig->ipaddr.c_str(), pSocketConfig->port); 
-                }
-                sleep(1);
+                cmdProcess::getInstance()->ProcessData();
             }
-            else
-            {
-                break;
-            }
-        } while (1); //网络等待socket绑定完成后执行后续
-
-        PRINT_LOG(LOG_INFO, xGetCurrentTime(), "Socket logger bind %s:%d success!", pSocketConfig->ipaddr.c_str(), pSocketConfig->port); 
-        listen(server_fd, 1);
-        for(;;)
-        {	   
-            uint32_t client_size;
-            int client_fd;
-
-            client_size = sizeof(clientaddr);
-            client_fd = accept(server_fd, (struct sockaddr *)&clientaddr, &client_size);
-            if(client_fd < 0)
-            {
-                pSocket->islink = false;
-                continue;
-            } 
-            else
-            {
-                pSocket->fd = client_fd;
-                pSocket->islink = true;    
-            }
-
-            PRINT_LOG(LOG_INFO, xGetCurrentTime(), "Socket logger accept success!");
-            for(;;)
-            {
-                char recvbuf[64];
-                int recvlen;
-
-                recvlen = ::recv(client_fd, recvbuf, 64, 0);
-                if(recvlen <= 0)
-                {   
-                    pSocket->islink = false;
-                    pSocket->fd = -1;
-                    close(client_fd);
-                    PRINT_LOG(LOG_INFO, xGetCurrentTime(), "Socket logger recv error!");
-                    break;
-                }
-                else
-                {
-                    if(cmdProcess::getInstance()->parseData(recvbuf, recvlen))
-                    {
-                        //PRINT_NOW("Socket logger command Process!");
-                        cmdProcess::getInstance()->ProcessData();
-                    }
-                }
-            }
-        }
+        });
+        logger_server.run();
     }
-    else
+    catch (std::exception& e)
     {
-        PRINT_LOG(LOG_INFO, xGetCurrentTime(), "Socket logger create failed!");
+        PRINT_LOG(LOG_DEBUG, xGetCurrentTicks(), "Exception:%s", e.what());
     }
-
-    close(server_fd);
-    return (void *)arg;
 }
 
-static void *loggerTxThread(void *arg)
+void LoggerManage::logger_tx_run()
 {
     int len;
     LOG_MESSAGE message;
-    LoggerManage *plogger = static_cast<LoggerManage *>(arg);
-    LOG_SOCKET *pSocket = LoggerManage::getInstance()->getsocket();
+    
+    setThreadWork();
 
-    plogger->setThreadWork();
     while(1)
     {
-        len = ::read(plogger->read_fd(), &message, sizeof(message));
+        len = ::read(read_fd(), &message, sizeof(message));
         if(len > 0)
         {
-            if(pSocket->islink)
+            auto session_ptr = logger_server.get_valid_session();
+            if(session_ptr != nullptr)
             {
-                len = ::send(pSocket->fd, message.ptr, message.length, 0);
-                if(len < 0)
-                {
-                    //do something
-                    PRINT_NOW("%s send failed:%d\n", __func__, len);
-                }
-                else
-                {
-                    printf("%s", message.ptr);
-                    fflush(stdout);
-                    usleep(300);
-                }
+                session_ptr->do_write(message.ptr, message.length);
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
             else
             {
@@ -185,7 +98,7 @@ bool LoggerManage::createfifo()
     unlink(LOGGER_FIFO_PATH);
 
     if(mkfifo(LOGGER_FIFO_PATH, (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) < 0){
-        PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Logger Fifo Create error!");
+        PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Logger Fifo Create error!");
         return false;
     }
 
@@ -204,6 +117,7 @@ bool LoggerManage::createfifo()
     return true;
 }
 
+char memoryBuffer[LOGGER_MESSAGE_BUFFER_SIZE+1];
 bool LoggerManage::init()
 {
     bool ret = true;
@@ -214,19 +128,10 @@ bool LoggerManage::init()
 
     createfifo();
 
-    m_RxThread = std::move(std::thread(loggerSocketThread, this));
-    m_TxThread = std::move(std::thread(loggerTxThread, this));
-    pMutex = new(std::nothrow) std::mutex();
-
-    if(pMutex == nullptr)
-    {
-        ret = false;
-        PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "%s failed, err:%d!", __func__, nErr);
-    }
-
-    m_RxThread.detach();
+    m_TxThread = std::thread(std::bind(&LoggerManage::logger_tx_run, this));
     m_TxThread.detach();
-
+    m_AsioServerThread = std::thread(std::bind(&LoggerManage::asio_server_run, this));
+    m_AsioServerThread.detach();
     return ret;
 }
 
@@ -234,12 +139,6 @@ void LoggerManage::release()
 {
     is_thread_work = false;
     
-    if(pMutex != nullptr)
-    {
-        delete pMutex;
-        pMutex = nullptr;
-    }
-
     if(readfd != - 1)
     {
         close(readfd);
@@ -321,8 +220,7 @@ int LoggerManage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...
     
     pbuf[0] = '\r';
     pbuf[1] = '\n';
-    pbuf[2] = 0;
-    message.length += 3;
+    message.length += 2;
 
     if(!is_thread_work)
     {

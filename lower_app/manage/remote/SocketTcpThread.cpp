@@ -32,7 +32,7 @@ TcpThreadManage* TcpThreadManage::getInstance()
         pInstance = new(std::nothrow) TcpThreadManage;
         if(pInstance == nullptr)
         {
-            PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Tcp thread manage new failed!");
+            PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Tcp thread manage new failed!");
         }
     }
     return pInstance;
@@ -62,7 +62,7 @@ static void *SocketTcpLoopThread(void *arg)
     struct sockaddr_in serverip, clientip;
 	const SocketSysConfig *pSocketConfig = SystemConfig::getInstance()->gettcp();
 
-    PRINT_LOG(LOG_INFO, xGetCurrentTime(), "Socket tcp thread Start!");
+    PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "Socket tcp thread Start!");
     memset((char *)&serverip, 0, sizeof(serverip));
     serverip.sin_family = AF_INET;
     serverip.sin_port = htons(pSocketConfig->port);
@@ -89,7 +89,7 @@ static void *SocketTcpLoopThread(void *arg)
                 if(is_bind_fail == 0)
                 {
                     is_bind_fail = 1;
-                    PRINT_LOG(LOG_ERROR, xGetCurrentTime(), "Socket tcp bind %s:%d failed!", pSocketConfig->ipaddr.c_str(), pSocketConfig->port); 
+                    PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Socket tcp bind %s:%d failed!", pSocketConfig->ipaddr.c_str(), pSocketConfig->port); 
                     if(errno == EADDRINUSE)
                     {
                         server_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -103,7 +103,7 @@ static void *SocketTcpLoopThread(void *arg)
             }
         } while (1); //网络等待socket绑定完成后执行后续
         
-        PRINT_LOG(LOG_INFO, xGetCurrentTime(), "Socket tcp bind %s:%d success!", pSocketConfig->ipaddr.c_str(), pSocketConfig->port); 
+        PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "Socket tcp bind %s:%d success!", pSocketConfig->ipaddr.c_str(), pSocketConfig->port); 
         listen(server_fd, 32);
         while(1)
         {
@@ -119,14 +119,13 @@ static void *SocketTcpLoopThread(void *arg)
             else
             {
                 int nErr;
-                std::thread clientThread(SocketTcpDataProcessThread, &client_fd);
-                clientThread.detach();
+                std::thread(SocketTcpDataProcessThread, &client_fd).detach();
             }
         }
     }
     else
     {
-        PRINT_LOG(LOG_INFO, xGetCurrentTime(), "Socket tcp create failed!");
+        PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "Socket tcp create failed!");
     }
 
     close(server_fd);

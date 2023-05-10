@@ -3,33 +3,28 @@
 //  All Rights Reserved
 //
 //  Name:
-//      FIFOMessage.hpp
+//      FIFOManage.hpp
 //
 //  Purpose:
-//      Communication by fifo interface.
+//      FIFO管理接口，用于提供外部，支持创建读写的接口
 //
 // Author:
-//      Alva Zhange
+//      听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
-//      7/24/2022   Create New Version
+//      12/19/2022   Add explian and update structure.
 /////////////////////////////////////////////////////////////////////////////
-#ifndef _INCLUDE_FIFO_MANAGE_HPP
-#define _INCLUDE_FIFO_MANAGE_HPP
+_Pragma("once")
 
-#include "MessageBase.hpp"
-#include "../../logger/logger.hpp"
+#include "logger.hpp"
 #include <mqueue.h>
+#include "driver.hpp"
 
-#define FIFO_MODE               (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)  
+#define S_FIFO_WORK_MODE               (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)  
 
-#define SYSTEM_FIFO             "/tmp/sys.fifo"
-#define APPLICATION_FIFO        "/tmp/app.fifo"  
-
-
-class FIFOMessage:public MessageBase
+class FIFOMessage final
 {
 private:
     std::string  fifoM;
@@ -50,14 +45,14 @@ public:
     }
 
     /*创建并打开FIFO*/
-    bool Create(void) override{
+    bool Create(void){
         
         //delete fifo
         unlink(fifoM.c_str());
 
         if(mkfifo(fifoM.c_str(), modeM) < 0)
         {
-            PRINT_LOG(LOG_ERROR, xGetCurrentTime(),  "fifo %s make error!", fifoM.c_str());
+            PRINT_LOG(LOG_ERROR, xGetCurrentTicks(),  "fifo %s make error!", fifoM.c_str());
             return false;
         }
 
@@ -67,15 +62,15 @@ public:
         if(writefdM < 0 || readfdM < 0)
         {
             Release();
-            PRINT_LOG(LOG_ERROR, xGetCurrentTime(),  "fifo open error:%d, %d!", writefdM, readfdM);
+            PRINT_LOG(LOG_ERROR, xGetCurrentTicks(),  "fifo open error:%d, %d!", writefdM, readfdM);
             return false;
         }
-        PRINT_LOG(LOG_INFO, xGetCurrentTime(), "fifo %s open success, fd:%d, %d", fifoM.c_str(), writefdM, readfdM);
+        PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "fifo %s open success, fd:%d, %d", fifoM.c_str(), writefdM, readfdM);
         return true;
     }                      
 
     /*关闭FIFO并释放资源*/
-    void Release() override{
+    void Release(){
 
         if(writefdM >= 0)
         {
@@ -91,7 +86,7 @@ public:
     }       
     
     /*等待FIFO数据接收*/
-    int read(char *buf, int bufsize) override{
+    int read(char *buf, int bufsize){
         int readbytes = -1;
         if(readfdM >= 0)
         {
@@ -106,7 +101,7 @@ public:
     }              
 
     /*向FIFO中投递数据*/
-    int write(char *buf, int bufsize) override{
+    int write(char *buf, int bufsize){
         int writebytes = -1;
         if(writefdM >= 0)
         {
@@ -115,23 +110,3 @@ public:
         return writebytes;
     }  
 };
-
-class FIFOManage
-{
-private:
-    static FIFOManage* pInstance;
-    std::vector<FIFOMessage *> messageM;
-
-public:
-    FIFOManage() = default;
-    ~FIFOManage() = delete;
-    static FIFOManage* getInstance();
-    
-    bool init();
-    void release();
-
-    MessageBase* getFIFOMessage(uint8_t index){
-        return static_cast<MessageBase*>(messageM[index]);
-    }
-};
-#endif

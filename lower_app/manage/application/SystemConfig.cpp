@@ -1,20 +1,32 @@
-/*
- * File      : SystemConfig.cpp
- * 系统配置信息文件处理
- * COPYRIGHT (C) 2020, zc
- *
- * Change Logs:
- * Date           Author       Notes
- * 2020-5-4      zc           the first version
- */
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2022-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      SystemConfigProcess.cpp
+//
+//  Purpose:
+//      系统信息配置组件，主要实现如下功能
+//      1.读取配置文件config.json, 赋值到内部配置中，如读取失败则使用默认配置
+//      2.提供接口，允许上位机读取配置信息
+//      3.提供接口，允许上位机写入配置信息，并保存到config.json文件中, 并支持一键复位
+//
+// Author:
+//     	Alva Zhange
+//
+//  Assumptions:
+//
+//  Revision History:
+//      12/19/2022   Create New Version
+/////////////////////////////////////////////////////////////////////////////
 
-/**
- * @addtogroup IMX6ULL
- */
-/*@{*/
 #include <fstream>
 #include <iostream>
 #include "SystemConfig.hpp"
+
+static const uint8_t fw_version[] = {
+    #include "../verion.txt"
+};
 
 SystemConfig* SystemConfig::pInstance = nullptr;
 SystemConfig* SystemConfig::getInstance()
@@ -35,8 +47,11 @@ bool SystemConfig::init(const char* path)
 {
     Json::Value root;
     std::ifstream ifs;
-    ifs.open(path);
 
+    //before init, need default init
+    default_init();
+
+    ifs.open(path);
     if(!ifs.is_open())
     {
         return false;
@@ -65,11 +80,11 @@ bool SystemConfig::init(const char* path)
         parameter.serial.parity = root["serial"]["parity"].asString();;
         parameter.serial.dev = root["serial"]["dev"].asString();
 
-        parameter.tcp.ipaddr = root["tcp"]["ipaddr"].asString();
+        parameter.tcp.ipaddr = root["socket"]["ipaddr"].asString();
         parameter.tcp.port = root["tcp"]["port"].asInt();
-        parameter.udp.ipaddr = root["udp"]["ipaddr"].asString();
+        parameter.udp.ipaddr = root["socket"]["ipaddr"].asString();
         parameter.udp.port = root["udp"]["port"].asInt();
-        parameter.logger.ipaddr = root["logger"]["ipaddr"].asString();
+        parameter.logger.ipaddr = root["socket"]["ipaddr"].asString();
         parameter.logger.port = root["logger"]["port"].asInt();
 
         parameter.rtc.dev = root["rtc"]["dev"].asString();
@@ -115,6 +130,7 @@ void SystemConfig::default_init() noexcept
     parameter.apI2c.dev = DEFAULT_API2C_DEV;
 
     parameter.downloadpath = DEFAULT_DOWNLOAD_PATH;
+    memcpy(parameter.version, fw_version, 4);
 }
 
 std::ostream& operator<<(std::ostream& os, const SystemConfig& config)

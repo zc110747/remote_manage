@@ -13,7 +13,7 @@
 HOST=
 CPU=x86-
 CC = $(HOST)g++
-CFLAGS := -O3 -std=c++17 -fno-strict-aliasing -lrt
+CFLAGS := -O3 -std=c++17 -fno-strict-aliasing -lrt 
 
 objects = 	main.o \
 			remote/SocketTcpThread.o 	 \
@@ -23,9 +23,6 @@ objects = 	main.o \
 			application/SystemConfig.o \
 			application/tools/CalcCrc16.o  \
 			application/TimeManage.o \
-			application/tools/MqManage.o   \
-			application/tools/FIFOManage.o \
-			application/tools/MessageBase.o \
 			driver/rtc.o \
 			driver/beep.o \
 			driver/led.o \
@@ -34,7 +31,16 @@ objects = 	main.o \
 			driver/deviceBase.o \
 			driver/driver.o \
 			logger/logger.o \
-			logger/cmdProcess.o 
+			logger/cmdProcess.o \
+			logger/asio_server.o 
+
+clear_dobject = *.d .*.o.d \
+				application/*.d application/.*.o.d \
+				driver/*.d driver/.*.o.d \
+				event/*.d event/.*.o.d \
+				lib/*.d lib/.*.o.d \
+				logger/*.d logger/.*.o.d \
+				remote/*.d remote/.*.o.d 
 
 include_path = -I remote/ 			\
 				-I driver/ 			\
@@ -42,8 +48,10 @@ include_path = -I remote/ 			\
 				-I include/ 		\
 				-I application/ 		\
 				-I lib/jsoncpp/include  \
+				-I lib/asio/include		\
 				-I logger/ 			\
-				-I application/tools/
+				-I application/tools/ \
+				-I event/			
 lib = lib/$(CPU)libjsoncpp.a
 
 # This is the file name of the executables and path where 

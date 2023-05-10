@@ -3,7 +3,7 @@ _Pragma("once")
 #include <mutex>
 #include <condition_variable>
 
-namespace DeviceManage
+namespace EVENT
 {
     class Semaphore
     {
@@ -22,16 +22,18 @@ namespace DeviceManage
 
         }
         
-        void wait()
+        bool wait()
         {
             std::unique_lock<std::mutex> lock(mt);
             if(--count < 0)
             {
+                //在这一步释放了lock, 同时进行解锁
                 cv.wait(lock, [this]()->bool{
                     return wakeups > 0;
                 });
                 --wakeups;
             }
+            return true;
         }
     private:
         std::mutex mt;
