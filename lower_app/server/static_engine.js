@@ -10,10 +10,12 @@ var contentTypeStatic = {
     "html": "text/html",
     "xml": "text/xml",
     "asp": "text/asp",
+    "css": "text/css",
     "jpg": "image/jpeg",
     "png": "image/png",
     "ico": "image/icon",
-    "js": "application/x-javascript"
+    "js": "application/x-javascript",
+    "map": "text/map"
 };
 
 function engine_process(request, response)
@@ -31,7 +33,8 @@ function engine_process(request, response)
     if (_tools.hasOwnKey(contentTypeStatic, ext))
     {
         //static data struct
-        response.setHeader('content-type', contentTypeStatic[ext]); 
+        response.setHeader('content-type', contentTypeStatic[ext]);
+        response.setHeader('server', 'node'); 
         if (fs.existsSync(filepath)) 
         {
             var FileData = fs.readFileSync(filepath);
@@ -39,8 +42,7 @@ function engine_process(request, response)
         }
         else 
         {
-            // @ts-ignore
-            console.log("invalid pathname ".concat(pathname));
+            console.log(`invalid pathname:${pathname}`);
             response.statusCode = 404;
             response.end("404 not found");
         }
@@ -48,7 +50,7 @@ function engine_process(request, response)
     }
     else
     {
-        console.log("content-type:".concat(ext));
+        console.log("Not Static Request");
     }
     
     return false;

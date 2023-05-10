@@ -85,6 +85,16 @@
         "codecvt": "cpp",
         "csignal": "cpp",
         "*.ipp": "cpp",
-        "future": "cpp"
-    }
+        "future": "cpp",
+        "*.txt": "cpp"
+    },
+    "eslint.alwaysShowStatus": true,
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "html",
+      ],
+      "eslint.options": {
+         "plugins": ["html"]
+      }
 }

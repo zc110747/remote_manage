@@ -3,18 +3,18 @@
 //  All Rights Reserved
 //
 //  Name:
-//      productConfig.hpp
+//      ProductConfig.hpp
 //
 //  Purpose:
-//      product default config.
+//      包含应用配置信息的文件
 //
 // Author:
-//      Alva Zhange
+//     @听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
-//      7/24/2022   Create New Version
+//      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
@@ -35,6 +35,7 @@ _Pragma("once")
 
 //默认设备ID
 #define DEVICE_ID                       0x01
+#define LOCAL_HOST                      "127.0.0.1"
 
 /*****************Default System Config******************/
 #define SYSTM_CONFIG_ON             1
@@ -60,5 +61,7 @@ _Pragma("once")
 #define DEFAULT_UDP_PORT            8001
 #define DEFAULT_LOGGER_IPADDR       DEFAULT_IPADDRESS
 #define DEFAULT_LOGGER_PORT         8002
+#define DEFAULT_NODE_IPADDR         DEFAULT_IPADDRESS
+#define DEFAULT_NODE_PORT           8003
 #define DEFAULT_DOWNLOAD_PATH       "/tmp/download/"
 

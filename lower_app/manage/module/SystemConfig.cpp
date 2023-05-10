@@ -3,7 +3,7 @@
 //  All Rights Reserved
 //
 //  Name:
-//      SystemConfigProcess.cpp
+//      SystemConfig.cpp
 //
 //  Purpose:
 //      系统信息配置组件，主要实现如下功能
@@ -12,22 +12,21 @@
 //      3.提供接口，允许上位机写入配置信息，并保存到config.json文件中, 并支持一键复位
 //
 // Author:
-//     	Alva Zhange
+//     	@听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
 //      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
-
 #include <fstream>
 #include <iostream>
 #include "SystemConfig.hpp"
 
-static const uint8_t fw_version[] = {
+//const默认内部链接的, 需要在初始化地方加上const
+const uint8_t fw_version[4] = {
     #include "../verion.txt"
 };
-
 SystemConfig* SystemConfig::pInstance = nullptr;
 SystemConfig* SystemConfig::getInstance()
 {
@@ -86,6 +85,8 @@ bool SystemConfig::init(const char* path)
         parameter.udp.port = root["udp"]["port"].asInt();
         parameter.logger.ipaddr = root["socket"]["ipaddr"].asString();
         parameter.logger.port = root["logger"]["port"].asInt();
+        parameter.node.ipaddr = LOCAL_HOST;
+        parameter.node.port = root["node"]["socket_port"].asInt();
 
         parameter.rtc.dev = root["rtc"]["dev"].asString();
         parameter.icmSpi.dev = root["icmSpi"]["dev"].asString();; 
@@ -124,7 +125,8 @@ void SystemConfig::default_init() noexcept
     parameter.udp.port = DEFAULT_UDP_PORT;
     parameter.logger.ipaddr = DEFAULT_LOGGER_IPADDR;
     parameter.logger.port = DEFAULT_LOGGER_PORT;
-
+    parameter.node.ipaddr = LOCAL_HOST;
+    parameter.node.port = DEFAULT_NODE_PORT;
     parameter.rtc.dev = DEFAULT_RTC_DEV;
     parameter.icmSpi.dev = DEFAULT_ICMSPI_DEV; 
     parameter.apI2c.dev = DEFAULT_API2C_DEV;
@@ -147,9 +149,15 @@ std::ostream& operator<<(std::ostream& os, const SystemConfig& config)
     os<<"tcp:"<<parameter->tcp.ipaddr<<" "<<parameter->tcp.port<<"\n";
     os<<"udp:"<<parameter->udp.ipaddr<<" "<<parameter->udp.port<<"\n";
     os<<"logger:"<<parameter->logger.ipaddr<<" "<<parameter->logger.port<<"\n";
+    os<<"node:"<<parameter->node.ipaddr<<" "<<parameter->node.port<<"\n";
     os<<"rtc:"<<parameter->rtc.dev<<"\n";
     os<<"icmSpi:"<<parameter->icmSpi.dev<<"\n";
     os<<"apI2c:"<<parameter->apI2c.dev<<"\n";
     os<<"downloadpath:"<<parameter->downloadpath;
     return os;
+}
+
+const uint8_t *get_version()
+{
+    return fw_version;
 }

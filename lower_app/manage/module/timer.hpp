@@ -1,3 +1,21 @@
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2022-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      Timer.hpp
+//
+//  Purpose:
+//      基于thread和cv实现的周期性定时器
+//
+// Author:
+//     	@听心跳的声音
+//
+//  Assumptions:
+//
+//  Revision History:
+//      12/19/2022   Create New Version
+/////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
 #include <mutex>

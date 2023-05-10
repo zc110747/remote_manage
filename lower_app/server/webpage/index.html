@@ -1,10 +1,26 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
-        <meta charset="utf-8">
-        <title>hello</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>device mange</title>
+        <script type="importmap">
+            {
+              "imports": {
+                "vue": "./js/vue.esm-browser.js",
+                "axios": "./js/axios.js"
+              }
+            }
+        </script>
+        <link href="css/global.css" rel="stylesheet" type="text/css" />
     </head>
     <body>
-        <div>hello world!</div>
+        <div id="app" class="segregate">
+            <button @click.native="dev_set('led', 'on')">LED ON</button>
+            <button @click.native="dev_set('led', 'off')">LED OFF</button>
+            <button @click.native="dev_set('beep', 'on')">BEEP ON</button>
+            <button @click.native="dev_set('beep', 'off')">BEEP OFF</button>
+        </div>
     </body>
+    <script src="js/axios.js"></script>
+    <script type="module" src="js/main.js"></script>
 </html>

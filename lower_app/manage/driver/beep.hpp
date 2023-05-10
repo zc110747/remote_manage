@@ -3,19 +3,19 @@
 //  All Rights Reserved
 //
 //  Name:
-//     beep.hpp
+//      beep.hpp
 //
 //  Purpose:
-//      Device Beep Interface.
+//      蜂鸣器管理驱动，包含IO支持特性
 //
 // Author:
-//      Alva Zhange
+//     @听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
-//      7/24/2022   Create New Version
-//////////////////////////////////////////////////////////////////////////////
+//      12/19/2022   Create New Version	
+/////////////////////////////////////////////////////////////////////////////
 #ifndef _INCLUDE_BEEP_H
 #define _INCLUDE_BEEP_H
 

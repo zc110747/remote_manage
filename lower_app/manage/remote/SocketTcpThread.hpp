@@ -6,18 +6,17 @@
 //      SocketTcpThread.hpp
 //
 //  Purpose:
-//      Socket Tcp Thread process interface.
+//      TCP协议执行模块，目前设计为同步模式，后续会修改
 //
 // Author:
-//      Alva Zhange
+//     	@听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
-//      7/31/2022   Create New Version
+//      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
-#ifndef _INCLUDE_SOCKET_THREAD_H
-#define _INCLUDE_SOCKET_THREAD_H
+_Pragma("once")
 
 #include <sys/socket.h>
 #include "Protocol.hpp"
@@ -59,4 +58,4 @@ public:
 	bool init();
 	static TcpThreadManage* getInstance();
 };
-#endif
+

@@ -6,18 +6,17 @@
 //      asio_server.hpp
 //
 //  Purpose:
-//      support for tcp server by asio.
-//      this copy from the example by asio application.
+//      基于asio实现的tcp服务器, 单连接，有新连接则断开旧连接
 //
 // Author:
-//      Alva Zhange
+//     @听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
-//      8/8/2022   Create New Version
+//      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
-
+_Pragma("once")
 #if !__has_include("asio.hpp")
 #error "asio library not exist, need release in lib directory"
 #endif
@@ -26,10 +25,11 @@
 #include <set>
 #include <memory>
 #include <iostream>
+#include <mutex>
 
-class session;
-using share_session_ptr = std::shared_ptr<session>;
-class session_manage
+class Session;
+using ShareSessionPointer = std::shared_ptr<Session>;
+class SessionMessage
 {
 public:
     void init(std::function<void(char* ptr, int size)> handler)
@@ -38,30 +38,30 @@ public:
         handler_ = handler;
     }
 
-    void join(share_session_ptr session_)
+    void join(ShareSessionPointer Session_)
     {
         std::lock_guard<std::mutex> lock(mut_);
-        set_.insert(session_);
+        set_.insert(Session_);
     }
 
-    void leave(share_session_ptr session_)
+    void leave(ShareSessionPointer Session_)
     {
         std::lock_guard<std::mutex> lock(mut_);
-        set_.erase(session_);
+        set_.erase(Session_);
     }
 
-    share_session_ptr get_session()
+    ShareSessionPointer get_session()
     {
-        share_session_ptr current_session;
+        ShareSessionPointer current_Session;
 
         {
             std::lock_guard<std::mutex> lock(mut_);
             if(set_.size() == 0)
-                current_session = nullptr;
+                current_Session = nullptr;
             else
-                current_session = *set_.begin(); //only send message to first session
+                current_Session = *set_.begin(); //only send message to first Session
         }
-        return current_session;
+        return current_Session;
     }
 
     void run(char *pbuf, int size)
@@ -71,14 +71,14 @@ public:
 
 private:
     std::mutex mut_;
-    std::set<share_session_ptr> set_;
+    std::set<ShareSessionPointer> set_;
     std::function<void(char* ptr, int size)> handler_;
 };
 
-class session : public std::enable_shared_from_this<session>
+class Session : public std::enable_shared_from_this<Session>
 {
 public:
-  session(asio::ip::tcp::socket socket, session_manage& group)
+  Session(asio::ip::tcp::socket socket, SessionMessage& group)
     : socket_(std::move(socket)),
       group_(group)
   {
@@ -98,6 +98,7 @@ public:
         {
             if (!ec)
             {
+                data_[length] = 0;
                 group_.run(data_, length);
                 do_read();
             }
@@ -144,21 +145,25 @@ public:
         });
   }
 
+  void do_close()
+  {
+    socket_.close();
+  }
 private:
   asio::ip::tcp::socket socket_;
   enum { max_length = 1024 };
   char data_[max_length];
-  session_manage& group_;
+  SessionMessage& group_;
 };
 
 
-class asio_server
+class AsioServer
 {
 public:
-    asio_server(const asio_server&) = delete;
-    asio_server& operator=(const asio_server&) = delete;
+    AsioServer(const AsioServer&) = delete;
+    AsioServer& operator=(const AsioServer&) = delete;
 
-    explicit asio_server():io_context_(2), acceptor_(io_context_)
+    explicit AsioServer():io_context_(2), acceptor_(io_context_)
     {
     }
 
@@ -166,9 +171,20 @@ public:
         io_context_.run();
     }
 
-    share_session_ptr get_valid_session()
+    ShareSessionPointer get_valid_session()
     {
         return group.get_session();
+    }
+
+    void clearSocket()
+    {
+      auto session = group.get_session();
+      while(session != nullptr)
+      {
+          session->do_close();
+          group.leave(session);
+          session = group.get_session();
+      }
     }
 
     void init(const std::string& address, const std::string& port, std::function<void(char* ptr, int size)> handler);
@@ -176,5 +192,5 @@ private:
     void do_accept();
     asio::io_context io_context_;
     asio::ip::tcp::acceptor acceptor_;
-    session_manage group;
+    SessionMessage group;
 };

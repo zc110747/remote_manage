@@ -21,6 +21,7 @@ namespace Tools
             Control.CheckForIllegalCrossThreadCalls = false;
         }
 
+        //进行配置初始化, 导入到UI界面中
         public void InitUserView()
         {
             AppendString = new AppendMethod(str =>
@@ -39,29 +40,54 @@ namespace Tools
             PortTextBox.Text = globalSocketManage.port.ToString(); 
         }
 
+        bool checkSocketSendAllow()
+        {
+            if(ProtocolComboBox.SelectedIndex == 0)
+            {
+                if (globalSocketManage.TcpSocket == null)
+                {
+                    return false;
+                }
+                else
+                {
+                    if(!globalSocketManage.TcpSocket.Connected)
+                    {
+                        return false;
+                    }
+                }
+            }
+            else
+            {
+                if (globalSocketManage.TcpClientSocket.Count == 0)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        //发送数据
         void SendSocket()
         {
             string text = WriteBox.Text;
 
             if (text.Length > 0)
             {
-                byte[] sendBytes = new byte[text.Length];
-                sendBytes = Encoding.UTF8.GetBytes(text);
-
-                //client mode
-                if (ProtocolComboBox.SelectedIndex == 0)
+                if(checkSocketSendAllow())
                 {
-                    if (globalSocketManage.TcpSocket != null)
+                    byte[] sendBytes = new byte[text.Length];
+                    sendBytes = Encoding.UTF8.GetBytes(text);
+
+                    //client mode
+                    if (ProtocolComboBox.SelectedIndex == 0)
                     {
                         globalSocketManage.tx_count += (ulong)sendBytes.Length;
                         TxLable.Text = $"tx: {globalSocketManage.tx_count.ToString()}";
-                        globalSocketManage.TcpSocket.Send(sendBytes, sendBytes.Length, 0);
+                        globalSocketManage.TcpSocket?.Send(sendBytes, sendBytes.Length, 0);
                     }
-                }
-                //server mode
-                else
-                {
-                    if (globalSocketManage.TcpClientSocket != null)
+                    //server mode
+                    else
                     {
                         globalSocketManage.tx_count += (ulong)sendBytes.Length;
                         TxLable.Text = $"tx: {globalSocketManage.tx_count.ToString()}";
@@ -72,6 +98,14 @@ namespace Tools
                         }
                     }
                 }
+                else
+                {
+                    ShowBox.Invoke(AppendString, "Send socket not allowed, need connect!\n");
+                }
+            }
+            else
+            {
+                ShowBox.Invoke(AppendString, "Send socket text is empty!\n");
             }
         }
 
@@ -152,12 +186,26 @@ namespace Tools
                 {
                     if (!is_send)
                     {
-                        enter_send();
-                        is_send = true;
+                        if(WriteBox.Text.Length > 0)
+                        {
+                            if (checkSocketSendAllow())
+                            {
+                                enter_send();
+                                is_send = true;
 
-                        Thread t = new Thread(SendLoopThread);
-                        t.IsBackground = true;
-                        t.Start(wait_time);
+                                Thread t = new Thread(SendLoopThread);
+                                t.IsBackground = true;
+                                t.Start(wait_time);
+                            }
+                            else
+                            {
+                                ShowBox.Invoke(AppendString, "Send socket not allowed, need connect!\n");
+                            }
+                        }
+                        else
+                        {
+                            ShowBox.Invoke(AppendString, "Send socket text is empty!\n");
+                        }
                     }
                     else
                     {

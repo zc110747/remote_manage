@@ -6,15 +6,15 @@
 //      i2c_ap.cpp
 //
 //  Purpose:
-//      i2c read ap application.
+//      AP模块对应的I2C接口，通过继承支持直接读取模块信息
 //
 // Author:
-//      Alva Zhange
+//     @听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
-//      7/24/2022   Create New Version
+//      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
 #include "i2c_ap.hpp"
 

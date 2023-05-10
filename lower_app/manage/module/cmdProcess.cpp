@@ -6,22 +6,19 @@
 //      cmdProcess.cpp
 //
 //  Purpose:
-//      cmdProcess done.
+//      用于支持命令行处理的接口, 包含字符串处理和事件触发
 //
 // Author:
-//      Alva Zhange
+//     @听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
-//      8/8/2022   Create New Version
+//      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
 
 #include "cmdProcess.hpp"
 #include "logger.hpp"
-#include "driver.hpp"
-#include "SystemConfig.hpp"
-#include <algorithm>
 #include "DeviceManageThread.hpp"
 
 /*
@@ -37,6 +34,7 @@ const static std::map<std::string, CmdFormat_t> CmdMapM = {
     {"!readdev",    CmdReadDev},
     {"!setdev",     CmdSetDev},
     {"!setlevel",   cmdSetLevel},
+    {"!connect",    CmdConnect},
     {"!?",          CmdGetHelp},
     {"!help",       CmdGetHelp},
 };
@@ -48,25 +46,6 @@ const static std::map<CmdFormat_t, std::string> CmdHelpMapM = {
     {cmdSetLevel, "!setlevel [lev 0-5]",},
     {CmdGetHelp, "!? ## !help"},
 };
-
-cmdProcess *cmdProcess::pInstance = nullptr;
-cmdProcess* cmdProcess::getInstance()
-{
-    if(pInstance == nullptr)
-    {
-        pInstance = new(std::nothrow) cmdProcess();
-        if(pInstance == nullptr)
-        {
-            //do something
-        }
-    }
-    return pInstance;
-}
-
-bool cmdProcess::init()
-{
-    return true;
-}
 
 bool cmdProcess::parseData(char *ptr, int size)
 {
@@ -152,6 +131,11 @@ bool cmdProcess::ProcessData()
                     level = 5;
                 LoggerManage::getInstance()->setlevel((LOG_LEVEL)level);
                 PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Set Logger Level:%d!", level);
+            }
+            break;
+        case CmdConnect:
+            {
+                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Connect with Remote Success!");
             }
             break;
         case CmdGetHelp:

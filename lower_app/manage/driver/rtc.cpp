@@ -6,15 +6,15 @@
 //      rtc.cpp
 //
 //  Purpose:
-//      rtc device.
+//      rtc时钟, 支持访问本地和硬件时钟
 //
 // Author:
-//      Alva Zhange
+//     @听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
-//      7/24/2022   Create New Version
+//      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
 #include "rtc.hpp"
 #include <sys/ioctl.h>

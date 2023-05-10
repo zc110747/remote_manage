@@ -3,18 +3,18 @@
 //  All Rights Reserved
 //
 //  Name:
-//      UartThrad.cpp
+//      UartThread.cpp
 //
 //  Purpose:
-//      Uart Thread process workflow.
+//      Uart通讯执行模块，目前设计为同步模式，后续会修改
 //
 // Author:
-//      Alva Zhange
+//     	@听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
-//      7/30/2022   Create New Version
+//      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
 #include "UartThread.hpp"
 #include <sys/termios.h>

@@ -6,20 +6,20 @@
 //      asio_server.cpp
 //
 //  Purpose:
-//      support for tcp server by asio
+//      基于asio实现的tcp服务器, 单连接，有新连接则断开旧连接
 //
 // Author:
-//      Alva Zhange
+//     @听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
-//      8/8/2022   Create New Version
+//      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
 #include "asio_server.hpp"
 #include "logger.hpp"
 
-void asio_server::init(const std::string& address, const std::string& port, std::function<void(char* ptr, int size)> handler)
+void AsioServer::init(const std::string& address, const std::string& port, std::function<void(char* ptr, int size)> handler)
 {
     //update for rx handler
     group.init(handler);
@@ -38,7 +38,7 @@ void asio_server::init(const std::string& address, const std::string& port, std:
     do_accept();
 } 
 
-void asio_server::do_accept()
+void AsioServer::do_accept()
 {
   acceptor_.async_accept(
       [this](std::error_code ec, asio::ip::tcp::socket socket)
@@ -50,7 +50,9 @@ void asio_server::do_accept()
 
         if (!ec)
         {
-            std::make_shared<session>(std::move(socket), group)->start();
+            //if accept, close other socket
+            clearSocket();
+            std::make_shared<Session>(std::move(socket), group)->start();
             PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Connect from client!");
         }
 

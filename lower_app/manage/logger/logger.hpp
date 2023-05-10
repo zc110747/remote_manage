@@ -6,20 +6,18 @@
 //      logger.hpp
 //
 //  Purpose:
-//      logger interface.
+//      基于asio_server实现的tcp服务器, 提供命令的接收处理以及异步的logger打印接口
 //
 // Author:
-//      Alva Zhange
+//     @听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
-//      7/26/2022   Create New Version
+//      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
-#ifndef _INCLUDE_LOGGER_HPP
-#define _INCLUDE_LOGGER_HPP
+_Pragma("once")
 
-#include <atomic>
 #include "productConfig.hpp"
 #include "cmdProcess.hpp"
 #include "timer.hpp"
@@ -95,4 +93,3 @@ public:
 
 #define PRINT_NOW(...)    { printf(__VA_ARGS__); fflush(stdout);}
 #define PRINT_LOG(level, time, fmt, ...) do{ LoggerManage::getInstance()->print_log(level, time, fmt, ##__VA_ARGS__); }while(0);
-#endif

@@ -6,18 +6,17 @@
 //      rtc.hpp
 //
 //  Purpose:
-//      rtc device interface.
+//      rtc时钟, 支持访问本地和硬件时钟
 //
 // Author:
-//      Alva Zhange
+//     @听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
-//      7/24/2022   Create New Version
+//      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
-#ifndef _INCLUDE_RTC_HPP
-#define _INCLUDE_RTC_HPP
+_Pragma("once")
 
 #include "deviceBase.hpp"
 #include <linux/rtc.h>
@@ -42,4 +41,3 @@ public:
     uint64_t getStartTime() {return TimeStart;}
 };
 
-#endif

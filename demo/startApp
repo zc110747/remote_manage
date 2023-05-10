@@ -1,0 +1,16 @@
+#tar the node server
+if [ ! -d "server/" ]; then
+    echo "server not exist, create."
+    tar -xvf server.tar.bz2
+else
+    echo "server already exist, start run."
+fi
+
+#stop run file
+pkill -9 app_demo
+pkill -9 node
+
+#start the application
+./app_demo -f server/config.json &
+cd server/
+node server.js &

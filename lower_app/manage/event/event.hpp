@@ -6,14 +6,15 @@
 //      event.hpp
 //
 //  Purpose:
-//     Interface for buffer envet translate.
+//      提供线程/进程间通讯的数据结构，需要满足copyable
 //
 // Author:
-//      Alva Zhange
+//     @听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
+//      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 

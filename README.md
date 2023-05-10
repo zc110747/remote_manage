@@ -5,31 +5,55 @@
 ![image](https://github.com/zc110747/remote_manage/blob/master/document/Image/firmware.jpg)
 
 ## 如何编译执行项目
-```bash
-cd lower_app/manage/lib/
-tar -xvf asio.tar.bz2
-cd ../
-make
+
+通过git下载项目后，在remote_manage目录下执行  
+在执行之前，需要修改demo/config.json符合嵌入式Linux的硬件平台的配置，特别是  
+
+```json
+"socket":{
+	"ipaddr":"192.168.2.99"
+},
 ```
-在执行修改manage目录下的config.json  
-"socket":{  
-		"ipaddr":"192.168.113.1"  
-},  
-其中ipaddr改成本地ip地址, 并复制到../Execute/目录下，并进入目录执行app_demo即可运行下位机.  
+
+必须和嵌入式Linux中ipconfig显示的地址一致.  
+接着执行如下脚本生成包,其中REMOTE_IPADDRESS需要与上面一致  
+
+```bash
+export REMOTE_IPADDRESS=192.168.2.99
+./BuildRelease.bash
+```
+
+下面问题可参考*document/构建Linux编译环境.md*目录下说明  
+1.如果编译失败，应该是g++版本过低，中说明如何更新arm-linux-gnueabihf-g++版本，目前测试通过使用的是7.5.0版本.  
+2.REMOTE_IPADDRESS是通过ssh将文件传送到嵌入式平台，所以需要嵌入式系统支持ssh功能，不支持也可将app_demo, server.tar.bz2, startApp手动拷贝到服务器上执行.  
+3.嵌入式linux平台需要支持node，另外需要支持环回接口即127.0.0.1本地连接,需要rcS文件添加如下端口.  
+
+```bash
+ifconfig lo up
+ifconfig lo netmask 255.255.255.0
+```
+
+在嵌入式linux平台, 在上传目录下直接执行  
+
+```bash
+./startApp  
+```
+
+即可运行.  
 
 ## 项目结构
 
-demo/           	测试代码    
-document/       	设计文档资料说明    
+demo/           	测试代码  
+document/       	设计文档资料说明  
 kernael_mod/     	内核驱动模块  
 lower_app/          嵌入式Linux设备应用实现  
-	-manage/     	主工作流应用，驱动模块处理，logger实现，外设和其它设备接口访问  
-	-gui/        	下位机图形界面，支持状态显示和基本操作(QT)  
-	-server/        支持桌面访问得web服务器(node/js/web)  
+    -manage/     	主工作流应用，驱动模块处理，logger实现，外设和其它设备接口访问  
+    -gui/        	下位机图形界面，支持状态显示和基本操作(QT)  
+    -server/        支持桌面访问得web服务器(node/js/web)  
 support/        	用于支持应用执行的lib库或者环境  
 upper_app/          PC客户端应用实现  
-	-manage/        用于访问嵌入式设备的桌面客户端(暂定QT)  
-	-loger_tool/    用于支持logger打印的网络调试工具(C#)
+    -manage/        用于访问嵌入式设备的桌面客户端(暂定QT)  
+    -loger_tool/    用于支持logger打印的网络调试工具(C#)  
 
 ## 设计文档
 
@@ -45,13 +69,14 @@ upper_app/          PC客户端应用实现
 6. 支持本地和网络的logger打印接口(基于asio设计)，调试等级显示可调  
 7. 访问外部设备的模块接口(基于CAN或者串口的轮询控制接口)  
 
-
 PC应用端设计  
 
 1. 访问Linux端接口，获取内部数据  
 2. 操作Linux端设备外设  
 3. 控制访问linux管理的远端信息  
 4. 其它功能组件  
+
+版本更新说明见demo/version_releas.md  
 
 ## 硬件适配和兼容性
 
@@ -62,17 +87,11 @@ PC应用端设计
 ## 编译环境
 
 嵌入式软件交叉编译工具  
-	内核模块使用编译工具 - arm-linux-gnueabihf-gcc  
-	manage，gui编译工具 - arm-linux-gnueabihf-g++  
-	server使用node作为运行环境  
-	网页则使用前端技术  
+    内核模块使用编译工具 - arm-linux-gnueabihf-gcc  
+    manage，gui编译工具 - arm-linux-gnueabihf-g++  
+    server使用node作为运行环境  
+    网页使用vue方案  
 上位机编译工具  
-	QT(the newest stable version)  
+    QT(the newest stable version)  
 logger显示工具  
-	visual studio(the newest stable version)  
-
-## 注意事项  
-  
-### lower_app/manage
-1.编译lowr_app/manage, 需要首先解压lower/manage/lib下的asio.zip到同一目录下  
-2.进入lower_app/manage, 执行make即可编译，默认编译为桌面端，可修改makefile编译嵌入式linux平台  
+    visual studio(the newest stable version)  

@@ -6,30 +6,34 @@
 //      main.cpp
 //
 //  Purpose:
-//      main entry for the manage system.
+//      本项目作为嵌入式管理平台的下位机，主要负责网络，串口通讯，本地设备管理，
+//		远端设备轮询，详细设计参考document目录下说明
 //
 // Author:
-//      Alva Zhange
+//     @听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
 //      7/30/2022   Create New Version
+//		
 /////////////////////////////////////////////////////////////////////////////
-#include "UnityMain.hpp"
+#include "modules.hpp"
+#include "remote.hpp"
 #include "Semaphore.hpp"
 #include "driver.hpp"
 #include "TimeManage.hpp"
+#include "node_process.hpp"
 
-#if __SYSTEM_DEBUG == 1
-static void SystemTest(void);
-#endif
-
-int nConfigDefault = 0;
-std::string sConfigFile(DEFAULT_CONFIG_FILE);
+//internal data
+static int nConfigDefault = 0;
+static std::string sConfigFile(DEFAULT_CONFIG_FILE);
 static EVENT::Semaphore global_exit_sem(0);
 
+//internal function
 static bool system_init(int is_default, const char* path);
+
+//用于处理命令行输入的函数
 static void option_process(int argc, char *argv[])
 {
 	int c;
@@ -63,8 +67,12 @@ static void option_process(int argc, char *argv[])
 				break;
 			case 'v':
 			case 'V':
-				//printf("app_demo %s\n", DEVICE_VERSION);
-				exit(0);	
+				{
+					const uint8_t *pVer = get_version();
+					printf("version: %d.%d.%d.%d\n", 
+						pVer[0], pVer[1], pVer[2], pVer[3]);
+					exit(0);	
+				}
 			default:
 				exit(1);
 				break;
@@ -100,6 +108,9 @@ int main(int argc, char* argv[])
 	return result;
 }
 
+//系统模块初始化
+//主要包含调试接口，硬件驱动，设备管理
+//网络协议通讯，串口协议通讯，以及时间周期触发的循环事件
 static bool system_init(int is_default, const char* path)
 {
 	bool ret = true;
@@ -116,13 +127,13 @@ static bool system_init(int is_default, const char* path)
 	}
 	std::cout<<*(SystemConfig::getInstance())<<std::endl;
 
-	ret &= cmdProcess::getInstance()->init();
 	ret &= LoggerManage::getInstance()->init();
 	ret &= DriverManage::getInstance()->init();
 	ret &= NAMESPACE_DEVICE::DeviceManageThread::getInstance()->init();
 	ret &= UartThreadManage::getInstance()->init();
 	ret &= TcpThreadManage::getInstance()->init();
 	ret &= UdpThreadManage::getInstance()->init();
+	ret &= NodeProcess::getInstance()->init();
 	ret &= TimeManage::getInstance()->init();
 
 	return ret;

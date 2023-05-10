@@ -1,3 +1,21 @@
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2022-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      Semaphore.hpp
+//
+//  Purpose:
+//      信号量, 用于线程间通讯的触发, 支持长等待和超时模式
+//
+// Author:
+//     @听心跳的声音
+//
+//  Assumptions:
+//
+//  Revision History:
+//      12/19/2022   Create New Version	
+/////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
 #include <mutex>
@@ -8,37 +26,44 @@ namespace EVENT
     class Semaphore
     {
     public:
-        Semaphore(int count = 0):count(count), wakeups(0) {}
+        Semaphore(int count = 0):wakeups(count) {}
             virtual ~Semaphore() {}
         
         void signal()
         {
             std::lock_guard<std::mutex> lock(mt);
-            if(++count <= 0)
-            {
-                ++wakeups;
-                cv.notify_one();
-            }
-
+            ++wakeups;
+            cv.notify_one();
         }
         
+        bool wait(uint32_t timeout)
+        {
+            bool ret;
+
+            std::unique_lock<std::mutex> lock(mt);
+            ret = cv.wait_for(lock, std::chrono::milliseconds(timeout), [this]()->bool{
+                return wakeups > 0;
+            });
+            if(ret)
+                --wakeups;
+            
+            return ret;
+        }
+
         bool wait()
         {
             std::unique_lock<std::mutex> lock(mt);
-            if(--count < 0)
-            {
-                //在这一步释放了lock, 同时进行解锁
-                cv.wait(lock, [this]()->bool{
-                    return wakeups > 0;
-                });
-                --wakeups;
-            }
+            //在这一步释放了lock, 同时进行解锁
+            cv.wait(lock, [this]()->bool{
+                return wakeups > 0;
+            });
+            --wakeups;
             return true;
         }
+
     private:
         std::mutex mt;
         std::condition_variable cv;
-        int count;
         int wakeups;
     };
 }

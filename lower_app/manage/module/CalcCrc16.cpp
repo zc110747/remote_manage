@@ -6,17 +6,17 @@
 //      CalcCrc16.cpp
 //
 //  Purpose:
-//      Calculate crc16 value.
+//   	计算CRC16的值
 //
 // Author:
-//      Alva Zhange
+//     @听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
-//      7/24/2022   Create New Version
+//      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
-#include "CalcCrc16.hpp"
+#include "modules.hpp"
 
 /** CRC table for the CRC-16. The poly is 0x8005 (x^16 + x^15 + x^2 + 1) */
 static uint16_t const crc16_table[256] = {

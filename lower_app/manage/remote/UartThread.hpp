@@ -6,18 +6,17 @@
 //      UartThread.hpp
 //
 //  Purpose:
-//      UartThread module interface.
+//      Uart通讯执行模块，目前设计为同步模式，后续会修改
 //
 // Author:
-//      Alva Zhange
+//     	@听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
-//      7/30/2022   Create New Version
+//      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
-#ifndef _INCLUDE_UART_THREAD_H
-#define _INCLUDE_UART_THREAD_H
+_Pragma("once")
 
 #include "Protocol.hpp"
 
@@ -72,4 +71,4 @@ public:
 	CUartProtocolInfo* getProtocolInfo() {return pProtocolInfo;}
 	int getComfd()	{return nComFd;}
 };
-#endif
+
