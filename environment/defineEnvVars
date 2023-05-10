@@ -10,11 +10,45 @@ echo "Load the Env Data..."
 # This section defines the internal 
 # Not need Change unless program change.
 #-------------------------------------------------------------------------------
-export ENV_KERNEL_DIR="/home/center/application/project/linux"
-export EMBED_DEVICE_IPADDRESS="192.168.2.99"
-export FIRMWARE_CURRENT_PLATFORMS="Linux"
+export TFTP_PATH="/home/center/arm_linux/tftp"
+export NFS_PATH="/home/center/arm_linux/nfs/rootfs"
+export NFS_RUN_PATH="$NFS_PATH/manage/bin"
+export DST_PATH="/home/freedom/Desktop/Firmware"
 
-export FMWARE_VESRION="1.0.0.7"
+export ENV_CONFIG_FILE="$ENV_PATH_ENVIRONMENT/EnvConfig.mk"
+
+export ENV_KERNEL_DIR="/home/center/application/project/linux"
+export ENV_KERNAL_ZIMAGE="$ENV_KERNEL_DIR/arch/arm/boot/zImage"
+export ENV_KERNAL_DTB="$ENV_KERNEL_DIR/arch/arm/boot/dts/imx6ull-14x14-emmc-4.3-800x480-c.dtb"
+export ENV_KERNAL_BIN="u-boot-imx6ull-14x14-ddr512-emmc.imx"
+
+export ENV_BOOT_DIR="/home/center/application/project/uboot"
+export ENV_ROOTFS_DIR="/home/center/application/project/rootfs"
+
+export OLD_GCC_PATH=/home/center/install/gcc-arm-old/gcc/bin
+export NEW_GCC_PATH=/home/center/install/gcc-arm/bin/
+export GCC_LIB=/home/center/install/gcc-arm/arm-linux-gnueabihf
+export KERNAL_CC=$OLD_GCC_PATH/arm-linux-gnueabihf-
+
+export PATH="$PATH:$NEW_GCC_PATH"
+
+#-------------------------------------------------------------------------------
+# This section defines the default internal config
+#-------------------------------------------------------------------------------
+export EMBED_DEVICE_IPADDRESS=""
+export FIRMWARE_CURRENT_PLATFORMS=""
+export FMWARE_VESRION=""
+
+#-------------------------------------------------------------------------------
+# ProcessConfig.
+#-------------------------------------------------------------------------------
+declare -a array
+while read line; do
+    array+=("$line")
+done < $ENV_CONFIG_FILE
+FIRMWARE_CURRENT_PLATFORMS="${array[0]}"
+FMWARE_VESRION="${array[1]}"
+EMBED_DEVICE_IPADDRESS="${array[2]}"
 
 #-------------------------------------------------------------------------------
 # This section defined the word color.
@@ -23,6 +57,17 @@ readonly defText="$(tput sgr0)"
 readonly redText="$(tput setaf 1)"
 readonly greenText="$(tput setaf 2)"
 readonly yellowText="$(tput setaf 3)"
+readonly limityellowText="$(tput setaf 190)"
+readonly powerblueText="$(tput setaf 153)"
+readonly blueText="$(tput setaf 4)"
+readonly magentaText="$(tput setaf 5)"
+readonly cyanText="$(tput setaf 6)"
+readonly whiteText="$(tput setaf 7)"
+readonly brightText="$(tput bold)"
+readonly blinkText="$(tput blink)"
+readonly reverseText="$(tput smso)"
+readonly underlineText="$(tput smul)"
+
 
 # Now define an global platforms for all the type support
 # Linux：used for PC software
@@ -67,5 +112,10 @@ export ENV_PATH_UPPER_APP="$ENV_PATH_ROOT/upper_app"
 export ENV_PATH_PACKAGE="$ENV_PATH_ROOT/package"
 export ENV_PATH_KERNAL_MOD="$ENV_PATH_ROOT/kernal_mod"
 
+#-------------------------------------------------------------------------------
+# Env Vars define finish shows
+#-------------------------------------------------------------------------------
 echo "Update Environment Data Success!"
-echo "Current Platform is ${greenText}$FIRMWARE_CURRENT_PLATFORMS.${defText}, Remote IPAdress is ${greenText}$EMBED_DEVICE_IPADDRESS.${defText}"
+echo "Can use command '${greenText}SysHelpCommand${defText}' for more helps."
+echo "Current Platform is ${greenText}$FIRMWARE_CURRENT_PLATFORMS${defText}, Remote IPAdress is ${greenText}$EMBED_DEVICE_IPADDRESS${defText}."
+echo "Current Firmware Version is ${greenText}$FMWARE_VESRION${defText}."

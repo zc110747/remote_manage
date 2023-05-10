@@ -26,10 +26,10 @@ namespace EVENT
     class semaphore
     {
     public:
-        //constructor
+        /// \brief constructor
         semaphore(int count = 0):wakeups_(count) {}
 
-        //destructor
+        /// \brief destructor
         virtual ~semaphore() {}
         
         /// \brief signal

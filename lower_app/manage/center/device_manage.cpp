@@ -21,7 +21,6 @@
 #include "time_manage.hpp"
 #include "center_manage.hpp"
 
-
 device_manage* device_manage::instance_pointer_ = nullptr;
 device_manage* device_manage::get_instance()
 {
@@ -45,13 +44,13 @@ bool device_manage::init()
     //clear thread
     std::thread(std::bind(&device_manage::run, this)).detach();
     
-    device_fifo_point_ = new(std::nothrow) fifo_manage(DEVICE_MESSAGE_FIFO, S_FIFO_WORK_MODE);
-    if(device_fifo_point_ == nullptr)
+    device_fifo_point_ = std::make_unique<fifo_manage>(DEVICE_MESSAGE_FIFO, S_FIFO_WORK_MODE);
+    if(!device_fifo_point_->create())
     {
         return false;
     }
     
-    return device_fifo_point_->create();
+    return true;
 }
 
 int device_manage::send_device_message(uint8_t device, uint8_t action)
@@ -174,8 +173,8 @@ void device_manage::run()
     char buffer[READ_BUFFER_SIZE];
 
     PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "device_manage start!");
-    time_manage::get_instance()->registerWork(0, TIME_TICK(1000), TIME_ACTION_ALWAYS, [&](){
-        Event event(DEVICE_ID_TIME_UPDATE_PREOID);
+    time_manage::get_instance()->register_action(DEVICE_ID_TIME_UPDATE_PREOID, TIME_TICK(1000), TIME_ACTION_ALWAYS, [&](int id){
+        Event event(id);
         send_message(reinterpret_cast<char *>(&event), sizeof(event));
     });
     
@@ -199,7 +198,9 @@ void device_manage::run()
         size = device_fifo_point_->read(buffer, READ_BUFFER_SIZE);
         if(size > 0)
         {
-            PRINT_LOG(LOG_DEBUG, xGetCurrentTicks(), "Device Command, %d!", size);
+            PRINT_LOG(LOG_DEBUG, xGetCurrentTicks(), "Device Command, size:%d, id:%d!", 
+                size,
+                reinterpret_cast<Event *>(buffer)->get_id());
             process_event(reinterpret_cast<Event *>(buffer));
         }
         else

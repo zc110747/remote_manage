@@ -1,4 +1,4 @@
-KERNELDIR := /usr/code/linux
+KERNELDIR := $(shell printenv ENV_KERNEL_DIR)
 CURRENT_PATH := $(shell pwd)
 obj-m := kernal_i2c_oled.o
 

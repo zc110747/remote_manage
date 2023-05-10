@@ -37,17 +37,17 @@ bool driver_manage::init()
     bool ret = true;
     system_config *pConfig = system_config::get_instance();
 
-    ret &= led_zero_.init(pConfig->getled()->dev, O_RDWR | O_NONBLOCK);
-    ret &= beep_zero_.init(pConfig->getbeep()->dev, O_RDWR | O_NONBLOCK);
-    ret &= ap3216_dev_.init(pConfig->getapI2c()->dev, O_RDONLY | O_NONBLOCK);
-    ret &= icm20608_dev_.init(pConfig->geticmSpi()->dev, O_RDONLY | O_NONBLOCK);
-    ret &= rtc_dev_.init(pConfig->getrtc()->dev,  O_RDONLY | O_NONBLOCK);
-    ret &= key_zero_.init(pConfig->getkey()->dev, O_RDWR | O_NONBLOCK);
+    ret &= led_zero_.init(pConfig->get_led_config().dev, O_RDWR | O_NONBLOCK);
+    ret &= beep_zero_.init(pConfig->get_beep_config().dev, O_RDWR | O_NONBLOCK);
+    ret &= ap3216_dev_.init(pConfig->get_ap_config().dev, O_RDONLY | O_NONBLOCK);
+    ret &= icm20608_dev_.init(pConfig->get_icm_config().dev, O_RDONLY | O_NONBLOCK);
+    ret &= rtc_dev_.init(pConfig->get_rtc_config().dev,  O_RDONLY | O_NONBLOCK);
+    ret &= key_zero_.init(pConfig->get_key_config().dev, O_RDWR | O_NONBLOCK);
 
     if(ret)
     {
-        led_zero_.write_io_status(pConfig->getled()->init);
-        beep_zero_.write_io_status(pConfig->getbeep()->init);
+        led_zero_.write_io_status(pConfig->get_led_config().init);
+        beep_zero_.write_io_status(pConfig->get_beep_config().init);
         PRINT_LOG(LOG_INFO, 0, "Device driver_manage Init Success!");
     }
     

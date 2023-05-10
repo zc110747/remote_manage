@@ -36,16 +36,12 @@ bool protocol_info::init(
 )
 {
 	//rx fifo
-	rx_fifo_ptr_ = new(std::nothrow) fifo_manage(rx_fifo, S_FIFO_WORK_MODE);
-	if(rx_fifo_ptr_ == nullptr)
-		return false;
+	rx_fifo_ptr_ = std::make_unique<fifo_manage>(rx_fifo, S_FIFO_WORK_MODE);
 	if(!rx_fifo_ptr_->create())
 		return false;
 	
 	//tx fifo
-	tx_fifo_ptr_ = new(std::nothrow) fifo_manage(tx_fifo, S_FIFO_WORK_MODE);
-	if(tx_fifo_ptr_ == nullptr)
-		return false;
+	tx_fifo_ptr_ = std::make_unique<fifo_manage>(tx_fifo, S_FIFO_WORK_MODE);
 	if(!tx_fifo_ptr_->create())
 		return false;
 

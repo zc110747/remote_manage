@@ -45,7 +45,7 @@ typedef struct
 class icm_device : public info_base<icm_adc_info>
 {
 public:
-    //constructor
+    /// \brief constructor
     using info_base::info_base;
 
     /// \brief calculate_angle

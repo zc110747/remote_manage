@@ -44,8 +44,8 @@ public:
 
     /// \brief parse_data
     /// - This method is used to parse the receive data and save format.
-    /// \param the start of the point received for parse.
-    /// \param the size of the point received for parse.
+    /// \param ptr -- start of the point received for parse.
+    /// \param size -- size of the point received for parse.
     /// \return Wheather parse is success or failed.
     bool parse_data(char *ptr, int size);
 

@@ -112,23 +112,23 @@ int uart_thread_manage::send_msg(char *buffer, uint16_t size)
 
 bool uart_thread_manage::init()
 {
-	auto pSerialConfig = system_config::get_instance()->getserial();
+	const auto& serial_config = system_config::get_instance()->get_serial_config();
 
-	if((com_fd_ = open(pSerialConfig->dev.c_str(), O_RDWR))<0)
+	if((com_fd_ = open(serial_config.dev.c_str(), O_RDWR))<0)
 	{	
-		PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Open Device %s failed!", pSerialConfig->dev.c_str());
+		PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Open Device %s failed!", serial_config.dev.c_str());
 		return false;
 	}
 	else
 	{
-		if(set_opt(pSerialConfig->baud, pSerialConfig->dataBits, pSerialConfig->parity, pSerialConfig->stopBits) != 0)
+		if(set_opt(serial_config.baud, serial_config.dataBits, serial_config.parity, serial_config.stopBits) != 0)
 		{
 			PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Serial Option failed!");
 			return false;
 		}
 	}
 	
-	uart_protocol_pointer_ = new(std::nothrow) protocol_info();
+	uart_protocol_pointer_ = std::make_unique<protocol_info>();
 	if(uart_protocol_pointer_ == nullptr)
 	{
 		PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "uart_protocol_pointer_ create failed!");

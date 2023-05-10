@@ -22,14 +22,14 @@ _Pragma("once")
 
 #include "modules.hpp"
 
-class center_manage final
+class center_manage final: std::enable_shared_from_this<center_manage>
 {
 public:
     /// \brief constructor
     center_manage()=default;
     center_manage(const center_manage&)=delete;
 
-    /// - destructor, delete not allow for singleton pattern.
+    /// \brief destructor, delete not allow for singleton pattern.
     virtual ~center_manage()=delete;
 
     /// \brief get_instance
@@ -92,5 +92,5 @@ private:
 
     /// \brief center_fifo_point_
     /// - fifo point used for the center management.
-    fifo_manage *center_fifo_point_{nullptr};
+    std::unique_ptr<fifo_manage> center_fifo_point_;
 };

@@ -23,11 +23,11 @@ static asio_server socket_tcp_server;
 
 void tcp_thread_manage::tcp_server_run()
 {
-    const SocketSysConfig *pSocketConfig = system_config::get_instance()->gettcp();
-    PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "tcp info:%s:%d", pSocketConfig->ipaddr.c_str(), pSocketConfig->port);
+    const auto& socket_config = system_config::get_instance()->get_tcp_config();
+    PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "tcp info:%s:%d", socket_config.ipaddr.c_str(), socket_config.port);
     try
     {
-        socket_tcp_server.init(pSocketConfig->ipaddr, std::to_string(pSocketConfig->port), [this](char* ptr, int length){
+        socket_tcp_server.init(socket_config.ipaddr, std::to_string(socket_config.port), [this](char* ptr, int length){
             tcp_protocol_pointer_->write_rx_fifo(ptr, length);
         });
         socket_tcp_server.run();
@@ -101,7 +101,7 @@ void tcp_thread_manage::tcp_tx_run()
 bool tcp_thread_manage::init()
 {
     //must creat fifo before thread start
-    tcp_protocol_pointer_ = new(std::nothrow) protocol_info();
+    tcp_protocol_pointer_ = std::make_unique<protocol_info>();
     if(tcp_protocol_pointer_ == nullptr)
     {
         PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "tcp_protocol_pointer_ create failed!");

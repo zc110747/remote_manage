@@ -1,4 +1,4 @@
-KERNELDIR := /home/center/application/Project/linux/
+KERNELDIR := $(shell printenv ENV_KERNEL_DIR)
 CURRENT_PATH := $(shell pwd)
 obj-m := kernal_key.o
 

@@ -91,7 +91,7 @@ bool system_config::init(const char* path)
 
         parameter_.downloadpath     = root["filepath"].asString();
 
-        //SaveConfigFile();
+        //save_config_file();
     }
     catch(const std::exception& e)
     {
@@ -175,7 +175,7 @@ void system_config::default_init() noexcept
     parameter_.downloadpath = DEFAULT_DOWNLOAD_PATH;
 }
 
-void system_config::SaveConfigFile()
+void system_config::save_config_file()
 {
     Json::Value root;
 
@@ -219,7 +219,7 @@ std::ostream& operator<<(std::ostream& os, const system_config& config)
 {
     const SystemParamter* parameter_ = &(config.parameter_);
 
-    os<<"filepath:"<<config.getFilePath()<<"\n";
+    os<<"filepath:"<<config.get_config_file_path()<<"\n";
     os<<"led:"<<parameter_->led.dev<<" "<<parameter_->led.init<<"\n";
     os<<"beep:"<<parameter_->beep.dev<<" "<<parameter_->beep.init<<"\n";
     

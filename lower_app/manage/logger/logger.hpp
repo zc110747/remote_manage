@@ -21,7 +21,7 @@ _Pragma("once")
 #include "fifo_manage.hpp"
 #include "productConfig.hpp"
 #include "cmd_process.hpp"
-#include "timer.hpp"
+#include "time_manage.hpp"
 
 #define LOGGER_MAX_BUFFER_SIZE      256
 #define LOGGER_MESSAGE_BUFFER_SIZE  16384
@@ -141,7 +141,7 @@ private:
 
     /// \brief logger_fifo_
     /// - fifo used for logger manage.
-    fifo_manage *logger_fifo_{nullptr};
+    std::unique_ptr<fifo_manage> logger_fifo_{nullptr};
 };
 
 #define PRINT_NOW(...)    { printf(__VA_ARGS__); fflush(stdout);}
