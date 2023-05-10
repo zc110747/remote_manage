@@ -8,33 +8,28 @@
 
 # This is object should be build and will link to generate
 # the executables
-HOST = arm-linux-gnueabihf-
-CPU = arm-
-#HOST =
-#CPU = x86-
-CC = $(HOST)g++
+CC = $(APP_CC_COMPILE)
 CFLAGS := -O3 -std=c++17 -fno-strict-aliasing -lrt 
 
 objects = 	main.o \
-			remote/SocketTcpThread.o 	 \
-			remote/SocketUdpThread.o 	 \
-			remote/UartThread.o 		 \
-			module/DeviceManageThread.o   \
-			module/SystemConfig.o \
-			module/CalcCrc16.o  \
-			module/TimeManage.o \
-			module/FIFOManage.o \
+			remote/tcp_thread.o 	 \
+			remote/uart_thread.o 		 \
+			remote/protocol.o			 \
+			module/system_config.o \
+			module/calculate.o  \
+			module/time_manage.o \
+			module/fifo_manage.o \
 			module/asio_server.o \
-			module/cmdProcess.o  \
+			module/cmd_process.o  \
 			driver/rtc.o \
-			driver/beep.o \
-			driver/led.o \
+			driver/key.o \
 			driver/spi_icm.o \
-			driver/i2c_ap.o \
-			driver/deviceBase.o \
+			driver/device_base.o \
 			driver/driver.o \
 			logger/logger.o \
-			node_process/node_process.o
+			center/internal_process.o \
+			center/device_manage.o   \
+			center/center_manage.o
 
 
 clear_dobject = *.d .*.o.d \
@@ -43,8 +38,7 @@ clear_dobject = *.d .*.o.d \
 				event/*.d event/.*.o.d \
 				lib/*.d lib/.*.o.d \
 				logger/*.d logger/.*.o.d \
-				remote/*.d remote/.*.o.d \
-				node_process/*.d node_process/.*.o.
+				remote/*.d remote/.*.o.d 
 
 include_path = -I remote/ 			\
 				-I driver/ 			\
@@ -56,9 +50,9 @@ include_path = -I remote/ 			\
 				-I logger/ 			\
 				-I module/tools/ \
 				-I event/		\
-				-I node_process/		
-				
-lib = lib/$(CPU)libjsoncpp.a
+				-I center/
+								
+lib = lib/$(APP_LIB_APPLICATION)libjsoncpp.a
 
 # This is the file name of the executables and path where 
 # place the executables

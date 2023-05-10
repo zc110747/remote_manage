@@ -19,7 +19,7 @@
 _Pragma("once")
 
 #include "productConfig.hpp"
-#include "SystemConfig.hpp"
-#include "DeviceManageThread.hpp"
+#include "system_config.hpp"
+#include "device_manage.hpp"
 
 uint16_t crc16(uint16_t crc, uint8_t const *buffer, uint16_t len);

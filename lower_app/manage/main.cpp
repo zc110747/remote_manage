@@ -20,15 +20,16 @@
 /////////////////////////////////////////////////////////////////////////////
 #include "modules.hpp"
 #include "remote.hpp"
-#include "Semaphore.hpp"
+#include "semaphore.hpp"
 #include "driver.hpp"
-#include "TimeManage.hpp"
-#include "node_process.hpp"
+#include "time_manage.hpp"
+#include "internal_process.hpp"
+#include "center_manage.hpp"
 
 //internal data
 static int nConfigDefault = 0;
 static std::string sConfigFile(DEFAULT_CONFIG_FILE);
-static EVENT::Semaphore global_exit_sem(0);
+static EVENT::semaphore global_exit_sem(0);
 
 //internal function
 static bool system_init(int is_default, const char* path);
@@ -38,10 +39,12 @@ static void option_process(int argc, char *argv[])
 {
 	int c;
 
+	system_config::get_instance()->update_fw_info();
+
 	//命令行输入说明
-	//if no parameter follow, no ":"
+	//if no parameter_ follow, no ":"
 	//must one paramter follow, one ":"
-	//can be no or one parameter, without space
+	//can be no or one parameter_, without space
 	while ((c = getopt(argc, argv, "vdf:h::")) != -1)
 	{
 		switch (c)
@@ -68,9 +71,8 @@ static void option_process(int argc, char *argv[])
 			case 'v':
 			case 'V':
 				{
-					const uint8_t *pVer = get_version();
-					printf("version: %d.%d.%d.%d\n", 
-						pVer[0], pVer[1], pVer[2], pVer[3]);
+					const auto& info = system_config::get_instance()->get_fw_information();
+					std::cout<<"Firmware Version:"<<info.version<<std::endl;
 					exit(0);	
 				}
 			default:
@@ -102,8 +104,7 @@ int main(int argc, char* argv[])
 		}
 	}
 	
-	DriverManage::getInstance()->release();
-	UartThreadManage::getInstance()->release();
+	uart_thread_manage::get_instance()->release();
 	PRINT_NOW("Process app_demo stop, error:%s\n", strerror(errno));
 	return result;
 }
@@ -118,23 +119,23 @@ static bool system_init(int is_default, const char* path)
 	//选中配置文件
 	if(is_default == 0)
 	{
-		SystemConfig::getInstance()->init(path);
+		system_config::get_instance()->init(path);
 	}
 	else
 	{
-		SystemConfig::getInstance()->default_init();
+		system_config::get_instance()->default_init();
 		PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "System Config use default!");
 	}
-	std::cout<<*(SystemConfig::getInstance())<<std::endl;
+	std::cout<<*(system_config::get_instance())<<std::endl;
 
-	ret &= LoggerManage::getInstance()->init();
-	ret &= DriverManage::getInstance()->init();
-	ret &= NAMESPACE_DEVICE::DeviceManageThread::getInstance()->init();
-	ret &= UartThreadManage::getInstance()->init();
-	ret &= TcpThreadManage::getInstance()->init();
-	ret &= UdpThreadManage::getInstance()->init();
-	ret &= NodeProcess::getInstance()->init();
-	ret &= TimeManage::getInstance()->init();
+	ret &= LoggerManage::get_instance()->init();
+	ret &= driver_manage::get_instance()->init();
+	ret &= device_manage::get_instance()->init();
+	ret &= uart_thread_manage::get_instance()->init();
+	ret &= tcp_thread_manage::get_instance()->init();
+	ret &= internal_process::get_instance()->init();
+	ret &= time_manage::get_instance()->init();
+	ret &= center_manage::get_instance()->init();
 
 	return ret;
 }

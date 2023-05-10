@@ -1,4 +1,4 @@
-KERNELDIR := /usr/code/linux
+KERNELDIR := /home/center/application/Project/linux/
 CURRENT_PATH := $(shell pwd)
 obj-m := kernal_spi_icm.o
 

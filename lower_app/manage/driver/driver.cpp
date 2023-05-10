@@ -18,47 +18,40 @@
 /////////////////////////////////////////////////////////////////////////////
 #include "driver.hpp"
 
-DriverManage* DriverManage::pInstance = nullptr;
-DriverManage* DriverManage::getInstance()
+driver_manage* driver_manage::instance_pointer_ = nullptr;
+driver_manage* driver_manage::get_instance()
 {
-    if(pInstance == nullptr)
+    if(instance_pointer_ == nullptr)
     {
-        pInstance = new(std::nothrow) DriverManage;
-        if(pInstance == nullptr)
+        instance_pointer_ = new(std::nothrow) driver_manage;
+        if(instance_pointer_ == nullptr)
         {
             //do something
         }
     }
-    return pInstance;
+    return instance_pointer_;
 }
 
-bool DriverManage::init()
+bool driver_manage::init()
 {
     bool ret = true;
+    system_config *pConfig = system_config::get_instance();
 
-    ret &= ledTheOne::getInstance()->open(O_RDWR | O_NDELAY);
-    ret &= beepTheOne::getInstance()->open(O_RDWR | O_NDELAY);
-    ret &= APDevice::getInstance()->open(O_RDONLY);
-    ret &= ICMDevice::getInstance()->open(O_RDONLY);
-    ret &= RTCDevice::getInstance()->open(O_RDONLY);
+    ret &= led_zero_.init(pConfig->getled()->dev, O_RDWR | O_NONBLOCK);
+    ret &= beep_zero_.init(pConfig->getbeep()->dev, O_RDWR | O_NONBLOCK);
+    ret &= ap3216_dev_.init(pConfig->getapI2c()->dev, O_RDONLY | O_NONBLOCK);
+    ret &= icm20608_dev_.init(pConfig->geticmSpi()->dev, O_RDONLY | O_NONBLOCK);
+    ret &= rtc_dev_.init(pConfig->getrtc()->dev,  O_RDONLY | O_NONBLOCK);
+    ret &= key_zero_.init(pConfig->getkey()->dev, O_RDWR | O_NONBLOCK);
 
     if(ret)
     {
-        ledTheOne::getInstance()->writeIoStatus(SystemConfig::getInstance()->getled()->init);
-        beepTheOne::getInstance()->writeIoStatus(SystemConfig::getInstance()->getbeep()->init);
-        PRINT_LOG(LOG_ERROR, 0, "Device DriverManage Init Success!");
+        led_zero_.write_io_status(pConfig->getled()->init);
+        beep_zero_.write_io_status(pConfig->getbeep()->init);
+        PRINT_LOG(LOG_INFO, 0, "Device driver_manage Init Success!");
     }
     
     return ret;
-}
-
-void DriverManage::release()
-{
-    ledTheOne::getInstance()->release();
-    beepTheOne::getInstance()->release();
-    APDevice::getInstance()->release();
-    ICMDevice::getInstance()->release();
-    RTCDevice::getInstance()->release();
 }
 
 

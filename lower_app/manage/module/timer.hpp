@@ -62,7 +62,7 @@ namespace DeviceManage
 
             while(!m_stop)
             {
-                std::unique_lock<std::mutex> lock{mt};
+                std::unique_lock<std::mutex> lock{mutex_};
                 auto stauts = cond.wait_for(lock, std::chrono::milliseconds(milli_s));
                 if(stauts == std::cv_status::timeout)
                 {
@@ -77,7 +77,7 @@ namespace DeviceManage
 
     private:
         std::condition_variable cond;
-        std::mutex mt;
+        std::mutex mutex_;
         uint32_t milli_s{1};
         std::function<void()> m_task;
         std::atomic<bool> m_stop{false};

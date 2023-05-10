@@ -21,20 +21,20 @@
 #include "driver.hpp"
 #include "asio_server.hpp"
 
-static AsioServer logger_server;
+static asio_server logger_server;
 
 //asio server test ok
-void LoggerManage::asio_server_run()
+void LoggerManage::logger_rx_server_run()
 {
-    const SocketSysConfig *pSocketConfig = SystemConfig::getInstance()->getlogger();
-    cmdProcess LoggerCmdProcess;
+    const SocketSysConfig *pSocketConfig = system_config::get_instance()->getlogger();
+    cmd_process Loggercmd_process;
 
     try
     {
-        logger_server.init(pSocketConfig->ipaddr, std::to_string(pSocketConfig->port), [&LoggerCmdProcess](char* ptr, int length){
-            if(LoggerCmdProcess.parseData(ptr, length))
+        logger_server.init(pSocketConfig->ipaddr, std::to_string(pSocketConfig->port), [&Loggercmd_process](char* ptr, int length){
+            if(Loggercmd_process.parse_data(ptr, length))
             {
-                LoggerCmdProcess.ProcessData();
+                Loggercmd_process.process_data();
             }
         });
         logger_server.run();
@@ -48,24 +48,23 @@ void LoggerManage::asio_server_run()
 void LoggerManage::logger_tx_run()
 {
     int len;
-    LOG_MESSAGE message;
+    LOG_MESSAGE logger_message_;
     
-    setThreadWork();
+    update_thread_in_work();
 
     while(1)
     {
-        len = ::read(read_fd(), &message, sizeof(message));
+        len = logger_fifo_->read((char *)&logger_message_, sizeof(logger_message_));
         if(len > 0)
         {
-            auto session_ptr = logger_server.get_valid_session();
-            if(session_ptr != nullptr)
+            if(logger_server.is_valid())
             {
-                session_ptr->do_write(message.ptr, message.length);
+                logger_server.do_write(logger_message_.ptr, logger_message_.length);
                 std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
             else
             {
-                len = ::write(STDOUT_FILENO, message.ptr, message.length);
+                len = ::write(STDOUT_FILENO, logger_message_.ptr, logger_message_.length);
                 fflush(stdout);
                 if(len < 0)
                 {
@@ -80,89 +79,57 @@ void LoggerManage::logger_tx_run()
     }
 }
 
-LoggerManage* LoggerManage::pInstance = nullptr;
-LoggerManage* LoggerManage::getInstance()
+LoggerManage* LoggerManage::instance_pointer_ = nullptr;
+LoggerManage* LoggerManage::get_instance()
 {
-    if(pInstance == nullptr)
+    if(instance_pointer_ == nullptr)
     {
-        pInstance = new(std::nothrow) LoggerManage;
-        if(pInstance == nullptr)
+        instance_pointer_ = new(std::nothrow) LoggerManage;
+        if(instance_pointer_ == nullptr)
         {
             //do something
         }
     }
-    return pInstance;
-}
-
-bool LoggerManage::createfifo()
-{
-    unlink(LOGGER_FIFO_PATH);
-
-    if(mkfifo(LOGGER_FIFO_PATH, (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) < 0){
-        PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Logger Fifo Create error!");
-        return false;
-    }
-
-    readfd = open(LOGGER_FIFO_PATH, O_RDWR, 0);
-    if(readfd == -1)
-    {
-        return false;
-    }
-
-    writefd = open(LOGGER_FIFO_PATH, O_RDWR, 0);
-    if(writefd == -1)
-    {
-        close(readfd);
-        return false;
-    }
-    return true;
+    return instance_pointer_;
 }
 
 char memoryBuffer[LOGGER_MESSAGE_BUFFER_SIZE+1];
 bool LoggerManage::init()
 {
-    bool ret = true;
-    int nErr;
+    memory_start_pointer_ = memoryBuffer;
+    memory_end_pointer_ = &memoryBuffer[LOGGER_MESSAGE_BUFFER_SIZE];
 
-    pNextMemoryBuffer = memoryBuffer;
-    pEndMemoryBuffer = &memoryBuffer[LOGGER_MESSAGE_BUFFER_SIZE];
+    //init and Create logger fifo, must before thread run.
+    logger_fifo_ = new(std::nothrow) fifo_manage(LOGGER_FIFO_PATH, S_FIFO_WORK_MODE);
+    if(logger_fifo_ == nullptr)
+        return false;
+    if(!logger_fifo_->create())
+        return false;
 
-    createfifo();
+    //init thread for logger
+    logger_tx_thread_ = std::thread(std::bind(&LoggerManage::logger_tx_run, this));
+    logger_tx_thread_.detach();
+    logger_rx_thread_ = std::thread(std::bind(&LoggerManage::logger_rx_server_run, this));
+    logger_rx_thread_.detach();
 
-    m_TxThread = std::thread(std::bind(&LoggerManage::logger_tx_run, this));
-    m_TxThread.detach();
-    m_AsioServerThread = std::thread(std::bind(&LoggerManage::asio_server_run, this));
-    m_AsioServerThread.detach();
-    return ret;
+    return true;
 }
 
 void LoggerManage::release()
 {
-    is_thread_work = false;
-    
-    if(readfd != - 1)
-    {
-        close(readfd);
-        readfd = -1;
-    }
-
-    if(writefd == -1)
-    {
-        close(writefd);   
-        writefd = -1;
-    }
+    logger_fifo_->release();
 }
 
-char *LoggerManage::getMemoryBuffer(uint16_t size)
+char *LoggerManage::get_memory_buffer_pointer(uint16_t size)
 {
     char *pCurrentMemBuffer;
 
-    pCurrentMemBuffer = pNextMemoryBuffer;
-    pNextMemoryBuffer = pCurrentMemBuffer+size;
-	if(pNextMemoryBuffer >  pEndMemoryBuffer)
+    pCurrentMemBuffer = memory_start_pointer_;
+    memory_start_pointer_ = pCurrentMemBuffer+size;
+	if(memory_start_pointer_ >  memory_end_pointer_)
 	{
 		pCurrentMemBuffer = memoryBuffer;
-		pNextMemoryBuffer = pCurrentMemBuffer + size;
+		memory_start_pointer_ = pCurrentMemBuffer + size;
 	}
 	return(pCurrentMemBuffer);
 }
@@ -171,29 +138,31 @@ int LoggerManage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...
 {
     int len, bufferlen;
     char *pbuf, *pstart;
+    bool is_thread_work = false;
 
-    if(level < log_level)
+    if(level < log_level_)
         return 0;
 
-    is_thread_work = set_thread_work;
+    is_thread_work = thread_work_;
 
-    mutex_lock();
-    pstart = getMemoryBuffer(LOGGER_MAX_BUFFER_SIZE);
+    mutex_.lock();
+
+    pstart = get_memory_buffer_pointer(LOGGER_MAX_BUFFER_SIZE);
     len = LOGGER_MAX_BUFFER_SIZE;
     bufferlen = len - 1;
     pbuf = pstart;
-    message.length = 0;
-    message.ptr = pstart;
+    logger_message_.length = 0;
+    logger_message_.ptr = pstart;
 
     len = snprintf(pbuf, bufferlen, "LogLevel:%d time:%d info:",level, time);
     if((len<=0) || (len>=bufferlen))
     {
         PRINT_NOW("%s label0 error\n", __func__);
-        mutex_unlock();
+        mutex_.unlock();
         return 0;
     }
 
-    message.length += len;
+    logger_message_.length += len;
     pbuf = &pbuf[len];
     bufferlen -= len;
     
@@ -201,7 +170,7 @@ int LoggerManage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...
     va_start(valist, fmt);
 	len = vsnprintf(pbuf, bufferlen, fmt, valist);
 	va_end(valist);
-    mutex_unlock();
+    mutex_.unlock();
 
     if((len<=0) || (len>=bufferlen))
     {
@@ -209,7 +178,7 @@ int LoggerManage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...
         return 0;
     }
     
-    message.length += len;
+    logger_message_.length += len;
     pbuf = &pbuf[len];
     bufferlen -= len;
 
@@ -221,11 +190,11 @@ int LoggerManage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...
     
     pbuf[0] = '\r';
     pbuf[1] = '\n';
-    message.length += 2;
+    logger_message_.length += 2;
 
     if(!is_thread_work)
     {
-        len = write(STDOUT_FILENO, message.ptr, message.length);
+        len = write(STDOUT_FILENO, logger_message_.ptr, logger_message_.length);
         if(len<0)
         {
             //do something error
@@ -234,10 +203,11 @@ int LoggerManage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...
     }
     else
     {
-        len = ::write(writefd, &message, sizeof(message));
+        
+        len = logger_fifo_->write((char *)&logger_message_, sizeof(logger_message_));
         if(len<=0)
         {
-            PRINT_NOW("%s label3 error\n", __func__);
+            PRINT_NOW("%s lable3 error\n", __func__);
         }
         else
         {
@@ -245,6 +215,6 @@ int LoggerManage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...
         }
     }
     
-    return  message.length;
+    return  logger_message_.length;
 }
 

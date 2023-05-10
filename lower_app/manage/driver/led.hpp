@@ -18,18 +18,11 @@
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
-#include "deviceBase.hpp"
+#include "device_base.hpp"
 
-class ledTheOne: public IoBase
+class led_device: public io_base
 {
-private:
-    static ledTheOne *pInstance;
-
 public:
-    using IoBase::IoBase;
-
-    static ledTheOne* getInstance();
-    void release();
-
-    void test();
+    /// \brief constructor
+    using io_base::io_base;
 };

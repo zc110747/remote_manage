@@ -710,8 +710,8 @@ private:
  * - ".name" => member named 'name' of root node (an object value)
  * - ".name1.name2.name3"
  * - ".[0][1][2].name1[3]"
- * - ".%" => member name is provided as parameter
- * - ".[%]" => index is provided as parameter
+ * - ".%" => member name is provided as parameter_
+ * - ".[%]" => index is provided as parameter_
  */
 class JSON_API Path {
 public:

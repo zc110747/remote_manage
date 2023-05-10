@@ -52,7 +52,7 @@ static uint16_t const crc16_table[256] = {
     实际内部数据 数据长度-3
     奇偶校验位 2Byte
 */
-int CProtocolInfo::CreateSendBuffer(uint8_t nId, uint16_t nSize, uint8_t *pStart, bool bWriteThrough)
+int protocol_info::CreateSendBuffer(uint8_t nId, uint16_t nSize, uint8_t *pStart, bool bWriteThrough)
 {
     if(m_pTxBuffer != nullptr)
     {
@@ -86,7 +86,7 @@ int CProtocolInfo::CreateSendBuffer(uint8_t nId, uint16_t nSize, uint8_t *pStart
                 }
             }
 
-            nCrcVal = CrcCalculate(&m_pTxBuffer[1], nTotalSize-1);
+            nCrcVal = calculate_crc(&m_pTxBuffer[1], nTotalSize-1);
             m_pTxBuffer[nTotalSize++] = (uint8_t)(nCrcVal>>8);
             m_pTxBuffer[nTotalSize++] = (uint8_t)(nCrcVal&0xff);
 
@@ -134,7 +134,7 @@ uint16_t crc16(uint16_t crc, uint8_t const *buffer, uint16_t len)
 /*!
     CRC16校验的代码实现
 */
-uint16_t CProtocolInfo::CrcCalculate(uint8_t *pStart, int nSize)
+uint16_t protocol_info::calculate_crc(uint8_t *pStart, int nSize)
 {
     uint16_t nCrcOut;
     if(pStart == NULL || nSize == 0)
@@ -149,7 +149,7 @@ uint16_t CProtocolInfo::CrcCalculate(uint8_t *pStart, int nSize)
 /*!
     接收数据并返回处理结果
 */
-int CProtocolInfo::CheckReceiveData(bool IsSignalCheckHead)
+int protocol_info::CheckReceiveData(bool IsSignalCheckHead)
 {
     int nRead;
     int CrcRecv, CrcCacl;
@@ -199,7 +199,7 @@ int CProtocolInfo::CheckReceiveData(bool IsSignalCheckHead)
                     {
                         /*计算head后到CRC尾之前的所有数据的CRC值*/
                         CrcRecv = (m_pRxBuffer[nLen-2]<<8) + m_pRxBuffer[nLen-1];
-                        CrcCacl = CrcCalculate(&m_pRxBuffer[1], nLen-PROTOCOL_CRC_SIZE-1);
+                        CrcCacl = calculate_crc(&m_pRxBuffer[1], nLen-PROTOCOL_CRC_SIZE-1);
                         if(CrcRecv == CrcCacl)
                         {
                             #if TEST_DEBUG == 1

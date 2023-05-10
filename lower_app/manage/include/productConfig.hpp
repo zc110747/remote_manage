@@ -18,10 +18,18 @@
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
-//------------------------- Global Defined --------------------------
-#define UART_MODULE_ON                  1
-#define SOCKET_TCP_MODULE_ON            1
-#define SOCKET_UDP_MODULE_ON            1
+//------------------------- FIFO List ------------------------------
+#define LOGGER_FIFO_PATH            "/tmp/logger.fifo"              //logger服务模块
+#define DEVICE_MESSAGE_FIFO         "/tmp/device_manage.fifo"        //设备管理模块
+#define CENTER_UNIT_FIFO            "/tmp/center_manage.fifo"
+
+//socket fifo
+#define SOCKET_TCP_RX_FIFO          "/tmp/socket_rx.fifo"
+#define SOCKET_TCP_TX_FIFO          "/tmp/socket_tx.fifo"
+
+//uart fifo
+#define SERVER_UART_RX_FIFO          "/tmp/uart_rx.fifo"
+#define SERVER_UART_TX_FIFO          "/tmp/uart_tx.fifo"
 
 /*返回状态*/
 #define RT_INVALID_MQ_SIZE              -4
@@ -42,10 +50,15 @@ _Pragma("once")
 #define SYSTM_CONFIG_OFF            0
 #define DEFAULT_CONFIG_FILE         "config.json"
 
+#define DEFAULT_FW_INFO_FILE        "version.json"
+#define DEFAULT_FW_AUTHOR           "zc"
+#define DEFAULT_FW_VERSION          "0.0.0.0"
+
 #define DEFAULT_LED_INIT            SYSTM_CONFIG_OFF
-#define DEFALUT_LED_DEV             "/dev/led"        
+#define DEFAULT_LED_DEV             "/dev/led"        
 #define DEFAULT_BEEP_INIT           SYSTM_CONFIG_OFF
-#define DEFALUT_BEEP_DEV            "/dev/beep"   
+#define DEFAULT_BEEP_DEV            "/dev/beep"   
+#define DEFAULT_KEY_DEV             "/dev/key"
 #define DEFAULT_SERIAL_BAUD         115200
 #define DEFAULT_SERIAL_DATABITS     8
 #define DEFAULT_SERIAL_STOPBITS     1
@@ -63,5 +76,6 @@ _Pragma("once")
 #define DEFAULT_LOGGER_PORT         8002
 #define DEFAULT_NODE_IPADDR         DEFAULT_IPADDRESS
 #define DEFAULT_NODE_PORT           8003
+#define DEFAULT_NODE_WEB_PORT       8004
 #define DEFAULT_DOWNLOAD_PATH       "/tmp/download/"
 

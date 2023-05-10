@@ -28,6 +28,8 @@ _Pragma("once")
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/time.h>
+#include <signal.h>
+
 
 //c++ interface
 #include <new>
@@ -42,3 +44,7 @@ _Pragma("once")
 #include <algorithm>
 #include <chrono>
 #include <atomic>
+
+#if __cplusplus < 201703
+#error "c++ compiler need newer than g++7, can use 'g++ -v' to see version."
+#endif

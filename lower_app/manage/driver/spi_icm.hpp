@@ -18,7 +18,7 @@
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
-#include "deviceBase.hpp"
+#include "device_base.hpp"
 
 typedef struct
 {
@@ -29,18 +29,45 @@ typedef struct
     int accel_y_adc;    /*加速度计y轴加速度*/
     int accel_z_adc;    /*加速度计z轴加速度*/
     int temp_adc;       /*温度信息*/
-}ICM_INFO;
+}icm_adc_info;
 
-class ICMDevice : public InfoBase<ICM_INFO>
+typedef struct
 {
-private:
-    static ICMDevice *pInstance;
+    float gyro_x_act;     /*陀螺仪x轴角速度*/
+    float gyro_y_act;     /*陀螺仪y轴角速度*/
+    float gyro_z_act;     /*陀螺仪z轴角速度*/ 
+    float accel_x_act;    /*加速度计x轴加速度*/
+    float accel_y_act;    /*加速度计y轴加速度*/
+    float accel_z_act;    /*加速度计z轴加速度*/     
+    float temp_act;       /*温度信息*/
+}icm_info;
 
+class icm_device : public info_base<icm_adc_info>
+{
 public:
     //constructor
-    using InfoBase::InfoBase;
+    using info_base::info_base;
 
-    static ICMDevice *getInstance();
-    void release();
+    /// \brief calculate_angle
+    /// - This method is used to calculate the angle.
+    void calculate_angle(void);
+
+    /// \brief get_icm_info
+    /// - This method is used to get icm info.
+    /// return current icm info.
+    const icm_info& get_icm_info()   { return icm_info_; }
+
+    /// \brief get_icm_info
+    /// - This method is used to get icm info.
+    int32_t get_angle()          { return angle_; }
+
+private:
+    /// \brief icm_info_
+    /// - icm device read information.
+    icm_info icm_info_;
+
+    /// \brief angle_
+    /// - angle data calculate from icm info.
+    int32_t angle_{0};
 };
 

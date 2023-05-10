@@ -1,0 +1,71 @@
+################################################################################
+# This file is used to define global vars, if want to create the build system, 
+# also need update the file.
+#
+################################################################################
+
+echo "Load the Env Data..."
+
+#-------------------------------------------------------------------------------
+# This section defines the internal 
+# Not need Change unless program change.
+#-------------------------------------------------------------------------------
+export ENV_KERNEL_DIR="/home/center/application/project/linux"
+export EMBED_DEVICE_IPADDRESS="192.168.2.99"
+export FIRMWARE_CURRENT_PLATFORMS="Linux"
+
+export FMWARE_VESRION="1.0.0.7"
+
+#-------------------------------------------------------------------------------
+# This section defined the word color.
+#-------------------------------------------------------------------------------
+readonly defText="$(tput sgr0)"
+readonly redText="$(tput setaf 1)"
+readonly greenText="$(tput setaf 2)"
+readonly yellowText="$(tput setaf 3)"
+
+# Now define an global platforms for all the type support
+# Linux：used for PC software
+# Embed-Linux: used for Embed Software
+export FIRMWARE_SUPPORT_PLATFORMS="Linux Embed-Linux"
+
+# Now define an array that contains the space-separated list defined above.
+declare -a supportedPlatforms=($FIRMWARE_SUPPORT_PLATFORMS)
+
+#-------------------------------------------------------------------------------
+# This section defines the compiler and compiler config.
+# Only Change if need.
+#-------------------------------------------------------------------------------
+if [[ "${supportedPlatforms[0]}" == "$FIRMWARE_CURRENT_PLATFORMS" ]]; then
+
+    #Linux
+    export APP_C_COMPILE=gcc
+    export APP_CC_COMPILE=g++
+    export APP_LIB_APPLICATION=x86-
+
+elif [[ "${supportedPlatforms[1]}" == "$FIRMWARE_CURRENT_PLATFORMS" ]]; then
+
+    #Embed-Linux
+    export APP_C_COMPILE=arm-linux-gnueabihf-gcc
+    export APP_CC_COMPILE=arm-linux-gnueabihf-g++
+    export APP_LIB_APPLICATION=arm-
+
+else
+
+    echo "error platform $FIRMWARE_CURRENT_PLATFORMS not exist in list of support"
+
+fi
+
+#-------------------------------------------------------------------------------
+# This section defines the path for the program
+# Not need Change unless program change.
+#-------------------------------------------------------------------------------
+export ENV_PATH_LOWER_APP="$ENV_PATH_ROOT/lower_app"
+export ENV_PATH_LOWER_APP_MANAGE="$ENV_PATH_LOWER_APP/manage"
+export ENV_PATH_LOWER_APP_SERVER="$ENV_PATH_LOWER_APP/server"
+export ENV_PATH_UPPER_APP="$ENV_PATH_ROOT/upper_app"
+export ENV_PATH_PACKAGE="$ENV_PATH_ROOT/package"
+export ENV_PATH_KERNAL_MOD="$ENV_PATH_ROOT/kernal_mod"
+
+echo "Update Environment Data Success!"
+echo "Current Platform is ${greenText}$FIRMWARE_CURRENT_PLATFORMS.${defText}, Remote IPAdress is ${greenText}$EMBED_DEVICE_IPADDRESS.${defText}"

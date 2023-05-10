@@ -19,19 +19,13 @@
 #ifndef _INCLUDE_BEEP_H
 #define _INCLUDE_BEEP_H
 
-#include "deviceBase.hpp"
+#include "device_base.hpp"
 
-class beepTheOne:public IoBase
+class beep_device:public io_base
 {
-private:
-    static beepTheOne* pInstance;
-
 public:
-    //consturctor
-    using IoBase::IoBase;
-
-    static beepTheOne* getInstance();
-    void release();
+    /// \brief constructor
+    using io_base::io_base;
 };
 
 #endif
