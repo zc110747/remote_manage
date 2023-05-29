@@ -12,11 +12,15 @@
 
 lower_app/server/node/node_modules
 lower_app/manage/lib/asio
+lower_app/Executables/app_demo
+lower_app/Executables/app_demo
+lower_app/board/MDK-ARM/LowerBoard
+lower_app/board/MDK-ARM/
+
 upper_app/manage_tool/manage_tool.pro.user
 upper_app/manage_tool/manage_tool.pro.user.2eaca31
-lower_app/Executables/app_demo
-/upper_app/logger_tool/Tools/obj/Debug/
-/upper_app/logger_tool/Tools/.vs/
-/upper_app/logger_tool/Tools/obj/
-/lower_app/Executables/app_demo
-/package/remote_manage*
+upper_app/logger_tool/Tools/obj/Debug/
+upper_app/logger_tool/Tools/.vs/
+upper_app/logger_tool/Tools/obj/
+
+package/remote_manage*
