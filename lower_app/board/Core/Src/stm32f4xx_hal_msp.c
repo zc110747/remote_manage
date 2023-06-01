@@ -76,6 +76,164 @@ void HAL_MspInit(void)
   /* USER CODE END MspInit 1 */
 }
 
+/**
+* @brief ADC MSP Initialization
+* This function configures the hardware resources used in this example
+* @param hadc: ADC handle pointer
+* @retval None
+*/
+void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
+{
+  if(hadc->Instance==ADC1)
+  {
+  /* USER CODE BEGIN ADC1_MspInit 0 */
+
+  /* USER CODE END ADC1_MspInit 0 */
+    /* Peripheral clock enable */
+    __HAL_RCC_ADC1_CLK_ENABLE();
+  /* USER CODE BEGIN ADC1_MspInit 1 */
+
+  /* USER CODE END ADC1_MspInit 1 */
+  }
+
+}
+
+/**
+* @brief ADC MSP De-Initialization
+* This function freeze the hardware resources used in this example
+* @param hadc: ADC handle pointer
+* @retval None
+*/
+void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
+{
+  if(hadc->Instance==ADC1)
+  {
+  /* USER CODE BEGIN ADC1_MspDeInit 0 */
+
+  /* USER CODE END ADC1_MspDeInit 0 */
+    /* Peripheral clock disable */
+    __HAL_RCC_ADC1_CLK_DISABLE();
+  /* USER CODE BEGIN ADC1_MspDeInit 1 */
+
+  /* USER CODE END ADC1_MspDeInit 1 */
+  }
+
+}
+
+/**
+* @brief RNG MSP Initialization
+* This function configures the hardware resources used in this example
+* @param hrng: RNG handle pointer
+* @retval None
+*/
+void HAL_RNG_MspInit(RNG_HandleTypeDef* hrng)
+{
+  if(hrng->Instance==RNG)
+  {
+  /* USER CODE BEGIN RNG_MspInit 0 */
+
+  /* USER CODE END RNG_MspInit 0 */
+    /* Peripheral clock enable */
+    __HAL_RCC_RNG_CLK_ENABLE();
+  /* USER CODE BEGIN RNG_MspInit 1 */
+
+  /* USER CODE END RNG_MspInit 1 */
+  }
+
+}
+
+/**
+* @brief RNG MSP De-Initialization
+* This function freeze the hardware resources used in this example
+* @param hrng: RNG handle pointer
+* @retval None
+*/
+void HAL_RNG_MspDeInit(RNG_HandleTypeDef* hrng)
+{
+  if(hrng->Instance==RNG)
+  {
+  /* USER CODE BEGIN RNG_MspDeInit 0 */
+
+  /* USER CODE END RNG_MspDeInit 0 */
+    /* Peripheral clock disable */
+    __HAL_RCC_RNG_CLK_DISABLE();
+  /* USER CODE BEGIN RNG_MspDeInit 1 */
+
+  /* USER CODE END RNG_MspDeInit 1 */
+  }
+
+}
+
+/**
+* @brief UART MSP Initialization
+* This function configures the hardware resources used in this example
+* @param huart: UART handle pointer
+* @retval None
+*/
+void HAL_UART_MspInit(UART_HandleTypeDef* huart)
+{
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+  if(huart->Instance==USART1)
+  {
+  /* USER CODE BEGIN USART1_MspInit 0 */
+
+  /* USER CODE END USART1_MspInit 0 */
+    /* Peripheral clock enable */
+    __HAL_RCC_USART1_CLK_ENABLE();
+
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    /**USART1 GPIO Configuration
+    PA9     ------> USART1_TX
+    PA10     ------> USART1_RX
+    */
+    GPIO_InitStruct.Pin = GPIO_PIN_9|GPIO_PIN_10;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF7_USART1;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+    /* USART1 interrupt Init */
+    HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(USART1_IRQn);
+  /* USER CODE BEGIN USART1_MspInit 1 */
+
+  /* USER CODE END USART1_MspInit 1 */
+  }
+
+}
+
+/**
+* @brief UART MSP De-Initialization
+* This function freeze the hardware resources used in this example
+* @param huart: UART handle pointer
+* @retval None
+*/
+void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
+{
+  if(huart->Instance==USART1)
+  {
+  /* USER CODE BEGIN USART1_MspDeInit 0 */
+
+  /* USER CODE END USART1_MspDeInit 0 */
+    /* Peripheral clock disable */
+    __HAL_RCC_USART1_CLK_DISABLE();
+
+    /**USART1 GPIO Configuration
+    PA9     ------> USART1_TX
+    PA10     ------> USART1_RX
+    */
+    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_9|GPIO_PIN_10);
+
+    /* USART1 interrupt DeInit */
+    HAL_NVIC_DisableIRQ(USART1_IRQn);
+  /* USER CODE BEGIN USART1_MspDeInit 1 */
+
+  /* USER CODE END USART1_MspDeInit 1 */
+  }
+
+}
+
 static uint32_t FMC_Initialized = 0;
 
 static void HAL_FMC_MspInit(void){
@@ -92,52 +250,55 @@ static void HAL_FMC_MspInit(void){
   __HAL_RCC_FMC_CLK_ENABLE();
 
   /** FMC GPIO Configuration
-  PF0   ------> FMC_A0
-  PF1   ------> FMC_A1
-  PF2   ------> FMC_A2
-  PF3   ------> FMC_A3
-  PF4   ------> FMC_A4
-  PF5   ------> FMC_A5
-  PC0   ------> FMC_SDNWE
-  PC2   ------> FMC_SDNE0
-  PC3   ------> FMC_SDCKE0
-  PF11   ------> FMC_SDNRAS
-  PF12   ------> FMC_A6
-  PF13   ------> FMC_A7
-  PF14   ------> FMC_A8
-  PF15   ------> FMC_A9
-  PG0   ------> FMC_A10
-  PG1   ------> FMC_A11
-  PE7   ------> FMC_D4
-  PE8   ------> FMC_D5
-  PE9   ------> FMC_D6
-  PE10   ------> FMC_D7
-  PE11   ------> FMC_D8
-  PE12   ------> FMC_D9
-  PE13   ------> FMC_D10
-  PE14   ------> FMC_D11
-  PE15   ------> FMC_D12
-  PD8   ------> FMC_D13
-  PD9   ------> FMC_D14
-  PD10   ------> FMC_D15
-  PD11   ------> FMC_A16
-  PD12   ------> FMC_A17
-  PD13   ------> FMC_A18
-  PD14   ------> FMC_D0
-  PD15   ------> FMC_D1
-  PG2   ------> FMC_A12
-  PG3   ------> FMC_A13
-  PG4   ------> FMC_BA0
-  PG4   ------> FMC_A14
-  PG5   ------> FMC_BA1
-  PG5   ------> FMC_A15
-  PG8   ------> FMC_SDCLK
-  PD0   ------> FMC_D2
-  PD1   ------> FMC_D3
-  PD4   ------> FMC_NOE
-  PD5   ------> FMC_NWE
-  PD7   ------> FMC_NE1
-  PG15   ------> FMC_SDNCAS
+    PF0   ------> FMC_A0
+    PF1   ------> FMC_A1
+    PF2   ------> FMC_A2
+    PF3   ------> FMC_A3
+    PF4   ------> FMC_A4
+    PF5   ------> FMC_A5
+    PF12  ------> FMC_A6
+    PF13  ------> FMC_A7
+    PF14  ------> FMC_A8
+    PF15  ------> FMC_A9
+    PG0   ------> FMC_A10
+    PG1   ------> FMC_A11
+    PG2   ------> FMC_A12
+    PG3   ------> FMC_A13
+    PG4   ------> FMC_A14
+    PG5   ------> FMC_A15
+    PD11   ------> FMC_A16
+    PD12   ------> FMC_A17   
+    PD13   ------> FMC_A18
+   
+    PD14   ------> FMC_D0
+    PD15   ------> FMC_D1
+    PD0   ------> FMC_D2
+    PD1   ------> FMC_D3
+    PE7   ------> FMC_D4
+    PE8   ------> FMC_D5
+    PE9   ------> FMC_D6
+    PE10   ------> FMC_D7
+    PE11   ------> FMC_D8
+    PE12   ------> FMC_D9
+    PE13   ------> FMC_D10
+    PE14   ------> FMC_D11
+    PE15   ------> FMC_D12   
+    PD8   ------> FMC_D13
+    PD9   ------> FMC_D14
+    PD10   ------> FMC_D15
+    
+    PD4   ------> FMC_NOE
+    PD5   ------> FMC_NWE
+    PD7   ------> FMC_NE1
+    PG15   ------> FMC_SDNCAS
+    PG8   ------> FMC_SDCLK
+    PC0   ------> FMC_SDNWE
+    PC2   ------> FMC_SDNE0
+    PC3   ------> FMC_SDCKE0
+    PF11   ------> FMC_SDNRAS
+
+    PG4   ------> FMC_BA0
+    PG5   ------> FMC_BA1
   */
   GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3
                           |GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_11|GPIO_PIN_12

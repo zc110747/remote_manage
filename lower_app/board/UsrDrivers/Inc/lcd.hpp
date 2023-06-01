@@ -12,19 +12,19 @@ typedef struct
 #define LCD             ((LCD_TypeDef *) LCD_BASE)
 
 //scan director
-#define L2R_U2D  0 		//´Ó×óµ½ÓÒ,´ÓÉÏµ½ÏÂ
-#define L2R_D2U  1 		//´Ó×óµ½ÓÒ,´ÓÏÂµ½ÉÏ
-#define R2L_U2D  2 		//´ÓÓÒµ½×ó,´ÓÉÏµ½ÏÂ
-#define R2L_D2U  3 		//´ÓÓÒµ½×ó,´ÓÏÂµ½ÉÏ
+#define L2R_U2D  0 		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½
+#define L2R_D2U  1 		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½Âµï¿½ï¿½ï¿½
+#define R2L_U2D  2 		//ï¿½ï¿½ï¿½Òµï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½
+#define R2L_D2U  3 		//ï¿½ï¿½ï¿½Òµï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½Âµï¿½ï¿½ï¿½
 
-#define U2D_L2R  4 		//´ÓÉÏµ½ÏÂ,´Ó×óµ½ÓÒ
-#define U2D_R2L  5 		//´ÓÉÏµ½ÏÂ,´ÓÓÒµ½×ó
-#define D2U_L2R  6 		//´ÓÏÂµ½ÉÏ,´Ó×óµ½ÓÒ
-#define D2U_R2L  7		//´ÓÏÂµ½ÉÏ,´ÓÓÒµ½×ó	 
+#define U2D_L2R  4 		//ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+#define U2D_R2L  5 		//ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½Òµï¿½ï¿½ï¿½
+#define D2U_L2R  6 		//ï¿½ï¿½ï¿½Âµï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+#define D2U_R2L  7		//ï¿½ï¿½ï¿½Âµï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½Òµï¿½ï¿½ï¿½	 
 
-#define DFT_SCAN_DIR  L2R_U2D  //Ä¬ÈÏµÄÉ¨Ãè·½Ïò
+#define DFT_SCAN_DIR  L2R_U2D  //Ä¬ï¿½Ïµï¿½É¨ï¿½è·½ï¿½ï¿½
 
-//»­±ÊÑÕÉ«
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É«
 #define WHITE         	 0xFFFF
 #define BLACK         	 0x0000	  
 #define BLUE         	 0x001F  
@@ -36,14 +36,14 @@ typedef struct
 #define GREEN         	 0x07E0
 #define CYAN          	 0x7FFF
 #define YELLOW        	 0xFFE0
-#define BROWN 			 0XBC40 //×ØÉ«
-#define BRRED 			 0XFC07 //×ØºìÉ«
-#define GRAY  			 0X8430 //»ÒÉ«
-//GUIÑÕÉ«
+#define BROWN 			 0XBC40 //ï¿½ï¿½É«
+#define BRRED 			 0XFC07 //ï¿½Øºï¿½É«
+#define GRAY  			 0X8430 //ï¿½ï¿½É«
+//GUIï¿½ï¿½É«
 
-#define DARKBLUE      	 0X01CF	//ÉîÀ¶É«
-#define LIGHTBLUE      	 0X7D7C	//Ç³À¶É«  
-#define GRAYBLUE       	 0X5458 //»ÒÀ¶É«
+#define DARKBLUE      	 0X01CF	//ï¿½ï¿½ï¿½ï¿½É«
+#define LIGHTBLUE      	 0X7D7C	//Ç³ï¿½ï¿½É«  
+#define GRAYBLUE       	 0X5458 //ï¿½ï¿½ï¿½ï¿½É«
 
 
 #define LED_BACKLIGHT_ON	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);
@@ -55,14 +55,19 @@ public:
 		bool init(void);
 		static lcd_driver *get_instance()
 		{
-				static lcd_driver driver;
-				return &driver;
+			static lcd_driver instance_;
+			return &instance_;
 		}
 
 public:
 		void lcd_clear(uint32_t color);
+        uint32_t lcd_pow(uint8_t m,uint8_t n);
 		void lcd_setcursor(uint16_t Xpos, uint16_t Ypos);
 		void lcd_showstring(uint16_t x,uint16_t y,uint16_t width,uint16_t height, uint8_t size, char *p);
+
+        void lcd_show_num(uint16_t x,uint16_t y,uint32_t num,uint8_t len,uint8_t size,uint8_t mode);
+        void lcd_show_extra_num(uint16_t x,uint16_t y,uint32_t num,uint8_t len,uint8_t size,uint8_t mode);
+            
 		void lcd_showchar(uint16_t x, uint16_t y, uint8_t num, uint8_t size, uint8_t mode);
 		void fast_drawpoint(uint16_t x, uint16_t y, uint32_t color);		
 		void test();
@@ -83,13 +88,13 @@ private:
 
 		void write_ram_prepare(void);
 
-private:
+private:	
 		SRAM_HandleTypeDef hsram1;
 		uint16_t id_{0};
 		uint32_t width_{480};
 		uint32_t height_{800};
-		uint16_t dir_{0};						//ºáÆÁ»¹ÊÇÊúÆÁ¿ØÖÆ£º0£¬ÊúÆÁ£»1£¬ºáÆÁ¡£	
-		uint16_t wramcmd_{0x2c00};		//¿ªÊ¼Ð´gramÖ¸Áî
-		uint16_t setxcmd_{0x2a00};		//ÉèÖÃx×ø±êÖ¸Áî
-		uint16_t setycmd_{0x2b00};		//ÉèÖÃy×ø±êÖ¸Áî 
+		uint16_t dir_{0};						
+		uint16_t wramcmd_{0x2c00};		
+		uint16_t setxcmd_{0x2a00};	
+		uint16_t setycmd_{0x2b00};		
 };

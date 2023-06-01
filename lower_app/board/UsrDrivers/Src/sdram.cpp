@@ -1,6 +1,6 @@
 
 #include "sdram.hpp"
-#include <string.h>
+#include "driver.hpp"
 
 void sdram_driver::init()
 {
@@ -10,14 +10,12 @@ void sdram_driver::init()
 	//initialize sdram command sequence
 	initialize_sequence();
 	
-		//刷新频率计数器(以SDCLK频率计数),计算方法:
-	//COUNT=SDRAM刷新周期/行数-20=SDRAM刷新周期(us)*SDCLK频率(Mhz)/行数
-    //我们使用的SDRAM刷新周期为64ms,SDCLK=180/2=90Mhz,行数为8192(2^13).
-	//所以,COUNT=64*1000*90/8192-20=683
-	HAL_SDRAM_ProgramRefreshRate(&hsdram1, 683);//设置刷新频率
+	HAL_SDRAM_ProgramRefreshRate(&hsdram1, 683);//锟斤拷锟斤拷刷锟斤拷频锟斤拷
 	
 	//test sdram
+	#if SDRAM_TEST == 1
 	test();
+	#endif
 }	
 
 void sdram_driver::initialize_sequence()
@@ -29,29 +27,30 @@ void sdram_driver::initialize_sequence()
 	send_command(0, FMC_SDRAM_CMD_PALL, 1, 0);
 	send_command(0, FMC_SDRAM_CMD_AUTOREFRESH_MODE, 1, 0);
 	
-	temp=(uint32_t)SDRAM_MODEREG_BURST_LENGTH_1
-							|SDRAM_MODEREG_BURST_TYPE_SEQUENTIAL
-							|SDRAM_MODEREG_CAS_LATENCY_3           |	
-              SDRAM_MODEREG_OPERATING_MODE_STANDARD |  
-              SDRAM_MODEREG_WRITEBURST_MODE_SINGLE;  
+	temp = (uint32_t)SDRAM_MODEREG_BURST_LENGTH_1
+            | SDRAM_MODEREG_BURST_TYPE_SEQUENTIAL
+            | SDRAM_MODEREG_CAS_LATENCY_3           
+            | SDRAM_MODEREG_OPERATING_MODE_STANDARD 
+            | SDRAM_MODEREG_WRITEBURST_MODE_SINGLE;  
+    
 	send_command(0, FMC_SDRAM_CMD_LOAD_MODE, 1, temp);
 }
 
 
 uint8_t sdram_driver::send_command(uint8_t bank, uint8_t cmd, uint8_t refresh, uint16_t regval)
 {
-	  uint32_t target_bank=0;
+    uint32_t target_bank=0;
     FMC_SDRAM_CommandTypeDef Command;
-    
+
     if(bank == 0) 
-		{
-			target_bank = FMC_SDRAM_CMD_TARGET_BANK1;
-		}		
+    {
+        target_bank = FMC_SDRAM_CMD_TARGET_BANK1;
+    }		
     else if(bank==1) 
-		{
-			target_bank = FMC_SDRAM_CMD_TARGET_BANK2;
-		}
-		
+    {
+        target_bank = FMC_SDRAM_CMD_TARGET_BANK2;
+    }
+
     Command.CommandMode = cmd;             
     Command.CommandTarget = target_bank;     
     Command.AutoRefreshNumber = refresh;    
@@ -61,9 +60,9 @@ uint8_t sdram_driver::send_command(uint8_t bank, uint8_t cmd, uint8_t refresh, u
         return 0;  
     }
     else
-		{
-				return 1;
-		}
+    {
+        return 1;
+    }
 }
 
 void sdram_driver::hardware_init()
@@ -107,7 +106,7 @@ void sdram_driver::hardware_init()
 
 bool sdram_driver::test()
 {
-	static uint16_t test_sdram[100] __attribute__((section(".ARM.__at_0xC0000000")));
+	static uint8_t test_sdram[100] __attribute__((section(".ARM.__at_0xC0000000")));
 	int i;
 	bool ret = true;
 	

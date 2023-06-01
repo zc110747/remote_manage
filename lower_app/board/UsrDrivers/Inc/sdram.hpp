@@ -21,8 +21,8 @@ public:
 		void init();
 		bool test();
 		static sdram_driver* get_instance(){
-			static sdram_driver driver;
-			return &driver;
+			static sdram_driver instance_;
+			return &instance_;
 		}
 		
 private:
