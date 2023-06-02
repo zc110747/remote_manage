@@ -16,7 +16,6 @@ lower_app/Executables/app_demo
 lower_app/Executables/app_demo
 lower_app/board/MDK-ARM/LowerBoard
 lower_app/board/MDK-ARM/
-
 upper_app/manage_tool/manage_tool.pro.user
 upper_app/manage_tool/manage_tool.pro.user.2eaca31
 upper_app/logger_tool/Tools/obj/Debug/

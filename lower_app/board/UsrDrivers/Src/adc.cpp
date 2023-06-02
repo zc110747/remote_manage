@@ -19,19 +19,19 @@ void adc_driver::hardware_init(void)
 
   /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
   */
-  hadc1.Instance = ADC1;
-  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
-  hadc1.Init.Resolution = ADC_RESOLUTION_12B;
-  hadc1.Init.ScanConvMode = DISABLE;
-  hadc1.Init.ContinuousConvMode = DISABLE;
-  hadc1.Init.DiscontinuousConvMode = DISABLE;
-  hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
-  hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
-  hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
-  hadc1.Init.NbrOfConversion = 1;
-  hadc1.Init.DMAContinuousRequests = DISABLE;
-  hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
-  if (HAL_ADC_Init(&hadc1) != HAL_OK)
+  adc1_hander_.Instance = ADC1;
+  adc1_hander_.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
+  adc1_hander_.Init.Resolution = ADC_RESOLUTION_12B;
+  adc1_hander_.Init.ScanConvMode = DISABLE;
+  adc1_hander_.Init.ContinuousConvMode = DISABLE;
+  adc1_hander_.Init.DiscontinuousConvMode = DISABLE;
+  adc1_hander_.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+  adc1_hander_.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+  adc1_hander_.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+  adc1_hander_.Init.NbrOfConversion = 1;
+  adc1_hander_.Init.DMAContinuousRequests = DISABLE;
+  adc1_hander_.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+  if (HAL_ADC_Init(&adc1_hander_) != HAL_OK)
   {
     Error_Handler();
   }
@@ -41,7 +41,7 @@ void adc_driver::hardware_init(void)
   sConfig.Channel = ADC_CHANNEL_TEMPSENSOR;
   sConfig.Rank = 1;
   sConfig.SamplingTime = ADC_SAMPLETIME_144CYCLES;
-  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  if (HAL_ADC_ConfigChannel(&adc1_hander_, &sConfig) != HAL_OK)
   {
     Error_Handler();
   }
@@ -51,10 +51,11 @@ uint16_t adc_driver::get_adc_value(uint32_t channel)
 {
     uint16_t value = 0;
     
-    HAL_ADC_Start(&hadc1);                               //¿ªÆôADC
-    HAL_ADC_PollForConversion(&hadc1,10);                //ÂÖÑ¯×ª»»
+    //start the adc run
+    HAL_ADC_Start(&adc1_hander_);                              
+    HAL_ADC_PollForConversion(&adc1_hander_, 10);     
     
-    value = HAL_ADC_GetValue(&hadc1);
+    value = HAL_ADC_GetValue(&adc1_hander_);
     return value;
 }
 

@@ -51,7 +51,7 @@ void motion_manage::run(void* parameter)
     double temperate;
     
     now_key = KEY0::get_instance()->get_value();
-    last_tpad_key = tpad_driver::get_instance()->scan_key(1);
+    last_tpad_key = tpad_driver::get_instance()->scan_key();
     
     while(1)
     {
@@ -105,13 +105,16 @@ void motion_manage::run(void* parameter)
         }
         
         //tpad key
-        now_tpad_key = tpad_driver::get_instance()->scan_key(1);
+        now_tpad_key = tpad_driver::get_instance()->scan_key();
         if(now_tpad_key == 1)
         {
             if(last_tpad_key != now_tpad_key)
             {
                 last_tpad_key = now_tpad_key;
-                PRINT_LOG(LOG_INFO, xTaskGetTickCount(), "Tpad Key Push down!");
+                PRINT_LOG(LOG_INFO, xTaskGetTickCount(), "Tpad Key Push down, no_push:%d, push:%d!",
+                    tpad_driver::get_instance()->get_no_push_value(),
+                    tpad_driver::get_instance()->get_current_value()
+                );
             }
         }
         else

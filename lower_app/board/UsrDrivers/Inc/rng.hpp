@@ -18,5 +18,5 @@ public:
     uint32_t get_value(void);
     
 private:
-    RNG_HandleTypeDef hrng;
+    RNG_HandleTypeDef rng_handler_;
 };

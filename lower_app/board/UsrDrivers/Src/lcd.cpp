@@ -696,16 +696,36 @@ void lcd_driver::lcd_showchar(uint16_t x, uint16_t y, uint8_t num, uint8_t size,
  	num=num-' ';
 	for(t=0;t<csize;t++)
 	{   
-		if(size==12)
-			temp=asc2_1206[num][t]; 	 
-		else if(size==16)
-			temp=asc2_1608[num][t];	
-		else if(size==24)
-			temp=asc2_2412[num][t];	
-		else if(size==32)
-			temp=asc2_3216[num][t];	
-		else 
-			return;								
+        switch(size)
+        {
+            #if SUPPORT_ASCII_1206 == 1
+            case 12:
+                temp = asc2_1206[num][t];
+                break;
+            #endif
+            
+            #if SUPPORT_ASCII_1608 == 1
+            case 16:
+                temp = asc2_1608[num][t];	
+                break;
+            #endif
+            
+            #if SUPPORT_ASCII_2412 == 1
+            case 24:
+                temp = asc2_2412[num][t];	
+                break; 
+            #endif
+            
+            #if SUPPORT_ASCII_3216 == 1
+            case 32:
+                temp = asc2_3216[num][t];	
+                break;
+            #endif
+            
+            default:
+                return;
+        }
+							
 		
 		for(t1=0;t1<8;t1++)
 		{			    
@@ -777,15 +797,6 @@ void lcd_driver::lcd_show_num(uint16_t x,uint16_t y,uint32_t num,uint8_t len,uin
 	}
 } 
 
-//显示数字,高位为0,还是显示
-//x,y:起点坐标
-//num:数值(0~999999999);	 
-//len:长度(即要显示的位数)
-//size:字体大小
-//mode:
-//[7]:0,不填充;1,填充0.
-//[6:1]:保留
-//[0]:0,非叠加显示;1,叠加显示.
 void lcd_driver::lcd_show_extra_num(uint16_t x,uint16_t y,uint32_t num,uint8_t len,uint8_t size,uint8_t mode)
 {  
 	uint8_t t,temp;

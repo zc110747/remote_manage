@@ -46,8 +46,8 @@ void usart_driver::hardware_init(void)
     
     //start usart1 interrupt.
     __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
-    HAL_NVIC_EnableIRQ(USART1_IRQn);				//使能USART1中断通道
-    HAL_NVIC_SetPriority(USART1_IRQn,1,1);			//抢占优先级3，子优先级3
+    HAL_NVIC_EnableIRQ(USART1_IRQn);			
+    HAL_NVIC_SetPriority(USART1_IRQn,1,1);	
 }
 
 extern "C" 

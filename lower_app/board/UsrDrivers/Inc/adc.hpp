@@ -22,5 +22,5 @@ public:
 private:
     void hardware_init(void);
 
-    ADC_HandleTypeDef hadc1;
+    ADC_HandleTypeDef adc1_hander_;
 };

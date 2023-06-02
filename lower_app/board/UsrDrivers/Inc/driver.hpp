@@ -28,9 +28,14 @@ typedef enum
 
 
 void driver_init();		
-void delay_us(uint16_t times);
+
 void led_set(led_device dev, led_status status);
-		
+void set_os_on();
+
+//if us, use loop delay, if max than 1000, use delay ms.
+void delay_us(uint16_t us);
+void delay_ms(uint16_t ms);
+
 #ifdef __cplusplus
 	}
 #endif

@@ -1,11 +1,13 @@
 
 #pragma once
 
-//c/c++ interface
+//c++ interface
 #include <atomic>
 #include <stdio.h>
 #include <stdarg.h>
 #include <cmath>
+#include <algorithm>
+#include <numeric>
 
 //stm32 hal interface
 #include "stm32f4xx_hal.h"

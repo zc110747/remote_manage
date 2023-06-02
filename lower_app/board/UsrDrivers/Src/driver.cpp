@@ -1,4 +1,5 @@
 
+#include "includes.hpp"
 #include "driver.hpp"
 #include "sdram.hpp"
 #include "led.hpp"
@@ -8,6 +9,8 @@
 #include "adc.hpp"
 #include "rng.hpp"
 #include "tpad.hpp"
+
+std::atomic<bool> is_os_on = false;
 
 void driver_init(void)
 {
@@ -60,4 +63,21 @@ void delay_us(uint16_t times)
 			__NOP();
 		}
 	}
+}
+
+void set_os_on()
+{
+    is_os_on = true;
+}
+
+void delay_ms(uint16_t ms)
+{
+    if(is_os_on)
+    {
+        vTaskDelay(100);
+    }
+    else
+    {
+        HAL_Delay(ms);
+    }
 }

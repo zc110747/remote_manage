@@ -27,6 +27,10 @@ bool schedular::init(void)
 void schedular::run(void* parameter)
 {
     static uint32_t index = 0;
+
+    //tell driver os is start.
+    set_os_on();
+
     while(1)
     {
         //PRINT_LOG(LOG_INFO, xTaskGetTickCount(), "LED Task Run!");

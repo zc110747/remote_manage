@@ -3,8 +3,8 @@
 
 bool rng_driver::init(void)
 {
-    hrng.Instance = RNG;
-    if (HAL_RNG_Init(&hrng) != HAL_OK)
+    rng_handler_.Instance = RNG;
+    if (HAL_RNG_Init(&rng_handler_) != HAL_OK)
     {
         return false;
     }
@@ -16,7 +16,7 @@ uint32_t rng_driver::get_value(void)
 {
     uint32_t value = 0;
     
-    HAL_RNG_GenerateRandomNumber(&hrng, &value);
+    HAL_RNG_GenerateRandomNumber(&rng_handler_, &value);
     
     return value;
 }

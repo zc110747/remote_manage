@@ -11,16 +11,21 @@ public:
         static tpad_driver instance_;
         return &instance_;
     }  
-    uint8_t scan_key(uint8_t mode=0);
-    
+    uint8_t scan_key();
+
+public:
+    uint16_t get_current_value()    {return current_value_;}
+    uint16_t get_no_push_value()    {return no_push_value_;}
+
 private:
-    void hardware_init(uint32_t arr, uint16_t psc); 
+    void hardware_init(); 
     uint16_t get_value();
-    uint16_t get_max_value(uint8_t n);
+    uint16_t get_max_value();
     void reset();
     bool test();
 
 private:
-    TIM_HandleTypeDef TIM2_Handler;
-    volatile uint16_t default_val{0};
+    TIM_HandleTypeDef timer_handler_;
+    uint16_t no_push_value_{0};
+    uint16_t current_value_;
 };
