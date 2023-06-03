@@ -7,18 +7,20 @@
 #define RTC_DATE_DAY        03
 #define RTC_DATE_WEEK       6
 
-#define RTC_TIME_HOUR       16
-#define RTC_TIME_MINUTE     30
+#define RTC_TIME_HOUR       19
+#define RTC_TIME_MINUTE     49
 #define RTC_TIME_SECOND     00
 
-#define RTC_SET_FLAGS       0x0A0A
+#define RTC_SET_FLAGS       0x5A5A
 #define RTC_FORMAT_MODE     RTC_FORMAT_BIN
 
 bool rtc_driver::init()
 {
+    //unlock backup register update.
+    HAL_PWR_EnableBkUpAccess();
+    
     hardware_init();
     
-    HAL_RTC_DeactivateAlarm(&rtc_handler_, RTC_ALARM_A);
     delay_alarm(0, 0, 0, 5);
     return true;
 }
@@ -104,9 +106,7 @@ void rtc_driver::delay_alarm(uint8_t day, uint8_t hour, uint8_t min, uint8_t sec
 }
 
 bool rtc_driver::hardware_init()
-{
-    HAL_PWR_EnableBkUpAccess();
-    
+{  
     rtc_handler_.Instance = RTC;
     rtc_handler_.Init.HourFormat = RTC_HOURFORMAT_24;
     rtc_handler_.Init.AsynchPrediv = 127;

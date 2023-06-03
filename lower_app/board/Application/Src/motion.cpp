@@ -92,20 +92,22 @@ void motion_manage::run(void* parameter)
         
         {
             static uint8_t temp_loop = 0;
-            
+
             temp_loop++;
             if(temp_loop >= 10)
             {
-               temp_loop = 0;
+                char tbuf[60];
                 
+                temp_loop = 0;
+  
                 //adc tempature
                 adc_temp = adc_driver::get_instance()->get_adc_avg(ADC_CHANNEL_TEMPSENSOR);
                 temperate=(float)adc_temp*(3.3/4096);		//电压值
                 temperate=(temperate-0.76)/0.0025 + 25;     //转换为温度值 
                 temp_loop = 0;
                 
-                lcd_driver::get_instance()->lcd_show_extra_num(30+11*8,140,(uint32_t)temperate, 2, 16, 0);		//显示整数部分
-                lcd_driver::get_instance()->lcd_show_extra_num(30+14*8,140,((uint32_t)(temperate*100))%100, 2, 16, 0);		//显示小数部分 
+                lcd_driver::get_instance()->lcd_show_extra_num(10+11*8,140,(uint32_t)temperate, 2, 16, 0);		//显示整数部分
+                lcd_driver::get_instance()->lcd_show_extra_num(10+14*8,140,((uint32_t)(temperate*100))%100, 2, 16, 0);		//显示小数部分 
                 
                 //rtc timer
                 rtc_driver::get_instance()->update();
@@ -114,6 +116,15 @@ void motion_manage::run(void* parameter)
                 if(last_second != ptimer->Seconds)
                 {
                     last_second = ptimer->Seconds;
+                    sprintf(tbuf, "Timer: %02d-%02d-%02d %02d:%02d:%02d",
+                        pdate->Year,
+                        pdate->Month,
+                        pdate->Date,
+                        ptimer->Hours,
+                        ptimer->Minutes,
+                        ptimer->Seconds);
+                    lcd_driver::get_instance()->lcd_showstring(10, 160, 200, 16, 16, tbuf);
+                    
                     PRINT_LOG(LOG_INFO, xTaskGetTickCount(), "20%02d-%02d-%02d Wek:%02d %02d:%02d:%02d tempature:%.2f, rng:%d ",
                         pdate->Year,
                         pdate->Month,
