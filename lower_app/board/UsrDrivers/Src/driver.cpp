@@ -74,7 +74,7 @@ void delay_ms(uint16_t ms)
 {
     if(is_os_on)
     {
-        vTaskDelay(100);
+        vTaskDelay(ms);
     }
     else
     {

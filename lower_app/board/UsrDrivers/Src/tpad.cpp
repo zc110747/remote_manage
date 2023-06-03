@@ -16,7 +16,7 @@ capture number must in the range, otherwise is hardware problem
 #define TPAD_TIMES_CAPTURE_LOW              50
 #define TPAD_TIMES_CAPTURE_HIGH             2500
 #define TPAD_INIT_CHECK_TIMES               10
-#define TPAD_CAPTURE_LOOP_TIMES             6
+#define TPAD_CAPTURE_LOOP_TIMES             4
 #define TPAD_IS_VALID_PUSH_KEY(value, no_push_value) \
     (((value)>((no_push_value)*4/3)) && ((value)<((no_push_value)*10)))
 #define TPAD_IS_VALID_CAPTURE(value) \
@@ -65,10 +65,10 @@ void tpad_driver::reset()
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);	
 	
     //delay to wait capture run to zero
-    delay_ms(5);	
+    delay_ms(3);	
 
     __HAL_TIM_CLEAR_FLAG(&timer_handler_, TIM_FLAG_CC1|TIM_FLAG_UPDATE);   
-    __HAL_TIM_SET_COUNTER(&timer_handler_,0); 
+    __HAL_TIM_SET_COUNTER(&timer_handler_, 0); 
     
     GPIO_Initure.Mode = GPIO_MODE_AF_PP;      
     GPIO_Initure.Pull = GPIO_NOPULL;         
@@ -81,7 +81,7 @@ uint16_t tpad_driver::get_value(void)
     /*reset the pin for next capture.*/
     reset();
     
-    while(__HAL_TIM_GET_FLAG(&timer_handler_,TIM_FLAG_CC1) == RESET) 
+    while(__HAL_TIM_GET_FLAG(&timer_handler_, TIM_FLAG_CC1) == RESET) 
     {
         //not more than TPAD_TIMES_CAPTURE_HIGH
         if(__HAL_TIM_GET_COUNTER(&timer_handler_) > TPAD_TIMES_CAPTURE_HIGH) 
