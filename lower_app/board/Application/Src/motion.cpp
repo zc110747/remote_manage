@@ -4,6 +4,8 @@
 #include "adc.hpp"
 #include "lcd.hpp"
 #include "tpad.hpp"
+#include "rtc.hpp"
+#include "rng.hpp"
 
 bool motion_manage::init()
 {
@@ -49,6 +51,7 @@ void motion_manage::run(void* parameter)
     uint8_t last_tpad_key, now_tpad_key;
     uint32_t adc_temp;
     double temperate;
+    uint8_t last_second = 0;
     
     now_key = KEY0::get_instance()->get_value();
     last_tpad_key = tpad_driver::get_instance()->scan_key();
@@ -93,15 +96,42 @@ void motion_manage::run(void* parameter)
             temp_loop++;
             if(temp_loop >= 10)
             {
+               temp_loop = 0;
+                
+                //adc tempature
                 adc_temp = adc_driver::get_instance()->get_adc_avg(ADC_CHANNEL_TEMPSENSOR);
                 temperate=(float)adc_temp*(3.3/4096);		//电压值
                 temperate=(temperate-0.76)/0.0025 + 25;     //转换为温度值 
-                PRINT_LOG(LOG_INFO, xTaskGetTickCount(), "temperate:%f!", temperate);
                 temp_loop = 0;
                 
                 lcd_driver::get_instance()->lcd_show_extra_num(30+11*8,140,(uint32_t)temperate, 2, 16, 0);		//显示整数部分
                 lcd_driver::get_instance()->lcd_show_extra_num(30+14*8,140,((uint32_t)(temperate*100))%100, 2, 16, 0);		//显示小数部分 
+                
+                //rtc timer
+                rtc_driver::get_instance()->update();
+                auto ptimer = rtc_driver::get_instance()->get_current_time();
+                auto pdate = rtc_driver::get_instance()->get_current_date();
+                if(last_second != ptimer->Seconds)
+                {
+                    last_second = ptimer->Seconds;
+                    PRINT_LOG(LOG_INFO, xTaskGetTickCount(), "20%02d-%02d-%02d Wek:%02d %02d:%02d:%02d tempature:%.2f, rng:%d ",
+                        pdate->Year,
+                        pdate->Month,
+                        pdate->Date,
+                        pdate->WeekDay,
+                        ptimer->Hours,
+                        ptimer->Minutes,
+                        ptimer->Seconds,
+                        temperate,
+                        rng_driver::get_instance()->get_value());    
+                }
             }
+        }
+        
+        if(rtc_driver::get_instance()->get_alarm())
+        {
+            PRINT_LOG(LOG_INFO, xTaskGetTickCount(), "RTC Alarm");
+            rtc_driver::get_instance()->set_alarm(false);
         }
         
         //tpad key
@@ -115,12 +145,15 @@ void motion_manage::run(void* parameter)
                     tpad_driver::get_instance()->get_no_push_value(),
                     tpad_driver::get_instance()->get_current_value()
                 );
+                
+                rtc_driver::get_instance()->delay_alarm(0, 0, 0, 5);
             }
         }
         else
         {
             last_tpad_key = now_tpad_key;  
         }
+       
         
         vTaskDelay(25);
     }

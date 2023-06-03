@@ -9,6 +9,7 @@
 #include "adc.hpp"
 #include "rng.hpp"
 #include "tpad.hpp"
+#include "rtc.hpp"
 
 std::atomic<bool> is_os_on = false;
 
@@ -51,6 +52,9 @@ void driver_init(void)
 
     //tpad 
     tpad_driver::get_instance()->init();
+    
+    //rtc
+    rtc_driver::get_instance()->init();
 }
 
 void delay_us(uint16_t times)

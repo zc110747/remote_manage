@@ -942,6 +942,16 @@
                 </FileArmAds>
               </FileOption>
             </File>
+            <File>
+              <FileName>stm32f4xx_hal_rtc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_rtc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_hal_rtc_ex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_rtc_ex.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1001,6 +1011,11 @@
               <FileName>tpad.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\UsrDrivers\Src\tpad.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>rtc.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\UsrDrivers\Src\rtc.cpp</FilePath>
             </File>
           </Files>
         </Group>

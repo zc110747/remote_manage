@@ -2,7 +2,6 @@
 #include "schedular.hpp"
 #include "led.hpp"
 #include "logger.hpp"
-#include "rng.hpp"
 
 bool schedular::init(void)
 {
@@ -25,9 +24,7 @@ bool schedular::init(void)
 }
     
 void schedular::run(void* parameter)
-{
-    static uint32_t index = 0;
-
+{    
     //tell driver os is start.
     set_os_on();
 
@@ -40,15 +37,6 @@ void schedular::run(void* parameter)
         vTaskDelay(100);
         
         schedular::get_instance()->wwdg_reload();   
-
-        if(index >= 10)
-        {
-            index = 0;
-            PRINT_LOG(LOG_INFO, xTaskGetTickCount(), "Rng value:%u", 
-            rng_driver::get_instance()->get_value());      
-        }
-       
-       index++;
     }    
 }
 
