@@ -6,6 +6,7 @@
 #include "tpad.hpp"
 #include "rtc.hpp"
 #include "rng.hpp"
+#include "i2c.hpp"
 
 bool motion_manage::init()
 {
@@ -65,7 +66,7 @@ void motion_manage::run(void* parameter)
             {
                 if(motion_manage::get_instance()->is_time_escape(KEY1::get_instance()->ticks, KEY_CHECK_TIMES_MS))
                 {
-                    PRINT_LOG(LOG_INFO, xTaskGetTickCount(), "Key1 Push down!");
+                    PRINT_LOG(LOG_INFO, xTaskGetTickCount(), "Key0 Push down!");
                     KEY1::get_instance()->is_interrupt = false;
                 }
             }
@@ -81,8 +82,18 @@ void motion_manage::run(void* parameter)
         {
             if(last_key != now_key)
             {
-                PRINT_LOG(LOG_INFO, xTaskGetTickCount(), "Key0 Push down!");
+                PRINT_LOG(LOG_INFO, xTaskGetTickCount(), "Key1 Push down!");
                 last_key = now_key;
+                
+                auto io_info = i2c_driver::get_instance()->get_ex_io();
+                if(io_info.u.beep)
+                {
+                    i2c_driver::get_instance()->set_output_io(OUTPUT_BEEP, IO_EX_ON);
+                }
+                else
+                {
+                    i2c_driver::get_instance()->set_output_io(OUTPUT_BEEP, IO_EX_OFF);
+                }
             }
         }
         else
@@ -142,6 +153,7 @@ void motion_manage::run(void* parameter)
         if(rtc_driver::get_instance()->get_alarm())
         {
             PRINT_LOG(LOG_INFO, xTaskGetTickCount(), "RTC Alarm");
+            
             rtc_driver::get_instance()->set_alarm(false);
         }
         
@@ -165,7 +177,7 @@ void motion_manage::run(void* parameter)
             last_tpad_key = now_tpad_key;  
         }
        
-        
+        i2c_driver::get_instance()->update_output();
         vTaskDelay(25);
     }
 }

@@ -1,4 +1,10 @@
-
+/*
+rtc ready when power on.
+if power off, rtc timer not update
+1.LSE Have been chooes.
+2.BAKE UP Register ready.
+may LSE not work when used VBAT(with lower power).
+*/
 #include "rtc.hpp"
 #include "driver.hpp"
 

@@ -10,6 +10,7 @@
 #include "rng.hpp"
 #include "tpad.hpp"
 #include "rtc.hpp"
+#include "i2c.hpp"
 
 std::atomic<bool> is_os_on = false;
 
@@ -55,6 +56,9 @@ void driver_init(void)
     
     //rtc
     rtc_driver::get_instance()->init();
+    
+    //i2c
+    i2c_driver::get_instance()->init();
 }
 
 void delay_us(uint16_t times)
