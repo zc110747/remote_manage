@@ -18,18 +18,18 @@ _Pragma("once")
 class sdram_driver
 {
 public:
-		void init();
-		bool test();
-		static sdram_driver* get_instance(){
-			static sdram_driver instance_;
-			return &instance_;
-		}
-		
-private:
-		void hardware_init();
-		void initialize_sequence();
-		uint8_t send_command(uint8_t bank, uint8_t cmd, uint8_t refresh, uint16_t regval);
+    void init();
+    bool test();
+    static sdram_driver* get_instance(){
+        static sdram_driver instance_;
+        return &instance_;
+    }
 
 private:
-		SDRAM_HandleTypeDef hsdram1;
+    void hardware_init();
+    void initialize_sequence();
+    uint8_t send_command(uint8_t bank, uint8_t cmd, uint8_t refresh, uint16_t regval);
+
+private:
+    SDRAM_HandleTypeDef hsdram1;
 };

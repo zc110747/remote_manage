@@ -23,46 +23,46 @@ void driver_init(void)
     __HAL_RCC_GPIOE_CLK_ENABLE();
     __HAL_RCC_GPIOD_CLK_ENABLE();
     __HAL_RCC_GPIOA_CLK_ENABLE();
-    
-	//led init
-	//all io clock init in this function, so need the first execute.
-	led_driver::get_instance()->init();
-	
-	//sdram init
-	sdram_driver::get_instance()->init();
-	
-	//lcd init
-	lcd_driver::get_instance()->init();
-    
+
+    //led init
+    //all io clock init in this function, so need the first execute.
+    led_driver::get_instance()->init();
+
+    //sdram init
+    sdram_driver::get_instance()->init();
+
+    //lcd init
+    lcd_driver::get_instance()->init();
+
     //usart init
     usart_driver::get_instance()->init();
-    
+
     //adc init
     adc_driver::get_instance()->init();
-    
+
     //key0 init
     KEY0::get_instance()->init();
     KEY1::get_instance()->init();
     KEY1::get_instance()->interrupt_init();
     KEY2::get_instance()->init();
-    
+
     //rng
     rng_driver::get_instance()->init();
-    
+
     //tpad 
     tpad_driver::get_instance()->init();
 }
 
 void delay_us(uint16_t times)
 {
-	uint16_t i, j;
-	for(i=0; i<times; i++)
-	{
-		for(j=0; j<5; j++)
-		{
-			__NOP();
-		}
-	}
+    uint16_t i, j;
+    for(i=0; i<times; i++)
+    {
+        for(j=0; j<5; j++)
+        {
+            __NOP();
+        }
+    }
 }
 
 void set_os_on()

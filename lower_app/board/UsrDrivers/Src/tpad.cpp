@@ -27,14 +27,14 @@ void tpad_driver::init(void)
     uint16_t buf[10];
 
     /*init the hardware time for capture.*/
-	hardware_init();
+    hardware_init();
 
     /*read the capture value for no push, sort, used middle*/
-	for(int i=0; i<TPAD_INIT_CHECK_TIMES;i++)
-	{				 
-		buf[i] = get_value();
-		delay_ms(5);	    
-	}
+    for(int i=0; i<TPAD_INIT_CHECK_TIMES;i++)
+    {				 
+        buf[i] = get_value();
+        delay_ms(5);	    
+    }
     std::sort(buf, buf+TPAD_INIT_CHECK_TIMES);
     no_push_value_ = std::accumulate(buf+2, buf+8, 0)/6;
     printf("tpad no_push_value_:%d\r\n", no_push_value_);	
@@ -43,13 +43,13 @@ void tpad_driver::init(void)
 uint8_t tpad_driver::scan_key()
 {
     /*get the max value when read capture.*/
-	current_value_ = get_max_value(); 
+    current_value_ = get_max_value(); 
 
     //check wheather is valid key push value.
-	if(TPAD_IS_VALID_PUSH_KEY(current_value_, no_push_value_))					 
-       return 1;  
+    if(TPAD_IS_VALID_PUSH_KEY(current_value_, no_push_value_))					 
+        return 1;  
 
-	return 0;
+    return 0;
 }	
 
 void tpad_driver::reset()
@@ -95,29 +95,29 @@ uint16_t tpad_driver::get_value(void)
 uint16_t tpad_driver::get_max_value()
 {
     uint16_t temp; 
-	uint16_t res = 0; 
-	uint8_t okcnt = 0;
+    uint16_t res = 0; 
+    uint8_t okcnt = 0;
     uint8_t times = TPAD_CAPTURE_LOOP_TIMES;
 
-	while(times--)
-	{
+    while(times--)
+    {
         //get the capture value, store the max in res.
-		temp = get_value();
-		if(temp > res)
+        temp = get_value();
+        if(temp > res)
         {
             res = temp;
         }
 
         //key capture need in the scope, so include means valid.
-		if(TPAD_IS_VALID_CAPTURE(temp))
+        if(TPAD_IS_VALID_CAPTURE(temp))
         {
             okcnt++;
         }
-	}
+    }
 
-	if(okcnt >= TPAD_CAPTURE_LOOP_TIMES*2/3)
+    if(okcnt >= TPAD_CAPTURE_LOOP_TIMES*2/3)
         return res;
-	else 
+    else 
         return 0;
 }
 
@@ -132,7 +132,7 @@ void tpad_driver::hardware_init()
     TIM_IC_InitTypeDef TIM2_CH1Config;  
 
     __HAL_RCC_TIM2_CLK_ENABLE();
-   
+
     timer_handler_.Instance = TIM2;                       
     timer_handler_.Init.Prescaler = TPAD_TIMER_PRESCALER;       
     timer_handler_.Init.CounterMode = TIM_COUNTERMODE_UP;    

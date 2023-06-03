@@ -182,15 +182,15 @@ void logger_manage::logger_rx_run(void *parameter)
 void logger_manage::logger_tx_run(void *parameter)
 {
     LOG_MESSAGE msg;
-	thread_work_ = true;
+    thread_work_ = true;
 
-	while(1)
-	{
-		if (xQueueReceive(tx_queue_, &msg, portMAX_DELAY) == pdPASS)
-		{
+    while(1)
+    {
+        if (xQueueReceive(tx_queue_, &msg, portMAX_DELAY) == pdPASS)
+        {
             usart_driver::get_instance()->usart1_translate(msg.ptr, msg.length);  
-			vTaskDelay(1);
-		}
-	}
+            vTaskDelay(1);
+        }
+    }
 }
 

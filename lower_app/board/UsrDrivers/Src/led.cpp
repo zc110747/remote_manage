@@ -36,33 +36,33 @@ void led_driver::hardware_init(void)
 
 bool led_driver::test(void)
 {
-	set(LED0, LED_STATUS_ON);
-	HAL_Delay(1000);
-	set(LED0, LED_STATUS_OFF);
-	HAL_Delay(1000);
-	
-	set(LED1, LED_STATUS_ON);
-	HAL_Delay(1000);
-	set(LED1, LED_STATUS_OFF);
-	HAL_Delay(1000);
-	return true;
+    set(LED0, LED_STATUS_ON);
+    HAL_Delay(1000);
+    set(LED0, LED_STATUS_OFF);
+    HAL_Delay(1000);
+
+    set(LED1, LED_STATUS_ON);
+    HAL_Delay(1000);
+    set(LED1, LED_STATUS_OFF);
+    HAL_Delay(1000);
+    return true;
 }
 
 void led_driver::set(led_device dev, led_status status)
 {
-	GPIO_PinState state = (status == LED_STATUS_OFF)?GPIO_PIN_SET:GPIO_PIN_RESET;
-	
-	if(dev == LED0)
-	{
-		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, state);
-	}
-	else
-	{
-		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, state);		
-	}
+    GPIO_PinState state = (status == LED_STATUS_OFF)?GPIO_PIN_SET:GPIO_PIN_RESET;
+
+    if(dev == LED0)
+    {
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, state);
+    }
+    else
+    {
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, state);		
+    }
 }
 
 void led_set(led_device dev, led_status status)
 {
-	led_driver::get_instance()->set(dev, status);
+    led_driver::get_instance()->set(dev, status);
 }
