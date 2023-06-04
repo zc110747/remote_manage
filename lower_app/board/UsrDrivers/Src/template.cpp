@@ -1,9 +1,9 @@
 
 #include "template.hpp"
 
-bool x_driver::init()
+BaseType_t x_driver::init()
 {
-    return true;
+    return pdPASS;
 }
 
 void x_driver::hardware_init()
@@ -11,7 +11,7 @@ void x_driver::hardware_init()
     
 }
 
-bool x_driver::test()
+BaseType_t x_driver::test()
 {
-    return true;
+    return pdPASS;
 }

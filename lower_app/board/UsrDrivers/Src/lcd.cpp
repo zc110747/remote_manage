@@ -838,6 +838,6 @@ void lcd_driver::test()
     lcd_showstring(10, 40, 320, 32, 32, (char *)"Apollo STM32F4/F7");
     lcd_showstring(10, 80, 240, 24, 24, (char *)"TFTLCD TEST");
     lcd_showstring(10, 110, 240, 16, 16, (char *)"ATOM@ALIENTEK");
-    lcd_showstring(10, 140, 200, 16, 16, (char *)"TEMPERATE: 00.00C");
+    lcd_showstring(10, 140, 320, 16, 16, (char *)"TEMPERATE: 00.00C, Vol:00.00V");
     lcd_showstring(10, 160, 200, 16, 16, (char *)"Timer: 00-00-00 00:00:00");
 }

@@ -7,6 +7,7 @@
 #include "rtc.hpp"
 #include "rng.hpp"
 #include "i2c_monitor.hpp"
+#include "dac.hpp"
 
 bool monitor_manage::init()
 {
@@ -63,14 +64,19 @@ std::function<void()> key_func_list[] = {
         i2c_monitor::get_instance()->write_io(OUTPUT_BEEP, IO_OFF);
     },
     [](){
+        static uint16_t voltage = 0;
         PRINT_LOG(LOG_INFO, xTaskGetTickCount(), "Key2 Push down!");
-        rtc_driver::get_instance()->delay_alarm(0, 0, 0, 5);
+        voltage += 200;
+        if(voltage > 3300)
+            voltage = 0;
+        dac_driver::get_instance()->set_voltage(voltage);
     },
     [](){
         PRINT_LOG(LOG_INFO, xTaskGetTickCount(), "Tpad Key Push down, no_push:%d, push:%d!",
             tpad_driver::get_instance()->get_no_push_value(),
             tpad_driver::get_instance()->get_current_value()
         );
+        rtc_driver::get_instance()->delay_alarm(0, 0, 0, 5);
     },    
     [](){
         PRINT_LOG(LOG_INFO, xTaskGetTickCount(), "EXIO Push down!");
@@ -107,22 +113,12 @@ void monitor_manage::timer_loop_motion()
     static uint8_t last_second = 0;
     static uint8_t temp_loop = 0;
     char tbuf[60];
-    uint32_t adc_temp;
-    double temperate;
     
      temp_loop++;
      if(temp_loop >= 10)
      {
         temp_loop = 0;
         
-        adc_temp = adc_driver::get_instance()->get_adc_avg(ADC_CHANNEL_TEMPSENSOR);
-        temperate=(float)adc_temp*(3.3/4096);		//电压值
-        temperate=(temperate-0.76)/0.0025 + 25;     //转换为温度值 
-        temp_loop = 0;
-
-        lcd_driver::get_instance()->lcd_show_extra_num(10+11*8,140,(uint32_t)temperate, 2, 16, 0);		//显示整数部分
-        lcd_driver::get_instance()->lcd_show_extra_num(10+14*8,140,((uint32_t)(temperate*100))%100, 2, 16, 0);		//显示小数部分 
-         
         rtc_driver::get_instance()->update();
         auto ptimer = rtc_driver::get_instance()->get_current_time();
         auto pdate = rtc_driver::get_instance()->get_current_date();
@@ -139,7 +135,7 @@ void monitor_manage::timer_loop_motion()
             ptimer->Seconds);
             lcd_driver::get_instance()->lcd_showstring(10, 160, 200, 16, 16, tbuf);
 
-            PRINT_LOG(LOG_INFO, xTaskGetTickCount(), "20%02d-%02d-%02d Wek:%02d %02d:%02d:%02d tempature:%.2f, rng:%d ",
+            PRINT_LOG(LOG_INFO, xTaskGetTickCount(), "20%02d-%02d-%02d Wek:%02d %02d:%02d:%02d rng:%d ",
             pdate->Year,
             pdate->Month,
             pdate->Date,
@@ -147,7 +143,6 @@ void monitor_manage::timer_loop_motion()
             ptimer->Hours,
             ptimer->Minutes,
             ptimer->Seconds,
-            temperate,
             rng_driver::get_instance()->get_value());
         }
     }
@@ -160,6 +155,33 @@ void monitor_manage::timer_loop_motion()
     }
 }
 
+void monitor_manage::adc_monitor()
+{
+    static uint8_t temp_loop = 0;
+    uint32_t adc_temp = 0, adc_vol;
+    double temperate;
+    double voltage;
+
+    temp_loop++;
+    if(temp_loop >= 20)
+    {
+        temp_loop = 0;
+
+        adc_temp = adc_driver::get_instance()->get_adc_avg(ADC_CHANNEL_TEMPSENSOR);
+        temperate = (float)adc_temp*(3.3/4096);		//电压值
+        temperate = (temperate-0.76)/0.0025 + 25;     //转换为温度值 
+
+        lcd_driver::get_instance()->lcd_show_extra_num(10+11*8,140,(uint32_t)temperate, 2, 16, 0);		//显示整数部分
+        lcd_driver::get_instance()->lcd_show_extra_num(10+14*8,140,((uint32_t)(temperate*100))%100, 2, 16, 0);		//显示小数部分 
+        
+        //PB1 - ADC Channel 9
+        adc_vol = adc_driver::get_instance()->get_adc_avg(ADC_CHANNEL_9);
+        voltage = (float)adc_vol*(3.3/4096);
+        lcd_driver::get_instance()->lcd_show_extra_num(10+23*8,140,(uint32_t)voltage, 2, 16, 0);		//显示整数部分
+        lcd_driver::get_instance()->lcd_show_extra_num(10+26*8,140,((uint32_t)(voltage*100))%100, 2, 16, 0);		//显示小数部分 
+    }
+}
+    
 void monitor_manage::run(void* parameter)
 {
     while(1)
@@ -168,6 +190,8 @@ void monitor_manage::run(void* parameter)
         key_motion();
         
         timer_loop_motion();
+        
+        adc_monitor();
         
         vTaskDelay(20);
     }

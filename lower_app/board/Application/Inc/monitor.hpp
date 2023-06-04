@@ -22,6 +22,7 @@ private:
     static void run(void* parameter);
     static void key_motion();
     static void timer_loop_motion();
+    static void adc_monitor();
 
 private:
     TaskHandle_t task_handle_{nullptr};
