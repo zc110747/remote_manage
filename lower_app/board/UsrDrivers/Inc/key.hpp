@@ -34,13 +34,13 @@ public:
     {
        if(KeyIndex == 0)
        {
-           HAL_NVIC_SetPriority(EXTI2_IRQn, 0, 0);
-           HAL_NVIC_EnableIRQ(EXTI2_IRQn);
+           HAL_NVIC_SetPriority(EXTI3_IRQn, 0, 0);
+           HAL_NVIC_EnableIRQ(EXTI3_IRQn);
        }
        else if(KeyIndex == 1)
        {
-           HAL_NVIC_SetPriority(EXTI3_IRQn, 0, 0);
-           HAL_NVIC_EnableIRQ(EXTI3_IRQn);
+           HAL_NVIC_SetPriority(EXTI2_IRQn, 0, 0);
+           HAL_NVIC_EnableIRQ(EXTI2_IRQn);
        }
        else
        {
@@ -61,7 +61,6 @@ public:
     }
 
 public:
-     std::atomic<bool> is_interrupt{false};
      std::atomic<uint32_t> ticks{false};
 
 private:
@@ -76,14 +75,13 @@ private:
         GPIO_Mode = GPIO_MODE_INPUT;
         if(KeyIndex == 0)
         {
-            GPIO_Pin = GPIO_PIN_2;
-            GPIO_Port = GPIOH;
+            GPIO_Pin = GPIO_PIN_3;
+            GPIO_Port = GPIOH; 
         }
         else if(KeyIndex == 1)
         {
-            GPIO_Mode = GPIO_MODE_IT_FALLING;
-            GPIO_Pin = GPIO_PIN_3;
-            GPIO_Port = GPIOH; 
+            GPIO_Pin = GPIO_PIN_2;
+            GPIO_Port = GPIOH;
         }
         else
         {

@@ -45,7 +45,6 @@ void driver_init(void)
     //key0 init
     KEY0::get_instance()->init();
     KEY1::get_instance()->init();
-    KEY1::get_instance()->interrupt_init();
     KEY2::get_instance()->init();
 
     //rng

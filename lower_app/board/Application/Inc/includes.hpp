@@ -8,6 +8,7 @@
 #include <cmath>
 #include <algorithm>
 #include <numeric>
+#include <functional>
 
 //stm32 hal interface
 #include "stm32f4xx_hal.h"
@@ -22,9 +23,11 @@
 #define LOGGER_RX_TASK_STACK        1024   
 #define LOGGER_TX_TASK_STACK        1024
 #define SCHEDULAR_TASK_STACK        256
-#define MOTION_TASK_STACK           512
+#define MONITOR_TASK_STACK           512
+#define I2C_MONITOR_TASK_STACK       512
 
 #define LOGGER_RX_TASK_PROITY       (tskIDLE_PRIORITY+1)
 #define LOGGER_TX_TASK_PROITY       (tskIDLE_PRIORITY+1)
 #define SCHEDULAR_TASK_PROITY       (tskIDLE_PRIORITY)
-#define MOTION_TASK_PROITY          (tskIDLE_PRIORITY+2)
+#define MONITOR_TASK_PROITY         (tskIDLE_PRIORITY+2)
+#define I2C_MONITOR_TASK_PROITY     (tskIDLE_PRIORITY+3)

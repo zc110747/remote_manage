@@ -1159,9 +1159,14 @@
               <FilePath>..\Application\Src\schedular.cpp</FilePath>
             </File>
             <File>
-              <FileName>motion.cpp</FileName>
+              <FileName>i2c_monitor.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\Application\Src\motion.cpp</FilePath>
+              <FilePath>..\Application\Src\i2c_monitor.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>monitor.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\Application\Src\monitor.cpp</FilePath>
             </File>
           </Files>
         </Group>

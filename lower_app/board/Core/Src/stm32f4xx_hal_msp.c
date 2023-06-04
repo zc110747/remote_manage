@@ -150,10 +150,13 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c)
       
     /*Configure GPIO pin : PB12 */
     GPIO_InitStruct.Pin = GPIO_PIN_12;
-    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+    GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
     GPIO_InitStruct.Pull = GPIO_PULLUP;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
+    HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(EXTI15_10_IRQn); 
+           
     /* Peripheral clock enable */
 
   /* USER CODE BEGIN I2C2_MspInit 1 */
