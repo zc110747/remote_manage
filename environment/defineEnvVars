@@ -30,7 +30,9 @@ export NEW_GCC_PATH=/home/center/install/gcc-arm/bin/
 export GCC_LIB=/home/center/install/gcc-arm/arm-linux-gnueabihf
 export KERNAL_CC=$OLD_GCC_PATH/arm-linux-gnueabihf-
 
-export PATH="$PATH:$NEW_GCC_PATH"
+export NONE_GCC_PATH=/home/center/install/arm-none-eabi/bin/
+
+export PATH="$PATH:$NEW_GCC_PATH:$NONE_GCC_PATH"
 
 #-------------------------------------------------------------------------------
 # This section defines the default internal config

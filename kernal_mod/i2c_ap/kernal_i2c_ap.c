@@ -51,7 +51,7 @@ struct ap3216_dev {
 	int cs_gpio;				/* 片选所使用的GPIO编号		*/
 };
 
-//icm20608应用信息
+//ap3216应用信息
 struct ap3216_info{
 	struct ap3216_dev dev;
 	unsigned short ir;
@@ -62,9 +62,9 @@ struct ap3216_info{
 static struct ap3216_info ap_info;
 
 /**
- * 连续读取icm20608设备寄存器的值
+ * 连续读取ap3216设备寄存器的值
  * 
- * @param dev ICM20608设备信息
+ * @param dev ap3216设备信息
  * @param reg 待读取设备寄存器的首地址
  * @param buf 读取数据缓冲区首地址
  * @param len 待读取数据长度
