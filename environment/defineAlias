@@ -243,7 +243,7 @@ function SysBuildUboot
 	if [ -d $ENV_BOOT_DIR ]; then
 		cd $ENV_BOOT_DIR
 		make V=1 ARCH=arm CROSS_COMPILE=$KERNAL_CC all -j4
-		cp -avf u-boot.imx $TFTP_PATH/
+		cp -avf u-boot-dtb.imx $TFTP_PATH/
 	else
 		echo "uboot directory:$ENV_BOOT_DIR not exist!"
 	fi
