@@ -15,11 +15,13 @@ public:
     bool init(void);
     void wwdg_init(void);
     void wwdg_reload(void);
-
+    
+private:
+    static void run(void* parameter);
+    static void ff_work(void);
+    
 private:
     IWDG_HandleTypeDef hiwdg;
 
     TaskHandle_t task_handle_{nullptr};
-     
-    static void run(void* parameter);
 };

@@ -16,6 +16,7 @@ lower_app/Executables/app_demo
 lower_app/Executables/app_demo
 lower_app/board/MDK-ARM/LowerBoard
 lower_app/board/MDK-ARM/
+lower_app/board/ff15/documents
 upper_app/manage_tool/manage_tool.pro.user
 upper_app/manage_tool/manage_tool.pro.user.2eaca31
 upper_app/logger_tool/Tools/obj/Debug/
@@ -24,3 +25,5 @@ upper_app/logger_tool/Tools/obj/
 
 package/remote_manage*
 /lower_app/board/MDK-ARM/LowerBoard.uvguix.Administrator
+/lower_app/board/ff15/source/00readme.txt
+/lower_app/board/ff15/LICENSE.txt

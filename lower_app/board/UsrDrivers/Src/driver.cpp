@@ -12,6 +12,7 @@
 #include "rtc.hpp"
 #include "i2c.hpp"
 #include "dac.hpp"
+#include "sdmmc.hpp"
 
 std::atomic<bool> is_os_on = false;
 
@@ -62,6 +63,9 @@ void driver_init(void)
     
     //dac
     dac_driver::get_instance()->init();
+    
+    //sdmmc
+    sdmmc_driver::get_instance()->init();
 }
 
 void delay_us(uint16_t times)
@@ -91,4 +95,14 @@ void delay_ms(uint16_t ms)
     {
         HAL_Delay(ms);
     }
+}
+
+HAL_StatusTypeDef read_disk(uint8_t *buf, uint32_t startBlocks, uint32_t NumberOfBlocks)
+{
+    return sdmmc_driver::get_instance()->read_disk(buf, startBlocks, NumberOfBlocks);
+}
+
+HAL_StatusTypeDef write_disk(const uint8_t *buf, uint32_t startBlocks, uint32_t NumberOfBlocks)
+{
+    return sdmmc_driver::get_instance()->write_disk(buf, startBlocks, NumberOfBlocks);
 }

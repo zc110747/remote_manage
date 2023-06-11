@@ -2,6 +2,7 @@
 #include "schedular.hpp"
 #include "led.hpp"
 #include "logger.hpp"
+#include "ff.h"
 
 bool schedular::init(void)
 {
@@ -22,12 +23,75 @@ bool schedular::init(void)
        return true;
    return false;
 }
+
+BYTE work[FF_MAX_SS];
+
+void schedular::ff_work(void)
+{
+    FATFS fs;
+    FIL fil;
+    UINT bw;  
     
+    FRESULT res;
+    
+    res = f_mount(&fs, "1:", 1);
+    if(res == FR_OK)
+    {
+       goto __mount;
+    }
+    else
+    {
+//        res = f_mkfs("1:", 0, work, FF_MAX_SS);
+//        if(res == FR_OK)
+        if(1)
+        {
+            res = f_mount(&fs, "1:", 1);
+
+            if(res == FR_OK)
+            {
+ __mount:
+                res = f_open(&fil, "1:hello.txt", FA_CREATE_ALWAYS | FA_READ | FA_WRITE);
+                if(res != FR_OK)
+                {
+                   PRINT_LOG(LOG_INFO, xTaskGetTickCount(), "f_mount open failed!") 
+                }
+                else
+                {
+                    f_write(&fil, "hello world test for mmc success", 32, &bw);
+                    if(bw != 0)
+                    {
+                        f_lseek(&fil, 0);
+                        f_read(&fil, work, 32, &bw);
+                        if(bw != 0)
+                        {
+                            work[bw] = 0;
+                            PRINT_LOG(LOG_INFO, xTaskGetTickCount(),"%s", work); 
+                        }
+                    }
+                    f_sync(&fil);
+                    f_close(&fil);
+                }
+                f_mount(0, "1:", 0);
+            }
+            else
+            {
+               PRINT_LOG(LOG_INFO, xTaskGetTickCount(), "f_mount failed:%d", res); 
+            }
+        }
+        else
+        {
+            PRINT_LOG(LOG_INFO, xTaskGetTickCount(), "f_mkfs failed:%d", res); 
+        }
+    }
+}
+
 void schedular::run(void* parameter)
 {    
     //tell driver os is start.
     set_os_on();
-
+    
+    //ff_work();
+    
     while(1)
     {
         //PRINT_LOG(LOG_INFO, xTaskGetTickCount(), "LED Task Run!");

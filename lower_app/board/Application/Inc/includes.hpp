@@ -22,7 +22,7 @@
 //task define
 #define LOGGER_RX_TASK_STACK        1024   
 #define LOGGER_TX_TASK_STACK        1024
-#define SCHEDULAR_TASK_STACK        256
+#define SCHEDULAR_TASK_STACK        2048
 #define MONITOR_TASK_STACK           512
 #define I2C_MONITOR_TASK_STACK       512
 
