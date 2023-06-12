@@ -12,8 +12,6 @@ BaseType_t sdmmc_driver::init()
 {
     hardware_init();
     
-    test();
-    
     #if SDMMC_TEST == 1
     test();
     #endif
@@ -46,28 +44,23 @@ BaseType_t sdmmc_driver::test()
     uint16_t index = 0;
     strcpy((char *)buffer, ptr);
     
-//    for(index=0; index<2000; index++)
-//    {
-//        if(write_disk(buffer, index, 1) == HAL_OK)
-//        {       
-//            memset(buffer, 0, 512);
-//            if(read_disk(buffer, index, 1) == HAL_OK)
-//            {
-//                printf("block%d:%s", index, buffer);
-//            }
-//            else
-//                return pdFAIL;
-//        }
-//        else
-//        {   
-//            printf("block write failed:%d", index);
-//            return pdFAIL;
-//        }
-//    }
-    if(read_disk(buffer, index, 1) == HAL_OK)
+    for(index=0; index<20000; index++)
     {
-        for(int sd_size=0;sd_size<512;sd_size++)
-            printf("%x ", buffer[sd_size]);//打印0扇区数据   
+        if(write_disk(buffer, index, 1) == HAL_OK)
+        {       
+            memset(buffer, 0, 512);
+            if(read_disk(buffer, index, 1) == HAL_OK)
+            {
+                printf("block%d:%s", index, buffer);
+            }
+            else
+                return pdFAIL;
+        }
+        else
+        {   
+            printf("block write failed:%d", index);
+            continue;
+        }
     }
     
     return pdPASS;
@@ -77,19 +70,15 @@ HAL_StatusTypeDef sdmmc_driver::read_disk(uint8_t *buf, uint32_t startBlocks, ui
 {
     HAL_StatusTypeDef status = HAL_OK;
     
-    //delay to aviod read failed
-    HAL_Delay(20);
-    
+    //delay to aviod read failed    
     taskENTER_CRITICAL();
-    for(uint8_t n=0; n<NumberOfBlocks; n++)
-    {
-       status = HAL_SD_ReadBlocks(&hsd_handler_, (uint8_t*)rx_data_, startBlocks*SDMMC_BLOCK_SIZE, NumberOfBlocks, SDMMC_READ_WRITE_TIMEOUT);
-       if(status != HAL_OK)
-            break;
-       memcpy(buf, (uint8_t *)rx_data_, SDMMC_BLOCK_SIZE);
-       buf += SDMMC_BLOCK_SIZE;
-    }
+    status = HAL_SD_ReadBlocks(&hsd_handler_, (uint8_t*)buf, startBlocks, NumberOfBlocks, SDMMC_READ_WRITE_TIMEOUT);
     taskEXIT_CRITICAL();
+    
+    while(HAL_SD_GetCardState(&hsd_handler_) != HAL_SD_CARD_TRANSFER )
+    {
+        HAL_Delay(1);
+    }
     return status;
 }
 
@@ -98,17 +87,13 @@ HAL_StatusTypeDef sdmmc_driver::write_disk(const uint8_t *buf, uint32_t startBlo
     HAL_StatusTypeDef status = HAL_OK;
     
     //delay to aviod write failed
-    HAL_Delay(20);
-    
     taskENTER_CRITICAL();
-    for(uint8_t n=0; n<NumberOfBlocks; n++)
-    {
-       memcpy(rx_data_, (uint8_t *)buf, SDMMC_BLOCK_SIZE);
-       status = HAL_SD_WriteBlocks(&hsd_handler_, (uint8_t*)rx_data_, startBlocks*SDMMC_BLOCK_SIZE, NumberOfBlocks, SDMMC_READ_WRITE_TIMEOUT);
-       if(status != HAL_OK)
-            break;
-       buf += SDMMC_BLOCK_SIZE;
-    }
+    status = HAL_SD_WriteBlocks(&hsd_handler_, (uint8_t*)buf, startBlocks, NumberOfBlocks, SDMMC_READ_WRITE_TIMEOUT);
     taskEXIT_CRITICAL();
+    
+    while(HAL_SD_GetCardState(&hsd_handler_) != HAL_SD_CARD_TRANSFER)
+    {
+        HAL_Delay(1);
+    }
     return status;
 }

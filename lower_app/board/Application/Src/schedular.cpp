@@ -90,7 +90,7 @@ void schedular::run(void* parameter)
     //tell driver os is start.
     set_os_on();
     
-    //ff_work();
+    ff_work();
     
     while(1)
     {
