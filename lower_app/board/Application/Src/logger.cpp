@@ -63,6 +63,22 @@ char *logger_manage::get_memory_buffer_pointer(uint16_t size)
 	return(pCurrentMemBuffer);
 }
 
+BaseType_t logger_manage::mutex_take(bool thread_ok, TickType_t tick)
+{
+    if(!thread_ok)
+         return pdTRUE; 
+    
+    return xSemaphoreTake(mutex_, tick);
+}
+
+BaseType_t logger_manage::mutex_give(bool thread_ok)
+{
+    if(!thread_ok)
+        return pdTRUE; 
+    
+    return xSemaphoreGive(mutex_);
+}
+
 int logger_manage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...)
 {
     int len, bufferlen;
@@ -73,8 +89,8 @@ int logger_manage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ..
         return 0;
 
     is_thread_work = thread_work_;
-
-    if( xSemaphoreTake( mutex_, ( TickType_t ) 10 ) == pdTRUE )
+    
+    if(mutex_take(is_thread_work, ( TickType_t )10) == pdTRUE )
     {
         pstart = get_memory_buffer_pointer(LOGGER_MAX_BUFFER_SIZE);
         len = LOGGER_MAX_BUFFER_SIZE;
@@ -86,7 +102,7 @@ int logger_manage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ..
         len = snprintf(pbuf, bufferlen, "LogLevel:%d time:%u info:",level, time);
         if((len<=0) || (len>=bufferlen))
         {
-            xSemaphoreGive(mutex_);
+            mutex_give(is_thread_work);
             return 0;
         }
 
@@ -98,7 +114,7 @@ int logger_manage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ..
         va_start(valist, fmt);
         len = vsnprintf(pbuf, bufferlen, fmt, valist);
         va_end(valist);
-        xSemaphoreGive(mutex_);
+        mutex_give(is_thread_work);
 
         if((len<=0) || (len>=bufferlen))
         {

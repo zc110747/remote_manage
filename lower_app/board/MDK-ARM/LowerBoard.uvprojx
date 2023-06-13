@@ -925,6 +925,11 @@
               <FileType>1</FileType>
               <FilePath>..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_ll_sdmmc.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4xx_hal_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_spi.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1004,6 +1009,11 @@
               <FileName>sdmmc.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\UsrDrivers\Src\sdmmc.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>spi.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\UsrDrivers\Src\spi.cpp</FilePath>
             </File>
           </Files>
         </Group>

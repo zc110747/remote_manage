@@ -76,12 +76,15 @@ int main(void)
         application_init(); 
     }        
     
-    //no run to this
+    //if run to this, start failed
     printf("system start failed, please check!\r\n");
     
     while (1)
     {
-        
+        led_set(LED0, LED_STATUS_ON);
+        HAL_Delay(2000);
+        led_set(LED0, LED_STATUS_ON);
+        HAL_Delay(2000);
     }
 }
 

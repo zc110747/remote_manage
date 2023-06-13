@@ -47,6 +47,9 @@ private:
     static void logger_tx_run(void *parameter);
 
     bool put_string(void);
+    
+    BaseType_t mutex_take(bool thread_ok, TickType_t tick);
+    BaseType_t mutex_give(bool thread_ok);
 
 private:
     /// \brief memory_start_pointer_

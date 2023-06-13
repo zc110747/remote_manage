@@ -29,6 +29,7 @@
 #include "i2c.hpp"
 #include "dac.hpp"
 #include "sdmmc.hpp"
+#include "spi.hpp"
 
 std::atomic<bool> is_os_on = false;
 
@@ -85,6 +86,9 @@ BaseType_t driver_init(void)
     
     //sdmmc
     result &= sdmmc_driver::get_instance()->init();
+    
+    //spi
+    result &= spi_driver::get_instance()->init();
     
     return result;
 }

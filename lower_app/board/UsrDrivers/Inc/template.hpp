@@ -1,6 +1,5 @@
 _Pragma("once")
 
-#include "main.h"
 #include "includes.h"
 
 class x_driver
@@ -16,7 +15,7 @@ public:
 
 
 private:
-    void hardware_init(); 
+    BaseType_t hardware_init(); 
     BaseType_t test();
 
 private:

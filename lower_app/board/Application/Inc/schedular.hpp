@@ -3,7 +3,6 @@
 
 #include "includes.hpp"
 
-
 class schedular
 {
 public:
@@ -18,7 +17,6 @@ public:
     
 private:
     static void run(void* parameter);
-    static void ff_work(void);
     
 private:
     IWDG_HandleTypeDef hiwdg;
