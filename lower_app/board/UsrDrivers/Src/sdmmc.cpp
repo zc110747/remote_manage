@@ -93,6 +93,10 @@ HAL_StatusTypeDef sdmmc_driver::read_disk(uint8_t *buf, uint32_t startBlocks, ui
     HAL_StatusTypeDef status = HAL_OK;
     uint16_t tick = 0;
     
+    taskENTER_CRITICAL();
+    status = HAL_SD_ReadBlocks(&hsd_handler_, (uint8_t*)buf, startBlocks, NumberOfBlocks, SDMMC_READ_WRITE_TIMEOUT);
+    taskEXIT_CRITICAL();
+    
     //wait card ok.
     while((HAL_SD_GetCardState(&hsd_handler_) != HAL_SD_CARD_TRANSFER)
     && (tick < SDMMC_READ_WRITE_TIMEOUT))
@@ -104,11 +108,6 @@ HAL_StatusTypeDef sdmmc_driver::read_disk(uint8_t *buf, uint32_t startBlocks, ui
     {
         return HAL_TIMEOUT;
     }
-    
-    taskENTER_CRITICAL();
-    status = HAL_SD_ReadBlocks(&hsd_handler_, (uint8_t*)buf, startBlocks, NumberOfBlocks, SDMMC_READ_WRITE_TIMEOUT);
-    taskEXIT_CRITICAL();
-    
     return status;
 }
 
@@ -116,6 +115,10 @@ HAL_StatusTypeDef sdmmc_driver::write_disk(const uint8_t *buf, uint32_t startBlo
 {
     HAL_StatusTypeDef status = HAL_OK;
     uint16_t tick = 0;
+
+    taskENTER_CRITICAL();
+    status = HAL_SD_WriteBlocks(&hsd_handler_, (uint8_t*)buf, startBlocks, NumberOfBlocks, SDMMC_READ_WRITE_TIMEOUT);
+    taskEXIT_CRITICAL();
     
     //wait card ok.
     while((HAL_SD_GetCardState(&hsd_handler_) != HAL_SD_CARD_TRANSFER)
@@ -128,11 +131,6 @@ HAL_StatusTypeDef sdmmc_driver::write_disk(const uint8_t *buf, uint32_t startBlo
     {
         return HAL_TIMEOUT;
     }
-
-    taskENTER_CRITICAL();
-    status = HAL_SD_WriteBlocks(&hsd_handler_, (uint8_t*)buf, startBlocks, NumberOfBlocks, SDMMC_READ_WRITE_TIMEOUT);
-    taskEXIT_CRITICAL();
-    
 
     return status;
 }

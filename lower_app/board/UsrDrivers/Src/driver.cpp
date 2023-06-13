@@ -48,7 +48,7 @@ BaseType_t driver_init(void)
 
     //usart init
     //usart first init for logger.
-    result &= usart_driver::get_instance()->init();
+    result = usart_driver::get_instance()->init();
     
     //led init
     //all io clock init in this function, so need the first execute.

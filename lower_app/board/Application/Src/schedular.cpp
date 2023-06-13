@@ -31,7 +31,7 @@ void schedular::ff_work(void)
     FATFS fs;
     FIL fil;
     UINT bw;  
-    
+    const char* ptr = "hello world test for mmc success!";
     FRESULT res;
     
     res = f_mount(&fs, "1:", 1);
@@ -57,7 +57,7 @@ void schedular::ff_work(void)
                 }
                 else
                 {
-                    f_write(&fil, "hello world test for mmc success", 32, &bw);
+                    f_write(&fil, ptr, strlen(ptr), &bw);
                     if(bw != 0)
                     {
                         f_lseek(&fil, 0);
