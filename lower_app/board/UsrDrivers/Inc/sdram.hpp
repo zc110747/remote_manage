@@ -1,7 +1,7 @@
 
 _Pragma("once")
 
-#include "main.h"
+#include "includes.hpp"
 
 #define SDRAM_MODEREG_BURST_LENGTH_1             ((uint16_t)0x0000)
 #define SDRAM_MODEREG_BURST_LENGTH_2             ((uint16_t)0x0001)
@@ -18,7 +18,7 @@ _Pragma("once")
 class sdram_driver
 {
 public:
-    void init();
+    BaseType_t init();
     bool test();
     static sdram_driver* get_instance(){
         static sdram_driver instance_;
@@ -26,9 +26,9 @@ public:
     }
 
 private:
-    void hardware_init();
-    void initialize_sequence();
-    uint8_t send_command(uint8_t bank, uint8_t cmd, uint8_t refresh, uint16_t regval);
+    BaseType_t hardware_init();
+    BaseType_t initialize_sequence();
+    BaseType_t send_command(uint8_t bank, uint8_t cmd, uint8_t refresh, uint16_t regval);
 
 private:
     SDRAM_HandleTypeDef hsdram1;

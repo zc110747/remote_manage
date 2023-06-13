@@ -1,7 +1,23 @@
-
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2023-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//     tpad.cpp
+//
+//  Purpose:
+//     tpad key driver.
+//
+// Author:
+//      @zc
+//
+//  Assumptions:
+//
+//  Revision History:
+//
+/////////////////////////////////////////////////////////////////////////////
 #include "tpad.hpp"
 #include "driver.hpp"
-#include "includes.hpp"
 
 /*
 APB2 Timer Clock 90Mhz
@@ -22,22 +38,30 @@ capture number must in the range, otherwise is hardware problem
 #define TPAD_IS_VALID_CAPTURE(value) \
    (((value)>=TPAD_TIMES_CAPTURE_LOW) && ((value)<=(TPAD_TIMES_CAPTURE_HIGH)))
 
-void tpad_driver::init(void)
+BaseType_t tpad_driver::init(void)
 {
     uint16_t buf[10];
+    BaseType_t result;
+    
+    result = hardware_init();
 
-    /*init the hardware time for capture.*/
-    hardware_init();
-
-    /*read the capture value for no push, sort, used middle*/
-    for(int i=0; i<TPAD_INIT_CHECK_TIMES;i++)
-    {				 
-        buf[i] = get_value();
-        delay_ms(5);	    
+    if(result == pdPASS)
+    {
+        /*read the capture value for no push, sort, used middle*/
+        for(int i=0; i<TPAD_INIT_CHECK_TIMES;i++)
+        {				 
+            buf[i] = get_value();
+            delay_ms(5);	    
+        }
+        std::sort(buf, buf+TPAD_INIT_CHECK_TIMES);
+        no_push_value_ = std::accumulate(buf+2, buf+8, 0)/6;
+        printf("tpad no_push_value_:%d\r\n", no_push_value_);    
     }
-    std::sort(buf, buf+TPAD_INIT_CHECK_TIMES);
-    no_push_value_ = std::accumulate(buf+2, buf+8, 0)/6;
-    printf("tpad no_push_value_:%d\r\n", no_push_value_);	
+    else
+    {
+        printf("tpad_driver hardware_init failed\r\n");
+    }
+    return result;
 }
 
 uint8_t tpad_driver::scan_key()
@@ -127,7 +151,7 @@ bool tpad_driver::test()
 }
 
 //APB1 Timer clocks 90Mhz
-void tpad_driver::hardware_init()
+BaseType_t tpad_driver::hardware_init()
 {
     TIM_IC_InitTypeDef TIM2_CH1Config;  
 
@@ -146,5 +170,7 @@ void tpad_driver::hardware_init()
     TIM2_CH1Config.ICFilter=0;                        
     HAL_TIM_IC_ConfigChannel(&timer_handler_, &TIM2_CH1Config, TIM_CHANNEL_1);
     HAL_TIM_IC_Start(&timer_handler_, TIM_CHANNEL_1);    
+    
+    return pdPASS;
 }
   

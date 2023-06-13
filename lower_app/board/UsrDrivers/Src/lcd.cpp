@@ -1,21 +1,45 @@
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2023-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      lcd.cpp
+//
+//  Purpose:
+//      lcd driver use fmc.
+//
+// Author:
+//      @zc
+//
+//  Assumptions:
+//
+//  Revision History:
+//
+/////////////////////////////////////////////////////////////////////////////
 #include "lcd.hpp"
 #include "font.h"
 
 uint32_t POINT_COLOR = 0xFF000000;		
 uint32_t BACK_COLOR = 0xFFFFFFFF;  	 
 
-bool lcd_driver::init(void)
+BaseType_t lcd_driver::init(void)
 {
-    hardware_init();
+    BaseType_t result;
+    
+    result = hardware_init();
+    if(result == pdPASS)
+    {
+        HAL_Delay(20);
 
-    HAL_Delay(20);
-
-    config_init();
-
-    #if LCD_TEST == 1
-    test();
-    #endif
-    return true;
+        config_init(); 
+        
+        test();     
+    }
+    else
+    {
+        printf("lcd hardware_init failed\r\n");
+    }
+    return result;
 }
 
 void lcd_driver::config_init(void)
@@ -442,7 +466,7 @@ void lcd_driver::config_init(void)
         delay_us(120);
         lcd_wr_reg(0x2900);  
     }
-                                        
+                                    
     FMC_Bank1E->BWTR[0]&=~(0XF<<0);	 
     FMC_Bank1E->BWTR[0]&=~(0XF<<8);	
     FMC_Bank1E->BWTR[0]|=4<<0;	 		 
@@ -453,7 +477,7 @@ void lcd_driver::config_init(void)
     lcd_clear(WHITE);
 
     LED_BACKLIGHT_ON;
-    }
+}
 
 void lcd_driver::lcd_scan_dir(uint8_t dir)
 {
@@ -582,7 +606,8 @@ void lcd_driver::lcd_clear(uint32_t color)
         LCD->LCD_RAM=color;	
     } 
 }
-void lcd_driver::hardware_init(void)
+
+BaseType_t lcd_driver::hardware_init(void)
 {
     FMC_NORSRAM_TimingTypeDef Timing = {0};
     FMC_NORSRAM_TimingTypeDef ExtTiming = {0};
@@ -620,6 +645,7 @@ void lcd_driver::hardware_init(void)
     hsram1.Init.WriteBurst = FMC_WRITE_BURST_DISABLE;
     hsram1.Init.ContinuousClock = FMC_CONTINUOUS_CLOCK_SYNC_ONLY;
     hsram1.Init.PageSize = FMC_PAGE_SIZE_NONE;
+    
     /* Timing */
     Timing.AddressSetupTime = 15;
     Timing.AddressHoldTime = 15;
@@ -628,6 +654,7 @@ void lcd_driver::hardware_init(void)
     Timing.CLKDivision = 16;
     Timing.DataLatency = 17;
     Timing.AccessMode = FMC_ACCESS_MODE_A;
+    
     /* ExtTiming */
     ExtTiming.AddressSetupTime = 15;
     ExtTiming.AddressHoldTime = 15;
@@ -638,9 +665,10 @@ void lcd_driver::hardware_init(void)
     ExtTiming.AccessMode = FMC_ACCESS_MODE_A;
 
     if (HAL_SRAM_Init(&hsram1, &Timing, &ExtTiming) != HAL_OK)
-    {
-        Error_Handler( );
-    }
+        return pdFAIL;
+    
+    return pdPASS;
+    
 }
 
 void lcd_driver::lcd_wr_reg(uint16_t regval)
@@ -821,6 +849,7 @@ void lcd_driver::lcd_show_extra_num(uint16_t x,uint16_t y,uint32_t num,uint8_t l
 
 void lcd_driver::test()
 {
+#if LCD_TEST == 1
     lcd_clear(WHITE);
     HAL_Delay(100);
     lcd_clear(BLACK);
@@ -840,4 +869,5 @@ void lcd_driver::test()
     lcd_showstring(10, 110, 240, 16, 16, (char *)"ATOM@ALIENTEK");
     lcd_showstring(10, 140, 320, 16, 16, (char *)"TEMPERATE: 00.00C, Vol:00.00V");
     lcd_showstring(10, 160, 200, 16, 16, (char *)"Timer: 00-00-00 00:00:00");
+#endif
 }

@@ -11,7 +11,6 @@
 #include "driver.hpp"
 #include <string.h>
 
-
 //RAM disk
 int RAM_disk_status(void)
 {

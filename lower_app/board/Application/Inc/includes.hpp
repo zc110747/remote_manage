@@ -1,23 +1,16 @@
 
 #pragma once
 
-//c++ interface
+//c++ header
 #include <atomic>
-#include <stdio.h>
-#include <stdarg.h>
 #include <cmath>
 #include <algorithm>
 #include <numeric>
 #include <functional>
+#include <type_traits>
 
-//stm32 hal interface
-#include "stm32f4xx_hal.h"
-
-//freertos interface
-#include "FreeRTOS.h"
-#include "task.h"
-#include "semphr.h"
-#include "message_buffer.h"
+//stm32 hal header
+#include "main.h"
 
 //task define
 #define LOGGER_RX_TASK_STACK        1024   

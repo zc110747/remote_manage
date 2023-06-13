@@ -1,31 +1,62 @@
-
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2023-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      sdmmc.cpp
+//
+//  Purpose:
+//      sdram driver use fmc.
+//
+// Author:
+//      @zc
+//
+//  Assumptions:
+//
+//  Revision History:
+//
+/////////////////////////////////////////////////////////////////////////////
 #include "sdram.hpp"
-#include "driver.hpp"
 
-void sdram_driver::init()
+BaseType_t sdram_driver::init()
 {
-    //initialize sdram hardware interface
-    hardware_init();
+    BaseType_t result;
+    
+    result =  hardware_init();
+    if(result == pdPASS)
+    {
+        //initialize sdram command sequence
+        result = initialize_sequence();
 
-    //initialize sdram command sequence
-    initialize_sequence();
+        if(result == pdPASS)
+        {
+            //define sdram refresh rate.
+            HAL_SDRAM_ProgramRefreshRate(&hsdram1, 683);
+            
+            test();
+        }
+        else
+        {
+            printf("sdram initialize_sequence failed\r\n");
+        }
+    }
+    else
+    {
+        printf("sdram hardware_init failed\r\n");
+    }
 
-    HAL_SDRAM_ProgramRefreshRate(&hsdram1, 683);//����ˢ��Ƶ��
-
-    //test sdram
-    #if SDRAM_TEST == 1
-    test();
-    #endif
+    return result;
 }	
 
-void sdram_driver::initialize_sequence()
+BaseType_t sdram_driver::initialize_sequence()
 {
     uint32_t temp;
+    BaseType_t result;
 
-    send_command(0, FMC_SDRAM_CMD_CLK_ENABLE, 1, 0);
+    result = send_command(0, FMC_SDRAM_CMD_CLK_ENABLE, 1, 0);
     HAL_Delay(1);
-    send_command(0, FMC_SDRAM_CMD_PALL, 1, 0);
-    send_command(0, FMC_SDRAM_CMD_AUTOREFRESH_MODE, 1, 0);
+    result &= send_command(0, FMC_SDRAM_CMD_PALL, 1, 0);
+    result &= send_command(0, FMC_SDRAM_CMD_AUTOREFRESH_MODE, 1, 0);
 
     temp = (uint32_t)SDRAM_MODEREG_BURST_LENGTH_1
             | SDRAM_MODEREG_BURST_TYPE_SEQUENTIAL
@@ -33,11 +64,13 @@ void sdram_driver::initialize_sequence()
             | SDRAM_MODEREG_OPERATING_MODE_STANDARD 
             | SDRAM_MODEREG_WRITEBURST_MODE_SINGLE;  
 
-    send_command(0, FMC_SDRAM_CMD_LOAD_MODE, 1, temp);
+    result &= send_command(0, FMC_SDRAM_CMD_LOAD_MODE, 1, temp);
+    
+    return result;
 }
 
 
-uint8_t sdram_driver::send_command(uint8_t bank, uint8_t cmd, uint8_t refresh, uint16_t regval)
+BaseType_t sdram_driver::send_command(uint8_t bank, uint8_t cmd, uint8_t refresh, uint16_t regval)
 {
     uint32_t target_bank=0;
     FMC_SDRAM_CommandTypeDef Command;
@@ -55,17 +88,13 @@ uint8_t sdram_driver::send_command(uint8_t bank, uint8_t cmd, uint8_t refresh, u
     Command.CommandTarget = target_bank;     
     Command.AutoRefreshNumber = refresh;    
     Command.ModeRegisterDefinition = regval;  
-    if(HAL_SDRAM_SendCommand(&hsdram1, &Command, 0X1000) == HAL_OK)
-    {
-        return 0;  
-    }
-    else
-    {
-        return 1;
-    }
+    if(HAL_SDRAM_SendCommand(&hsdram1, &Command, 0x1000) != HAL_OK)
+        return pdFAIL;
+    
+    return pdPASS;
 }
 
-void sdram_driver::hardware_init()
+BaseType_t sdram_driver::hardware_init()
 {
 	
     FMC_SDRAM_TimingTypeDef SdramTiming = {0};
@@ -99,17 +128,17 @@ void sdram_driver::hardware_init()
     SdramTiming.RCDDelay = 2;
 
     if (HAL_SDRAM_Init(&hsdram1, &SdramTiming) != HAL_OK)
-    {
-        Error_Handler( );
-    }
+        return pdFAIL;
+    
+    return pdPASS;
 }
 
 
 bool sdram_driver::test()
 {
+#if SDRAM_TEST == 1
     static uint8_t test_sdram[100] __attribute__((section(".ARM.__at_0xC0000000")));
     int i;
-    bool ret = true;
 
     memset(test_sdram, 0, 100);
     for(i=0; i<100; i++)
@@ -121,12 +150,11 @@ bool sdram_driver::test()
     {
         if(test_sdram[i] != i)
         {
-            ret = false;
-            break;
+            return false;
         }
     }
-
-    return ret;
+#endif
+    return true;
 }
 
 

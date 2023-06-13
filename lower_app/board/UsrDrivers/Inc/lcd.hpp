@@ -1,5 +1,23 @@
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2023-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      lcd.hpp
+//
+//  Purpose:
+//      lcd driver interface use fmc.
+//
+// Author:
+//      @zc
+//
+//  Assumptions:
+//
+//  Revision History:
+//
+/////////////////////////////////////////////////////////////////////////////
+_Pragma("once")
 
-#pragma once
 #include "driver.hpp"
 
 //LCD register and data 
@@ -14,6 +32,7 @@ typedef struct
     uint16_t reg;
     uint16_t val;
 }LCD_RegValue;
+
 #define LCD_BASE        ((uint32_t)(0x60000000 | 0x0007FFFE))
 #define LCD             ((LCD_TypeDef *) LCD_BASE)
 
@@ -54,7 +73,7 @@ typedef struct
 class lcd_driver
 {
 public:
-    bool init(void);
+    BaseType_t init(void);
     static lcd_driver *get_instance()
     {
         static lcd_driver instance_;
@@ -76,7 +95,7 @@ public:
 
 private:
     //config interface
-    void hardware_init(void);
+    BaseType_t hardware_init(void);
     void config_init(void);
     void display_dir(uint8_t dir);
     void lcd_scan_dir(uint8_t dir);

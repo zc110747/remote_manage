@@ -1,13 +1,29 @@
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2023-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//     rng.hpp
+//
+//  Purpose:
+//     rng driver interface.
+//
+// Author:
+//      @zc
+//
+//  Assumptions:
+//
+//  Revision History:
+//
+/////////////////////////////////////////////////////////////////////////////
+_Pragma("once");
 
-#pragma once
-
-#include "main.h"
-#include "driver.hpp"
+#include "includes.hpp"
 
 class rng_driver
 {
 public:
-    bool init(void);
+    BaseType_t init(void);
 
     static rng_driver *get_instance(void)
     {

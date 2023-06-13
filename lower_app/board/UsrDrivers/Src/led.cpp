@@ -1,19 +1,35 @@
-
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2023-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      led.cpp
+//
+//  Purpose:
+//      led driver defined for init.
+//      hardware: led0 ------------ PB0
+//
+// Author:
+//      @zc
+//
+//  Assumptions:
+//
+//  Revision History:
+//
+/////////////////////////////////////////////////////////////////////////////
 #include "led.hpp"
 #include "driver.hpp"
 
-
-void led_driver::init(void)
+BaseType_t led_driver::init(void)
 {
     //device initialize
     hardware_init();
 
     set(LED0, LED_STATUS_OFF);
-    //set(LED1, LED_STATUS_OFF);
 
-    #if LED_TEST == 1
     test();
-    #endif
+    
+    return pdPASS;
 }
 
 void led_driver::hardware_init(void)
@@ -36,15 +52,13 @@ void led_driver::hardware_init(void)
 
 bool led_driver::test(void)
 {
+#if LED_TEST == 1
     set(LED0, LED_STATUS_ON);
     HAL_Delay(1000);
     set(LED0, LED_STATUS_OFF);
     HAL_Delay(1000);
-
-//    set(LED1, LED_STATUS_ON);
-//    HAL_Delay(1000);
-//    set(LED1, LED_STATUS_OFF);
-//    HAL_Delay(1000);
+#endif
+    
     return true;
 }
 
@@ -52,13 +66,13 @@ void led_driver::set(led_device dev, led_status status)
 {
     GPIO_PinState state = (status == LED_STATUS_OFF)?GPIO_PIN_SET:GPIO_PIN_RESET;
 
-    if(dev == LED0)
+    switch(dev)
     {
-        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, state);
-    }
-    else
-    {
-        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, state);		
+        case LED0:
+            HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, state);
+            break;
+        default:
+            break;
     }
 }
 

@@ -1,5 +1,21 @@
-
-#include "includes.hpp"
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2023-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      driver.cpp
+//
+//  Purpose:
+//      driver defined for init.
+//
+// Author:
+//      @zc
+//
+//  Assumptions:
+//
+//  Revision History:
+//
+/////////////////////////////////////////////////////////////////////////////
 #include "driver.hpp"
 #include "sdram.hpp"
 #include "led.hpp"
@@ -16,8 +32,10 @@
 
 std::atomic<bool> is_os_on = false;
 
-void driver_init(void)
+BaseType_t driver_init(void)
 {
+    BaseType_t result;
+    
     /* GPIO Ports Clock Enable */
     __HAL_RCC_GPIOF_CLK_ENABLE();
     __HAL_RCC_GPIOH_CLK_ENABLE();
@@ -28,44 +46,47 @@ void driver_init(void)
     __HAL_RCC_GPIOD_CLK_ENABLE();
     __HAL_RCC_GPIOA_CLK_ENABLE();
 
+    //usart init
+    //usart first init for logger.
+    result &= usart_driver::get_instance()->init();
+    
     //led init
     //all io clock init in this function, so need the first execute.
-    led_driver::get_instance()->init();
+    result &= led_driver::get_instance()->init();
 
     //sdram init
-    sdram_driver::get_instance()->init();
+    result &= sdram_driver::get_instance()->init();
 
     //lcd init
-    lcd_driver::get_instance()->init();
-
-    //usart init
-    usart_driver::get_instance()->init();
+    result &= lcd_driver::get_instance()->init();
 
     //adc init
-    adc_driver::get_instance()->init();
+    result &= adc_driver::get_instance()->init();
 
     //key0 init
-    KEY0::get_instance()->init();
-    KEY1::get_instance()->init();
-    KEY2::get_instance()->init();
+    result &= KEY0::get_instance()->init();
+    result &= KEY1::get_instance()->init();
+    result &= KEY2::get_instance()->init();
 
     //rng
-    rng_driver::get_instance()->init();
+    result &= rng_driver::get_instance()->init();
 
     //tpad 
-    tpad_driver::get_instance()->init();
+    result &= tpad_driver::get_instance()->init();
     
     //rtc
-    rtc_driver::get_instance()->init();
+    result &= rtc_driver::get_instance()->init();
     
     //i2c
-    i2c_driver::get_instance()->init();
+    result &= i2c_driver::get_instance()->init();
     
     //dac
-    dac_driver::get_instance()->init();
+    result &= dac_driver::get_instance()->init();
     
     //sdmmc
-    sdmmc_driver::get_instance()->init();
+    result &= sdmmc_driver::get_instance()->init();
+    
+    return result;
 }
 
 void delay_us(uint16_t times)

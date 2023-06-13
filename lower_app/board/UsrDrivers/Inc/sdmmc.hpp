@@ -1,7 +1,28 @@
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2023-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      sdmmc.hpp
+//
+//  Purpose:
+//      sdcard driver interface for init, read, write.
+//
+// Author:
+//      @zc
+//
+//  Assumptions:
+//
+//  Revision History:
+//
+/////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
-#include "main.h"
 #include "includes.hpp"
+
+#define SDMMC_READ_WRITE_TIMEOUT        100
+#define SDMMC_BLOCK_SIZE                512
+#define SDMMC_CLOCK_DIV                 2
 
 class sdmmc_driver
 {
@@ -17,7 +38,7 @@ public:
     HAL_StatusTypeDef write_disk(const uint8_t *buf, uint32_t startBlocks, uint32_t NumberOfBlocks);
 
 private:
-    void hardware_init(); 
+    BaseType_t hardware_init(); 
     BaseType_t test();
 
 private:

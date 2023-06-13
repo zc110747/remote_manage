@@ -2,7 +2,6 @@
 _Pragma("once")
 
 #include "main.h"
-#include <string.h>
 
 #ifdef __cplusplus
 	extern "C" {
@@ -11,7 +10,6 @@ _Pragma("once")
 typedef enum
 {
     LED0 = 0,
-    LED1,
 }led_device;
 
 //led status
@@ -21,13 +19,7 @@ typedef enum
     LED_STATUS_ON,
 }led_status;
 
-#define LED_TEST            0
-#define SDRAM_TEST          0
-#define LCD_TEST            1
-#define UART_TEST           0
-#define SDMMC_TEST          0
-
-void driver_init();		
+BaseType_t driver_init();		
 
 void led_set(led_device dev, led_status status);
 void set_os_on();

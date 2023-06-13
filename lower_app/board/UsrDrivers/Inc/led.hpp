@@ -1,13 +1,13 @@
 
 #pragma once
 
-#include "main.h"
 #include "driver.hpp"
+#include "includes.hpp"
 
 class led_driver
 {
 public:
-    void init(void);
+    BaseType_t init(void);
     bool test(void);
     void set(led_device dev, led_status status);
     static led_driver* get_instance(){

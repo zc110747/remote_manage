@@ -1,12 +1,22 @@
-/*
-rtc ready when power on.
-if power off, rtc timer not update
-1.LSE Have been chooes.
-2.BAKE UP Register ready.
-may LSE not work when used VBAT(with lower power).
-*/
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2023-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//     rtc.cpp
+//
+//  Purpose:
+//     rtc driver.
+//
+// Author:
+//      @zc
+//
+//  Assumptions:
+//
+//  Revision History:
+//
+/////////////////////////////////////////////////////////////////////////////
 #include "rtc.hpp"
-#include "driver.hpp"
 
 #define RTC_DATE_YEAR       23
 #define RTC_DATE_MONTH      06
@@ -20,15 +30,24 @@ may LSE not work when used VBAT(with lower power).
 #define RTC_SET_FLAGS       0x5A5A
 #define RTC_FORMAT_MODE     RTC_FORMAT_BIN
 
-bool rtc_driver::init()
+BaseType_t rtc_driver::init()
 {
+    BaseType_t result;
+    
     //unlock backup register update.
     HAL_PWR_EnableBkUpAccess();
     
-    hardware_init();
+    result = hardware_init();
     
-    delay_alarm(0, 0, 0, 5);
-    return true;
+    if(result == pdPASS)
+    {
+        delay_alarm(0, 0, 0, 5);
+    }
+    else
+    {
+        printf("rtc_driver hardware_init failed\r\n");
+    }
+    return result;
 }
 
 HAL_StatusTypeDef rtc_driver::set_time(uint8_t hour, uint8_t min, uint8_t sec)
@@ -111,7 +130,7 @@ void rtc_driver::delay_alarm(uint8_t day, uint8_t hour, uint8_t min, uint8_t sec
     set_alarm(alarm_week, alarm_hour, alarm_min, alarm_sec);
 }
 
-bool rtc_driver::hardware_init()
+BaseType_t rtc_driver::hardware_init()
 {  
     rtc_handler_.Instance = RTC;
     rtc_handler_.Init.HourFormat = RTC_HOURFORMAT_24;
@@ -121,9 +140,7 @@ bool rtc_driver::hardware_init()
     rtc_handler_.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
     rtc_handler_.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
     if (HAL_RTC_Init(&rtc_handler_) != HAL_OK)
-    {
-        return false;
-    }
+        return pdFAIL;
 
     if(HAL_RTCEx_BKUPRead(&rtc_handler_, RTC_BKP_DR0) != RTC_SET_FLAGS)
     {
@@ -133,7 +150,7 @@ bool rtc_driver::hardware_init()
         HAL_RTCEx_BKUPWrite(&rtc_handler_, RTC_BKP_DR0, RTC_SET_FLAGS);
     }
     
-    return true;
+    return pdPASS;
 }
 
 bool rtc_driver::update(void)

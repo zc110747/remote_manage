@@ -29,6 +29,18 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
 
+//c interface
+#include <string.h>
+#include <stdio.h>
+#include <stdarg.h>
+    
+//freertos header
+#include "FreeRTOS.h"
+#include "task.h"
+#include "semphr.h"
+#include "message_buffer.h"
+#include "product_config.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 

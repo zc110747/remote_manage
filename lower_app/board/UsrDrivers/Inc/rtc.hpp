@@ -1,11 +1,29 @@
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2023-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//     rtc.hpp
+//
+//  Purpose:
+//     rtc interface driver.
+//
+// Author:
+//      @zc
+//
+//  Assumptions:
+//
+//  Revision History:
+//
+/////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
-#include "main.h"
+#include "includes.hpp"
 
 class rtc_driver
 {
 public:
-    bool init();
+    BaseType_t init();
 
     static rtc_driver* get_instance(){
         static rtc_driver instance_;
@@ -30,7 +48,7 @@ public:
     }
     
 private:
-    bool hardware_init(); 
+    BaseType_t hardware_init(); 
     bool test();
 
 private:

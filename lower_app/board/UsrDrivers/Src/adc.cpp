@@ -1,44 +1,57 @@
-
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2023-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//     adc.cpp
+//
+//  Purpose:
+//     adc driver normal get.
+//
+// Author:
+//      @zc
+//
+//  Assumptions:
+//
+//  Revision History:
+//
+/////////////////////////////////////////////////////////////////////////////
 #include "adc.hpp"
 #include "includes.hpp"
 
-bool adc_driver::init(void)
+BaseType_t adc_driver::init(void)
 {
-    hardware_init();
+    BaseType_t result;
     
-    return true;
+    result = hardware_init();
+    if(result != pdPASS)
+    {
+        printf("adc hardware_init failed\r\n");
+    }
+    
+    return result;
 }
 
-void adc_driver::hardware_init(void)
+BaseType_t adc_driver::hardware_init(void)
 {
-    /* USER CODE BEGIN ADC1_Init 1 */
-
-    /* USER CODE END ADC1_Init 1 */
-
-    /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
-     */
     adc1_hander_.Instance=ADC1;
-    adc1_hander_.Init.ClockPrescaler=ADC_CLOCK_SYNC_PCLK_DIV4;   //4分频，ADCCLK=PCLK2/4=90/4=22.5MHZ
-    adc1_hander_.Init.Resolution=ADC_RESOLUTION_12B;             //12位模式
-    adc1_hander_.Init.DataAlign=ADC_DATAALIGN_RIGHT;             //右对齐
-    adc1_hander_.Init.ScanConvMode=DISABLE;                      //非扫描模式
-    adc1_hander_.Init.EOCSelection=DISABLE;                      //关闭EOC中断
-    adc1_hander_.Init.ContinuousConvMode=DISABLE;                //关闭连续转换
-    adc1_hander_.Init.NbrOfConversion=1;                         //1个转换在规则序列中 也就是只转换规则序列1 
-    adc1_hander_.Init.DiscontinuousConvMode=DISABLE;             //禁止不连续采样模式
-    adc1_hander_.Init.NbrOfDiscConversion=0;                     //不连续采样通道数为0
-    adc1_hander_.Init.ExternalTrigConv=ADC_SOFTWARE_START;       //软件触发
-    adc1_hander_.Init.ExternalTrigConvEdge=ADC_EXTERNALTRIGCONVEDGE_NONE;//使用软件触发
-    adc1_hander_.Init.DMAContinuousRequests=DISABLE;             //关闭DMA请求
-    HAL_ADC_Init(&adc1_hander_);                                 //初始化 
+    adc1_hander_.Init.ClockPrescaler=ADC_CLOCK_SYNC_PCLK_DIV4;   
+    adc1_hander_.Init.Resolution=ADC_RESOLUTION_12B;          
+    adc1_hander_.Init.DataAlign=ADC_DATAALIGN_RIGHT;           
+    adc1_hander_.Init.ScanConvMode=DISABLE;                      
+    adc1_hander_.Init.EOCSelection=DISABLE;                     
+    adc1_hander_.Init.ContinuousConvMode=DISABLE;              
+    adc1_hander_.Init.NbrOfConversion=1;                        
+    adc1_hander_.Init.DiscontinuousConvMode=DISABLE;             
+    adc1_hander_.Init.NbrOfDiscConversion=0;                    
+    adc1_hander_.Init.ExternalTrigConv=ADC_SOFTWARE_START;     
+    adc1_hander_.Init.ExternalTrigConvEdge=ADC_EXTERNALTRIGCONVEDGE_NONE;
+    adc1_hander_.Init.DMAContinuousRequests=DISABLE;             
+
     if (HAL_ADC_Init(&adc1_hander_) != HAL_OK)
-    {
-        Error_Handler();
-    }
+        return pdFAIL;
 
-    /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-     */
-
+    return pdPASS;
 }
 
 uint16_t adc_driver::get_adc_value(uint32_t channel)

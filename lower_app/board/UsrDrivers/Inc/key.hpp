@@ -1,10 +1,24 @@
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2023-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      key.hpp
+//
+//  Purpose:
+//      key driver interface use gpio.
+//
+// Author:
+//      @zc
+//
+//  Assumptions:
+//
+//  Revision History:
+//
+/////////////////////////////////////////////////////////////////////////////
+_Pragma("once");
 
-#pragma once
-
-#include "main.h"
-#include "driver.hpp"
-#include <type_traits>
-#include <atomic>
+#include "includes.hpp"
 
 #define KEY_MAX_INDEX           3
 
@@ -19,45 +33,47 @@ template<uint8_t KeyIndex, typename U = typename std::enable_if<(KeyIndex < 3), 
 class key
 {
 public:
-    void init(void)
+    BaseType_t init(void)
     {
-      /*Configure GPIO pins : PH2 PH3 */
-      GPIO_InitTypeDef GPIO_InitStruct = {0};
+        /*Configure GPIO pins : PH2 PH3 */
+        GPIO_InitTypeDef GPIO_InitStruct = {0};
 
-      GPIO_InitStruct.Pin = GPIO_Pin;
-      GPIO_InitStruct.Mode = GPIO_Mode;
-      GPIO_InitStruct.Pull = GPIO_PULLUP;
-      HAL_GPIO_Init(GPIO_Port, &GPIO_InitStruct);
+        GPIO_InitStruct.Pin = GPIO_Pin;
+        GPIO_InitStruct.Mode = GPIO_Mode;
+        GPIO_InitStruct.Pull = GPIO_PULLUP;
+        HAL_GPIO_Init(GPIO_Port, &GPIO_InitStruct);
+
+        return pdPASS;
     }
     
     void interrupt_init(void)
     {
-       if(KeyIndex == 0)
-       {
-           HAL_NVIC_SetPriority(EXTI3_IRQn, 0, 0);
-           HAL_NVIC_EnableIRQ(EXTI3_IRQn);
-       }
-       else if(KeyIndex == 1)
-       {
-           HAL_NVIC_SetPriority(EXTI2_IRQn, 0, 0);
-           HAL_NVIC_EnableIRQ(EXTI2_IRQn);
-       }
-       else
-       {
-           HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
-           HAL_NVIC_EnableIRQ(EXTI15_10_IRQn); 
-       }
+        if(KeyIndex == 0)
+        {
+            HAL_NVIC_SetPriority(EXTI3_IRQn, 0, 0);
+            HAL_NVIC_EnableIRQ(EXTI3_IRQn);
+        }
+        else if(KeyIndex == 1)
+        {
+            HAL_NVIC_SetPriority(EXTI2_IRQn, 0, 0);
+            HAL_NVIC_EnableIRQ(EXTI2_IRQn);
+        }
+        else
+        {
+            HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+            HAL_NVIC_EnableIRQ(EXTI15_10_IRQn); 
+        }
     }
     
     GPIO_PinState get_value()
     {
-       return HAL_GPIO_ReadPin(GPIO_Port, GPIO_Pin);
+        return HAL_GPIO_ReadPin(GPIO_Port, GPIO_Pin);
     }
 
     static key* get_instance()
     {
-       static key instance_;
-       return &instance_;
+        static key instance_;
+        return &instance_;
     }
 
 public:

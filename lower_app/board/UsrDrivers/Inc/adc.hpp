@@ -1,4 +1,21 @@
-
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2023-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      adc.hpp
+//
+//  Purpose:
+//     adc driver normal get.
+//
+// Author:
+//      @zc
+//
+//  Assumptions:
+//
+//  Revision History:
+//
+/////////////////////////////////////////////////////////////////////////////
 #pragma once
 
 #include "main.h"
@@ -9,7 +26,7 @@
 class adc_driver
 {
 public:
-    bool init(void);
+    BaseType_t init(void);
 
     uint16_t get_adc_value(uint32_t channel);
     uint16_t get_adc_avg(uint32_t channel);
@@ -20,7 +37,7 @@ public:
     }
 
 private:
-    void hardware_init(void);
+    BaseType_t hardware_init(void);
 
     ADC_HandleTypeDef adc1_hander_;
 };

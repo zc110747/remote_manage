@@ -104,7 +104,7 @@ void i2c_monitor::run(void* parameter)
         {
             if(event.id == I2C_EVENT_ID_WRITE)
             {
-                i2c_driver::get_instance()->write_i2c(write_data_.data);
+                i2c_driver::get_instance()->write_i2c(PCF8574_ADDR, write_data_.data);
             }
             else if(event.id == I2C_EVENT_ID_READ)
             {
@@ -113,7 +113,7 @@ void i2c_monitor::run(void* parameter)
                 //if read, dealy 5ms to wait io on.
                 vTaskDelay(5);
                 
-                if(i2c_driver::get_instance()->read_i2c(&io_read) == pdPASS)
+                if(i2c_driver::get_instance()->read_i2c(PCF8574_ADDR, &io_read) == pdPASS)
                 {
                     read_data_.data = io_read;
                     PRINT_LOG(LOG_INFO, xTaskGetTickCount(), "i2c read:0x%x!", io_read);

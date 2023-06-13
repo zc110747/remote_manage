@@ -1,7 +1,30 @@
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2023-by Persional Inc.  
+//  All Rights Reserved
+//
+//  Name:
+//      dac.hpp
+//
+//  Purpose:
+//      dac interface init and set_voltage.
+//
+// Author:
+//      @zc
+//
+//  Assumptions:
+//
+//  Revision History:
+//
+/////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
-#include "main.h"
 #include "includes.hpp"
+
+//reference voltage, uint:mv
+#define DAC_REFERENCE_VOL   3300
+
+//dac max output value
+#define DAC_MAX_VALUE       4096
 
 class dac_driver
 {
@@ -16,7 +39,7 @@ public:
     void set_voltage(uint16_t mv);
 
 private:
-    void hardware_init(); 
+    BaseType_t hardware_init(); 
     BaseType_t test();
 
 private:
