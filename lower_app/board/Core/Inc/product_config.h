@@ -29,4 +29,11 @@
 //default config
 #define DAC_DEFAULT_VOL     1500   //uint:mv
 
+//logger interface
+#define LOGGER_INTERFACE_UART       0
+#define LOGGER_INTERFACE_SWO        1
+#define LOGGER_INTERFACE_NET        2
+
+#define LOGGER_DEFAULT_INTERFACE    LOGGER_INTERFACE_SWO
+
 #endif

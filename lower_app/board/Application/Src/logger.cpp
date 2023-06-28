@@ -195,6 +195,12 @@ void logger_manage::logger_rx_run(void *parameter)
     }
 }
 
+/*
+itm is allow:
+1.swo pin need link with stlink
+2.debug>trace need config
+3.read in View/Serial Windows/Debug View
+*/
 void logger_manage::logger_tx_run(void *parameter)
 {
     LOG_MESSAGE msg;
@@ -204,9 +210,30 @@ void logger_manage::logger_tx_run(void *parameter)
     {
         if (xQueueReceive(tx_queue_, &msg, portMAX_DELAY) == pdPASS)
         {
-            usart_driver::get_instance()->usart1_translate(msg.ptr, msg.length);  
+            if(interface_ == LOGGER_INTERFACE_UART)
+            {    
+                usart_driver::get_instance()->usart1_translate(msg.ptr, msg.length); 
+            }
+            else if(interface_ == LOGGER_INTERFACE_SWO)
+            {          
+                for(int i=0; i<msg.length; i++)
+                {
+                    ITM_SendChar(msg.ptr[i]);
+                }
+            }
+            else
+            {
+                
+            }
             vTaskDelay(1);
         }
     }
 }
 
+extern "C" 
+{   
+    BaseType_t logger_send_data(uint8_t data)
+    {
+        return logger_manage::get_instance()->send_data(data);
+    }
+}
