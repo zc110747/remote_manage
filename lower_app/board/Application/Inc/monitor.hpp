@@ -26,7 +26,7 @@ private:
 
 private:
     TaskHandle_t task_handle_{nullptr};
-    static inline KEY_STATE key_last_[KEY_NUM];
-    static inline KEY_STATE key_now_[KEY_NUM];
-    static inline uint8_t tick[KEY_NUM];
+    static KEY_STATE key_last_[KEY_NUM];
+    static KEY_STATE key_now_[KEY_NUM];
+    static uint8_t tick[KEY_NUM];
 };

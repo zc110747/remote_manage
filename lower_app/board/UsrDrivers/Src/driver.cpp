@@ -31,7 +31,7 @@
 #include "sdmmc.hpp"
 #include "spi.hpp"
 
-std::atomic<bool> is_os_on = false;
+std::atomic<bool> is_os_on{false};
 
 BaseType_t driver_init(void)
 {

@@ -2,6 +2,12 @@
 #include "i2c.hpp"
 #include "logger.hpp"
 
+
+TaskHandle_t i2c_monitor::task_handle_{nullptr};
+QueueHandle_t i2c_monitor::queue_{nullptr};
+io_ex_info i2c_monitor::read_data_{0x00};
+io_ex_info i2c_monitor::write_data_{0xff};
+    
 BaseType_t i2c_monitor::init()
 {
     BaseType_t xReturn;

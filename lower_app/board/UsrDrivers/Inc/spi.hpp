@@ -57,11 +57,12 @@ public:
 public:
     uint8_t read_write_byte(uint8_t data);
     uint16_t read_id(void);
+    void chip_type_update();
 
 private:
     BaseType_t hardware_init(); 
     BaseType_t test();
-    void chip_type_update();
+
 
 private:
     SPI_HandleTypeDef spi_handler_;

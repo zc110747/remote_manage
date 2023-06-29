@@ -32,7 +32,8 @@
 //logger interface
 #define LOGGER_INTERFACE_UART       0
 #define LOGGER_INTERFACE_SWO        1
-#define LOGGER_INTERFACE_NET        2
+#define LOGGER_INTERFACE_RTT        2
+#define LOGGER_INTERFACE_NET        3
 
 #define LOGGER_DEFAULT_INTERFACE    LOGGER_INTERFACE_SWO
 

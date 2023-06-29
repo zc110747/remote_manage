@@ -72,10 +72,11 @@ private:
     static void run(void* parameter);
     
 private:
-    static inline TaskHandle_t task_handle_{nullptr};
+    static TaskHandle_t task_handle_;
     
-    static inline QueueHandle_t queue_{nullptr};
+    static QueueHandle_t queue_;
     
-    static inline io_ex_info read_data_{0x00};
-    static inline io_ex_info write_data_{0xff};
+    static io_ex_info read_data_;
+
+    static  io_ex_info write_data_;
 };

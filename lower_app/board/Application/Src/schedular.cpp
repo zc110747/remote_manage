@@ -2,6 +2,7 @@
 #include "schedular.hpp"
 #include "led.hpp"
 #include "logger.hpp"
+#include "spi.hpp"
 
 bool schedular::init(void)
 {
@@ -37,6 +38,8 @@ void schedular::run(void* parameter)
         vTaskDelay(100);
         
         schedular::get_instance()->wwdg_reload();   
+        
+        spi_driver::get_instance()->chip_type_update();
     }    
 }
 

@@ -78,7 +78,7 @@ private:
     
     static QueueHandle_t rx_queue_;
     
-    static inline uint8_t interface_{LOGGER_DEFAULT_INTERFACE};
+    static uint8_t interface_;
 };
 
 #define PRINT_NOW(...)                   {printf(__VA_ARGS__);}

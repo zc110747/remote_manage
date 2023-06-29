@@ -33,8 +33,8 @@
           <SLE66CMisc></SLE66CMisc>
           <SLE66AMisc></SLE66AMisc>
           <SLE66LinkerMisc></SLE66LinkerMisc>
-          <SFDFile>$$Device:STM32F429IGTx$CMSIS\SVD\STM32F429.svd</SFDFile>
-          <bCustSvd>0</bCustSvd>
+          <SFDFile>C:\Users\Administrator\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.17.0\CMSIS\SVD\STM32F429.SFR</SFDFile>
+          <bCustSvd>1</bCustSvd>
           <UseEnv>0</UseEnv>
           <BinPath></BinPath>
           <IncludePath></IncludePath>
@@ -115,7 +115,7 @@
           <SimDlgDllArguments>-pCM4</SimDlgDllArguments>
           <TargetDllName>SARMCM3.DLL</TargetDllName>
           <TargetDllArguments>-MPU</TargetDllArguments>
-          <TargetDlgDll>TCM.DLL</TargetDlgDll>
+          <TargetDlgDll>TARMSTM.DLL</TargetDlgDll>
           <TargetDlgDllArguments>-pCM4</TargetDlgDllArguments>
         </DllOption>
         <DebugOption>
@@ -329,7 +329,7 @@
             <uGnu>0</uGnu>
             <useXO>0</useXO>
             <v6Lang>3</v6Lang>
-            <v6LangP>9</v6LangP>
+            <v6LangP>7</v6LangP>
             <vShortEn>1</vShortEn>
             <vShortWch>1</vShortWch>
             <v6Lto>0</v6Lto>
@@ -339,7 +339,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F429xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;../UsrDrivers/Inc;../FreeRTOS/include;../FreeRTOS/portable/ARM_CM4F;../Application/Inc;..\ff15\source</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;../UsrDrivers/Inc;../FreeRTOS/include;../FreeRTOS/portable/ARM_CM4F;../Application/Inc;..\ff15\source;..\SEGGER_RTT\RTT;..\SEGGER_RTT\Config</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1134,6 +1134,26 @@
               <FileName>disk_interface.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\ff15\source\disk_interface.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>RTT</GroupName>
+          <Files>
+            <File>
+              <FileName>SEGGER_RTT_ASM_ARMv7M.S</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\SEGGER_RTT\RTT\SEGGER_RTT_ASM_ARMv7M.S</FilePath>
+            </File>
+            <File>
+              <FileName>SEGGER_RTT_printf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\SEGGER_RTT\RTT\SEGGER_RTT_printf.c</FilePath>
+            </File>
+            <File>
+              <FileName>SEGGER_RTT.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\SEGGER_RTT\RTT\SEGGER_RTT.c</FilePath>
             </File>
           </Files>
         </Group>

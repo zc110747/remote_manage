@@ -9,6 +9,10 @@
 #include "i2c_monitor.hpp"
 #include "dac.hpp"
 
+KEY_STATE monitor_manage::key_last_[KEY_NUM];
+KEY_STATE monitor_manage::key_now_[KEY_NUM];
+uint8_t monitor_manage::tick[KEY_NUM];
+
 bool monitor_manage::init()
 {
     BaseType_t xReturned;
@@ -135,7 +139,7 @@ void monitor_manage::timer_loop_motion()
             ptimer->Seconds);
             lcd_driver::get_instance()->lcd_showstring(10, 160, 200, 16, 16, tbuf);
 
-            PRINT_LOG(LOG_INFO, xTaskGetTickCount(), "20%02d-%02d-%02d Wek:%02d %02d:%02d:%02d rng:%d ",
+            PRINT_LOG(LOG_DEBUG, xTaskGetTickCount(), "20%02d-%02d-%02d Wek:%02d %02d:%02d:%02d rng:%d ",
             pdate->Year,
             pdate->Month,
             pdate->Date,

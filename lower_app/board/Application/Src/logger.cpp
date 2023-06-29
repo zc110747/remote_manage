@@ -2,6 +2,7 @@
 #include "logger.hpp"
 #include "application.hpp"
 #include "usart.hpp"
+#include "SEGGER_RTT.h"
 
 /// \brief memoryBuffer
 /// - memory buffer cache
@@ -10,6 +11,7 @@ std::atomic<bool> logger_manage::thread_work_ = {false};
 
 QueueHandle_t logger_manage::tx_queue_ = nullptr;
 QueueHandle_t logger_manage::rx_queue_ = nullptr;
+uint8_t logger_manage::interface_{LOGGER_DEFAULT_INTERFACE};
 
 bool logger_manage::init()
 {
@@ -171,15 +173,16 @@ BaseType_t logger_manage::send_data(uint8_t data)
     return xReturn;
 }
 
+volatile int32_t ITM_RxBuffer = ITM_RXBUFFER_EMPTY;
 void logger_manage::logger_rx_run(void *parameter)
 {
     uint8_t data;
-    uint8_t buffer[256];
+    uint8_t buffer[256] = {0};
     uint8_t index = 0;
     
     while(1)
     {
-        if (xQueueReceive(rx_queue_, &data, portMAX_DELAY) == pdPASS)
+        if (xQueueReceive(rx_queue_, &data, 5) == pdPASS)
         {
             if(data != '\n')
             {
@@ -190,6 +193,25 @@ void logger_manage::logger_rx_run(void *parameter)
                 buffer[index] = '\0';
                 PRINT_LOG(LOG_INFO, xTaskGetTickCount(), "%s", buffer);
                 index = 0;
+            }
+        }
+        else
+        {
+            while(ITM_CheckChar() == 1)
+            {
+                data = ITM_ReceiveChar();
+                buffer[index++] = data;
+                if(data != '\n' && data != '\r')
+                {
+                    ITM_SendChar(data);
+                }
+                else
+                {
+                    buffer[index] = '\0';
+                    PRINT_LOG(LOG_INFO, xTaskGetTickCount(), "%s", buffer);
+                    index = 0;
+                    break;
+                }
             }
         }
     }
@@ -220,6 +242,10 @@ void logger_manage::logger_tx_run(void *parameter)
                 {
                     ITM_SendChar(msg.ptr[i]);
                 }
+            }
+            else if(interface_ == LOGGER_INTERFACE_RTT)
+            {
+                SEGGER_RTT_Write(0, msg.ptr, msg.length); 
             }
             else
             {
