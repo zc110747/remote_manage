@@ -18,10 +18,8 @@
 /////////////////////////////////////////////////////////////////////////////
 #include "driver.hpp"
 #include "sdram.hpp"
-#include "led.hpp"
 #include "lcd.hpp"
 #include "usart.hpp"
-#include "key.hpp"
 #include "adc.hpp"
 #include "rng.hpp"
 #include "tpad.hpp"
@@ -53,7 +51,7 @@ BaseType_t driver_init(void)
     
     //led init
     //all io clock init in this function, so need the first execute.
-    result &= led_driver::get_instance()->init();
+    result &= led_init();
 
     //sdram init
     result &= sdram_driver::get_instance()->init();
@@ -64,10 +62,8 @@ BaseType_t driver_init(void)
     //adc init
     result &= adc_driver::get_instance()->init();
 
-    //key0 init
-    result &= KEY0::get_instance()->init();
-    result &= KEY1::get_instance()->init();
-    result &= KEY2::get_instance()->init();
+    //key init
+    result &= key_init();
 
     //rng
     result &= rng_driver::get_instance()->init();

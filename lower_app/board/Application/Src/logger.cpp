@@ -182,7 +182,7 @@ void logger_manage::logger_rx_run(void *parameter)
     
     while(1)
     {
-        if (xQueueReceive(rx_queue_, &data, 5) == pdPASS)
+        if (xQueueReceive(rx_queue_, &data, 5 ) == pdPASS)
         {
             if(data != '\n')
             {

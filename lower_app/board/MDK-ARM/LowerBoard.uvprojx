@@ -956,11 +956,6 @@
               <FilePath>..\UsrDrivers\Src\driver.cpp</FilePath>
             </File>
             <File>
-              <FileName>led.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\UsrDrivers\Src\led.cpp</FilePath>
-            </File>
-            <File>
               <FileName>lcd.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\UsrDrivers\Src\lcd.cpp</FilePath>
@@ -969,11 +964,6 @@
               <FileName>usart.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\UsrDrivers\Src\usart.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>key.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\UsrDrivers\Src\key.cpp</FilePath>
             </File>
             <File>
               <FileName>adc.cpp</FileName>
@@ -1019,6 +1009,16 @@
               <FileName>interface.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\UsrDrivers\Src\interface.c</FilePath>
+            </File>
+            <File>
+              <FileName>led.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\UsrDrivers\Src\led.c</FilePath>
+            </File>
+            <File>
+              <FileName>key.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\UsrDrivers\Src\key.c</FilePath>
             </File>
           </Files>
         </Group>

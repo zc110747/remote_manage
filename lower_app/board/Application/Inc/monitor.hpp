@@ -1,7 +1,6 @@
 #pragma once
 
-#include "includes.hpp"
-#include "key.hpp"
+#include "driver.hpp"
 
 #define KEY_NUM     5
 

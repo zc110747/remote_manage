@@ -89,9 +89,9 @@ std::function<void()> key_func_list[] = {
 
 void monitor_manage::key_motion()
 {
-    key_now_[0] = monitor_manage::get_instance()->anti_shake(&tick[0], key_now_[0], KEY0::get_instance()->get_value());
-    key_now_[1] = monitor_manage::get_instance()->anti_shake(&tick[1], key_now_[1], KEY1::get_instance()->get_value());
-    key_now_[2] = monitor_manage::get_instance()->anti_shake(&tick[2], key_now_[2], KEY2::get_instance()->get_value());
+    key_now_[0] = monitor_manage::get_instance()->anti_shake(&tick[0], key_now_[0], key_get_value(0));
+    key_now_[1] = monitor_manage::get_instance()->anti_shake(&tick[1], key_now_[1], key_get_value(1));
+    key_now_[2] = monitor_manage::get_instance()->anti_shake(&tick[2], key_now_[2], key_get_value(2));
     key_now_[3] = monitor_manage::get_instance()->anti_shake(&tick[3], key_now_[3], tpad_driver::get_instance()->scan_key()==1?KEY_ON:KEY_OFF);
     key_now_[4] = monitor_manage::get_instance()->anti_shake(&tick[4], key_now_[4], i2c_monitor::get_instance()->get_read_io()->u.exio==0?KEY_ON:KEY_OFF);
     
