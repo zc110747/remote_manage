@@ -99,7 +99,7 @@ elif [[ "${supportedPlatforms[1]}" == "$FIRMWARE_CURRENT_PLATFORMS" ]]; then
 
 else
 
-    echo "error platform $FIRMWARE_CURRENT_PLATFORMS not exist in list of support"
+    echo "${redText}error platform $FIRMWARE_CURRENT_PLATFORMS not exist in list of support${defText}"
 
 fi
 
