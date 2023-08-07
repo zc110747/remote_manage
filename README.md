@@ -5,17 +5,23 @@
 ![image](document/image/firmware.jpg)
 
 ## 如何编译执行项目
-1.将项目下载到指定的目录  
+1.将项目下载到指定的目录(PC平台，使用WSL和Ubuntu验证)
 (1)在wsl中编译该项目，下载或者解压到window下d:/user_project/git/中.<br/>
 (2)在linux中编译该项目，下载或者解压到/home/center/application/git/中.<br/>
-(3)使用自定义目录，需要修改项目下environment/.bashrc, 将export ENV_PATH_ROOT修改到项目下载目录.<br/>
+(3)使用自定义目录，需要修改项目下environment/.bashrc, 将ENV_PATH_ROOT修改到项目下载目录(在.bashrc文件起始).<br/>
+```bash
+#修改ENV_PATH_ROOT为本项目下载的目录
+export ENV_PATH_ROOT="/home/center/application/git/remote_manage/"
+if [ ! -d "$ENV_PATH_ROOT" ]; then 
+    export ENV_PATH_ROOT="/mnt/d/user_project/git/remote_manage"
+fi
+```
 2.将environment/.bashrc复制到系统根目录, 如我的用户名为freedom, 执行命令如下(此处利用linux在启动时会自动执行根目录下的.bashrc, 来加载编译环境和命令).<br/>
 ```bash
 cp environment/.bashrc /home/freedom/
 ```
 然后重新Ctrl+ALT+T打开新窗口，如果显示如下，表示脚本加载成功.<br/>
-```
-
+```c
 Loading CDE Plugin...
 -------------------------------------------------------------------------
 Load Plugin Success!
@@ -31,7 +37,11 @@ Update the Alias Command...
 Update the Alias Command Success!
 -------------------------------------------------------------------------
 ```
-3.使用命令进行编译和上传firmware.<br/>
+备注:<br />
+Current Platform is Embed-Linux表示的是编译后的固件执行平台，分别代表使用g++和arm-linux-gnueabihf-g++编译.<br />
+Remote IPAdress指示用于通过ssh上传编译好固件的地址.<br />
+3.在使用该平台前，需要搭建好支持uboot，kernal，rootfs编译的嵌入式Linux系统，并构建平台运行执行的环境(包含设备树，node执行环境)，后续会用网盘分享我个人编译好的一套系统，如果自己希望构建，参考document/linux summy notes/3.嵌入式Linux编译.md.<br />
+4.对于以构建好能够执行的嵌入式Linux平台(阿尔法开发板为例)，使用如下命令可进行编译和上传文件包.<br/>
 ```bash
 SysBulidApplication
 SysPushFirmware

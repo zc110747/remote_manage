@@ -85,7 +85,12 @@ function SysBuildApplication()
 	cd $ENV_PATH_LOWER_APP_MANAGE
 	make -j4
 	cd $ENV_PATH_ROOT
-	cp lower_app/Executables/app_demo package/
+	if [ -f lower_app/Executables/app_demo ]; then
+		cp lower_app/Executables/app_demo package/
+	else
+		echo "${redText}Application compiler failed, please check the logs for more information!${defText}"
+		return
+	fi
 
 	#打包服务器程序(包含node的后台和前端页面),拷贝到输出目录
 	cd lower_app/
