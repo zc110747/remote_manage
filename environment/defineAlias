@@ -32,7 +32,7 @@ alias cdls="cd $ENV_PATH_LOWER_APP_SERVER"
 function SysBuildApplication()
 {
 	echo frimware path:$ENV_PATH_ROOT
-	echo kernal dir:$ENV_KERNEL_DIR
+	echo kernal dir:$ENV_KERNEL_DIR 
 
 	#asio库以压缩包形式进行上传,首次使用需要解压
 	if [ ! -d "$ENV_PATH_LOWER_APP_MANAGE/lib/asio" ]; then
@@ -213,22 +213,22 @@ alias SysSetApplicationVer='SysSetApplicationVer'
 #编译linux内核
 #对于内核目录，需要提前构建好配置定义，此命令仅进行编译
 #因为最新的gcc编译会无法执行，所以指定了$KERNAL_CC对应的编译器
-function SysBuildKernal
+function SysBuildKernel
 {
 	if [ -d $ENV_KERNEL_DIR ]; then
 		cd $ENV_KERNEL_DIR
 		make V=1 ARCH=arm CROSS_COMPILE=$KERNAL_CC all -j4
 
-		cp -avf $ENV_KERNAL_ZIMAGE $TFTP_PATH/
-		cp -avf $ENV_KERNAL_DTB $TFTP_PATH/
+		cp -avf $ENV_KERNEL_ZIMAGE $TFTP_PATH/
+		cp -avf $ENV_KERNEL_DTB $TFTP_PATH/
 	else
 		echo "Kernal Directory:$ENV_KERNEL_DIR not exist!"
 	fi
 }
-alias SysBuildKernal='SysBuildKernal'
+alias SysBuildKernel='SysBuildKernel'
 
 #清除内核编译
-function SysCleanKernal
+function SysCleanKernel
 {
 	if [ -d $ENV_KERNEL_DIR ]; then
 		cd $ENV_KERNEL_DIR
@@ -238,7 +238,7 @@ function SysCleanKernal
 		echo "Kernal Directory:$ENV_KERNEL_DIR not exist!"
 	fi
 }
-alias SysCleanKernal='SysCleanKernal'
+alias SysCleanKernel='SysCleanKernel'
 
 #编译uboot
 #对于uboot目录，需要提前构建好配置定义，此命令仅进行编译
@@ -273,13 +273,16 @@ alias SysCleanUboot='SysCleanUboot'
 function SysBuildRootfs
 {
 	if [ -d $ENV_ROOTFS_DIR ]; then
-		cd $ENV_ROOTFS_DIR/busybox
+		cd $ENV_ROOTFS_DIR
 		make&&make install
 
 		cp -ravf $ENV_ROOTFS_DIR/_install/* $NFS_PATH/
+		
+		echo "copy c++ library"
 		cd $GCC_LIB/lib
-
 		cp -ravf *so* *.a $NFS_PATH/lib/
+
+		echo "copy c library"
 		cd $GCC_LIB/libc/lib
 		cp -ravf *so* *.a $NFS_PATH/lib/
 	else
@@ -303,7 +306,7 @@ alias SysCleanRootfs='SysCleanRootfs'
 #打包内核 firmware包，文件系统到$DST_PATH，对于新的工程环境，命令执行流程
 #SysCleanUboot
 #SysBuildUboot
-#SysCleanKernal
+#SysCleanKernel
 #SysCleanRootfs
 #SysBuildRootfs
 #SysSetApplicationVer [version]
@@ -321,7 +324,7 @@ function SysPackageFirmware
 		cp -rvf * $DST_PATH/
 		
 		cd $DST_PATH/
-		mv u-boot.imx $ENV_KERNAL_BIN
+		mv u-boot.imx $ENV_KERNAL_UBOOT
 	fi
 
 	if [ -d $NFS_PATH ]; then
@@ -341,7 +344,7 @@ function SysHelpCommand
 {
 	echo "${blueText}SysBuildApplication${defText}"
 	echo "    ${limityellowText}Build Application, Package Firmware."
-	echo "${blueText}SysBuildKernal${defText}"
+	echo "${blueText}SysBuildKernel${defText}"
 	echo "    ${limityellowText}Build the Kernal, if exist kernal directory."
 	echo "${blueText}SysSetPlatformEmbedLinux${defText}"
 	echo "    ${limityellowText}Set Current Platform to Embed-Linux Complier."
@@ -359,9 +362,9 @@ function SysHelpCommand
 	echo "    ${limityellowText}Push firmware to remote embed-linux device."
 	echo "${blueText}SysCleanApplication${defText}"
 	echo "    ${limityellowText}Clean the app firmware for next."
-	echo "${blueText}SysBuildKernal${defText}"
-	echo "    ${limityellowText}Build the linux kernal, copy to tftp directory, if failed, execute SysCleanKernal first."
-	echo "${blueText}SysCleanKernal${defText}"
+	echo "${blueText}SysBuildKernel${defText}"
+	echo "    ${limityellowText}Build the linux kernal, copy to tftp directory, if failed, execute SysCleanKernel first."
+	echo "${blueText}SysCleanKernel${defText}"
 	echo "    ${limityellowText}Clean the kernal compiler data for next."
 	echo "${blueText}SysBuildUboot${defText}"
 	echo "    ${limityellowText}Build the uboot, copy to tftp directory, if failed, execute SysCleanUboot first."
