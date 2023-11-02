@@ -5,55 +5,53 @@
 ![image](document/image/firmware.jpg)
 
 ## 如何编译执行项目
-### 第一步:将项目下载到指定的目录
-
-1. 在wsl中编译该项目，下载或者解压到window下d:/user_project/git/中.<br/>
-2. 在linux中编译该项目，下载或者解压到/home/center/application/git/中.<br/>
-3. 使用自定义目录，需要修改文件**environment/.bashrc**, 将ENV_PATH_ROOT的值[usr_dir]替换成实际下载目录.<br/>
-
+1.将项目下载到指定的目录(PC平台，使用WSL和Ubuntu验证)
+(1)在wsl中编译该项目，下载或者解压到window下d:/user_project/git/中.<br/>
+(2)在linux中编译该项目，下载或者解压到/home/center/application/git/中.<br/>
+(3)使用自定义目录，需要修改项目下environment/.bashrc, 将ENV_PATH_ROOT修改到项目下载目录(在.bashrc文件起始).<br/>
 ```bash
-#environment/.bashrc line 18, 
-export ENV_PATH_ROOT="[usr_dir]"
+#修改ENV_PATH_ROOT为本项目下载的目录
+export ENV_PATH_ROOT="/home/center/application/git/remote_manage/"
 if [ ! -d "$ENV_PATH_ROOT" ]; then 
-    export ENV_PATH_ROOT="/home/center/application/git/remote_manage/"
-    if [ ! -d "$ENV_PATH_ROOT" ]; then 
-        export ENV_PATH_ROOT="/mnt/d/user_project/git/remote_manage"
-    fi
+    export ENV_PATH_ROOT="/mnt/d/user_project/git/remote_manage"
 fi
 ```
-
-###  第二步:将bashrc导入到系统目录
-将environment/.bashrc复制到系统根目录, 如我的用户名为freedom, 执行命令如下，此处利用linux非root权限启动时会自动执行根目录下的.bashrc, 来加载编译环境和命令.<br/>
+2.将environment/.bashrc复制到系统根目录, 如我的用户名为freedom, 执行命令如下(此处利用linux在启动时会自动执行根目录下的.bashrc, 来加载编译环境和命令).<br/>
 ```bash
 cp environment/.bashrc /home/freedom/
 ```
-在linux环境执行linuxCtrl+ALT+T, WSL环境下输入bash，打开新窗口，如果显示如下，表示脚本加载成功.<br/>
-```bash
+然后重新Ctrl+ALT+T打开新窗口，如果显示如下，表示脚本加载成功.<br/>
+```c
 Loading CDE Plugin...
 -------------------------------------------------------------------------
 Load Plugin Success!
+Can use command 'SysHelpCommand' for more helps.
 Update the Plugin by filepath /home/[root]/.bashrc.
 Root Path:/mnt/d/user_project/git/remote_manage
 Load the Env Data...
 Update Environment Data Success!
 Can use command 'SysHelpCommand' for more helps.
 Current Platform is Embed-Linux, Remote IPAdress is 192.168.1.24.
-Current Firmware Version is 1.0.0.7.
+Current Firmware Version is 1.0.0.9.
 Update the Alias Command...
 Update the Alias Command Success!
 -------------------------------------------------------------------------
 ```
-
-### 第三步:使用命令进行编译和上传firmware
+备注:<br />
+Current Platform is Embed-Linux表示的是编译后的固件执行平台，分别代表使用g++和arm-linux-gnueabihf-g++编译.<br />
+Remote IPAdress指示用于通过ssh上传编译好固件的地址.<br />
+3.在使用该平台前，需要搭建好支持uboot，kernal，rootfs编译的嵌入式Linux系统，并构建平台运行执行的环境(包含设备树，node执行环境)，后续会用网盘分享我个人编译好的一套系统，如果自己希望构建，参考document/linux summy notes/3.嵌入式Linux编译.md.<br />
+4.对于以构建好能够执行的嵌入式Linux平台(阿尔法开发板为例)，使用如下命令可进行编译和上传文件包.<br/>
 ```bash
 SysBulidApplication
 SysPushFirmware
 ```
-即可完成项目的编译和上传的支持ssh的远端服务器平台，另外可通过SysHelpCommand查询支持的命令, 另外本项目的应用也可以在Linux平台执行，因此通过命令**SysSetPlatformEmbedLinux**和**SysSetPlatformLinux**实现编译平台的切换，目前支持命令如下所示.<br/>
-```bash
+即可完成项目的编译。<br/>
+另外可通过SysHelpCommand查询支持的命令, SysSetPlatformEmbedLinux和SysSetPlatformLinux切换编译不同平台的应用文件，目前支持命令如下所示.<br/>
+```
 SysBuildApplication
     Build Application, Package Firmware.
-SysBuildKernal
+SysBuildKernel
     Build the Kernal, if exist kernal directory.
 SysSetPlatformEmbedLinux
     Set Current Platform to Embed-Linux Complier.
@@ -71,9 +69,9 @@ SysPushApplication
     Push firmware to remote embed-linux device.
 SysCleanApplication
     Clean the app firmware for next.
-SysBuildKernal
-    Build the linux kernal, copy to tftp directory, if failed, execute SysCleanKernal first.
-SysCleanKernal
+SysBuildKernel
+    Build the linux kernal, copy to tftp directory, if failed, execute SysCleanKernel first.
+SysCleanKernel
     Clean the kernal compiler data for next.
 SysBuildUboot
     Build the uboot, copy to tftp directory, if failed, execute SysCleanUboot first.
@@ -88,11 +86,12 @@ SysPackageFirmware
 SysHelpCommand
     Show the help command.
 ```
-如果编译报错，可参考**document/构建Linux编译环境.md**目录下说明.<br/>
-1. 上述命令支持需要在指定的目录里仿真对应的文件，如果不存在会打印对应的目录，需要将对应的文件放置在指定目录中。<br/>
-2. 如果编译失败，大概率是g++版本过低，更新arm-linux-gnueabihf-g++版本，目前测试通过使用的是7.5.0版本.<br/>
-3. 在编译完成后，通过ssh将打包后文件传送到嵌入式平台，并上传到/tmp目录下，执行SysPushFirmware命令即可实现Code更新.<br/>
-4. 嵌入式linux平台需要支持node服务器，可参考server/README.md构建，另外需要支持环回接口即127.0.0.1本地连接, 需要rcS文件添加如下端口.<br/>
+如果编译报错，可参考*document/构建Linux编译环境.md*目录下说明.<br/>
+1.上述命令支持需要在指定的目录里仿真对应的文件，如果不存在会打印对应的目录，需要将对应的文件放置在指定目录中。<br/>
+2.如果编译失败，应该是g++版本过低，中说明如何更新arm-linux-gnueabihf-g++版本，目前测试通过使用的是7.5.0版本.<br/>
+3.在编译完成后，通过ssh将打包后文件传送到嵌入式平台，并上传到/tmp目录下，执行SysPushFirmware命令即可实现Code更新.<br/>
+4.嵌入式linux平台需要支持node服务器，可参考server/README.md构建，另外需要支持环回接口即127.0.0.1本地连接, 需要rcS文件添加如下端口.<br/>
+
 ```bash
 ifconfig lo up
 ifconfig lo netmask 255.255.255.0
@@ -142,21 +141,19 @@ PC应用端设计<br/>
 ## 硬件适配和兼容性
 
 整个项目由上位机(windows平台和web平台), 主控设备(嵌入式linux平台)和其它设备平台(STM32单片机)组成.<br/>
-1. 主控设备基于正点原子阿尔法开发板实现，使用imx6ull内核.<br/>
-2. windows平台主要提供对于开发板的远程管理，基于QT设计，用于本地的软件访问和管理.<br/>
-3. web平台基于vue开发，主要用于本地的web访问和管理.<br/>
-4. 其它设备平台基于STM32单片机设计.<br/>
+1.主控设备基于正点原子阿尔法开发板实现，使用imx6ull内核.<br/>
+2.windows平台主要提供对于开发板的远程管理，基于QT设计，用于本地的软件访问和管理.<br/>
+3.web平台基于vue开发，主要用于本地的web访问和管理.<br/>
+4.其它设备平台基于STM32单片机设计.<br/>
 
 ## 编译环境
 
 嵌入式软件交叉编译工具<br/>
-1. 内核模块使用编译工具 - arm-linux-gnueabihf-gcc<br/>
-2. manage，gui编译工具 - arm-linux-gnueabihf-g++<br/>
-3. server使用node作为运行环境<br/>
-4. 网页使用vue方案<br/>
-
+&emsp;&emsp;内核模块使用编译工具 - arm-linux-gnueabihf-gcc<br/>
+&emsp;&emsp;manage，gui编译工具 - arm-linux-gnueabihf-g++<br/>
+&emsp;&emsp;server使用node作为运行环境<br/>
+&emsp;&emsp;网页使用vue方案<br/>
 上位机编译工具<br/>
-1. QT(the newest stable version)<br/>
-
+&emsp;&emsp;QT(the newest stable version)<br/>
 logger显示工具<br/>
-1. visual studio(the newest stable version)<br/>
+&emsp;&emsp;visual studio(the newest stable version)<br/>

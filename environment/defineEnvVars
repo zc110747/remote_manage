@@ -19,8 +19,9 @@ export PROGRAM_BUILD=$PROGRAM_PATH/build
 export OLD_GCC_PATH=$PROGRAM_SUPPORT/old_compiler/bin/
 export KERNAL_CC=$OLD_GCC_PATH/arm-linux-gnueabihf-
 export NEW_GCC_PATH=$PROGRAM_SUPPORT/compiler/bin/
+export NEW_KERNAL_CC=$NEW_GCC_PATH/arm-none-linux-gnueabihf-
 export GCC_LIB=$PROGRAM_SUPPORT/compiler/arm-none-linux-gnueabihf
-export PATH=$PATH:$NEW_GCC_PATH
+export PATH=$PATH:$NEW_GCC_PATH:$OLD_GCC_PATH
 
 #uboot infos
 export ENV_BOOT_DIR=$PROGRAM_SUPPORT/uboot

@@ -242,12 +242,12 @@ alias SysCleanKernel='SysCleanKernel'
 
 #编译uboot
 #对于uboot目录，需要提前构建好配置定义，此命令仅进行编译
-#因为最新的gcc编译会无法执行，所以指定了$KERNAL_CC对应的编译器
 function SysBuildUboot
 {
 	if [ -d $ENV_BOOT_DIR ]; then
 		cd $ENV_BOOT_DIR
-		make V=1 ARCH=arm CROSS_COMPILE=$KERNAL_CC all -j4
+		echo "compiler:$NEW_KERNAL_CC"
+		make V=1 ARCH=arm CROSS_COMPILE=$NEW_KERNAL_CC all -j4
 		cp -avf u-boot-dtb.imx $TFTP_PATH/
 	else
 		echo "uboot directory:$ENV_BOOT_DIR not exist!"
@@ -261,7 +261,7 @@ function SysCleanUboot
 	if [ -d $ENV_BOOT_DIR ]; then
 		cd $ENV_BOOT_DIR
 		make distclean
-		make ARCH=arm CROSS_COMPILE=$KERNAL_CC mx6ull_14x14_evk_emmc_defconfig
+		make ARCH=arm CROSS_COMPILE=$NEW_KERNAL_CC mx6ull_14x14_evk_emmc_defconfig
 	else
 		echo "uboot directory:$ENV_BOOT_DIR not exist!"
 	fi
@@ -324,7 +324,7 @@ function SysPackageFirmware
 		cp -rvf * $DST_PATH/
 		
 		cd $DST_PATH/
-		mv u-boot.imx $ENV_KERNAL_UBOOT
+		mv u-boot-dtb.imx $ENV_KERNAL_UBOOT
 	fi
 
 	if [ -d $NFS_PATH ]; then
