@@ -4,24 +4,18 @@
 
 ![image](document/image/firmware.jpg)
 
-## 如何编译执行项目
-1.将项目下载到指定的目录(PC平台，使用WSL和Ubuntu验证)
-(1)在wsl中编译该项目，下载或者解压到window下d:/user_project/git/中.<br/>
-(2)在linux中编译该项目，下载或者解压到/home/center/application/git/中.<br/>
-(3)使用自定义目录，需要修改项目下environment/.bashrc, 将ENV_PATH_ROOT修改到项目下载目录(在.bashrc文件起始).<br/>
+## 快速启动项目
+下载项目后到本地后，执行预处理脚本构建完整的应用平台。
 ```bash
-#修改ENV_PATH_ROOT为本项目下载的目录
-export ENV_PATH_ROOT="/home/center/application/git/remote_manage/"
-if [ ! -d "$ENV_PATH_ROOT" ]; then 
-    export ENV_PATH_ROOT="/mnt/d/user_project/git/remote_manage"
-fi
+#下载项目，进入目录
+git clone https://github.com/zc110747/remote_manage.git
+cd remote_mange/
+
+#预处理构建环境
+./preBuildEnvironment.sh
 ```
-2.将environment/.bashrc复制到系统根目录, 如我的用户名为freedom, 执行命令如下(此处利用linux在启动时会自动执行根目录下的.bashrc, 来加载编译环境和命令).<br/>
+重新开启命令行，如果加载如下所示，表示已经成功安装，项目需要在非root权限下执行，root权限无法加载。
 ```bash
-cp environment/.bashrc /home/freedom/
-```
-然后重新Ctrl+ALT+T打开新窗口，如果显示如下，表示脚本加载成功.<br/>
-```c
 Loading CDE Plugin...
 -------------------------------------------------------------------------
 Load Plugin Success!
@@ -36,6 +30,9 @@ Current Firmware Version is 1.0.0.9.
 Update the Alias Command...
 Update the Alias Command Success!
 -------------------------------------------------------------------------
+
+#进入当前项目目录
+cda 
 ```
 备注:<br />
 Current Platform is Embed-Linux表示的是编译后的固件执行平台，分别代表使用g++和arm-linux-gnueabihf-g++编译.<br />
@@ -48,7 +45,7 @@ SysPushFirmware
 ```
 即可完成项目的编译。<br/>
 另外可通过SysHelpCommand查询支持的命令, SysSetPlatformEmbedLinux和SysSetPlatformLinux切换编译不同平台的应用文件，目前支持命令如下所示.<br/>
-```
+```bash
 SysBuildApplication
     Build Application, Package Firmware.
 SysBuildKernel
@@ -109,7 +106,7 @@ lower_app/          嵌入式Linux设备应用实现<br/>
 &emsp;&emsp;gui/            嵌入式图形界面开发<br/>
 &emsp;&emsp;server/         web服务器和web网页<br/>
 package/            生成应用的打包文件<br/>
-support/            用于支持应用执行的lib库或者环境<br/>
+thirdparts/         支持平台运行的库，程序等<br/>
 package/            编译完成后的打包目录<br/>
 upper_app/          PC客户端应用实现<br/>
 &emsp;&emsp;manage_tool/         用于访问嵌入式设备的桌面客户端(暂定QT)<br/>

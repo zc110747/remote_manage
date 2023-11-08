@@ -10,17 +10,22 @@ echo "Load the Env Data..."
 # This section defines the internal 
 # Not need Change unless program change.
 #-------------------------------------------------------------------------------
+export CPU_CORE=2
+
 export PROGRAM_PATH=/home/program
 export PROGRAM_SUPPORT=$PROGRAM_PATH/support
 export PROGRAM_BUILD=$PROGRAM_PATH/build
+export PROGRAM_APPLICATION=$PROGRAM_PATH/application
 
 #GCC compile path info
 #support old gcc to build kernel(version low, update linux kernel next)
 export OLD_GCC_PATH=$PROGRAM_SUPPORT/old_compiler/bin/
-export KERNAL_CC=$OLD_GCC_PATH/arm-linux-gnueabihf-
+export KERNEL_CC=$OLD_GCC_PATH/arm-linux-gnueabihf-
 export NEW_GCC_PATH=$PROGRAM_SUPPORT/compiler/bin/
-export NEW_KERNAL_CC=$NEW_GCC_PATH/arm-none-linux-gnueabihf-
+export NEW_KERNEL_CC=$NEW_GCC_PATH/arm-none-linux-gnueabihf-
 export GCC_LIB=$PROGRAM_SUPPORT/compiler/arm-none-linux-gnueabihf
+
+#Add directory to PATH
 export PATH=$PATH:$NEW_GCC_PATH:$OLD_GCC_PATH
 
 #uboot infos
@@ -38,9 +43,8 @@ export ENV_ROOTFS_DIR=$PROGRAM_SUPPORT/rootfs_busybox
 #build output info
 export TFTP_PATH=$PROGRAM_BUILD/tftp_root
 export NFS_PATH=$PROGRAM_BUILD/nfs_root
-export NFS_RUN_PATH="$NFS_PATH/manage/bin"
+export NFS_RUN_PATH="$NFS_PATH/build"
 export DST_PATH="/home/freedom/Desktop/Firmware"
-
 export ENV_CONFIG_FILE="$ENV_PATH_ENVIRONMENT/EnvConfig.mk"
 
 #-------------------------------------------------------------------------------
@@ -93,23 +97,17 @@ declare -a supportedPlatforms=($FIRMWARE_SUPPORT_PLATFORMS)
 # Only Change if need.
 #-------------------------------------------------------------------------------
 if [[ "${supportedPlatforms[0]}" == "$FIRMWARE_CURRENT_PLATFORMS" ]]; then
-
     #Linux
     export APP_C_COMPILE=gcc
     export APP_CC_COMPILE=g++
-    export APP_LIB_APPLICATION=x86-
 
 elif [[ "${supportedPlatforms[1]}" == "$FIRMWARE_CURRENT_PLATFORMS" ]]; then
-
     #Embed-Linux
     export APP_C_COMPILE=arm-none-linux-gnueabihf-gcc
     export APP_CC_COMPILE=arm-none-linux-gnueabihf-g++
-    export APP_LIB_APPLICATION=arm-
 
 else
-
     echo "${redText}error platform $FIRMWARE_CURRENT_PLATFORMS not exist in list of support${defText}"
-
 fi
 
 #-------------------------------------------------------------------------------
@@ -122,6 +120,13 @@ export ENV_PATH_LOWER_APP_SERVER="$ENV_PATH_LOWER_APP/server"
 export ENV_PATH_UPPER_APP="$ENV_PATH_ROOT/upper_app"
 export ENV_PATH_PACKAGE="$ENV_PATH_ROOT/package"
 export ENV_PATH_KERNAL_MOD="$ENV_PATH_ROOT/kernal_mod"
+
+export ENV_BUILD=$PROGRAM_APPLICATION/build
+export ENV_BUILD_FIRMWARE=$ENV_BUILD/firmware
+export ENV_BUILD_SUPPORT=$ENV_BUILD/support
+export ENV_BUILD_BIN=$ENV_BUILD_FIRMWARE/bin
+export ENV_BUILD_DRIVER=$ENV_BUILD_FIRMWARE/driver
+export PACKAGE_FILE=remote_manage_v$FMWARE_VESRION.tar.bz2 
 
 #-------------------------------------------------------------------------------
 # Env Vars define finish shows

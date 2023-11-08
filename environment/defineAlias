@@ -14,14 +14,13 @@ alias ll="ls -alF"
 alias pe="printenv"
 alias se="saveenv"
 
-alias cdr="cd $ENV_PATH_ROOT"
+alias cda="cd $ENV_PATH_ROOT"
 alias cdk="cd $ENV_KERNEL_DIR"
 alias cdu="cd $ENV_BOOT_DIR"
 alias cdf="cd $ENV_ROOTFS_DIR"
-alias cdl="cd $ENV_PATH_LOWER_APP"
 alias cdn="cd $NFS_PATH"
-alias cdlm="cd $ENV_PATH_LOWER_APP_MANAGE"
-alias cdls="cd $ENV_PATH_LOWER_APP_SERVER"
+alias cdb="cd $ENV_BUILD"
+alias cdf="cd $ENV_BUILD_FIRMWARE"
 
 #-------------------------------------------------------------------------------
 # This section defines the function for program management.
@@ -29,6 +28,63 @@ alias cdls="cd $ENV_PATH_LOWER_APP_SERVER"
 #-------------------------------------------------------------------------------
 # 编译项目下应用，包含驱动，下位机的主控，服务器程序，打包成firmware
 # 同时复制到nfs路径下，用于驱动板远程访问
+function build_driver_module()
+{
+	cd $ENV_PATH_ROOT
+	if [ -f "$ENV_KERNEL_DIR/.config" ]; then
+		echo "start bulid kernal driver"
+		cd $ENV_PATH_KERNAL_MOD/led/
+		make ARCH=arm CROSS_COMPILE=$KERNEL_CC
+		mv kernal_led.ko $ENV_BUILD_DRIVER
+		make clean
+
+		cd $ENV_PATH_KERNAL_MOD/beep/
+		make ARCH=arm CROSS_COMPILE=$KERNEL_CC
+		mv kernal_beep.ko $ENV_BUILD_DRIVER
+		make clean
+
+		cd $ENV_PATH_KERNAL_MOD/i2c_ap/
+		make ARCH=arm CROSS_COMPILE=$KERNEL_CC
+		mv kernal_i2c_ap.ko $ENV_BUILD_DRIVER
+		make clean
+
+		cd $ENV_PATH_KERNAL_MOD/spi_icm/
+		make ARCH=arm CROSS_COMPILE=$KERNEL_CC
+		mv kernal_spi_icm.ko $ENV_BUILD_DRIVER
+		make clean
+
+		cd $ENV_PATH_KERNAL_MOD/key/
+		make ARCH=arm CROSS_COMPILE=$KERNEL_CC
+		mv kernal_key.ko $ENV_BUILD_DRIVER
+		make clean
+	else
+		echo "without compiled linux kernal, not build kernal module"
+	fi
+}
+
+function build_support_library()
+{
+	cd $ENV_PATH_LOWER_APP_MANAGE
+	if [ "$APP_CC_COMPILE" == "g++" ]; then
+		echo $ENV_PATH_LOWER_APP_MANAGE/lib/jsoncpp/x86_libjsoncpp.a 
+		if [ ! -f $ENV_PATH_LOWER_APP_MANAGE/lib/jsoncpp/x86_libjsoncpp.a ]; then
+			echo "x86 libjson not exist. start build!"
+			cd lib/jsoncpp
+			make -j4
+		else
+			echo "x86 libjson exist. not build!"
+		fi
+	else 
+		if [ ! -f $ENV_PATH_LOWER_APP_MANAGE/lib/jsoncpp/arm_libjsoncpp.a ]; then
+			echo "arm libjson not exist. start build!"
+			cd lib/jsoncpp
+			make -j4
+		else
+			echo "arm libjson exist. not build!"
+		fi
+	fi
+}
+
 function SysBuildApplication()
 {
 	echo frimware path:$ENV_PATH_ROOT
@@ -36,89 +92,56 @@ function SysBuildApplication()
 
 	#asio库以压缩包形式进行上传,首次使用需要解压
 	if [ ! -d "$ENV_PATH_LOWER_APP_MANAGE/lib/asio" ]; then
-		cd $ENV_PATH_LOWER_APP_MANAGE/lib/
-		tar -xvf asio.tar.bz2
-		echo "create asio library for manage sucess"
+		echo "asio not exist, run preBuildEnvironment.sh."
+		exit -1
 	else
 		echo "already exist asio, can build"
 	fi
 
 	#编译驱动地址
+	build_driver_module
+
+	#复制版本信息
 	cd $ENV_PATH_ROOT
-	if [ -d "$ENV_KERNEL_DIR" ]; then
-		echo "start bulid kernal driver"
-		cd $ENV_PATH_KERNAL_MOD/led/
-		make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
-		mv kernal_led.ko ../../package/driver/
-		make clean
+	cp config.json.template $ENV_BUILD_FIRMWARE/config.json
+	cp version.json.template $ENV_BUILD_FIRMWARE/verison.json
 
-		cd $ENV_PATH_KERNAL_MOD/beep/
-		make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
-		mv kernal_beep.ko ../../package/driver/
-		make clean
+	#编译支持的库
+	build_support_library
 
-		cd $ENV_PATH_KERNAL_MOD/i2c_ap/
-		make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
-		mv kernal_i2c_ap.ko ../../package/driver/
-		make clean
-
-		cd $ENV_PATH_KERNAL_MOD/spi_icm/
-		make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
-		mv kernal_spi_icm.ko ../../package/driver/
-		make clean
-
-		cd $ENV_PATH_KERNAL_MOD/key/
-		make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
-		mv kernal_key.ko ../../package/driver/
-		make clean
-	else
-		echo "without linux kernal, not build kernal module"
-	fi
-
-	#覆盖配置文件
-	cp -f $ENV_PATH_PACKAGE/config.json $ENV_PATH_LOWER_APP_MANAGE/config.json
-	cp -f $ENV_PATH_PACKAGE/version.json $ENV_PATH_LOWER_APP_MANAGE/version.json
-	cp -f $ENV_PATH_PACKAGE/config.json $ENV_PATH_LOWER_APP_SERVER/config.json
-	cp -f $ENV_PATH_PACKAGE/version.json $ENV_PATH_LOWER_APP_SERVER/version.json
-
-	#编译程序
+	#编译打包程序
 	cd $ENV_PATH_LOWER_APP_MANAGE
-	make -j4
-	cd $ENV_PATH_ROOT
-	if [ -f lower_app/Executables/app_demo ]; then
-		cp lower_app/Executables/app_demo package/
+	make -j${CPU_CORE}
+	if [ -f $ENV_PATH_ROOT/lower_app/Executables/app_demo ]; then
+		cp $ENV_PATH_ROOT/lower_app/Executables/app_demo $ENV_BUILD_BIN
 	else
 		echo "${redText}Application compiler failed, please check the logs for more information!${defText}"
 		return
 	fi
 
 	#打包服务器程序(包含node的后台和前端页面),拷贝到输出目录
-	cd lower_app/
+	cd $ENV_PATH_ROOT/lower_app/
+	rm -rf server.tar.bz2
 	tar -vcjf server.tar.bz2 server/ 
-	cd ../
-	mv lower_app/server.tar.bz2 package/
+	mv server.tar.bz2 $ENV_BUILD_BIN
 
 	#压缩完整包
-	cd package/
-	tar -vcjf remote_manage_v$FMWARE_VESRION.tar.bz2 *
-	rm server.tar.bz2
+	cd $ENV_BUILD
+	tar -vcjf $PACKAGE_FILE $ENV_BUILD_FIRMWARE/
+	mv $PACKAGE_FILE  $ENV_PATH_ROOT/
+	rm $ENV_BUILD_BIN/server.tar.bz2
 
 	#将编译好的项目复制到nfs目录指定位置
 	#采用nfs启动后即可执行
 	if [ -d $NFS_RUN_PATH ]; then
 		rm -rf $NFS_RUN_PATH/*
-		cd $ENV_PATH_ROOT
-		cp package/app_demo $NFS_RUN_PATH/
-		cp package/config.json $NFS_RUN_PATH/
-		cp package/startApp $NFS_RUN_PATH/
-		cp package/SysUpdate $NFS_RUN_PATH/
-		cp -rf package/driver/ $NFS_RUN_PATH/
-		cp -rf lower_app/server/ $NFS_RUN_PATH/
+		cd $ENV_BUILD
+		cp -rv * $NFS_RUN_PATH/
 	else
 		echo "nfs directory $NFS_RUN_PATH not exist, not copy!"
 	fi
 
-	cdr
+	cda
 }
 alias SysBuildApplication='SysBuildApplication'
 
@@ -126,27 +149,27 @@ alias SysBuildApplication='SysBuildApplication'
 #需要嵌入式linux设备端支持ssh服务，且$EMBED_DEVICE_IPADDRESS一致
 function SysPushApplication
 {
-	echo filepath:$ENV_PATH_PACKAGE, ipaddress:$EMBED_DEVICE_IPADDRESS
-	scp -r $ENV_PATH_PACKAGE/remote_manage_v$FMWARE_VESRION.tar.bz2 root@$EMBED_DEVICE_IPADDRESS:/tmp/
+	echo filepath:$ENV_BUILD, ipaddress:$EMBED_DEVICE_IPADDRESS
+	scp -r $ENV_PATH_ROOT/$PACKAGE_FILE root@$EMBED_DEVICE_IPADDRESS:/tmp/
 }
 alias SysPushApplication='SysPushApplication'
 
 #清除firmware，包含编译的中间文件和打包后的firmware.
 function SysCleanApplication
 {
-	rm $ENV_PATH_PACKAGE/remote_manage_v$FMWARE_VESRION.tar.bz2
+	rm $ENV_BUILD/$PACKAGE_FILE
 	cd $ENV_PATH_LOWER_APP_MANAGE
 	make clean
 
 	#回到项目的地址
-	cdr
+	cda
 }
 alias SysCleanApplication='SysCleanApplication'
 
 #执行firmware，仅限于linux环境下编译的应用，主要用于测试
 function SysExecuteFirmware
 {
-	$ENV_PATH_PACKAGE/app_demo -f $ENV_PATH_PACKAGE/config.json
+	$ENV_BUILD_BIN/app_demo -f $ENV_BUILD_FIRMWARE/config.json
 }
 alias SysExecuteFirmware='SysExecuteFirmware'
 
@@ -212,12 +235,12 @@ alias SysSetApplicationVer='SysSetApplicationVer'
 
 #编译linux内核
 #对于内核目录，需要提前构建好配置定义，此命令仅进行编译
-#因为最新的gcc编译会无法执行，所以指定了$KERNAL_CC对应的编译器
+#因为最新的gcc编译会无法执行，所以指定了$KERNEL_CC对应的编译器
 function SysBuildKernel
 {
 	if [ -d $ENV_KERNEL_DIR ]; then
 		cd $ENV_KERNEL_DIR
-		make V=1 ARCH=arm CROSS_COMPILE=$KERNAL_CC all -j4
+		make V=1 ARCH=arm CROSS_COMPILE=$KERNEL_CC all -j4
 
 		cp -avf $ENV_KERNEL_ZIMAGE $TFTP_PATH/
 		cp -avf $ENV_KERNEL_DTB $TFTP_PATH/
@@ -233,7 +256,7 @@ function SysCleanKernel
 	if [ -d $ENV_KERNEL_DIR ]; then
 		cd $ENV_KERNEL_DIR
 		make distclean
-		make ARCH=arm CROSS_COMPILE=$KERNAL_CC imx_v7_defconfig
+		make ARCH=arm CROSS_COMPILE=$KERNEL_CC imx_v7_defconfig
 	else
 		echo "Kernal Directory:$ENV_KERNEL_DIR not exist!"
 	fi
@@ -246,8 +269,8 @@ function SysBuildUboot
 {
 	if [ -d $ENV_BOOT_DIR ]; then
 		cd $ENV_BOOT_DIR
-		echo "compiler:$NEW_KERNAL_CC"
-		make V=1 ARCH=arm CROSS_COMPILE=$NEW_KERNAL_CC all -j4
+		echo "compiler:$NEW_KERNEL_CC"
+		make V=1 ARCH=arm CROSS_COMPILE=$NEW_KERNEL_CC all -j4
 		cp -avf u-boot-dtb.imx $TFTP_PATH/
 	else
 		echo "uboot directory:$ENV_BOOT_DIR not exist!"
@@ -261,7 +284,7 @@ function SysCleanUboot
 	if [ -d $ENV_BOOT_DIR ]; then
 		cd $ENV_BOOT_DIR
 		make distclean
-		make ARCH=arm CROSS_COMPILE=$NEW_KERNAL_CC mx6ull_14x14_evk_emmc_defconfig
+		make ARCH=arm CROSS_COMPILE=$NEW_KERNEL_CC mx6ull_14x14_evk_emmc_defconfig
 	else
 		echo "uboot directory:$ENV_BOOT_DIR not exist!"
 	fi

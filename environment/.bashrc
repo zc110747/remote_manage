@@ -15,13 +15,7 @@ echo "Update the Plugin by filepath /home/[root]/.bashrc."
 # This section defines the private config for the program.
 # if download the package, first modify when download.
 #-------------------------------------------------------------------------------
-export ENV_PATH_ROOT="[usr_dir]"
-if [ ! -d "$ENV_PATH_ROOT" ]; then 
-    export ENV_PATH_ROOT="/home/center/application/git/remote_manage/"
-    if [ ! -d "$ENV_PATH_ROOT" ]; then 
-        export ENV_PATH_ROOT="/mnt/d/user_project/git/remote_manage"
-    fi
-fi
+export ENV_PATH_ROOT="/home/program/application/remote_manage"
 
 echo "Root Path:$ENV_PATH_ROOT"
 export ENV_PATH_ENVIRONMENT="$ENV_PATH_ROOT/environment"

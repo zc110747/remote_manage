@@ -40,19 +40,23 @@ clear_dobject = *.d .*.o.d \
 				logger/*.d logger/.*.o.d \
 				remote/*.d remote/.*.o.d 
 
-include_path = -I remote/ 			\
-				-I driver/ 			\
-				-I lib/ 			\
-				-I include/ 		\
-				-I module/ 		\
+include_path = -I remote/ 				\
+				-I driver/ 				\
+				-I lib/ 				\
+				-I include/ 			\
+				-I module/ 				\
 				-I lib/jsoncpp/include  \
 				-I lib/asio/include		\
-				-I logger/ 			\
-				-I module/tools/ \
-				-I event/		\
+				-I logger/ 				\
+				-I module/tools/ 		\
+				-I event/				\
 				-I center/
-								
-lib = lib/$(APP_LIB_APPLICATION)libjsoncpp.a
+
+ifeq ($(CC), g++)		
+	lib = lib/jsoncpp/x86_libjsoncpp.a
+else
+	lib = lib/jsoncpp/arm_libjsoncpp.a
+endif
 
 # This is the file name of the executables and path where 
 # place the executables
@@ -60,4 +64,4 @@ executables = app_demo
 executables_path = ../Executables
 
 # Including this file allows access to the Build System.
-include ../../Build/basic.mk
+include ../../buildtool/basic.mk
