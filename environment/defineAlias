@@ -129,12 +129,10 @@ function SysBuildApplication()
 	cd $ENV_BUILD
 	tar -vcjf $PACKAGE_FILE $ENV_BUILD_FIRMWARE/
 	mv $PACKAGE_FILE  $ENV_PATH_ROOT/
-	rm $ENV_BUILD_BIN/server.tar.bz2
 
 	#将编译好的项目复制到nfs目录指定位置
 	#采用nfs启动后即可执行
 	if [ -d $NFS_RUN_PATH ]; then
-		rm -rf $NFS_RUN_PATH/*
 		cd $ENV_BUILD
 		cp -rv * $NFS_RUN_PATH/
 	else
@@ -241,7 +239,7 @@ function SysBuildKernel
 	if [ -d $ENV_KERNEL_DIR ]; then
 		cd $ENV_KERNEL_DIR
 		make V=1 ARCH=arm CROSS_COMPILE=$KERNEL_CC all -j4
-
+/build/bin/server/
 		cp -avf $ENV_KERNEL_ZIMAGE $TFTP_PATH/
 		cp -avf $ENV_KERNEL_DTB $TFTP_PATH/
 	else
