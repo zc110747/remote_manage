@@ -9,6 +9,7 @@
 *.mod
 *.order
 *.symvers
+*.a
 
 lower_app/server/node/node_modules
 lower_app/manage/lib/asio
@@ -27,6 +28,3 @@ remote_manage*
 /lower_app/board/MDK-ARM/LowerBoard.uvguix.Administrator
 /lower_app/board/ff15/source/00readme.txt
 /lower_app/board/ff15/LICENSE.txt
-
-/lower_app/manage/lib/jsoncpp/arm_libjsoncpp.a
-/lower_app/manage/lib/jsoncpp/libjsoncpp.a

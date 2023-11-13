@@ -135,6 +135,8 @@ function SysBuildApplication()
 	if [ -d $NFS_RUN_PATH ]; then
 		cd $ENV_BUILD
 		cp -rv * $NFS_RUN_PATH/
+		cd $ENV_PATH_ROOT/thirdparts/rootfs
+		sudo cp -rv * $NFS_PATH/
 	else
 		echo "nfs directory $NFS_RUN_PATH not exist, not copy!"
 	fi
