@@ -18,3 +18,5 @@ thirdparts/jsoncpp/
 rootfs/run/server/*
 rootfs/run/support/*
 /rootfs/run/bin/main_process
+/buildout/arm/libjsoncpp.a
+/buildout/arm/main_process
