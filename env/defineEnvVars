@@ -48,11 +48,6 @@ export NFS_RUN_PATH="$NFS_PATH/run/"
 export DST_PATH="/home/freedom/Desktop/Firmware"
 export ENV_CONFIG_FILE="$ENV_PATH_ENVIRONMENT/EnvConfig.mk"
 
-#application 
-export APPLICATION_RUN=$ENV_PATH_ROOT/rootfs/run
-export APPLICATION_THIRDPARTS=$ENV_PATH_ROOT/thirdparts
-export APPLICATION_EMBED=$ENV_PATH_ROOT/embed
-
 #-------------------------------------------------------------------------------
 # This section defines the default internal config
 #-------------------------------------------------------------------------------
@@ -123,18 +118,19 @@ fi
 # This section defines the path for the program
 # Not need Change unless program change.
 #-------------------------------------------------------------------------------
-export ENV_PATH_LOWER_APP="$ENV_PATH_ROOT/lower_app"
-export ENV_PATH_LOWER_APP_MANAGE="$ENV_PATH_LOWER_APP/manage"
-export ENV_PATH_LOWER_APP_SERVER="$ENV_PATH_LOWER_APP/server"
-export ENV_PATH_UPPER_APP="$ENV_PATH_ROOT/upper_app"
-export ENV_PATH_PACKAGE="$ENV_PATH_ROOT/package"
-export ENV_PATH_KERNAL_MOD="$ENV_PATH_ROOT/kernal_mod"
+#kernal_mod
+export ENV_PATH_KERNAL_MOD="$ENV_PATH_ROOT/mod"
+
+#application 
+export APPLICATION_RUN=$ENV_PATH_ROOT/rootfs/run
+export APPLICATION_THIRDPARTS=$ENV_PATH_ROOT/thirdparts
+export APPLICATION_EMBED=$ENV_PATH_ROOT/embed
+export APP_MAIN_PORCESS=$APPLICATION_EMBED/main_process
+export APP_BUILD_DRIVER=$ENV_PATH_ROOT/rootfs/run/modules
 
 export ENV_BUILD=$PROGRAM_APPLICATION/build
 export ENV_BUILD_FIRMWARE=$ENV_BUILD/firmware
-export ENV_BUILD_SUPPORT=$ENV_BUILD/support
 export ENV_BUILD_BIN=$ENV_BUILD_FIRMWARE/bin
-export ENV_BUILD_DRIVER=$ENV_BUILD_FIRMWARE/driver
 
 #-------------------------------------------------------------------------------
 # Env Vars define finish shows

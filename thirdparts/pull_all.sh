@@ -72,7 +72,7 @@ function pull_node()
 echo "run option: $OPTION"
 if [ $OPTION == "all" ]; then
     pull_asio
-    #tar_and_build_jsoncpp
+    tar_and_build_jsoncpp
     pull_node
 elif [ $OPTION == "asio" ]; then
     pull_asio

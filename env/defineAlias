@@ -28,8 +28,9 @@ alias cdn="cd $NFS_PATH"
 # The Extend Command for program compiler, package, push.
 #-------------------------------------------------------------------------------
 exit_if_last_error() {
-    if [[ $? -ne 0 ]]; then
-        echo "last command run failed, exit。"
+    if [[ $? -ne 0 ]]; then	
+		read -p "last command run failed, exit."
+
         exit 1
     fi
 }
@@ -53,27 +54,27 @@ function build_driver_module()
 		echo "start bulid kernal driver"
 		cd $ENV_PATH_KERNAL_MOD/led/
 		make ARCH=arm CROSS_COMPILE=$KERNEL_CC
-		mv kernal_led.ko $ENV_BUILD_DRIVER
+		mv kernal_led.ko $APP_BUILD_DRIVER
 		make clean
 
 		cd $ENV_PATH_KERNAL_MOD/beep/
 		make ARCH=arm CROSS_COMPILE=$KERNEL_CC
-		mv kernal_beep.ko $ENV_BUILD_DRIVER
+		mv kernal_beep.ko $APP_BUILD_DRIVER
 		make clean
 
 		cd $ENV_PATH_KERNAL_MOD/i2c_ap/
 		make ARCH=arm CROSS_COMPILE=$KERNEL_CC
-		mv kernal_i2c_ap.ko $ENV_BUILD_DRIVER
+		mv kernal_i2c_ap.ko $APP_BUILD_DRIVER
 		make clean
 
 		cd $ENV_PATH_KERNAL_MOD/spi_icm/
 		make ARCH=arm CROSS_COMPILE=$KERNEL_CC
-		mv kernal_spi_icm.ko $ENV_BUILD_DRIVER
+		mv kernal_spi_icm.ko $APP_BUILD_DRIVER
 		make clean
 
 		cd $ENV_PATH_KERNAL_MOD/key/
 		make ARCH=arm CROSS_COMPILE=$KERNEL_CC
-		mv kernal_key.ko $ENV_BUILD_DRIVER
+		mv kernal_key.ko $APP_BUILD_DRIVER
 		make clean
 	else
 		echo "without compiled linux kernal, not build kernal module"
@@ -138,6 +139,7 @@ function SysBuildApplication()
 	#采用nfs启动后即可执行
 	if [ -d $NFS_RUN_PATH ]; then
 		cp -rv $APPLICATION_RUN/* $NFS_RUN_PATH/
+		sudo cp -rv $ENV_PATH_ROOT/rootfs/etc/* $NFS_PATH/etc/
 	else
 		echo "nfs directory $NFS_RUN_PATH not exist, not copy!"
 	fi
@@ -158,8 +160,7 @@ alias SysPushApplication='SysPushApplication'
 #清除firmware，包含编译的中间文件和打包后的firmware.
 function SysCleanApplication
 {
-	rm $ENV_BUILD/remote_manage_v$FMWARE_VESRION.tar.bz2
-	cd $ENV_PATH_LOWER_APP_MANAGE
+	cd $APP_MAIN_PORCESS
 	make clean
 
 	#回到项目的地址

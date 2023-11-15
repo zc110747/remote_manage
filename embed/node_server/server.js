@@ -23,15 +23,15 @@ let netInfo = {
 };
 //for internal link, need use loopback host
 const local_ipaddr = "127.0.0.1"; 
-const filepath = "config.json";
+const filepath = "../config.json";
 
 function server_process(fileContents)
 {
     let jsonValue = JSON.parse(fileContents)
 
-    netInfo.ipaddr = jsonValue.socket.ipaddr;
-    netInfo.web_port = jsonValue.node.web_port;
-    netInfo.socket_port = jsonValue.socket.internal_port;
+    netInfo.ipaddr = jsonValue.ipaddress;
+    netInfo.web_port = jsonValue.node_server.web_port;
+    netInfo.socket_port = jsonValue.main_process.node_port;
 
     //server on process
     server.on('request', function (request, response) {
