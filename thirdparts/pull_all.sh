@@ -23,6 +23,10 @@ function pull_asio()
 
         #解压asio文件, 重命名为asio
         tar -xvf $asio_gz
+
+        if [ ! -d $asio_out/ ]; then
+            mkdir -p $asio_out
+        fi
         mv $asio_ver/* $asio_out/
         rm -rf $asio_ver
 
@@ -31,17 +35,16 @@ function pull_asio()
     fi
 }
 
-function tar_and_build_jsoncpp()
+function tar_jsoncpp()
 {
     JSONCPP_FILE=jsoncpp
     JSONCPP_FILE_TAR=$JSONCPP_FILE.tar.bz2
 
     if [ ! -d $JSONCPP_FILE/include ]; then
         tar -xvf $JSONCPP_FILE_TAR
+    else
+        echo "jsoncpp alread install, skip this step!"
     fi
-
-    cd $JSONCPP_FILE/
-    make
 }
 
 function pull_node()
@@ -72,7 +75,7 @@ function pull_node()
 echo "run option: $OPTION"
 if [ $OPTION == "all" ]; then
     pull_asio
-    tar_and_build_jsoncpp
+    tar_jsoncpp
     pull_node
 elif [ $OPTION == "asio" ]; then
     pull_asio
