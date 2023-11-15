@@ -27,6 +27,12 @@ alias cdn="cd $NFS_PATH"
 # This section defines the function for program management.
 # The Extend Command for program compiler, package, push.
 #-------------------------------------------------------------------------------
+exit_if_last_error() {
+    if [[ $? -ne 0 ]]; then
+        echo "last command run failed, exit。"
+        exit 1
+    fi
+}
 
 function SysPullAll()
 {
@@ -76,20 +82,19 @@ function build_driver_module()
 
 function build_support_library()
 {
-	cd $ENV_PATH_LOWER_APP_MANAGE
-	if [ "$APP_CC_COMPILE" == "g++" ]; then
-		echo $ENV_PATH_LOWER_APP_MANAGE/lib/jsoncpp/x86_libjsoncpp.a 
-		if [ ! -f $ENV_PATH_LOWER_APP_MANAGE/lib/jsoncpp/x86_libjsoncpp.a ]; then
-			echo "x86 libjson not exist. start build!"
-			cd lib/jsoncpp
+	cd $APPLICATION_THIRDPARTS
+	if [ "${APP_CC_COMPILE}" == "g++" ]; then
+		echo "start build lib:${APPLICATION_BUILDOUT}/libjsoncpp.a"
+		if [ ! -f ${APPLICATION_BUILDOUT}/libjsoncpp.a ]; then
+			cd $APPLICATION_THIRDPARTS/jsoncpp
 			make -j4
 		else
 			echo "x86 libjson exist. not build!"
 		fi
-	else 
-		if [ ! -f $ENV_PATH_LOWER_APP_MANAGE/lib/jsoncpp/arm_libjsoncpp.a ]; then
-			echo "arm libjson not exist. start build!"
-			cd lib/jsoncpp
+	else
+		echo "start build lib:${APPLICATION_BUILDOUT}/libjsoncpp.a"
+		if [ ! -f ${APPLICATION_BUILDOUT}/libjsoncpp.a ]; then
+			cd ${APPLICATION_THIRDPARTS}/jsoncpp
 			make -j4
 		else
 			echo "arm libjson exist. not build!"
@@ -102,57 +107,37 @@ function SysBuildApplication()
 	echo frimware path:$ENV_PATH_ROOT
 	echo kernal dir:$ENV_KERNEL_DIR 
 
-	#asio库以压缩包形式进行上传,首次使用需要解压
-	if [ ! -d "$ENV_PATH_LOWER_APP_MANAGE/lib/asio" ]; then
-		echo "asio not exist, run preBuildEnvironment.sh."
-		exit -1
-	else
-		echo "already exist asio, can build"
-	fi
-
 	#编译驱动地址
 	build_driver_module
 
 	#复制版本信息
 	cd $ENV_PATH_ROOT
-	cp config.json.template $ENV_BUILD_FIRMWARE/config.json
-	cp version.json.template $ENV_BUILD_FIRMWARE/verison.json
+	cp config.json.template $APPLICATION_RUN/config.json
 
 	#编译支持的库
 	build_support_library
 
-	#编译打包程序
-	cd $ENV_PATH_LOWER_APP_MANAGE
+	#编译并复制main_process进程
+	cd ${APPLICATION_EMBED}/main_process
 	make -j${CPU_CORE}
-	if [ -f $ENV_PATH_ROOT/lower_app/Executables/app_demo ]; then
-		cp $ENV_PATH_ROOT/lower_app/Executables/app_demo $ENV_BUILD_BIN
-	else
-		echo "${redText}Application compiler failed, please check the logs for more information!${defText}"
-		return
+	
+	exit_if_last_error
+	
+	if [ ${FIRMWARE_CURRENT_PLATFORMS} == "Embed-Linux" ]; then
+		cp ${APPLICATION_BUILDOUT}/main_process $APPLICATION_RUN/bin/
 	fi
-
-	#打包服务器程序(包含node的后台和前端页面),拷贝到输出目录
-	cd $ENV_PATH_ROOT/lower_app/
-	rm -rf server.tar.bz2
-	tar -vcjf server.tar.bz2 server/ 
-	mv server.tar.bz2 $ENV_BUILD_BIN
-
-	#压缩完整包
-	cd $ENV_BUILD
-	tar -vcjf remote_manage_v$FMWARE_VESRION.tar.bz2 $ENV_BUILD_FIRMWARE/
-	rm $ENV_BUILD_BIN/server.tar.bz2
+		
+	#打包服务器程序(包含node的后台和前端页面)
+	cd ${APPLICATION_EMBED}/
+	if [ ! -d $APPLICATION_RUN/server/ ]; then
+		mkdir $APPLICATION_RUN/server/ 
+	fi
+	cp -rv node_server/* $APPLICATION_RUN/server/
 
 	#将编译好的项目复制到nfs目录指定位置
 	#采用nfs启动后即可执行
 	if [ -d $NFS_RUN_PATH ]; then
-		rm -rf $NFS_RUN_PATH/*
-		cd $ENV_PATH_ROOT
-		cp $APP_BUILD/app_demo $NFS_RUN_PATH/
-		cp $APP_BUILD/config.json $NFS_RUN_PATH/
-		cp $APP_BUILD/startApp $NFS_RUN_PATH/
-		cp $APP_BUILD/SysUpdate $NFS_RUN_PATH/
-		cp -rf $APP_BUILD/driver/ $NFS_RUN_PATH/
-		cp -rf lower_app/server/ $NFS_RUN_PATH/
+		cp -rv $APPLICATION_RUN/* $NFS_RUN_PATH/
 	else
 		echo "nfs directory $NFS_RUN_PATH not exist, not copy!"
 	fi

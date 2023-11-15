@@ -9,8 +9,12 @@
 *.mod
 *.order
 *.symvers
+*.tar.xz
 
 thirdparts/asio
 thirdparts/asio-1.28.0.tar.gz
 thirdparts/jsoncpp/
 
+rootfs/run/server/*
+rootfs/run/support/*
+/rootfs/run/bin/main_process

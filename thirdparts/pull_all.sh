@@ -44,10 +44,36 @@ function tar_and_build_jsoncpp()
     make
 }
 
+function pull_node()
+{
+    node_ver=v20.9.0
+    node_file=node-${node_ver}-linux-armv7l
+    node_tar_file=${node_file}.tar.xz
+    node_addr=https://nodejs.org/dist/${node_ver}/${node_tar_file}
+
+    if [ ! -d $APPLICATION_RUN/support/node/bin ]; then
+        if [ ! -f ${node_tar_file} ]; then
+            echo "download file $node_tar_file:$node_addr"
+            wget ${node_addr}
+        fi
+
+        tar -xvf ${node_tar_file}
+        if [ ! -d $APPLICATION_RUN/support/node ]; then
+            mkdir -p $APPLICATION_RUN/support/node
+        fi
+
+        mv ${node_file}/* $APPLICATION_RUN/support/node/
+        rm -rf ${node_file}
+    else
+        echo "node already exist, not install!"
+    fi
+}
+
 echo "run option: $OPTION"
 if [ $OPTION == "all" ]; then
     pull_asio
-    tar_and_build_jsoncpp
+    #tar_and_build_jsoncpp
+    pull_node
 elif [ $OPTION == "asio" ]; then
     pull_asio
 fi

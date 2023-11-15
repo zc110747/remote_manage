@@ -44,9 +44,14 @@ export ENV_ROOTFS_DIR=$PROGRAM_SUPPORT/rootfs_busybox
 #build output info
 export TFTP_PATH=$PROGRAM_BUILD/tftp_root
 export NFS_PATH=$PROGRAM_BUILD/nfs_root
-export NFS_RUN_PATH="$NFS_PATH/manage/bin"
+export NFS_RUN_PATH="$NFS_PATH/run/"
 export DST_PATH="/home/freedom/Desktop/Firmware"
 export ENV_CONFIG_FILE="$ENV_PATH_ENVIRONMENT/EnvConfig.mk"
+
+#application 
+export APPLICATION_RUN=$ENV_PATH_ROOT/rootfs/run
+export APPLICATION_THIRDPARTS=$ENV_PATH_ROOT/thirdparts
+export APPLICATION_EMBED=$ENV_PATH_ROOT/embed
 
 #-------------------------------------------------------------------------------
 # This section defines the default internal config
@@ -84,7 +89,6 @@ readonly blinkText="$(tput blink)"
 readonly reverseText="$(tput smso)"
 readonly underlineText="$(tput smul)"
 
-
 # Now define an global platforms for all the type support
 # Linux：used for PC software
 # Embed-Linux: used for Embed Software
@@ -102,12 +106,15 @@ if [[ "${supportedPlatforms[0]}" == "$FIRMWARE_CURRENT_PLATFORMS" ]]; then
     export APP_C_COMPILE=gcc
     export APP_CC_COMPILE=g++
     export APP_AR_COMPILE=ar
+    export APPLICATION_BUILDOUT=$ENV_PATH_ROOT/buildout/i386
 
 elif [[ "${supportedPlatforms[1]}" == "$FIRMWARE_CURRENT_PLATFORMS" ]]; then
     #Embed-Linux
     export APP_C_COMPILE=arm-none-linux-gnueabihf-gcc
     export APP_CC_COMPILE=arm-none-linux-gnueabihf-g++
     export APP_AR_COMPILE=arm-none-linux-gnueabihf-ar
+    export APPLICATION_BUILDOUT=$ENV_PATH_ROOT/buildout/arm
+
 else
     echo "${redText}error platform $FIRMWARE_CURRENT_PLATFORMS not exist in list of support${defText}"
 fi
