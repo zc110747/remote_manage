@@ -1,17 +1,22 @@
 # 基于嵌入式Linux的局域网和云平台管理应用
 
+## 项目说明
+用于管理
+
 ## 项目框架
 
-![image](document/image/firmware.jpg)
+![image](doc/image/mainFrame.png)
 
 ## 快速启动项目
 下载项目后到本地后，执行预处理脚本构建完整的应用平台。
 ```bash
-#下载项目，进入目录
-git clone https://github.com/zc110747/remote_manage.git
+#download the program
+git clone https://github.com/zc110747/remote_manage.
+
+#enter the directory
 cd remote_mange/
 
-#预处理构建环境
+#prepare for the environment
 ./preBuildEnvironment.sh
 ```
 重新开启命令行，如果加载如下所示，表示已经成功安装，项目需要在非root权限下执行，root权限无法加载。
@@ -19,20 +24,22 @@ cd remote_mange/
 Loading CDE Plugin...
 -------------------------------------------------------------------------
 Load Plugin Success!
-Can use command 'SysHelpCommand' for more helps.
 Update the Plugin by filepath /home/[root]/.bashrc.
-Root Path:/mnt/d/user_project/git/remote_manage
+Root Path:/home/program/application/remote_manage
 Load the Env Data...
 Update Environment Data Success!
 Can use command 'SysHelpCommand' for more helps.
-Current Platform is Embed-Linux, Remote IPAdress is 192.168.1.24.
-Current Firmware Version is 1.0.0.9.
+Current Platform is Embed-Linux, Remote IPAdress is 192.168.1.24.        
+Current Firmware Version is 1.0.0.7.
 Update the Alias Command...
 Update the Alias Command Success!
 -------------------------------------------------------------------------
 
 #进入当前项目目录
-cda 
+cda
+
+#下载第三方应用, 编译当前平台的库文件
+SysPullAll
 ```
 备注:<br />
 Current Platform is Embed-Linux表示的是编译后的固件执行平台，分别代表使用g++和arm-linux-gnueabihf-g++编译.<br />
@@ -46,6 +53,8 @@ SysPushFirmware
 即可完成项目的编译。<br/>
 另外可通过SysHelpCommand查询支持的命令, SysSetPlatformEmbedLinux和SysSetPlatformLinux切换编译不同平台的应用文件，目前支持命令如下所示.<br/>
 ```bash
+SysPullAll
+    Pull all thirdpart application for build.
 SysBuildApplication
     Build Application, Package Firmware.
 SysBuildKernel

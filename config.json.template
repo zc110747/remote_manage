@@ -1,51 +1,47 @@
 {
-	"device" : 
-	{
-		"apI2c" : 
-		{
-			"path" : "/dev/ap3216"
+	"local_ipaddress":"127.0.0.1",
+	"ipaddress":"192.168.16.52",
+	"version" : "1.0.1.0",
+	"local_device" : {
+		"ap_i2c" : {
+			"dev" : "/dev/ap3216"
 		},
-		"beep" : 
-		{
+		"beep" : {
 			"init" : 0,
-			"path" : "/dev/beep"
+			"dev" : "/dev/beep"
 		},
-		"icmSpi" : 
-		{
-			"path" : "/dev/icm20608"
+		"icm_spi" : {
+			"dev" : "/dev/icm20608"
 		},
-		"key" : 
-		{
-			"path" : "/dev/key"
+		"key" : {
+			"dev" : "/dev/key"
 		},
-		"led" : 
-		{
+		"led" : {
 			"init" : 0,
-			"path" : "/dev/led"
+			"dev" : "/dev/led"
 		},
-		"rtc" : 
-		{
-			"path" : "/dev/rtc0"
-		},
-		"serial" : 
-		{
-			"StopBits" : 0,
+		"rtc" : {
+			"dev" : "/dev/rtc0"
+		}
+	},
+	"lower_device" : {
+		"serial" : {
+			"stopBits" : 0,
 			"baud" : 115200,
 			"dataBits" : 8,
 			"parity" : "n",
-			"path" : "/dev/ttymxc2"
+			"dev" : "/dev/ttymxc2"
 		}
 	},
-	"filepath" : "/tmp/download/",
-	"node" : 
-	{
-		"web_port" : 15060
+	"main_process" :{
+		"download_path" : "/tmp/download",
+		"node_port":15000,
+		"lower_deivce_port":15001,
+		"local_device_port":15002,
+		"gui_device_port":15003,
+		"logger_port":15004
 	},
-	"socket" : 
-	{
-		"internal_port" : 15060,
-		"ipaddr" : "192.168.3.99",
-		"logger_port" : 15059,
-		"tcp_port" : 15058
+	"node_server" : {
+		"web_port" : 15100
 	}
 }

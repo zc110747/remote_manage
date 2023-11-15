@@ -1,0 +1,33 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${env.includePath}",
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "_UNICODE",
+                "__ARM_PCS_VFP",
+                "CONFIG_SPARSE_IRQ",
+                "CONFIG_GPIOLIB",
+                "CONFIG_OF=1",
+                "_GNU_SOURCE",
+                "__GNUC__",
+                "_SIGNAL_H",
+                "MODULE",
+                "CONFIG_I2C",
+                "__KERNEL__"
+            ],
+            "compilerPath": "C:\\Keil_v5\\ARM\\ARMCC\\bin\\armcc.exe",
+            "cStandard": "c11",
+            "cppStandard": "c++20",
+            "intelliSenseMode": "gcc-x86",
+            "compilerArgs": [
+                "-m32"
+            ]
+        }
+    ],
+    "version": 4
+}

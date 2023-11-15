@@ -9,22 +9,8 @@
 *.mod
 *.order
 *.symvers
-*.a
 
-lower_app/server/node/node_modules
-lower_app/manage/lib/asio
-lower_app/Executables/app_demo
-lower_app/Executables/app_demo
-lower_app/board/MDK-ARM/LowerBoard
-lower_app/board/MDK-ARM/
-lower_app/board/ff15/documents
-upper_app/manage_tool/manage_tool.pro.user
-upper_app/manage_tool/manage_tool.pro.user.2eaca31
-upper_app/logger_tool/Tools/obj/Debug/
-upper_app/logger_tool/Tools/.vs/
-upper_app/logger_tool/Tools/obj/
+thirdparts/asio
+thirdparts/asio-1.28.0.tar.gz
+thirdparts/jsoncpp/
 
-remote_manage*
-/lower_app/board/MDK-ARM/LowerBoard.uvguix.Administrator
-/lower_app/board/ff15/source/00readme.txt
-/lower_app/board/ff15/LICENSE.txt
