@@ -41,6 +41,8 @@ if [ ! -d "$GLOBAL_PROGRAM_PATH" ]; then
     mkdir $GLOBAL_PROGRAM_PATH/build/
     mkdir $GLOBAL_PROGRAM_PATH/build/nfs_root/
     mkdir $GLOBAL_PROGRAM_PATH/build/tftp_root/
+
+    sudo chmod -Rv 755 ${GLOBAL_PROGRAM_PATH}/
 else
     echo "Directory ${greenText}$GLOBAL_PROGRAM_PATH${defText} exist, Check Ok!"
 fi
@@ -57,15 +59,15 @@ echo "未复制则后续编译时会显示找不到文件或者直接编译失�
 
 #按照系统编译支持的library库
 if [ x$1 != x ] && [ $1 == "all" ]; then
-    echo "install library or tools for the build environment."
-    sudo apt-get install vim lib32z1 cmake 
-    sudo apt-get install bc lzop libffi-dev libssl-dev lzop git
-    sudo apt-get install libncurses5-dev u-boot-tools openssh-server 
-    sudo apt-get install dos2unix gzip libtool flex
-    sudo apt-get install build-essential manpages-dev make bison
-    sudo apt-get install software-properties-common binutils gcc-multilib 
-    sudo apt-get install libc6-dev-i386
-    sudo apt-get install lsb-core lib32stdc++6
+    echo "install library or tools for the build environment." 
+    sudo apt-get install vim lib32z1 cmake -y
+    sudo apt-get install bc lzop libffi-dev libssl-dev lzop git -y
+    sudo apt-get install libncurses5-dev u-boot-tools openssh-server -y 
+    sudo apt-get install dos2unix gzip libtool flex -y
+    sudo apt-get install build-essential manpages-dev make bison -y
+    sudo apt-get install software-properties-common binutils gcc-multilib -y
+    sudo apt-get install libc6-dev-i386 -y
+    sudo apt-get install lsb-core lib32stdc++6 -y
 fi
 
 #下载arm-none-linux-gnueabihf-交叉编译器到compiler目录
