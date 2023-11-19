@@ -20,7 +20,7 @@
 #include <map>
 #include "key.hpp"
 #include "logger.hpp"
-#include "includes.hpp"
+#include "common.hpp"
 
 static std::map<int, std::function<void(int)>> FuncList;
 

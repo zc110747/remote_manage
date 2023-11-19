@@ -18,7 +18,7 @@
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
-#include "includes.hpp"
+#include "common.hpp"
 
 #define COMMAND_MAX_SIZE    4
 typedef enum

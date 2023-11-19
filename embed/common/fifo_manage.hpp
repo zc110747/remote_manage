@@ -18,7 +18,7 @@
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
-#include "includes.hpp"
+#include "common.hpp"
 
 #define S_FIFO_WORK_MODE               (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)  
 

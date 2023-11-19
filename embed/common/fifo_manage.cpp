@@ -18,7 +18,6 @@
 /////////////////////////////////////////////////////////////////////////////
 #include "fifo_manage.hpp"
 #include "logger.hpp"
-//#include "driver.hpp"
 
 fifo_manage::fifo_manage(const std::string& fstr, int mode){
     fifo_path_ = std::move(fstr);

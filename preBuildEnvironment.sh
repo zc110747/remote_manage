@@ -66,7 +66,7 @@ if [ x$1 != x ] && [ $1 == "all" ]; then
     sudo apt-get install dos2unix gzip libtool flex -y
     sudo apt-get install build-essential manpages-dev make bison -y
     sudo apt-get install software-properties-common binutils gcc-multilib -y
-    sudo apt-get install libc6-dev-i386 -y
+    sudo apt-get install libc6-dev-i386 net-tools -y
     sudo apt-get install lsb-core lib32stdc++6 -y
 fi
 

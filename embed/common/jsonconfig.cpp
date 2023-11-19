@@ -22,7 +22,7 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
-#include "system_config.hpp"
+#include "jsonconfig.hpp"
 
 system_config* system_config::instance_pointer_ = nullptr;
 system_config* system_config::get_instance()

@@ -22,7 +22,7 @@
 #define __device_base_HPP
 
 #include "../include/productConfig.hpp"
-#include "system_config.hpp"
+#include "jsonconfig.hpp"
 
 class device_base
 {

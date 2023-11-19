@@ -13,34 +13,25 @@ BUILD=e
 CCFLAGS := -O3 -std=c++17 -fno-strict-aliasing -lrt 
 
 cpp_objects = 	main.o \
-			remote/tcp_thread.o 	 \
-			remote/uart_thread.o 		 \
-			remote/protocol.o			 \
-			module/calculate.o  \
-			module/time_manage.o \
-			module/fifo_manage.o \
-			module/asio_server.o \
+			remote/tcp_thread.o	\
+			remote/uart_thread.o \
+			remote/protocol.o	\
 			module/cmd_process.o  \
 			driver/rtc.o \
 			driver/key.o \
 			driver/spi_icm.o \
 			driver/device_base.o \
 			driver/driver.o \
-			logger/logger.o \
 			center/internal_process.o \
 			center/device_manage.o   \
-			center/center_manage.o   \
-			parameter/system_config.o
+			center/center_manage.o
 
 INCLUDES = 	-I remote/ 				\
 			-I driver/ 				\
 			-I include/ 			\
 			-I module/ 				\
-			-I logger/ 				\
-			-I module/tools/ 		\
 			-I event/				\
-			-I parameter/			\
-			-I center/				
+			-I center/
 				
 INCLUDES +=	-I $(ENV_PATH_ROOT)/thirdparts/asio/include/ \
 			-I $(ENV_PATH_ROOT)/thirdparts/jsoncpp/include/ 
@@ -56,4 +47,5 @@ endif
 buildout = main_process
 
 # Including this file allows access to the Build System.
+include $(ENV_PATH_ROOT)/embed/common/common.mk
 include $(ENV_PATH_ROOT)/build/buildrules.mk
