@@ -1,7 +1,11 @@
-# 基于嵌入式Linux的局域网和云平台管理应用
+# 基于嵌入式Linux的管理平台应用
 
 ## 项目说明
-用于管理
+
+本项目包含嵌入式Linux从平台构建，项目管理，内核驱动，应用开发的大部分功能, 可在大部分嵌入式Linux设备中验证.<br />
+目前开发平台使用的为正点原子的'阿尔法Linux开发板'.<br />
+项目地址: https://github.com/zc110747/remote_manage.git <br />
+嵌入式Linux系统学习文档地址: https://github.com/zc110747/build_embed_linux_system.git <br />
 
 ## 项目框架
 
@@ -11,7 +15,7 @@
 下载项目后到本地后，执行预处理脚本构建完整的应用平台。
 ```bash
 #download the program
-git clone https://github.com/zc110747/remote_manage.
+git clone https://github.com/zc110747/remote_manage.git
 
 #enter the directory
 cd remote_mange/
@@ -105,21 +109,15 @@ ifconfig lo netmask 255.255.255.0
 
 ## 项目结构
 
-Build/              编译文件的基础结构，后面编译文件依赖此结构<br/>
-document/           设计文档资料说明<br/>
-enviroment/         用于构建编译环境的脚本<br/>
-kernal_mod/         内核驱动模块实现<br/>
-lower_app/          嵌入式Linux设备应用实现<br/>
-&emsp;&emsp;Executables     生成可执行文件目录<br/>
-&emsp;&emsp;manage/         嵌入式数据管理进程(数据处理核心进程)<br/>
-&emsp;&emsp;gui/            嵌入式图形界面开发<br/>
-&emsp;&emsp;server/         web服务器和web网页<br/>
-package/            生成应用的打包文件<br/>
+build/              编译脚本文件，后续编译Makefile基于此实现<br/>
+buildout/           编译打包输出目录<br/>
+doc/                设计文档资料说明<br/>
+embed/              嵌入式Linux平台应用<br />
+env/                用于构建编译环境的脚本<br/>
+mod/                内核驱动模块实现<br/>
+remote/             用于远程访问的PC客户端应用<br/>
+rootfs/             用于文件系统中带支持脚本和库文件<br />
 thirdparts/         支持平台运行的库，程序等<br/>
-package/            编译完成后的打包目录<br/>
-upper_app/          PC客户端应用实现<br/>
-&emsp;&emsp;manage_tool/         用于访问嵌入式设备的桌面客户端(暂定QT)<br/>
-&emsp;&emsp;loger_tool/     用于支持logger打印的网络调试工具(C#)<br/>
 
 ## 设计文档
 
@@ -154,12 +152,15 @@ PC应用端设计<br/>
 
 ## 编译环境
 
-嵌入式软件交叉编译工具<br/>
-&emsp;&emsp;内核模块使用编译工具 - arm-linux-gnueabihf-gcc<br/>
-&emsp;&emsp;manage，gui编译工具 - arm-linux-gnueabihf-g++<br/>
-&emsp;&emsp;server使用node作为运行环境<br/>
-&emsp;&emsp;网页使用vue方案<br/>
-上位机编译工具<br/>
-&emsp;&emsp;QT(the newest stable version)<br/>
-logger显示工具<br/>
-&emsp;&emsp;visual studio(the newest stable version)<br/>
+&emsp;&emsp;对于编译环境，主要包含虚拟机环境，Linux系统，软件源，交叉编译工具这些基础设施。<br />
+&emsp;&emsp;对于虚拟机环境使用过VMware, VirtualBox和WSL，其中VMware和Virtualbox使用体验都差不多，需要依赖跨系统复制，ssh或samba来回进行切换，不过在Linux平台使用vscode开发已经大大加快了开发效率。WSL则直接可以访问Windows平台程序，不过wsl1因为是模拟Linux接口，所以有很多Linux组件不支持，所以一定不要使用wsl1做交叉编译的环境，对于wsl2,也要确定是在Hyper-V环境下运行，可以综合两部分的优点，不过我电脑上I/O效率延时很大，不知道是不是特例。<br />
+&emsp;&emsp;Linux系统使用了16.04LTS, 20.04 LTS, 22.04LTS, **建议满足条件下选择最新的LTS版本(本项目22.04LTS环境测试正常)**，这是自己编译新的Linux库或者工具软件，旧版本Linux往往因为libc/licxx的版本问题，如果使用较新的源码，会导致编译链接时失败，另外自己千万不要去更新libc/licxx带最新，有可能导致系统命令链接失败，无法执行，基本只能重装，这就是我使用Linux，编译和交叉编译遇到的最大问题，如果你所有使用的范围都在apt-get覆盖的范围，那么Linux使用很简单，不过当你自己编译某个工具，就比较复杂了, 这里以编译mosquitto举个例子，编译mosquitto，需要openssl和Cjson的支持，而编译openssl需要perl新版本的支持，也就是需要4个软件的安装才能完成最后的编译，还需要将动态库放置在指定位置系统才能正常工作，不同的Linux版本，编译器版本以及库安装情况，编译面临的错误都会不一致，我的建议是给定环境，给定系统，确定后后续都在此系统编译，遇到问题就进行相应安装和更新，并记录，后期就可以少遇到问题。<br />
+&emsp;&emsp;软件源为国内镜像源，我目前使用的是清华镜像源，地址:https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/ , 按照方法说明即可。<br />
+&emsp;&emsp;交叉编译工具主要用于编译uboot，kernal，文件系统，应用和库，uboot和kernal如果使用较早版本则有限制，使用新的编译器会包含删除的功能，导致无法编译通过，用老的编译工具即可，文件系统和应用，库需要用一个编译器版本，它们的执行依赖文件系统中的lib库，版本不匹配可能会导致接口缺少而无法正常工作。<br />
+本项目开发使用过的环境如下:<br />
+虚拟机 - VMvare<br />
+Linux系统 - 22.04LTS<br />
+软件源 - 清华源<br />
+交叉编译(uboot/kernal) - gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf <br />
+交叉编译(rootfs/application/lib) - gcc-arm-11.2-2022.02-x86_64-arm-none-linux-gnueabihf<br />
+

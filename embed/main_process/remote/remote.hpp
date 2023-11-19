@@ -19,4 +19,3 @@
 _Pragma("once")
 
 #include "tcp_thread.hpp"
-#include "uart_thread.hpp"

@@ -22,7 +22,6 @@
 #include "logger.hpp"
 #include "internal_process.hpp"
 #include "tcp_thread.hpp"
-#include "uart_thread.hpp"
 
 center_manage* center_manage::get_instance()
 {
@@ -85,7 +84,6 @@ void center_manage::send_remote_device_status(const device_read_info &info)
     size += info.copy_to_buffer(&buffer[size]);
     
     tcp_thread_manage::get_instance()->send_msg(buffer, size);
-    uart_thread_manage::get_instance()->send_msg(buffer, size);
 }
 
 bool center_manage::process_event(Event *pEvent)
@@ -108,9 +106,6 @@ bool center_manage::process_event(Event *pEvent)
         {
             auto *pdata = &pbuffer[sizeof(Event)];
             device_manage::get_instance()->send_device_message(pdata[0], pdata[1]);
-            
-            // char buffer[] = {0x01, 0x20, 0x30};
-            // tcp_thread_manage::get_instance()->send_msg(buffer, 3);
         }
         break;
     default:

@@ -14,7 +14,6 @@ CCFLAGS := -O3 -std=c++17 -fno-strict-aliasing -lrt
 
 cpp_objects = 	main.o \
 			remote/tcp_thread.o	\
-			remote/uart_thread.o \
 			remote/protocol.o	\
 			module/cmd_process.o  \
 			driver/rtc.o \

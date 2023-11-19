@@ -102,7 +102,6 @@ int main(int argc, char* argv[])
 		}
 	}
 	
-	uart_thread_manage::get_instance()->release();
 	PRINT_NOW("Process app_demo stop, error:%s\n", strerror(errno));
 	return result;
 }
@@ -129,7 +128,6 @@ static bool system_init(int is_default, const char* path)
 	ret &= LoggerManage::get_instance()->init();
 	ret &= driver_manage::get_instance()->init();
 	ret &= device_manage::get_instance()->init();
-	ret &= uart_thread_manage::get_instance()->init();
 	ret &= tcp_thread_manage::get_instance()->init();
 	ret &= internal_process::get_instance()->init();
 	ret &= time_manage::get_instance()->init();
