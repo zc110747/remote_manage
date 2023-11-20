@@ -19,8 +19,8 @@
 _Pragma("once")
 
 #include "common.hpp"
-#include "logger.hpp"
-#include "modules.hpp"
+#include "logger_server.hpp"
+#include "device_manage.hpp"
 
 class internal_process final
 {

@@ -18,13 +18,14 @@
 /////////////////////////////////////////////////////////////////////////////
 #include "tcp_thread.hpp"
 #include "asio_server.hpp"
+#include "common_unit.hpp"
 
 static asio_server socket_tcp_server;
 
 void tcp_thread_manage::tcp_server_run()
 {
     const auto& ipaddr = system_config::get_instance()->get_ipaddress();
-    const auto& port = system_config::get_instance()->get_logger_port();
+    const auto& port = system_config::get_instance()->get_local_port();
 
     PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "tcp info:%s:%d", ipaddr.c_str(), port);
     try

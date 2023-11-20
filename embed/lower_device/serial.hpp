@@ -3,10 +3,10 @@
 //  All Rights Reserved
 //
 //  Name:
-//      uart_thread.hpp
+//      serial.hpp
 //
 //  Purpose:
-//      Uart通讯执行模块，目前设计为同步模式，后续会修改
+//      串口通讯执行模块，目前设计为同步模式，后续会修改
 //
 // Author:
 //     	@听心跳的声音
@@ -18,23 +18,24 @@
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
-#include "protocol.hpp"
+#include "common_unit.hpp"
 
-#define UART_MAX_BUFFER_SIZE     		512
+#define SERIAL_RX_MAX_BUFFER_SIZE		1024
+#define SERIAL_TX_MAX_BUFFER_SIZE		1024
 
-class uart_thread_manage
+class serial_manage
 {
 public:
     /// \brief constructor
-	uart_thread_manage() = default;
+	serial_manage() = default;
 
 	/// \brief destructor, delete not allow for singleton pattern.
-	~uart_thread_manage() = delete;
+	~serial_manage() = delete;
 	
     /// \brief get_instance
     /// - This method is used to get the pattern of the class.
     /// \return the singleton pattern point of the object.	
-	static uart_thread_manage* get_instance();
+	static serial_manage* get_instance();
 
 	/// \brief init
     /// - This method is used to init the object.
@@ -66,10 +67,6 @@ private:
     /// - server thread to process tcp received, tranform to rx fifo.
 	void uart_server_run();
 
-	/// \brief uart_rx_run
-    /// - read from protocol rx fifo and do protocol management.
-	void uart_rx_run();
-
 	/// \brief tcp_rx_run
     /// - read from protocol tx fifo and do write data.
 	void uart_tx_run();
@@ -84,15 +81,11 @@ private:
 private:
     /// \brief instance_pointer_
     /// - object used to implement the singleton pattern.
-	static uart_thread_manage* instance_pointer_;
+	static serial_manage* instance_pointer_;
 
     /// \brief com_fd_
     /// - the fd of uart device.
 	int com_fd_{-1};
-
-	/// \brief uart_protocol_pointer_
-    /// - protocol manage for uart thread.
-	std::unique_ptr<protocol_info> uart_protocol_pointer_;
 
 	/// \brief mutex_
     /// - mutex used to protect com send.
@@ -109,5 +102,17 @@ private:
 	/// \brief uart_tx_thread_
     /// - uart tx thread object. 
 	std::thread uart_tx_thread_;
+
+	/// \brief serial_tx_fifo_
+    /// - fifo used for logger manage.
+    std::unique_ptr<fifo_manage> serial_tx_fifo_{nullptr};
+
+	/// \brief rx_buffer_
+    /// - rx buffer for receive. 	
+	char rx_buffer_[SERIAL_RX_MAX_BUFFER_SIZE];
+
+	/// \brief tx_buffer_
+    /// - tx buffer for receive. 	
+	char tx_buffer_[SERIAL_TX_MAX_BUFFER_SIZE];
 };
 

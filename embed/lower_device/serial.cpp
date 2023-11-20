@@ -16,36 +16,37 @@
 //  Revision History:
 //      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
-#include "uart_thread.hpp"
+#include "serial.hpp"
 #include <sys/termios.h>
+#include "asio_client.hpp"
+#include "common_unit.hpp"
 
-uart_thread_manage* uart_thread_manage::instance_pointer_ = nullptr;
-uart_thread_manage* uart_thread_manage::get_instance()
+
+serial_manage* serial_manage::instance_pointer_ = nullptr;
+serial_manage* serial_manage::get_instance()
 {
 	if(instance_pointer_ == nullptr)
 	{
-		instance_pointer_ = new(std::nothrow) uart_thread_manage();
+		instance_pointer_ = new(std::nothrow) serial_manage();
 		if(instance_pointer_ == nullptr)
 		{
-			PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "uart_thread_manage new failed!");
+			PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "serial_manage new failed!");
 		}
 	}
 	return instance_pointer_;
 }
 
-#define MAX_BUFFER_SIZE 512
-void uart_thread_manage::uart_server_run()
+void serial_manage::uart_server_run()
 {
-	char buffer[MAX_BUFFER_SIZE];
-
 	PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "%s start", __func__);
 
 	for(;;)
 	{
-		int size = read(com_fd_, buffer, MAX_BUFFER_SIZE);
+		int size = ::read(com_fd_, rx_buffer_, SERIAL_RX_MAX_BUFFER_SIZE);
 		if(size > 0)
 		{
-			uart_protocol_pointer_->write_rx_fifo(buffer, size);
+			//put int asio client to send
+			asio_client::get_instance()->send_msg(rx_buffer_, size);
 		}
 		else
 		{
@@ -54,49 +55,17 @@ void uart_thread_manage::uart_server_run()
 	}
 }
 
-void uart_thread_manage::uart_rx_run()
+void serial_manage::uart_tx_run()
 {
-    char data;
-    ENUM_PROTOCOL_STATUS status;
-
-	PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "%s start", __func__);
-
-	for(;;)
-	{	   
-        if(uart_protocol_pointer_->read_rx_fifo(&data, 1) > 0)
-        {
-            status = uart_protocol_pointer_->check_rx_frame(data);
-            if(status == ROTOCOL_FRAME_FINISHED)
-            {
-                //if process, clear data received.
-                uart_protocol_pointer_->process_rx_frame();
-                uart_protocol_pointer_->clear_rx_info();
-            }
-            else if(status == PROTOCOL_FRAME_EMPTY)
-            {
-                uart_protocol_pointer_->clear_rx_info();
-            }
-            else
-            {
-                //in receive, do nothing
-            }
-        }
-	}
-}
-
-void uart_thread_manage::uart_tx_run()
-{
-    ENUM_PROTOCOL_STATUS status;
     int size;
-    char buffer[TX_BUFFER_SIZE];
 
 	PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "%s start", __func__);
     while(1)
     {
-        size = uart_protocol_pointer_->read_tx_fifo(buffer, TX_BUFFER_SIZE);
+        size = serial_tx_fifo_->read(tx_buffer_, SERIAL_RX_MAX_BUFFER_SIZE);
         if(size > 0)
         {
-            write_data(buffer, size);
+            write_data(tx_buffer_, size);
         }
         else
         {
@@ -105,12 +74,12 @@ void uart_thread_manage::uart_tx_run()
     }
 }
 
-int uart_thread_manage::send_msg(char *buffer, uint16_t size)
+int serial_manage::send_msg(char *buffer, uint16_t size)
 {
-    return uart_protocol_pointer_->send_data(buffer, size);
+    return serial_tx_fifo_->write(buffer, size);
 }
 
-bool uart_thread_manage::init()
+bool serial_manage::init()
 {
 	const auto& serial_config = system_config::get_instance()->get_serial_config();
 
@@ -121,53 +90,38 @@ bool uart_thread_manage::init()
 	}
 	else
 	{
+		PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Open Device %s success, id:%d!", serial_config.dev.c_str(), com_fd_);
 		if(set_opt(serial_config.baud, serial_config.dataBits, serial_config.parity, serial_config.stopBits) != 0)
 		{
 			PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Serial Option failed!");
 			return false;
 		}
 	}
-	
-	uart_protocol_pointer_ = std::make_unique<protocol_info>();
-	if(uart_protocol_pointer_ == nullptr)
-	{
-		PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "uart_protocol_pointer_ create failed!");
-		return false;
-	}
-	auto ret = uart_protocol_pointer_->init(SERVER_UART_RX_FIFO, SERVER_UART_TX_FIFO, [this](char *ptr, int size){
-		write_data(ptr, size);
-	});
-	if(!ret)
-	{
-		PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "uart_protocol_pointer_ init failed!");
-		return false;
-	}
 
-	uart_server_thread_ = std::thread(std::bind(&uart_thread_manage::uart_server_run, this));
+	serial_tx_fifo_ = std::make_unique<fifo_manage>(SERVER_UART_TX_FIFO, S_FIFO_WORK_MODE);
+
+	uart_server_thread_ = std::thread(std::bind(&serial_manage::uart_server_run, this));
 	uart_server_thread_.detach();
-	uart_rx_thread_ = std::thread(std::bind(&uart_thread_manage::uart_rx_run, this));
-	uart_rx_thread_.detach();
-	uart_tx_thread_ = std::thread(std::bind(&uart_thread_manage::uart_tx_run, this));
+	uart_tx_thread_ = std::thread(std::bind(&serial_manage::uart_tx_run, this));
 	uart_tx_thread_.detach();
 
-	PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "uart_thread_manage init success!");
+	PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "serial_manage init success!");
 	return true;
 }
 
-int uart_thread_manage::write_data(char *pbuffer, uint16_t size)
+int serial_manage::write_data(char *pbuffer, uint16_t size)
 {
 	int send_size = -1;
 
 	if(com_fd_ >= 0)
 	{
-		std::lock_guard lock{mutex_};
 		send_size = ::write(com_fd_, pbuffer, size);
 	}
 
 	return send_size;
 }
 
-int uart_thread_manage::set_opt(int nBaud, int nDataBits, std::string cParity, int nStopBits)
+int serial_manage::set_opt(int nBaud, int nDataBits, std::string cParity, int nStopBits)
 {
 	struct termios newtio;
 	struct termios oldtio;
@@ -267,7 +221,7 @@ int uart_thread_manage::set_opt(int nBaud, int nDataBits, std::string cParity, i
 	return 0;
 }
 
-void uart_thread_manage::release()
+void serial_manage::release()
 {
 	if(com_fd_ >= 0)
 	{

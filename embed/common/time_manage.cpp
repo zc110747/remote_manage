@@ -6,7 +6,8 @@
 //      time_manage.cpp
 //
 //  Purpose:
-//      定时触发器，管理周期性执行或者延时执行的任务
+//      时间管理组件
+//      1.提供系统定时器，通过接口xGetCurrentTicks获取当前工作的时间计数
 //      提供非精确的延时处理，精度位10
 //
 // Author:
@@ -18,7 +19,7 @@
 //      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
 #include "time_manage.hpp"
-#include "logger.hpp"
+#include "logger_server.hpp"
 
 time_manage *time_manage::instance_pointer_ = nullptr;
 
@@ -99,4 +100,9 @@ bool time_manage::init(uint32_t timeInterval)
 uint32_t xGetCurrentTicks(void)
 {
     return time_manage::get_instance()->get_current_ticks();
+}
+
+uint32_t xGetCurrentPeroid(void)
+{
+    return time_manage::get_instance()->get_current_period();
 }

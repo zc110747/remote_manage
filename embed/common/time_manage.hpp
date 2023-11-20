@@ -19,9 +19,6 @@
 _Pragma("once")
 
 #include "common.hpp"
-#include <condition_variable>
-#include <chrono>
-#include <functional>
 
 #define TIME_ACTION_ALWAYS      0xFFFFFFF
 #define TIME_INTERVAL           100
@@ -236,6 +233,11 @@ public:
     /// \return the ticks of the thread run.
     uint32_t get_current_ticks() {return ticks_;}
 
+    /// \brief get_current_ticks
+    /// - This method is used to get work peroid
+    /// \return the time of the 1 ticks.
+    uint32_t get_current_period() {return peroid_;}
+
 private:
     /// \brief run
     /// - This method is used to run the timer_struct management.
@@ -268,3 +270,4 @@ private:
 };
 
 uint32_t xGetCurrentTicks(void);
+uint32_t xGetCurrentPeroid(void);

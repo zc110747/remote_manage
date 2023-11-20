@@ -34,6 +34,21 @@ exit_if_last_error() {
         exit 1
     fi
 }
+alias exit_if_last_error='exit_if_last_error'
+
+#tar the firmware source
+function SysTarFirmwareSource
+{
+	cd ${ENV_PATH_ROOT}/../
+
+	tar -vcjf remote_manage.tar.bz2 --exclude=remote_manage/.git --exclude=remote_manage/rootfs/support --exclude=remote_manage/thirdparts remote_manage/
+
+	exit_if_last_error
+
+	echo "move to ${DST_PATH}"
+	mv remote_manage.tar.bz2 ${DST_PATH}/
+}	
+alias SysTarFirmwareSource='SysTarFirmwareSource'
 
 function SysPullAll()
 {
@@ -111,9 +126,9 @@ function SysBuildApplication()
 	#编译驱动地址
 	build_driver_module
 
-	#复制版本信息
+	#复制配置文件
 	cd $ENV_PATH_ROOT
-	cp config.json.template $APPLICATION_RUN/config.json
+	cp config.template.json $APPLICATION_RUN/config.json
 
 	#编译支持的库
 	build_support_library
@@ -121,12 +136,12 @@ function SysBuildApplication()
 	#编译并复制main_process进程
 	cd ${APPLICATION_EMBED}/main_process
 	make -j${CPU_CORE}
-	
 	exit_if_last_error
-	
-	if [ ${FIRMWARE_CURRENT_PLATFORMS} == "Embed-Linux" ]; then
-		cp ${APPLICATION_BUILDOUT}/main_process $APPLICATION_RUN/bin/
-	fi
+
+	#编译并复制lower_device进程
+	cd ${APPLICATION_EMBED}/lower_device
+	make -j${CPU_CORE}
+	exit_if_last_error
 		
 	#打包服务器程序(包含node的后台和前端页面)
 	cd ${APPLICATION_EMBED}/
@@ -137,11 +152,18 @@ function SysBuildApplication()
 
 	#将编译好的项目复制到nfs目录指定位置
 	#采用nfs启动后即可执行
-	if [ -d $NFS_RUN_PATH ]; then
-		cp -rv $APPLICATION_RUN/* $NFS_RUN_PATH/
-		sudo cp -rv $ENV_PATH_ROOT/rootfs/etc/* $NFS_PATH/etc/
-	else
-		echo "nfs directory $NFS_RUN_PATH not exist, not copy!"
+	if [ ${FIRMWARE_CURRENT_PLATFORMS} == "Embed-Linux" ]; then
+		
+		#复制可执行程序
+		cp ${APPLICATION_BUILDOUT}/main_process $APPLICATION_RUN/bin/
+		cp ${APPLICATION_BUILDOUT}/lower_device $APPLICATION_RUN/bin/
+		
+		if [ -d $NFS_RUN_PATH ]; then
+			cp -rv $APPLICATION_RUN/* $NFS_RUN_PATH/
+			sudo cp -rv $ENV_PATH_ROOT/rootfs/etc/* $NFS_PATH/etc/
+		else
+			echo "nfs directory $NFS_RUN_PATH not exist, not copy!"
+		fi
 	fi
 
 	cda
@@ -178,7 +200,9 @@ alias SysExecuteFirmware='SysExecuteFirmware'
 #关闭firmware，仅限于linux环境下编译的应用，主要用于测试
 function SysKillFirmware
 {
-	pkill -9 app_demo
+	echo "kill main_process lower_device"
+	sudo pkill -9 lower_device
+	sudo pkill -9 main_process
 }
 alias SysKillFirmware='SysKillFirmware'
 

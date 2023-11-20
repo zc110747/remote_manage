@@ -60,7 +60,7 @@ echo "未复制则后续编译时会显示找不到文件或者直接编译失�
 #按照系统编译支持的library库
 if [ x$1 != x ] && [ $1 == "all" ]; then
     echo "install library or tools for the build environment." 
-    sudo apt-get install vim lib32z1 cmake -y
+    sudo apt-get install vim lib32z1 cmake net-tools -y
     sudo apt-get install bc lzop libffi-dev libssl-dev lzop git -y
     sudo apt-get install libncurses5-dev u-boot-tools openssh-server -y 
     sudo apt-get install dos2unix gzip libtool flex -y

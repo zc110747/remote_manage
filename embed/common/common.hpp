@@ -29,7 +29,7 @@ _Pragma("once")
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <signal.h>
-
+#include <stdarg.h>
 
 //c++ interface
 #include <new>
@@ -45,6 +45,10 @@ _Pragma("once")
 #include <chrono>
 #include <atomic>
 #include <vector>
+
+#include "event.hpp"
+#include "thread_queue.hpp"
+#include "productConfig.hpp"
 
 #if __cplusplus < 201703
 #error "c++ compiler need newer than g++7, can use 'g++ -v' to see version."

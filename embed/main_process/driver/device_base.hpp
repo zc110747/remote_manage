@@ -21,8 +21,8 @@
 #ifndef __device_base_HPP
 #define __device_base_HPP
 
-#include "../include/productConfig.hpp"
 #include "jsonconfig.hpp"
+#include "common_unit.hpp"
 
 class device_base
 {

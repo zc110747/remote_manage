@@ -16,9 +16,9 @@
 //  Revision History:
 //      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
+
 #include "cmd_process.hpp"
-#include "center_manage.hpp"
-#include "common_unit.hpp"
+#include "logger_server.hpp"
 
 /*
 !readdev    [index] #index=[0~3 led,beep,ap,icm]
@@ -30,18 +30,13 @@
 */
 const static std::map<std::string, cmd_format_t> CmdMapM = {
     {"!getos",      CmdGetOS},
-    {"!readdev",    CmdReadDev},
-    {"!setdev",     CmdSetDev},
     {"!setlevel",   cmdSetLevel},
-    {"!connect",    CmdConnect},
     {"!?",          CmdGetHelp},
     {"!help",       CmdGetHelp},
 };
 
 const static std::map<cmd_format_t, std::string> CmdHelpMapM = {
     {CmdGetOS,   "!getos"},
-    {CmdReadDev, "!readdev"},
-    {CmdSetDev,  "!setdev [index],[action]"},
     {cmdSetLevel, "!setlevel [lev 0-5]",},
     {CmdGetHelp, "!? ## !help"},
 };
@@ -84,40 +79,12 @@ bool cmd_process::process_data()
     bool ret = true;
     switch(cmd_format_)
     {
-        case CmdReadDev:
-            { 
-                auto info = device_manage::get_instance()->get_device_info();
-                
-                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "LedStatus:%d!", info.led_io_);
-                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "beepStatus:%d!", info.beep_io_);
-                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "ApInfo, ir:%d, als:%d, ps:%d!",
-                        info.ap_info_.ir,
-                        info.ap_info_.als,
-                        info.ap_info_.ps);
-                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "ICMInfo, gx,gy,gz:%.2f,%.2f,%.2f;ax,ay,az:%.2f,%.2f,%.2f;temp:%.2f!",
-                        info.icm_info_.gyro_x_act,
-                        info.icm_info_.gyro_y_act,
-                        info.icm_info_.gyro_z_act,
-                        info.icm_info_.accel_x_act,
-                        info.icm_info_.accel_y_act,
-                        info.icm_info_.accel_z_act,
-                        info.icm_info_.temp_act);
-            }  
-            break;
         case CmdGetOS:
             {
                 auto pSysConfig = system_config::get_instance();
                 auto pVersion = pSysConfig->get_version().c_str();
                 PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "FW_Version:%d, %d, %d, %d", pVersion[0], pVersion[1], pVersion[2], pVersion[3]);
                 PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Logger Level:%d ", (int)LoggerManage::get_instance()->get_level());
-            }
-            break;
-        case CmdSetDev:
-            {
-                uint32_t device = 0, action = 0;
-                sscanf(cmd_data_pointer_, "%d,%d", &device, &action);
-                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "SetDev:%d, %d!", device, action);
-                center_manage::get_instance()->send_hardware_config_message(device, action);
             }
             break;
         case cmdSetLevel:
@@ -127,11 +94,6 @@ bool cmd_process::process_data()
                     level = 5;
                 LoggerManage::get_instance()->set_level((LOG_LEVEL)level);
                 PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Set Logger Level:%d!", level);
-            }
-            break;
-        case CmdConnect:
-            {
-                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Connect with Remote Success!");
             }
             break;
         case CmdGetHelp:

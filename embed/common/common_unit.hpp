@@ -3,23 +3,28 @@
 //  All Rights Reserved
 //
 //  Name:
-//      modules.hpp
+//      common.hpp
 //
 //  Purpose:
-//      组件的总接口, 提供对外的接口
+//      全局的用于支持项目编译包含的库
 //
 // Author:
-//      @听心跳的声音
+//     @听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
-//      12/19/2022   Add explian and update structure.
+//      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
-#include "productConfig.hpp"
-#include "jsonconfig.hpp"
-#include "device_manage.hpp"
+#include "common.hpp"
+
+//common unit for all application
+#include "time_manage.hpp"
+#include "fifo/fifo_manage.hpp"
+#include "jsonconfig/jsonconfig.hpp"
+#include "logger/logger_server.hpp"
+#include "server/asio_server.hpp"
 
 uint16_t crc16(uint16_t crc, uint8_t const *buffer, uint16_t len);

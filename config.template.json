@@ -24,24 +24,25 @@
 			"dev" : "/dev/rtc0"
 		}
 	},
-	"lower_device" : {
-		"serial" : {
-			"stopBits" : 0,
-			"baud" : 115200,
-			"dataBits" : 8,
-			"parity" : "n",
-			"dev" : "/dev/ttymxc2"
-		}
-	},
 	"main_process" :{
-		"download_path" : "/tmp/download",
-		"node_port":15000,
-		"lower_deivce_port":15001,
-		"local_device_port":15002,
-		"gui_device_port":15003,
-		"logger_port":15004
+		"download_path" :"/tmp/download",
+		"local_port"	:15002,
+		"gui_port"		:15003,
+		"logger_port"	:15004,
+		"node_port"		:15005
 	},
 	"node_server" : {
-		"web_port" : 15100
+		"web_port" 		:15101
+	},
+	"lower_device" :{
+		"logger_port"	:15201,
+		"serial" : {
+			"net_port"  :15202,
+			"stopBits" 	:0,
+			"baud" 		:115200,
+			"dataBits" 	:8,
+			"parity" 	:"n",
+			"dev" 		:"/dev/ttyS3"
+		}
 	}
 }

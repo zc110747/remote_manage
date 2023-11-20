@@ -1,4 +1,4 @@
-﻿//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 //  (c) copyright 2022-by Persional Inc.  
 //  All Rights Reserved
 //
@@ -6,8 +6,7 @@
 //      main.cpp
 //
 //  Purpose:
-//      本项目作为嵌入式管理平台的下位机，主要负责网络，串口通讯，本地设备管理，
-//		远端设备轮询，详细设计参考document目录下说明
+//     	支持将socket数据转换为
 //
 // Author:
 //     @听心跳的声音
@@ -18,12 +17,9 @@
 //      7/30/2022   Create New Version
 //		
 /////////////////////////////////////////////////////////////////////////////
-#include "device_manage.hpp"
-#include "remote.hpp"
-#include "driver.hpp"
-#include "internal_process.hpp"
-#include "center_manage.hpp"
 #include "common_unit.hpp"
+#include "serial.hpp"
+#include "asio_client.hpp"
 
 //internal data
 static int nConfigDefault = 0;
@@ -101,6 +97,8 @@ int main(int argc, char* argv[])
 		}
 	}
 	
+	LoggerManage::get_instance()->release();
+	
 	PRINT_NOW("Process app_demo stop, error:%s\n", strerror(errno));
 	return result;
 }
@@ -125,13 +123,10 @@ static bool system_init(int is_default, const char* path)
 	std::cout<<*(system_config::get_instance())<<std::endl;
 
 	ret &= LoggerManage::get_instance()->init();
-	ret &= driver_manage::get_instance()->init();
-	ret &= device_manage::get_instance()->init();
-	ret &= tcp_thread_manage::get_instance()->init();
-	ret &= internal_process::get_instance()->init();
 	ret &= time_manage::get_instance()->init();
-	ret &= center_manage::get_instance()->init();
-
+	ret &= serial_manage::get_instance()->init();
+	ret &= asio_client::get_instance()->init();
+	
 	return ret;
 }
 

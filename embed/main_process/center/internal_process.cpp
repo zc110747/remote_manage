@@ -16,10 +16,8 @@
 //  Revision History:
 //      12/20/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
-
 #include "internal_process.hpp"
-#include "asio_server.hpp"
-#include "modules.hpp"
+#include "common_unit.hpp"
 
 internal_process*  internal_process::instance_pointer_ = nullptr;
 internal_process* internal_process::get_instance()
@@ -40,7 +38,7 @@ static asio_server InterServer;
 void internal_process::run()
 {
     const auto& ipaddr = system_config::get_instance()->get_local_ipaddress();
-    const auto& port = system_config::get_instance()->get_node_port();
+    const auto& port = system_config::get_instance()->get_serial_config().net_port;
     
     try
     {

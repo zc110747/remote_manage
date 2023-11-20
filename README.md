@@ -145,10 +145,10 @@ PC应用端设计<br/>
 ## 硬件适配和兼容性
 
 整个项目由上位机(windows平台和web平台), 主控设备(嵌入式linux平台)和其它设备平台(STM32单片机)组成.<br/>
-1.主控设备基于正点原子阿尔法开发板实现，使用imx6ull内核.<br/>
-2.windows平台主要提供对于开发板的远程管理，基于QT设计，用于本地的软件访问和管理.<br/>
-3.web平台基于vue开发，主要用于本地的web访问和管理.<br/>
-4.其它设备平台基于STM32单片机设计.<br/>
+1. 主控设备基于正点原子阿尔法开发板实现，使用imx6ull内核.<br/>
+2. windows平台主要提供对于开发板的远程管理，基于QT设计，用于本地的软件访问和管理.<br/>
+3. web平台基于vue开发，主要用于本地的web访问和管理.<br/>
+4. 其它设备平台基于STM32单片机设计.<br/>
 
 ## 编译环境
 
@@ -158,9 +158,10 @@ PC应用端设计<br/>
 &emsp;&emsp;软件源为国内镜像源，我目前使用的是清华镜像源，地址:https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/ , 按照方法说明即可。<br />
 &emsp;&emsp;交叉编译工具主要用于编译uboot，kernal，文件系统，应用和库，uboot和kernal如果使用较早版本则有限制，使用新的编译器会包含删除的功能，导致无法编译通过，用老的编译工具即可，文件系统和应用，库需要用一个编译器版本，它们的执行依赖文件系统中的lib库，版本不匹配可能会导致接口缺少而无法正常工作。<br />
 本项目开发使用过的环境如下:<br />
+```
 虚拟机 - VMvare<br />
 Linux系统 - 22.04LTS<br />
 软件源 - 清华源<br />
 交叉编译(uboot/kernal) - gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf <br />
 交叉编译(rootfs/application/lib) - gcc-arm-11.2-2022.02-x86_64-arm-none-linux-gnueabihf<br />
-
+```

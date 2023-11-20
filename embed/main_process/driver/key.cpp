@@ -19,7 +19,7 @@
 
 #include <map>
 #include "key.hpp"
-#include "logger.hpp"
+#include "logger_server.hpp"
 #include "common.hpp"
 
 static std::map<int, std::function<void(int)>> FuncList;

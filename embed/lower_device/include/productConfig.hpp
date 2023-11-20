@@ -20,20 +20,16 @@ _Pragma("once")
 
 #define PROCESS_MAIN_PROCESS        0
 #define PROCESS_LOWER_DEVICE        1
-#define PROCESS_RUN                 PROCESS_MAIN_PROCESS
+#define PROCESS_RUN                 PROCESS_LOWER_DEVICE
 
 //------------------------- FIFO List ------------------------------
-#define LOGGER_FIFO_PATH            "/tmp/logger.fifo"              //logger服务模块
-#define DEVICE_MESSAGE_FIFO         "/tmp/device_manage.fifo"        //设备管理模块
-#define CENTER_UNIT_FIFO            "/tmp/center_manage.fifo"
-
-//socket fifo
-#define SOCKET_TCP_RX_FIFO          "/tmp/socket_rx.fifo"
-#define SOCKET_TCP_TX_FIFO          "/tmp/socket_tx.fifo"
+#define LOGGER_FIFO_PATH            "/tmp/ld_logger.fifo"              //logger服务模块
 
 //uart fifo
 #define SERVER_UART_RX_FIFO          "/tmp/uart_rx.fifo"
 #define SERVER_UART_TX_FIFO          "/tmp/uart_tx.fifo"
+
+#define ASIO_CLENET_FIFO            "/tmp/ld_client_tx.fifo"
 
 /*返回状态*/
 #define RT_INVALID_MQ_SIZE              -4

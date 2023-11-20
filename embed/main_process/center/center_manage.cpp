@@ -19,9 +19,9 @@
 //      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
 #include "center_manage.hpp"
-#include "logger.hpp"
 #include "internal_process.hpp"
 #include "tcp_thread.hpp"
+#include "common_unit.hpp"
 
 center_manage* center_manage::get_instance()
 {

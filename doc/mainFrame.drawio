@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="97HLYAoYRTmnaLsdLiow" name="Page-1">
-        <mxGraphModel dx="1346" dy="551" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="978" dy="365" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -10,8 +10,8 @@
                 <mxCell id="36" value="" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="260" y="240" width="540" height="280" as="geometry"/>
                 </mxCell>
-                <mxCell id="91" value="LocalDevice" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;" parent="1" vertex="1">
-                    <mxGeometry x="560" y="370" width="220" height="80" as="geometry"/>
+                <mxCell id="91" value="LowerDevice" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;" parent="1" vertex="1">
+                    <mxGeometry x="560" y="370" width="233" height="142" as="geometry"/>
                 </mxCell>
                 <mxCell id="77" value="" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;" parent="1" vertex="1">
                     <mxGeometry x="520" y="540" width="280" height="110" as="geometry"/>
@@ -22,7 +22,7 @@
                 <mxCell id="3" value="MainProcess" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;" parent="1" vertex="1">
                     <mxGeometry x="390" y="250" width="150" height="260" as="geometry"/>
                 </mxCell>
-                <mxCell id="4" value="LowerDevice&lt;br&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;" parent="1" vertex="1">
+                <mxCell id="4" value="LocalDevice" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;" parent="1" vertex="1">
                     <mxGeometry x="560" y="250" width="150" height="110" as="geometry"/>
                 </mxCell>
                 <mxCell id="7" value="Server" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
@@ -40,7 +40,7 @@
                 <mxCell id="92" style="edgeStyle=none;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;startArrow=classicThin;startFill=1;" parent="1" source="12" target="90" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="12" value="ser2net" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                <mxCell id="12" value="serial" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="580" y="465" width="80" height="40" as="geometry"/>
                 </mxCell>
                 <mxCell id="14" value="" style="endArrow=classic;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;startArrow=classic;startFill=1;" parent="1" source="10" target="12" edge="1">
@@ -79,8 +79,8 @@
                 <mxCell id="94" style="edgeStyle=none;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;startArrow=classicThin;startFill=1;" parent="1" source="32" target="90" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="32" value="CanSocket" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-                    <mxGeometry x="705" y="470" width="80" height="40" as="geometry"/>
+                <mxCell id="32" value="can" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="700" y="465" width="88" height="40" as="geometry"/>
                 </mxCell>
                 <mxCell id="37" value="LED" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="720" y="250" width="60" height="20" as="geometry"/>
@@ -183,9 +183,6 @@
                 </mxCell>
                 <mxCell id="90" value="client" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="580" y="400" width="80" height="35" as="geometry"/>
-                </mxCell>
-                <mxCell id="97" value="DateManage" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-                    <mxGeometry x="680" y="400" width="80" height="35" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>

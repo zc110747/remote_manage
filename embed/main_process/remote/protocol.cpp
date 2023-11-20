@@ -17,8 +17,8 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "protocol.hpp"
-#include "logger.hpp"
 #include "center_manage.hpp"
+#include "common_unit.hpp"
 
 const uint8_t PACKED_HEAD[] = {0x5a, 0x5b};
 

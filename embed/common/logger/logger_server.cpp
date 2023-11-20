@@ -16,10 +16,10 @@
 //  Revision History:
 //      12/19/2022   Create New Version	
 /////////////////////////////////////////////////////////////////////////////
-#include <stdarg.h>
+#include "logger_server.hpp"
+#include "time_manage.hpp"
+#include "jsonconfig.hpp"
 #include "asio_server.hpp"
-#include "logger.hpp"
-#include "productConfig.hpp"
 
 static asio_server logger_server;
 
@@ -27,9 +27,16 @@ static asio_server logger_server;
 void LoggerManage::logger_rx_server_run()
 {
     const auto& ipaddr = system_config::get_instance()->get_ipaddress();
+
+#if PROCESS_RUN == PROCESS_LOWER_DEVICE
+    const auto& port = system_config::get_instance()->get_lower_device_logger_port();
+#else
     const auto& port = system_config::get_instance()->get_logger_port();
+#endif
 
     cmd_process Loggercmd_process;
+
+    PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "logger server start!");
 
     try
     {

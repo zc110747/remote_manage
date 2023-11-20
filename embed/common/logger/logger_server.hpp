@@ -3,7 +3,7 @@
 //  All Rights Reserved
 //
 //  Name:
-//      logger.hpp
+//      logger_server.hpp
 //
 //  Purpose:
 //      基于asio_server实现的tcp服务器, 提供命令的接收处理以及异步的logger打印接口
@@ -18,10 +18,9 @@
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
-#include "fifo_manage.hpp"
-#include "time_manage.hpp"
-#include "jsonconfig.hpp"
+#include "common.hpp"
 #include "cmd_process.hpp"
+#include "fifo_manage.hpp"
 
 #define LOGGER_MAX_BUFFER_SIZE      256
 #define LOGGER_MESSAGE_BUFFER_SIZE  16384

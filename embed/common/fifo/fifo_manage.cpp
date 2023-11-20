@@ -17,7 +17,8 @@
 //      12/19/2022   Add explian and update structure.
 /////////////////////////////////////////////////////////////////////////////
 #include "fifo_manage.hpp"
-#include "logger.hpp"
+#include "time_manage.hpp"
+#include "logger_server.hpp"
 
 fifo_manage::fifo_manage(const std::string& fstr, int mode){
     fifo_path_ = std::move(fstr);

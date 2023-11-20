@@ -22,7 +22,6 @@
 _Pragma("once")
 
 #include "json/json.h"
-#include "logger.hpp"
 
 #define DEFAULT_LOCAL_IPADRESS      "127.0.0.1"
 #define DEFAULT_IPADDRESS           "127.0.0.1"
@@ -64,15 +63,6 @@ typedef struct
     JString dev;
 }IoSysConfig;
 
-typedef struct
-{
-    int baud;
-    int dataBits;
-    int stopBits;
-    JString parity;
-    JString dev;
-}SerialSysConfig;
-
 typedef struct 
 {
     DeviceSysConfig ap_i2c;
@@ -83,25 +73,37 @@ typedef struct
     IoSysConfig beep;
 }LocalDeviceConfig;
 
-typedef struct 
-{
-    SerialSysConfig serial;
-}LowerDeviceConfig;
 
 typedef struct 
 {
     JString download_path;
     int node_port;
+    int local_port;
+    int gui_port;
     int logger_port;
-    int lower_deivce_port;
-    int local_device_port;
-    int gui_device_port;
 }MainProcessConfig;
 
 typedef struct 
 {
     int web_port;
 }NodeServerConfig;
+
+typedef struct 
+{
+    int net_port;
+    int baud;
+    int dataBits;
+    int stopBits;
+    JString parity;
+    JString dev;
+}SerialSysConfig;
+
+typedef struct 
+{
+    int logger_port;
+    
+    SerialSysConfig serial;
+}LowerDeviceConfig;
 
 typedef struct 
 {
@@ -113,11 +115,11 @@ typedef struct
 
     LocalDeviceConfig local_device;
 
-    LowerDeviceConfig lower_device;
-
     MainProcessConfig main_process;
 
     NodeServerConfig node_sever;
+
+    LowerDeviceConfig lower_device;
 }SystemParamter;
 
 class system_config
@@ -153,27 +155,27 @@ public:
 public:
     /// \brief get*
     /// - All This method is used to get internal information.
-    const std::string &get_config_file_path() const {return file_path_;}
-    const JString &get_local_ipaddress()            {return parameter_.local_ipaddress;}
-    const JString &get_ipaddress()                  {return parameter_.ipaddress;}
-    const JString &get_version()                    {return parameter_.version;}
+    const std::string &get_config_file_path()   const   {return file_path_;}
+    const JString &get_local_ipaddress()        const   {return parameter_.local_ipaddress;}
+    const JString &get_ipaddress()              const   {return parameter_.ipaddress;}
+    const JString &get_version()                const   {return parameter_.version;}
 
-    const IoSysConfig &get_led_config()             {return parameter_.local_device.led;}
-    const IoSysConfig &get_beep_config()            {return parameter_.local_device.beep;}
-    const DeviceSysConfig &get_key_config()         {return parameter_.local_device.key;}
-    const DeviceSysConfig &get_rtc_config()         {return parameter_.local_device.rtc;}
-    const DeviceSysConfig &get_icm_config()         {return parameter_.local_device.icm_spi;}
-    const DeviceSysConfig &get_ap_config()          {return parameter_.local_device.ap_i2c;}
+    const IoSysConfig &get_led_config()         const   {return parameter_.local_device.led;}
+    const IoSysConfig &get_beep_config()        const   {return parameter_.local_device.beep;}
+    const DeviceSysConfig &get_key_config()     const   {return parameter_.local_device.key;}
+    const DeviceSysConfig &get_rtc_config()     const   {return parameter_.local_device.rtc;}
+    const DeviceSysConfig &get_icm_config()     const   {return parameter_.local_device.icm_spi;}
+    const DeviceSysConfig &get_ap_config()      const   {return parameter_.local_device.ap_i2c;}
 
-    const SerialSysConfig &get_serial_config()      {return parameter_.lower_device.serial;}
+    const int &get_lower_device_logger_port()   const    {return parameter_.lower_device.logger_port;}
+    const SerialSysConfig &get_serial_config()  const    {return parameter_.lower_device.serial;}
 
-    const JString &get_download_path()              {return parameter_.main_process.download_path;}
-    const int get_node_port()                       {return parameter_.main_process.node_port;}
-    const int get_lower_device_port()               {return parameter_.main_process.lower_deivce_port;}
-    const int get_local_device_port()               {return parameter_.main_process.local_device_port;}
-    const int get_logger_port()                     {return parameter_.main_process.logger_port;}   
-    const int get_gui_device_port()                 {return parameter_.main_process.gui_device_port;}
-    const int get_node_web_port()                   {return parameter_.node_sever.web_port;}
+    const JString &get_download_path()          const    {return parameter_.main_process.download_path;}
+    const int get_node_port()                   const    {return parameter_.main_process.node_port;}
+    const int get_local_port()                  const    {return parameter_.main_process.local_port;}
+    const int get_logger_port()                 const    {return parameter_.main_process.logger_port;}   
+    const int get_gui_device_port()             const    {return parameter_.main_process.gui_port;}
+    const int get_node_web_port()               const    {return parameter_.node_sever.web_port;}
 private:
     /// \brief instance_pointer_
     /// - object used to implement the singleton pattern.

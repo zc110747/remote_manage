@@ -12,6 +12,7 @@
 *.tar.xz
 *.a
 *.so
+*.ko
 
 thirdparts/asio
 thirdparts/asio-1.28.0.tar.gz

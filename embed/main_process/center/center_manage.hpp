@@ -20,7 +20,8 @@
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
-#include "modules.hpp"
+#include "common.hpp"
+#include "device_manage.hpp"
 
 class center_manage final: std::enable_shared_from_this<center_manage>
 {

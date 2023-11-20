@@ -12,24 +12,14 @@ BUILD=e
 
 CCFLAGS := -O3 -std=c++17 -fno-strict-aliasing -lrt 
 
-cpp_objects = 	main.o \
-				remote/tcp_thread.o	\
-				remote/protocol.o	\
+cpp_objects = 	main.o	\
+				serial.o \
+				asio_client.o \
 				module/cmd_process.o  \
-				driver/rtc.o \
-				driver/key.o \
-				driver/spi_icm.o \
-				driver/device_base.o \
-				driver/driver.o \
-				center/internal_process.o \
-				center/device_manage.o   \
-				center/center_manage.o
+				
 
-INCLUDES = 	-I remote/ 				\
-			-I driver/ 				\
-			-I include/ 			\
-			-I module/ 				\
-			-I center/
+INCLUDES = 	-I include/ \
+			-I module/
 				
 INCLUDES +=	-I $(ENV_PATH_ROOT)/thirdparts/asio/include/ \
 			-I $(ENV_PATH_ROOT)/thirdparts/jsoncpp/include/ 
@@ -42,7 +32,7 @@ endif
 
 # This is the file name of the executables and path where 
 # place the executables
-buildout = main_process
+buildout = lower_device
 
 # Including this file allows access to the Build System.
 include $(ENV_PATH_ROOT)/embed/common/common.mk
