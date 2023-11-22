@@ -1,6 +1,6 @@
 #编译工具和编译选项
-CC = arm-linux-gnueabihf-g++
-CFLAGS  := -O3 -std=c++11 -lpthread
+CC = arm-none-linux-gnueabihf-gcc
+CFLAGS  := -O3 -lpthread
 
 #头文件路径
 LOWERAPP_INC_ROOT = ../

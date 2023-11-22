@@ -38,7 +38,7 @@ static asio_server InterServer;
 void internal_process::run()
 {
     const auto& ipaddr = system_config::get_instance()->get_local_ipaddress();
-    const auto& port = system_config::get_instance()->get_serial_config().net_port;
+    const auto& port = system_config::get_instance()->get_node_port();
     
     try
     {

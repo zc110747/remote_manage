@@ -98,18 +98,18 @@
 		};
 	};
 
+	usr_beep {
+		compatible = "usr-beep";
+		pinctrl-0 = <&pinctrl_beep>;
+		beep-gpio = <&gpio5 1 GPIO_ACTIVE_LOW>;
+		status = "okay";
+	};
+
 	/*gpio application add by zc*/
 	usr_gpios {
 		compatible = "usr-gpios";
 		pinctrl-names = "default";
 		model = "usr-gpios";
-
-		beep {
-			compatible = "usr-beep";
-			pinctrl-0 = <&pinctrl_beep>;
-			beep-gpio = <&gpio5 1 GPIO_ACTIVE_LOW>;
-			status = "okay";
-		};
 
 		led {
 			compatible = "gpio-led";

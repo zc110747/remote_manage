@@ -6,5 +6,5 @@
 #
 ################################################################################
 dir := ${ENV_PATH_ROOT}/mod
-
+with_kernel :=0
 include $(ENV_PATH_ROOT)/build/buildmulti.mk

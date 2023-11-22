@@ -223,30 +223,19 @@ static int beep_hardware_init(struct platform_device *pdev)
 {
     int result;
 
-    // /*1.获取设备节点*/
-    // driver.hw.nd = of_find_node_by_path("/usr_gpios/beep");
-    // if(driver.hw.nd == NULL){
-    //     printk(KERN_INFO"beep node no find\n");
-    //     return -EINVAL;
-    // }
+    /*1.获取设备节点*/
+    driver.hw.nd = of_find_node_by_path("/usr_beep");
+    if(driver.hw.nd == NULL){
+        printk(KERN_INFO"beep node no find\n");
+        return -EINVAL;
+    }
 
-    // /*2.获取设备树中的gpio属性编号*/
-    // driver.hw.gpio = of_get_named_gpio(driver.hw.nd, "beep-gpio", 0);
-    // if(driver.hw.gpio < 0){
-    //     printk(KERN_INFO"beep-gpio no find\n");
-    //     return -EINVAL;
-    // }
-
-    struct resource *res;  
-
-    // 获取platform_device的GPIO资源信息  
-    res = platform_get_resource(pdev, IORESOURCE_IO, 0);  
-    if (res == NULL) {  
-        // 处理获取失败的情况  
-        printk(KERN_ERR "Failed to get GPIO resource\n");  
-        return -EINVAL;  
-    }  
-    driver.hw.gpio = res->start;
+    /*2.获取设备树中的gpio属性编号*/
+    driver.hw.gpio = of_get_named_gpio(driver.hw.nd, "beep-gpio", 0);
+    if(driver.hw.gpio < 0){
+        printk(KERN_INFO"beep-gpio no find\n");
+        return -EINVAL;
+    }
 
     /*3.设置beep对应GPIO输出*/
     result = gpio_direction_output(driver.hw.gpio, 1);
@@ -270,15 +259,15 @@ static int beep_probe(struct platform_device *dev)
 
     //硬件初始化
     result = beep_hardware_init(dev);
-    if(!result)
+    if(result != 0)
     {
         printk(KERN_INFO"beep hardware init failed, error:%d!\r\n", result);
         return result;
     }
 
-    //设备创建
+    //设备创建!result
     result = beep_device_create();
-    if(!result)
+    if(result != 0)
     {
         printk(KERN_INFO"beep device create failed, error:%d!\r\n", result);
         return result;
@@ -332,7 +321,11 @@ static int __init beep_module_init(void)
     status = platform_driver_register(&platform_driver);
     if(status != 0)
     {
-        printk("mdoule init:%d\r\n", status);
+        printk(KERN_INFO"mdoule init failed:%d\r\n", status);
+    }
+    else
+    {
+        printk(KERN_INFO"mdoule init ok:%d\r\n", status);
     }
     return status;
 }

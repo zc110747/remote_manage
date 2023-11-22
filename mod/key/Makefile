@@ -6,5 +6,6 @@
 #
 ################################################################################
 obj-m := kernel_key.o
+with_kernel:=y
 
 include $(ENV_PATH_ROOT)/build/buildmod.mk
