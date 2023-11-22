@@ -105,7 +105,7 @@
 		model = "usr-gpios";
 
 		beep {
-			compatible = "gpio-beep";
+			compatible = "usr-beep";
 			pinctrl-0 = <&pinctrl_beep>;
 			beep-gpio = <&gpio5 1 GPIO_ACTIVE_LOW>;
 			status = "okay";

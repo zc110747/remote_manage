@@ -1,0 +1,45 @@
+################################################################################
+#
+# THIS FILE IS BASIC MAKE FILE FOR
+# Copyright (c) 2020-2021
+# Original Author: 1107473010@qq.com
+#
+################################################################################
+
+# This is object should be build and will link to generate
+# the executables
+BUILD=e
+
+CCFLAGS := -O3 -std=c++17 -fno-strict-aliasing -lrt 
+
+cpp_objects = 	main.o	\
+				asio_client.o \
+				driver/rtc.o \
+				driver/key.o \
+				driver/spi_icm.o \
+				driver/device_base.o \
+				driver/driver.o \
+				module/cmd_process.o  \
+				module/device_manage.o
+				
+
+INCLUDES = 	-I include/ \
+			-I module/	\
+			-I driver/
+				
+INCLUDES +=	-I $(ENV_PATH_ROOT)/thirdparts/asio/include/ \
+			-I $(ENV_PATH_ROOT)/thirdparts/jsoncpp/include/ 
+
+ifeq ($(APP_CC_COMPILE),g++)
+library = $(ENV_PATH_ROOT)/buildout/i386/libjsoncpp.a
+else
+library = $(ENV_PATH_ROOT)/buildout/arm/libjsoncpp.a
+endif
+
+# This is the file name of the executables and path where 
+# place the executables
+buildout = local_device
+
+# Including this file allows access to the Build System.
+include $(ENV_PATH_ROOT)/embed/common/common.mk
+include $(ENV_PATH_ROOT)/build/buildrules.mk

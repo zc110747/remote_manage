@@ -34,7 +34,7 @@
 #include <asm/mach/map.h>
 #include <asm/uaccess.h>
 #include <asm/io.h>
-#include "kernal_spi_icm.h"
+#include "kernel_spi_icm.h"
 
 //全局的指令定义
 #define SPI_ICM_NAME            "icm20608"

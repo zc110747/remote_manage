@@ -20,18 +20,13 @@ _Pragma("once")
 
 #include "global_def.hpp"
 
-#define PROCESS_RUN                     PROCESS_LOWER_DEVICE
+#define PROCESS_RUN                 PROCESS_LOCAL_DEVICE
 
 //------------------------- FIFO List ------------------------------
-#define LOGGER_FIFO_PATH                "/tmp/ld_logger.fifo"              //logger服务模块
-
-//uart fifo
-#define SERVER_UART_RX_FIFO             "/tmp/uart_rx.fifo"
-#define SERVER_UART_TX_FIFO             "/tmp/uart_tx.fifo"
-
-#define ASIO_CLENET_FIFO                "/tmp/ld_client_tx.fifo"
+#define LOGGER_FIFO_PATH                "/tmp/loc_logger.fifo"              //logger服务模块
+#define DEVICE_MESSAGE_FIFO             "/tmp/device_manage.fifo"        //设备管理模块
+#define ASIO_CLENET_FIFO                "/tmp/loc_client_tx.fifo"
 
 //默认设备ID
 #define DEVICE_ID                       0x01
-
 

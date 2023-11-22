@@ -1,10 +1,10 @@
 ################################################################################
 #
-# Build for module files.
+# Build for multi files.
 # Copyright (c) 2020-2023
 # Original Author: 1107473010@qq.com
 #
 ################################################################################
-obj-m := kernel_led.o
+dir := ${ENV_PATH_ROOT}/embed
 
-include $(ENV_PATH_ROOT)/build/buildmod.mk
+include $(ENV_PATH_ROOT)/build/buildmulti.mk

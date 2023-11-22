@@ -33,7 +33,7 @@
 #include <asm/mach/map.h>
 #include <asm/uaccess.h>
 #include <asm/io.h>
-#include "kernal_i2c_ap.h"
+#include "kernel_i2c_ap.h"
 
 //全局的指令定义
 #define AP3216_NAME            		"ap3216"

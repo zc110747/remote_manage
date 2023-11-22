@@ -23,3 +23,5 @@ rootfs/run/support/*
 rootfs/run/bin/main_process
 
 buildout/arm/main_process
+
+/rootfs/run/bin/lower_device

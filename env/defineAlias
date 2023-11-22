@@ -28,10 +28,12 @@ alias cdn="cd $NFS_PATH"
 # The Extend Command for program compiler, package, push.
 #-------------------------------------------------------------------------------
 exit_if_last_error() {
-    if [[ $? -ne 0 ]]; then	
-		read -p "last command run failed, exit."
+    if [[ $? -ne 0 ]]; then
+		read -p "shell faild, wheather exit?(y/n, default is y)" exit_val
 
-        exit 1
+		if [ -z ${exit_val} ] || [ ${exit_val} == 'y' ]; then
+        	exit 1
+		fi
     fi
 }
 alias exit_if_last_error='exit_if_last_error'
@@ -41,7 +43,7 @@ function SysTarFirmwareSource
 {
 	cd ${ENV_PATH_ROOT}/../
 
-	tar -vcjf remote_manage.tar.bz2 --exclude=remote_manage/.git --exclude=remote_manage/rootfs/support --exclude=remote_manage/thirdparts remote_manage/
+	tar --exclude='remote_manage/.git' --exclude='remote_manage/rootfs/run/support' --exclude='remote_manage/thirdparts' -vcjf remote_manage.tar.bz2 remote_manage/
 
 	exit_if_last_error
 
@@ -67,34 +69,15 @@ function build_driver_module()
 	cd $ENV_PATH_ROOT
 	if [ -f "$ENV_KERNEL_DIR/.config" ]; then
 		echo "start bulid kernal driver"
-		cd $ENV_PATH_KERNAL_MOD/led/
-		make ARCH=arm CROSS_COMPILE=$KERNEL_CC
-		mv kernal_led.ko $APP_BUILD_DRIVER
-		make clean
-
-		cd $ENV_PATH_KERNAL_MOD/beep/
-		make ARCH=arm CROSS_COMPILE=$KERNEL_CC
-		mv kernal_beep.ko $APP_BUILD_DRIVER
-		make clean
-
-		cd $ENV_PATH_KERNAL_MOD/i2c_ap/
-		make ARCH=arm CROSS_COMPILE=$KERNEL_CC
-		mv kernal_i2c_ap.ko $APP_BUILD_DRIVER
-		make clean
-
-		cd $ENV_PATH_KERNAL_MOD/spi_icm/
-		make ARCH=arm CROSS_COMPILE=$KERNEL_CC
-		mv kernal_spi_icm.ko $APP_BUILD_DRIVER
-		make clean
-
-		cd $ENV_PATH_KERNAL_MOD/key/
-		make ARCH=arm CROSS_COMPILE=$KERNEL_CC
-		mv kernal_key.ko $APP_BUILD_DRIVER
-		make clean
+		cd $ENV_PATH_KERNAL_MOD/
+		
+		#执行全部的make_modules
+		make
 	else
 		echo "without compiled linux kernal, not build kernal module"
 	fi
 }
+alias test_build_driver_module='build_driver_module'
 
 function build_support_library()
 {
@@ -134,12 +117,7 @@ function SysBuildApplication()
 	build_support_library
 
 	#编译并复制main_process进程
-	cd ${APPLICATION_EMBED}/main_process
-	make -j${CPU_CORE}
-	exit_if_last_error
-
-	#编译并复制lower_device进程
-	cd ${APPLICATION_EMBED}/lower_device
+	cd ${APPLICATION_EMBED}/
 	make -j${CPU_CORE}
 	exit_if_last_error
 		

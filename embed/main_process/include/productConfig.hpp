@@ -18,8 +18,7 @@
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
-#define PROCESS_MAIN_PROCESS        0
-#define PROCESS_LOWER_DEVICE        1
+#include "global_def.hpp"
 #define PROCESS_RUN                 PROCESS_MAIN_PROCESS
 
 //------------------------- FIFO List ------------------------------
@@ -35,17 +34,5 @@ _Pragma("once")
 #define SERVER_UART_RX_FIFO          "/tmp/uart_rx.fifo"
 #define SERVER_UART_TX_FIFO          "/tmp/uart_tx.fifo"
 
-/*返回状态*/
-#define RT_INVALID_MQ_SIZE              -4
-#define RT_INVALID_BUF_SIZE             -3
-#define RT_INVALID_MQ                   -2
-#define RT_OK               	        0
-#define RT_FAIL             	        1
-#define RT_EMPTY            	        2
-#define RT_TIMEOUT                      3
-#define RT_INVALID                      4
-
 //默认设备ID
 #define DEVICE_ID                       0x01
-
-#define DEFAULT_CONFIG_FILE             "config.json"

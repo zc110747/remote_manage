@@ -1,10 +1,10 @@
-KERNELDIR := $(shell printenv ENV_KERNEL_DIR)
-CURRENT_PATH := $(shell pwd)
-obj-m := kernal_key.o
+################################################################################
+#
+# Build for module files.
+# Copyright (c) 2020-2023
+# Original Author: 1107473010@qq.com
+#
+################################################################################
+obj-m := kernel_key.o
 
-build: kernel_modules
-
-kernel_modules:
-	$(MAKE) -C $(KERNELDIR) M=$(CURRENT_PATH) modules
-clean:
-	$(MAKE) -C $(KERNELDIR) M=$(CURRENT_PATH) clean
+include $(ENV_PATH_ROOT)/build/buildmod.mk

@@ -45,6 +45,7 @@ _Pragma("once")
 #include <chrono>
 #include <atomic>
 #include <vector>
+#include <functional>
 
 #include "event.hpp"
 #include "thread_queue.hpp"
