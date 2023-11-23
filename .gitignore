@@ -19,7 +19,10 @@ thirdparts/asio
 thirdparts/asio-1.28.0.tar.gz
 thirdparts/jsoncpp/
 
-thirdparts/mosquitto/
+thirdparts/mosquitto/m*
+thirdparts/mosquitto/c*
+thirdparts/mosquitto/o*
+thirdparts/mosquitto/z*
 
 rootfs/run/server/*
 rootfs/run/support/*
