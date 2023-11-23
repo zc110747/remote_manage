@@ -167,6 +167,10 @@ bool device_manage::process_event(Event *pEvent)
     return true;
 }
 
+#if MODULE_DEFINE_MQTT == 1
+#include "mqtt_process.hpp"
+#endif
+
 void device_manage::run()
 {
     int size;
@@ -202,6 +206,10 @@ void device_manage::run()
                 size,
                 reinterpret_cast<Event *>(buffer)->get_id());
             process_event(reinterpret_cast<Event *>(buffer));
+
+#if MODULE_DEFINE_MQTT == 1
+            mqtt_publish("device run");
+#endif
         }
         else
         {

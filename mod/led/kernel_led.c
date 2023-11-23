@@ -1,11 +1,11 @@
 /*
- * File      : led.c
- * This file is led driver
- * COPYRIGHT (C) 2020, zc
+ * File      : kernel_led.c
+ * This file is the driver for led i/o.
+ * COPYRIGHT (C) 2023, zc
  *
  * Change Logs:
  * Date           Author       Notes
- * 2020-4-30      zc           the first version
+ * 2023-11-22     zc           the first version
  */
 
 /**
@@ -22,72 +22,75 @@
 #include <linux/errno.h>
 #include <linux/gpio.h>
 #include <linux/cdev.h>
-#include <linux/of.h>
-#include <linux/of_address.h>
+#include <linux/device.h>
 #include <linux/of_gpio.h>
+#include <linux/semaphore.h>
+//总线和硬件相关接口
+#include <linux/platform_device.h>
 #include <asm/mach/map.h>
 #include <asm/uaccess.h>
 #include <asm/io.h>
 
-/*led device information*/
-struct led_device
+typedef struct 
 {
-    /* device node in dts */
-    struct device_node *nd;    
+    dev_t dev_id;           /*总设备号*/
+    int major;              /*主设备号*/
+    int minor;              /*从设备号*/
+    struct cdev cdev;       /*设备接口*/
+    struct class *class;	/*设备类指针*/
+    struct device *device;	/*设备指针*/
+}device_info;
 
-    /* gpio number by dts */
-    int led_gpio;         
-
-    /* led show status saved */
-    int led_status;  
-
-    /* lock for device */        
-    atomic_long_t lock;        
-};
-
-/*led device information for ker*/
-struct led_kernal
+typedef struct 
 {
-    dev_t dev_id;             
-    int major;                 
-    int minor;                 
-    struct cdev cdev;          
-    struct class *class;	  
-	struct device *device;	    
-};
+    struct device_node *nd; /*设备节点*/
+    int gpio;               /*led使用的GPIO编号*/
+    int status;    
+}hardware_info;
 
-static struct led_device device_info;
-static struct led_kernal led_kernal_info;
+typedef struct 
+{
+    hardware_info   hw;
+    device_info     dev;
+}led_driver;
+static led_driver driver;
 
-#define DEFAULT_MAJOR                   0          /*默认主设备号*/
-#define DEFAULT_MINOR                   0          /*默认从设备号*/
-#define DEVICE_LED_CNT			        1		   /* 设备号个数 */
-#define DEVICE_LED_NAME			        "led"      /* 设备名 */
+#define LED_OFF                            0
+#define LED_ON                             1
 
-#define LED_OFF                         0
-#define LED_ON                          1
+//自定义设备号
+#define DEFAULT_MAJOR                       0          /*默认主设备号*/
+#define DEFAULT_MINOR                       0          /*默认从设备号*/
+#define DEVICE_NAME			                "led"     /* 设备名, 应用将以/dev/led访问 */
 
-#define TREE_NODE_NAME                  "/usr_gpios/led"
-#define TREE_GPIO_NAME                  "led-gpio"
-
-static int led_gpio_init(void);
-static void led_gpio_release(void);
-static void led_switch(u8 status);
+static void led_hardware_set(u8 status)
+{
+    switch(status)
+    {
+        case LED_OFF:
+            printk(KERN_INFO"led off\n");
+            gpio_set_value(driver.hw.gpio, 1);	
+            driver.hw.status = 0;
+            break;
+        case LED_ON:
+            printk(KERN_INFO"led on\n");
+            gpio_set_value(driver.hw.gpio, 0);	
+            driver.hw.status = 1;
+            break;
+        default:
+            printk(KERN_INFO"Invalid led Set");
+            break;
+    }
+}
 
 int led_open(struct inode *inode, struct file *filp)
 {
-    if(!atomic_dec_and_test(&device_info.lock))
-    {
-        atomic_inc(&device_info.lock); //atomic_dec_and_test会执行减操作，此处恢复
-        return -EBUSY;
-    }
-    filp->private_data = &device_info;
+    filp->private_data = &driver.dev;
     return 0;
 }
 
 int led_release(struct inode *inode, struct file *filp)
 {
-    atomic_inc(&device_info.lock);
     return 0;
 }
 
@@ -96,11 +99,10 @@ ssize_t led_read(struct file *filp, char __user *buf, size_t count, loff_t *f_po
     int result;
     u8 databuf[2];
 
-    databuf[0] = device_info.led_status;
-
+    databuf[0] = driver.hw.status;
     result = copy_to_user(buf, databuf, 1);
     if(result < 0) {
-		printk(KERN_INFO"kernel read failed!\r\n");
+		printk(KERN_INFO"kernel read failed!\n");
 		return -EFAULT;
 	}
     return 1;
@@ -113,12 +115,12 @@ ssize_t led_write(struct file *filp, const char __user *buf, size_t count,  loff
 
 	result = copy_from_user(databuf, buf, count);
 	if(result < 0) {
-		printk(KERN_INFO"kernel write failed!\r\n");
+		printk(KERN_INFO"kernel write failed!\n");
 		return -EFAULT;
 	}
-
-	led_switch(databuf[0]);
-
+	
+    /*硬件操作*/
+	led_hardware_set(databuf[0]);
 	return 0;
 }
 
@@ -126,10 +128,10 @@ long led_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 {
     switch(cmd){
         case 0:
-            led_switch(0);
+            led_hardware_set(0);
             break;
         case 1:
-            led_switch(1);
+            led_hardware_set(1);
             break;
         default:
             printk(KERN_INFO"Invalid Cmd!\r\n");
@@ -139,7 +141,6 @@ long led_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
     return 0;
 }
 
-/* 设备操作函数 */
 static struct file_operations led_fops = {
     .owner = THIS_MODULE,
     .open = led_open,
@@ -149,155 +150,194 @@ static struct file_operations led_fops = {
     .release = led_release,
 };
 
-static int __init led_module_init(void)
+static int led_device_create(void)
 {
     int result;
 
-    led_kernal_info.major = DEFAULT_MAJOR;
-    led_kernal_info.minor = DEFAULT_MINOR;
+    driver.dev.major = DEFAULT_MAJOR;
+    driver.dev.minor = DEFAULT_MINOR;
 
-    result = led_gpio_init();
-    if(result != 0)
-    {
-        printk(KERN_INFO"led gpio init failed\n0");
-        return result;
-    }
-
-    /*在总线上创建设备*/
     /*1.申请字符设备号*/
-    if(led_kernal_info.major){
-        led_kernal_info.dev_id = MKDEV(led_kernal_info.major, led_kernal_info.minor);
-        result = register_chrdev_region(led_kernal_info.dev_id, DEVICE_LED_CNT, DEVICE_LED_NAME);
+    if(driver.dev.major){
+        driver.dev.dev_id = MKDEV(driver.dev.major, driver.dev.minor);
+        result = register_chrdev_region(driver.dev.dev_id, 1, DEVICE_NAME);
     }
     else{
-        result = alloc_chrdev_region(&led_kernal_info.dev_id, 0, DEVICE_LED_CNT, DEVICE_LED_NAME);
-        led_kernal_info.major = MAJOR(led_kernal_info.dev_id);
-        led_kernal_info.minor = MINOR(led_kernal_info.dev_id);
+        result = alloc_chrdev_region(&driver.dev.dev_id, 0, 1, DEVICE_NAME);
+        driver.dev.major = MAJOR(driver.dev.dev_id);
+        driver.dev.minor = MINOR(driver.dev.dev_id);
     }
     if(result < 0){
-        printk(KERN_INFO"dev alloc or set failed\r\n");
-        goto fail_;
+        printk(KERN_INFO"dev alloc or set failed\r\n");	
+        goto exit;
     }
     else{
-        printk(KERN_INFO"dev alloc or set ok, major:%d, minor:%d\r\n", led_kernal_info.major,  led_kernal_info.minor);
+        printk(KERN_INFO"dev alloc or set ok, major:%d, minor:%d\r\n", driver.dev.major,  driver.dev.minor);	
     }
-
-    /*2.初始化设备信息，将设备接口和设备号进行关联*/
-    cdev_init(&led_kernal_info.cdev, &led_fops);
-    led_kernal_info.cdev.owner = THIS_MODULE;
-    result = cdev_add(&led_kernal_info.cdev, led_kernal_info.dev_id, DEVICE_LED_CNT);
+    
+    /*2.添加设备到相应总线上*/
+    cdev_init(&driver.dev.cdev, &led_fops);
+    driver.dev.cdev.owner = THIS_MODULE;
+    result = cdev_add(&driver.dev.cdev, driver.dev.dev_id, 1);
     if(result != 0){
         printk(KERN_INFO"cdev add failed\r\n");
-        goto cdev_add_fail_;
+        goto exit_cdev_add;
     }else{
-	    printk(KERN_INFO"device add Success!\r\n");
+	    printk(KERN_INFO"device add Success!\r\n");	
     }
 
-    /* 3、创建类 */
-	led_kernal_info.class = class_create(THIS_MODULE, DEVICE_LED_NAME);
-	if (IS_ERR(led_kernal_info.class)) {
+    /* 4、创建类 */
+	driver.dev.class = class_create(THIS_MODULE, DEVICE_NAME);
+	if (IS_ERR(driver.dev.class)) {
 		printk(KERN_INFO"class create failed!\r\n");
-        goto class_create_fail_;
+        result = PTR_ERR(driver.dev.class);
+        goto exit_class_create;
 	}
 	else{
 		printk(KERN_INFO"class create successed!\r\n");
 	}
 
-	/* 4、创建设备 */
-	led_kernal_info.device = device_create(led_kernal_info.class, NULL, led_kernal_info.dev_id, NULL, DEVICE_LED_NAME);
-	if (IS_ERR(led_kernal_info.device)) {
+	/* 5、创建设备 */
+	driver.dev.device = device_create(driver.dev.class, NULL, driver.dev.dev_id, NULL, DEVICE_NAME);
+	if (IS_ERR(driver.dev.device)) {
 		printk(KERN_INFO"device create failed!\r\n");
-        goto device_create_fail_;
+        result = PTR_ERR(driver.dev.device);
+		goto exit_device_create;
 	}
 	else{
 		printk(KERN_INFO"device create successed!\r\n");
 	}
-
-    printk(KERN_INFO"Led Driver Init Ok!\r\n");
     return 0;
 
-device_create_fail_:
-    class_destroy(led_kernal_info.class);
-class_create_fail_:
-    cdev_del(&led_kernal_info.cdev);
-cdev_add_fail_:
-    unregister_chrdev_region(led_kernal_info.dev_id, DEVICE_LED_CNT);
-fail_:
-    return -1;
+exit_device_create:
+	class_destroy(driver.dev.class);
+exit_class_create:
+    cdev_del(&driver.dev.cdev);
+exit_cdev_add:
+    unregister_chrdev_region(driver.dev.dev_id, 1);
+exit:
+    return result;
 }
 
-static void __exit led_module_exit(void)
+static int led_hardware_init(struct platform_device *pdev)
 {
-    device_destroy(led_kernal_info.class, led_kernal_info.dev_id);
-	class_destroy(led_kernal_info.class);
-	cdev_del(&led_kernal_info.cdev);
-	unregister_chrdev_region(led_kernal_info.dev_id, DEVICE_LED_CNT);
-
-    led_gpio_release();
-}
-
-static int led_gpio_init(void)
-{
-    int ret;
-
-    atomic_set(&device_info.lock, 1);
+    int result;
 
     /*1.获取设备节点*/
-    device_info.nd = of_find_node_by_path(TREE_NODE_NAME);
-    if(device_info.nd == NULL){
+    driver.hw.nd = of_find_node_by_path("/usr_led");
+    if(driver.hw.nd == NULL){
         printk(KERN_INFO"led node no find\n");
         return -EINVAL;
     }
 
     /*2.获取设备树中的gpio属性编号*/
-    device_info.led_gpio = of_get_named_gpio(device_info.nd, TREE_GPIO_NAME, 0);
-    if(device_info.led_gpio < 0){
-        printk(KERN_INFO"led-gpio no find\n");    /* 注销字符设备驱动 */
+    driver.hw.gpio = of_get_named_gpio(driver.hw.nd, "led-gpio", 0);
+    if(driver.hw.gpio < 0){
+        printk(KERN_INFO"led-gpio no find\n");
         return -EINVAL;
     }
 
-    /*3.设置beep对应GPIO输出*/
-    ret = gpio_direction_output(device_info.led_gpio, 1);
-    if(ret<0){
+    /*3.设置对应GPIO输出*/
+    result = gpio_direction_output(driver.hw.gpio, 1);
+    if(result<0){
         printk(KERN_INFO"led gpio config error\n");
         return -EINVAL;
     }
 
-    led_switch(LED_OFF);
-
-    printk(KERN_INFO"led tree hardware init ok\r\n");    /* 注销字符设备驱动 */
-
+    /*配置默认状态*/
+    led_hardware_set(LED_OFF);
     return 0;
 }
 
-/* 注销字符设备驱动 */
-static void led_gpio_release(void)
+static int led_probe(struct platform_device *dev)
 {
+    int result;
+
+    printk(KERN_INFO"device and driver match, do probe!\r\n");
+
+    memset((char *)&driver, 0, sizeof(led_driver));
+
+    //硬件初始化
+    result = led_hardware_init(dev);
+    if(result != 0)
+    {
+        printk(KERN_INFO"led hardware init failed, error:%d!\r\n", result);
+        return result;
+    }
+
+    //设备创建!result
+    result = led_device_create();
+    if(result != 0)
+    {
+        printk(KERN_INFO"led device create failed, error:%d!\r\n", result);
+        return result;
+    }
+    return 0;
 }
 
-static void led_switch(u8 status)
+static void led_device_destory(void)
 {
-    switch(status)
+    device_destroy(driver.dev.class, driver.dev.dev_id);
+	class_destroy(driver.dev.class);
+
+	cdev_del(&driver.dev.cdev);
+	unregister_chrdev_region(driver.dev.dev_id, 1);   
+}
+
+static void led_hardware_release(void)
+{
+    devm_gpio_free(driver.dev.device, driver.hw.gpio);
+}
+
+static int led_remove(struct platform_device *dev)
+{
+    /*移除硬件驱动*/
+    led_hardware_release();
+    
+    /*注销设备*/
+    led_device_destory();
+    return 0;
+}
+
+/* 查询设备树的匹配函数 */
+static const struct of_device_id led_of_match[] = {
+	{ .compatible = "usr-led" },
+	{ /* Sentinel */ }
+};
+
+static struct platform_driver platform_driver = {
+    .driver = {
+        .name = "led",
+        .of_match_table = led_of_match,
+    },
+    .probe = led_probe,
+    .remove = led_remove,
+};
+
+static int __init led_module_init(void)
+{
+    int status;
+
+    status = platform_driver_register(&platform_driver);
+    if(status != 0)
     {
-        case LED_OFF:
-            printk(KERN_INFO"led off\r\n");
-            gpio_set_value(device_info.led_gpio, 1);
-            device_info.led_status = 0;
-            break;
-        case LED_ON:
-            printk(KERN_INFO"led on\r\n");
-	        gpio_set_value(device_info.led_gpio, 0);
-	        device_info.led_status = 1;
-            break;
-        default:
-            printk(KERN_INFO"Invalid LED Set");
-            break;
+        printk(KERN_INFO"mdoule init failed:%d\r\n", status);
     }
+    else
+    {
+        printk(KERN_INFO"mdoule init ok:%d\r\n", status);
+    }
+    return status;
+}
+
+static void __exit led_module_exit(void)
+{
+    platform_driver_unregister(&platform_driver);
 }
 
 module_init(led_module_init);
 module_exit(led_module_exit);
-MODULE_AUTHOR("zc");				            //模块作者
-MODULE_LICENSE("GPL v2");                       //模块许可协议
-MODULE_DESCRIPTION("led driver");               //模块许描述
-MODULE_ALIAS("led_driver");                     //模块别名
+MODULE_AUTHOR("wzdxf");				    //模块作者
+MODULE_LICENSE("GPL v2");               //模块许可协议
+MODULE_DESCRIPTION("platform driver for led");      //模块许描述
+MODULE_ALIAS("led_driver");            //模块别名

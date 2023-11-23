@@ -304,6 +304,13 @@ static const struct of_device_id beep_of_match[] = {
 	{ .compatible = "usr-beep" },
 	{ /* Sentinel */ }
 };
+MODULE_DEVICE_TABLE(of, beep_of_match);
+
+static const struct platform_device_id beep_id_table[] = {
+	{ .name = "beep" },
+	{ /* sentinel */ },
+};
+MODULE_DEVICE_TABLE(platform, beep_id_table);
 
 static struct platform_driver platform_driver = {
     .driver = {
@@ -312,6 +319,7 @@ static struct platform_driver platform_driver = {
     },
     .probe = beep_probe,
     .remove = beep_remove,
+    .id_table = beep_id_table,	
 };
 
 static int __init beep_module_init(void)

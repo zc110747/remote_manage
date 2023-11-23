@@ -89,34 +89,6 @@ if [ ! -f ${base_build}/lib/libssl.so ];then
 fi
 
 ######################################################################################################
-#openssh build
-######################################################################################################
-function build_openssh()
-{   
-    openssh_ver=openssh-9.5p1
-
-    if [ -f ${openssh_ver}/sshd ]; then
-        echo "openssh already build, return!"
-        return 0
-    fi
-
-    if [ ! -d ${openssh_ver}/ ]; then
-        wget https://mirrors.tuna.tsinghua.edu.cn/OpenBSD/OpenSSH/portable/${openssh_ver}.tar.gz
-        tar -xvf ${openssh_ver}.tar.gz
-    fi
-
-    cd ${run_path}/${openssh_ver}/
-    ./configure --host=arm-none-linux-gnueabihf --with-libs --with-zlib=${base_build}/zlib \
-                --with-ssl-dir=${base_build} --disable-etc-default-login \
-                --prefix=${base_build}/openssh
-
-    make -j2
-
-    exit_if_last_error
-}
-build_openssh
-
-######################################################################################################
 #mosquitto build
 ######################################################################################################
 function build_mosquitto()
@@ -143,7 +115,10 @@ function build_mosquitto()
     mosquitto_ver=mosquitto-2.0.18
 
     if [ ! -d ${mosquitto_ver}/ ]; then
-        wget https://mosquitto.org/files/source/${mosquitto_ver}.tar.gz
+        if [ ! -f ${mosquitto_ver}.tar.gz ]; then 
+            wget https://mosquitto.org/files/source/${mosquitto_ver}.tar.gz
+        fi
+        sleep 2
         tar -xvf ${mosquitto_ver}.tar.gz
     fi
 

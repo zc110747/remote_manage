@@ -105,18 +105,18 @@
 		status = "okay";
 	};
 
+	usr_led {
+		compatible = "usr-led";
+		pinctrl-0 = <&pinctrl_gpio_leds>;
+		led-gpio = <&gpio1 3 GPIO_ACTIVE_LOW>;
+		status = "okay";
+	};
+
 	/*gpio application add by zc*/
 	usr_gpios {
 		compatible = "usr-gpios";
 		pinctrl-names = "default";
 		model = "usr-gpios";
-
-		led {
-			compatible = "gpio-led";
-			pinctrl-0 = <&pinctrl_gpio_leds>;
-			led-gpio = <&gpio1 3 GPIO_ACTIVE_LOW>;
-			status = "okay";
-		};
 
 		key {
 			compatible = "gpio-key";

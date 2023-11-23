@@ -25,6 +25,11 @@
 #include "center_manage.hpp"
 #include "common_unit.hpp"
 
+#if MODULE_DEFINE_MQTT == 1
+#include "mqtt_process.hpp"
+static bool mqtt_init(void);
+#endif
+
 //internal data
 static int nConfigDefault = 0;
 static std::string sConfigFile(DEFAULT_CONFIG_FILE);
@@ -32,6 +37,7 @@ static EVENT::semaphore global_exit_sem(0);
 
 //internal function
 static bool system_init(int is_default, const char* path);
+
 
 //用于处理命令行输入的函数
 static void option_process(int argc, char *argv[])
@@ -128,9 +134,14 @@ static bool system_init(int is_default, const char* path)
 	ret &= driver_manage::get_instance()->init();
 	ret &= device_manage::get_instance()->init();
 	ret &= tcp_thread_manage::get_instance()->init();
-	ret &= internal_process::get_instance()->init();
 	ret &= time_manage::get_instance()->init();
 	ret &= center_manage::get_instance()->init();
+
+	ret &= internal_process::get_instance()->init();
+
+#if MODULE_DEFINE_MQTT == 1
+	ret &= mqtt_init();
+#endif
 
 	return ret;
 }
@@ -139,3 +150,43 @@ void exit_main_app()
 {
 	global_exit_sem.signal();
 }
+
+#if MODULE_DEFINE_MQTT == 1
+static std::unique_ptr<mqtt_process> mqtt_process_ptr{nullptr};
+static bool mqtt_init(void)
+{
+	bool ret = false;
+	try
+	{
+		//mqtt subscribe init
+		mqtt_info mqtt_process_info = {
+			id:"sub_user",
+			host:"192.168.3.99",
+			port:1883,
+			sub_topic:"/info/sub",
+			pub_topic:"/info/pub",
+			keepalive:30,
+			qos:1
+		};
+		mqtt_process_ptr = std::make_unique<mqtt_process>(mqtt_process_info);
+		ret = mqtt_process_ptr->start();
+
+		return ret;
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+		return false;
+	}
+}
+int mqtt_publish(const std::string &str)
+{
+	int ret = -1;
+
+	if(mqtt_process_ptr != nullptr)
+	{
+		ret = mqtt_process_ptr->publish_msg(str);
+	}
+	return ret;
+}
+#endif

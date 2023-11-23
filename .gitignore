@@ -12,11 +12,14 @@
 *.tar.xz
 *.a
 *.so
+*.so*
 *.ko
 
 thirdparts/asio
 thirdparts/asio-1.28.0.tar.gz
 thirdparts/jsoncpp/
+
+thirdparts/mosquitto/
 
 rootfs/run/server/*
 rootfs/run/support/*
