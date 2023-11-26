@@ -29,7 +29,15 @@
 		"local_port"	:15002,
 		"gui_port"		:15003,
 		"logger_port"	:15004,
-		"node_port"		:15005
+		"node_port"		:15005,
+		"mqtt_device"	:{
+			"id"   : "cl_usr",
+			"port" : 1883,
+			"sub_topic" : "/info/sub",
+			"pub_topic" : "/info/pub",
+			"keepalive": 60,
+			"qos":1
+		}
 	},
 	"node_server" : {
 		"web_port" 		:15101

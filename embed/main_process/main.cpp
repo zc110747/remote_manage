@@ -38,7 +38,6 @@ static EVENT::semaphore global_exit_sem(0);
 //internal function
 static bool system_init(int is_default, const char* path);
 
-
 //用于处理命令行输入的函数
 static void option_process(int argc, char *argv[])
 {
@@ -158,15 +157,17 @@ static bool mqtt_init(void)
 	bool ret = false;
 	try
 	{
+		const MqttDeivceInfo mqtt_config = system_config::get_instance()->get_mqtt_config();
+
 		//mqtt subscribe init
 		mqtt_info mqtt_process_info = {
-			id:"sub_user",
-			host:"192.168.3.99",
-			port:1883,
-			sub_topic:"/info/sub",
-			pub_topic:"/info/pub",
-			keepalive:30,
-			qos:1
+			id:mqtt_config.id,
+			host:system_config::get_instance()->get_ipaddress(),
+			port:mqtt_config.port,
+			sub_topic:mqtt_config.sub_topic,
+			pub_topic:mqtt_config.pub_topic,
+			keepalive:mqtt_config.keepalive,
+			qos:mqtt_config.qos
 		};
 		mqtt_process_ptr = std::make_unique<mqtt_process>(mqtt_process_info);
 		ret = mqtt_process_ptr->start();

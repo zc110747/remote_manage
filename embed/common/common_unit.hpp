@@ -25,6 +25,5 @@ _Pragma("once")
 #include "fifo/fifo_manage.hpp"
 #include "jsonconfig/jsonconfig.hpp"
 #include "logger/logger_server.hpp"
-#include "server/asio_server.hpp"
 
 uint16_t crc16(uint16_t crc, uint8_t const *buffer, uint16_t len);

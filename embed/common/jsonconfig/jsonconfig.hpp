@@ -73,6 +73,15 @@ typedef struct
     IoSysConfig beep;
 }LocalDeviceConfig;
 
+typedef struct 
+{
+    JString id;
+    int port;
+    JString sub_topic;
+    JString pub_topic;
+    int keepalive;
+    int qos;
+}MqttDeivceInfo;
 
 typedef struct 
 {
@@ -81,6 +90,7 @@ typedef struct
     int local_port;
     int gui_port;
     int logger_port;
+    MqttDeivceInfo mqtt_device;
 }MainProcessConfig;
 
 typedef struct 
@@ -170,11 +180,15 @@ public:
     const int &get_lower_device_logger_port()   const    {return parameter_.lower_device.logger_port;}
     const SerialSysConfig &get_serial_config()  const    {return parameter_.lower_device.serial;}
 
+    //main process
     const JString &get_download_path()          const    {return parameter_.main_process.download_path;}
     const int get_node_port()                   const    {return parameter_.main_process.node_port;}
     const int get_local_port()                  const    {return parameter_.main_process.local_port;}
     const int get_logger_port()                 const    {return parameter_.main_process.logger_port;}   
     const int get_gui_device_port()             const    {return parameter_.main_process.gui_port;}
+    const MqttDeivceInfo &get_mqtt_config()     const    {return parameter_.main_process.mqtt_device;}
+    
+    //node info
     const int get_node_web_port()               const    {return parameter_.node_sever.web_port;}
 private:
     /// \brief instance_pointer_

@@ -15,6 +15,7 @@ void mqtt_process::mqtt_run()
 {
 	mosqpp::lib_init();
 
+	PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "Mqtt start run!");
 	connect(info_.host.c_str(), info_.port, info_.keepalive);
 
 	while(1)
@@ -35,7 +36,7 @@ bool mqtt_process::start()
 
 void mqtt_process::on_connect(int rc)
 {
-	PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "Connected with code:%d\n", rc);
+	PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "Connected with code:%d!", rc);
 	if(rc == 0)
 	{
 		/* Only attempt to subscribe on a successful connect. */

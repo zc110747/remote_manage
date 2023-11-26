@@ -79,13 +79,20 @@ bool system_config::init(const char* path)
         parameter_.local_device.icm_spi.dev         = root["local_device"]["icm_spi"]["dev"].asString();
         parameter_.local_device.ap_i2c.dev          = root["local_device"]["ap_i2c"]["dev"].asString();
         parameter_.local_device.rtc.dev             = root["local_device"]["rtc"]["dev"].asString();
-    
-        parameter_.main_process.download_path       = root["main_process"]["download_path"].asString();
-        parameter_.main_process.node_port           = root["main_process"]["node_port"].asInt();
-        parameter_.main_process.local_port          = root["main_process"]["local_port"].asInt();
-        parameter_.main_process.logger_port         = root["main_process"]["logger_port"].asInt();
-        parameter_.main_process.gui_port            = root["main_process"]["gui_port"].asInt();
-        
+
+        //main process
+        parameter_.main_process.download_path           = root["main_process"]["download_path"].asString();
+        parameter_.main_process.node_port               = root["main_process"]["node_port"].asInt();
+        parameter_.main_process.local_port              = root["main_process"]["local_port"].asInt();
+        parameter_.main_process.logger_port             = root["main_process"]["logger_port"].asInt();
+        parameter_.main_process.gui_port                = root["main_process"]["gui_port"].asInt();
+        parameter_.main_process.mqtt_device.id            = root["main_process"]["mqtt_device"]["id"].asString();
+        parameter_.main_process.mqtt_device.port          = root["main_process"]["mqtt_device"]["port"].asInt();
+        parameter_.main_process.mqtt_device.sub_topic     = root["main_process"]["mqtt_device"]["sub_topic"].asString();
+        parameter_.main_process.mqtt_device.pub_topic     = root["main_process"]["mqtt_device"]["pub_topic"].asString();
+        parameter_.main_process.mqtt_device.keepalive     = root["main_process"]["mqtt_device"]["keepalive"].asInt();
+        parameter_.main_process.mqtt_device.qos           = root["main_process"]["mqtt_device"]["qos"].asInt();
+
         parameter_.node_sever.web_port              = root["node_sever"]["web_port"].asInt();
 
         parameter_.lower_device.logger_port         = root["lower_device"]["logger_port"].asInt();
@@ -129,7 +136,13 @@ void system_config::default_init() noexcept
     parameter_.main_process.local_port      = DEFAULT_LOCAL_DEVICE_PORT;
     parameter_.main_process.logger_port     = DEFAULT_LOGGER_PORT;
     parameter_.main_process.gui_port        = DEFAULT_GUI_DEVICE_PORT;
-    
+    parameter_.main_process.mqtt_device.id    = "default";
+    parameter_.main_process.mqtt_device.port  = 1883;
+    parameter_.main_process.mqtt_device.sub_topic = "/info/null0",
+    parameter_.main_process.mqtt_device.pub_topic = "/info/null1",
+    parameter_.main_process.mqtt_device.keepalive = 60;
+    parameter_.main_process.mqtt_device.qos   = 0;
+
     parameter_.node_sever.web_port          = DEFAULT_NODE_WEB_PORT;
 
     parameter_.lower_device.serial.baud     = DEFAULT_SERIAL_BAUD;
@@ -161,8 +174,14 @@ void system_config::save_config_file()
     root["main_process"]["node_port"]           = parameter_.main_process.node_port;
     root["main_process"]["local_port"]          = parameter_.main_process.local_port;
     root["main_process"]["logger_port"]         = parameter_.main_process.logger_port;
-    root["main_process"]["gui_port"]             = parameter_.main_process.gui_port;
-
+    root["main_process"]["gui_port"]            = parameter_.main_process.gui_port;
+    root["main_process"]["mqtt_device"]["id"]     = parameter_.main_process.mqtt_device.id; 
+    root["main_process"]["mqtt_device"]["port"]   = parameter_.main_process.mqtt_device.port;
+    root["main_process"]["mqtt_device"]["sub_topic"] = parameter_.main_process.mqtt_device.sub_topic;
+    root["main_process"]["mqtt_device"]["pub_topic"] = parameter_.main_process.mqtt_device.pub_topic;
+    root["main_process"]["mqtt_device"]["keepalive"] = parameter_.main_process.mqtt_device.keepalive;
+    root["main_process"]["mqtt_device"]["qos"]       = parameter_.main_process.mqtt_device.qos;
+        
     root["node_sever"]["web_port"]              = parameter_.node_sever.web_port;
 
     root["lower_device"]["logger_port"]         = parameter_.lower_device.logger_port;   
@@ -218,6 +237,12 @@ std::ostream& operator<<(std::ostream& os, const system_config& config)
     os<<"local port:"<<sys_parameter_->main_process.local_port<<"\n";
     os<<"logger port:"<<sys_parameter_->main_process.logger_port<<"\n";
     os<<"gui port:"<<sys_parameter_->main_process.gui_port<<"\n";
+    os<<"mqtt id:"<<sys_parameter_->main_process.mqtt_device.id<<"\n";
+    os<<"mqtt port:"<<sys_parameter_->main_process.mqtt_device.port<<"\n";
+    os<<"mqtt keepalive:"<<sys_parameter_->main_process.mqtt_device.keepalive<<"\n";
+    os<<"mqtt pub_topic:"<<sys_parameter_->main_process.mqtt_device.pub_topic<<"\n";
+    os<<"mqtt sub_topic:"<<sys_parameter_->main_process.mqtt_device.sub_topic<<"\n";
+    os<<"mqtt qos:"<<sys_parameter_->main_process.mqtt_device.qos<<"\n"; 
 
     os<<"------------------node server info ------------------------------\n";
     os<<"node port:"<<config.get_node_port()<<"\n";

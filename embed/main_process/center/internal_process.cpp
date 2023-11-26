@@ -18,6 +18,7 @@
 /////////////////////////////////////////////////////////////////////////////
 #include "internal_process.hpp"
 #include "common_unit.hpp"
+#include "asio_server.hpp"
 
 internal_process*  internal_process::instance_pointer_ = nullptr;
 internal_process* internal_process::get_instance()

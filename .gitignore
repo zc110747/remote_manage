@@ -14,9 +14,10 @@
 *.so
 *.so*
 *.ko
+*.tar.bz2
+*.tar.gz
 
-thirdparts/asio
-thirdparts/asio-1.28.0.tar.gz
+thirdparts/asio/
 thirdparts/jsoncpp/
 
 thirdparts/mosquitto/m*
@@ -28,6 +29,6 @@ rootfs/run/server/*
 rootfs/run/support/*
 rootfs/run/bin/main_process
 
-buildout/arm/main_process
+buildout/
 
 /rootfs/run/bin/lower_device
