@@ -39,7 +39,7 @@ export ENV_KERNEL_ZIMAGE=$ENV_KERNEL_DIR/arch/arm/boot/zImage
 export ENV_KERNEL_DTB=$ENV_KERNEL_DIR/arch/arm/boot/dts/imx6ull-14x14-emmc-4.3-800x480-c.dtb
 
 #rootfs info
-export ENV_ROOTFS_DIR=$PROGRAM_SUPPORT/rootfs_busybox
+export ENV_ROOTFS_DIR=$PROGRAM_SUPPORT/rootfs
 
 #build output info
 export TFTP_PATH=$PROGRAM_BUILD/tftp_root

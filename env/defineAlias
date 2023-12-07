@@ -19,9 +19,9 @@ alias cdb="cd $ENV_PATH_ROOT/buildout"
 alias cdd="cd $PROGRAM_DOWNLOAD"
 alias cde="cd $ENV_PATH_ROOT/embed"
 alias cdk="cd $ENV_KERNEL_DIR"
+alias cdn="cd $NFS_PATH"
 alias cdu="cd $ENV_BOOT_DIR"
 alias cdf="cd $ENV_ROOTFS_DIR"
-alias cdn="cd $NFS_PATH"
 
 #-------------------------------------------------------------------------------
 # This section defines the function for program management.
