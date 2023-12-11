@@ -12,27 +12,14 @@
  * @addtogroup IMX6ULL
  */
 /*@{*/
-#include <linux/types.h>
+
 #include <linux/kernel.h>
 #include <linux/delay.h>
-#include <linux/ide.h>
-#include <linux/init.h>
 #include <linux/module.h>
-#include <linux/errno.h>
 #include <linux/gpio.h>
 #include <linux/cdev.h>
-#include <linux/device.h>
-#include <linux/of_gpio.h>
-#include <linux/semaphore.h>
-#include <linux/timer.h>
 #include <linux/i2c.h>
-#include <linux/of.h>
-#include <linux/of_address.h>
-#include <linux/of_gpio.h>
 #include <linux/platform_device.h>
-#include <asm/mach/map.h>
-#include <asm/uaccess.h>
-#include <asm/io.h>
 #include "kernel_i2c_ap.h"
 
 //全局的指令定义
@@ -307,7 +294,7 @@ static int ap3216_probe(struct i2c_client *client, const struct i2c_device_id *i
  *
  * @return 设备移除处理结果
  */
-static int ap3216_remove(struct i2c_client *client)
+static void ap3216_remove(struct i2c_client *client)
 {
 	/* 删除设备 */
 	cdev_del(&ap_info.dev.cdev);
@@ -316,7 +303,7 @@ static int ap3216_remove(struct i2c_client *client)
 	/* 注销掉类和设备 */
 	device_destroy(ap_info.dev.class, ap_info.dev.devid);
 	class_destroy(ap_info.dev.class);
-	return 0;
+	//return 0;
 }
 
 /* 传统匹配方式ID列表 -- name不重要，但必须存在 */

@@ -20,8 +20,8 @@ alias cdd="cd $PROGRAM_DOWNLOAD"
 alias cde="cd $ENV_PATH_ROOT/embed"
 alias cdk="cd $ENV_KERNEL_DIR"
 alias cdn="cd $NFS_PATH"
+alias cdr="cd $ENV_ROOTFS_DIR"
 alias cdu="cd $ENV_BOOT_DIR"
-alias cdf="cd $ENV_ROOTFS_DIR"
 
 #-------------------------------------------------------------------------------
 # This section defines the function for program management.
@@ -138,7 +138,6 @@ function SysBuildApplication()
 		
 		if [ -d $NFS_RUN_PATH ]; then
 			cp -rv $APPLICATION_RUN/* $NFS_RUN_PATH/
-			sudo cp -rv $ENV_PATH_ROOT/rootfs/etc/* $NFS_PATH/etc/
 		else
 			echo "nfs directory $NFS_RUN_PATH not exist, not copy!"
 		fi
@@ -244,10 +243,17 @@ function SysBuildKernel
 {
 	if [ -d $ENV_KERNEL_DIR ]; then
 		cd $ENV_KERNEL_DIR
+
+		echo "compiler:$KERNEL_CC"
+		make ARCH=arm CROSS_COMPILE=$KERNEL_CC imx_v7_defconfig
 		make V=1 ARCH=arm CROSS_COMPILE=$KERNEL_CC all -j4
 
-		cp -avf $ENV_KERNEL_ZIMAGE $TFTP_PATH/
-		cp -avf $ENV_KERNEL_DTB $TFTP_PATH/
+		if [ -f $ENV_KERNEL_ZIMAGE ]; then
+			cp -avf $ENV_KERNEL_ZIMAGE $TFTP_PATH/
+			cp -avf $ENV_KERNEL_DTB $TFTP_PATH/
+		else
+			echo "${redText}Linux Kernel build failed, please check!${defText}"
+		fi
 	else
 		echo "Kernal Directory:$ENV_KERNEL_DIR not exist!"
 	fi
@@ -260,7 +266,6 @@ function SysCleanKernel
 	if [ -d $ENV_KERNEL_DIR ]; then
 		cd $ENV_KERNEL_DIR
 		make distclean
-		make ARCH=arm CROSS_COMPILE=$KERNEL_CC imx_v7_defconfig
 	else
 		echo "Kernal Directory:$ENV_KERNEL_DIR not exist!"
 	fi
@@ -271,11 +276,20 @@ alias SysCleanKernel='SysCleanKernel'
 #对于uboot目录，需要提前构建好配置定义，此命令仅进行编译
 function SysBuildUboot
 {
+	uboot_file="u-boot.imx"
+
 	if [ -d $ENV_BOOT_DIR ]; then
 		cd $ENV_BOOT_DIR
+
 		echo "compiler:$NEW_KERNEL_CC"
+		make ARCH=arm CROSS_COMPILE=$NEW_KERNEL_CC mx6ull_14x14_evk_emmc_defconfig
 		make V=1 ARCH=arm CROSS_COMPILE=$NEW_KERNEL_CC all -j4
-		cp -avf u-boot-dtb.imx $TFTP_PATH/
+
+		if [ -f u-boot-dtb.imx ]; then
+			uboot_file="u-boot-dtb.imx"
+		fi
+
+		cp -avf ${uboot_file} $TFTP_PATH/
 	else
 		echo "uboot directory:$ENV_BOOT_DIR not exist!"
 	fi
@@ -288,7 +302,6 @@ function SysCleanUboot
 	if [ -d $ENV_BOOT_DIR ]; then
 		cd $ENV_BOOT_DIR
 		make distclean
-		make ARCH=arm CROSS_COMPILE=$NEW_KERNEL_CC mx6ull_14x14_evk_emmc_defconfig
 	else
 		echo "uboot directory:$ENV_BOOT_DIR not exist!"
 	fi
@@ -303,7 +316,7 @@ function SysBuildRootfs
 		cd $ENV_ROOTFS_DIR
 		make&&make install
 
-		cp -ravf $ENV_ROOTFS_DIR/_install/* $NFS_PATH/
+		sudo cp -ravf $ENV_ROOTFS_DIR/_install/* $NFS_PATH/
 		
 		echo "copy c++ library"
 		cd $GCC_LIB/lib
@@ -312,6 +325,9 @@ function SysBuildRootfs
 		echo "copy c library"
 		cd $GCC_LIB/libc/lib
 		cp -ravf *so* *.a $NFS_PATH/lib/
+
+		echo "copy user defined."
+		cp -ravf ${ENV_PATH_ROOT}/rootfs/* ${NFS_PATH}/
 	else
 		echo "rootfs directory:$ENV_ROOTFS_DIR not exist!"
 	fi

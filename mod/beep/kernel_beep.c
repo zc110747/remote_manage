@@ -13,23 +13,11 @@
  */
 /*@{*/
 
-#include <linux/types.h>
 #include <linux/kernel.h>
-#include <linux/delay.h>
-#include <linux/ide.h>
-#include <linux/init.h>
-#include <linux/module.h>
-#include <linux/errno.h>
-#include <linux/gpio.h>
 #include <linux/cdev.h>
 #include <linux/device.h>
 #include <linux/of_gpio.h>
-#include <linux/semaphore.h>
-//总线和硬件相关接口
 #include <linux/platform_device.h>
-#include <asm/mach/map.h>
-#include <asm/uaccess.h>
-#include <asm/io.h>
 
 typedef struct 
 {
@@ -286,7 +274,7 @@ static void beep_device_destory(void)
 
 static void beep_hardware_release(void)
 {
-    devm_gpio_free(driver.dev.device, driver.hw.gpio);
+    //devm_gpio_free(driver.dev.device, driver.hw.gpio);
 }
 
 static int beep_remove(struct platform_device *dev)

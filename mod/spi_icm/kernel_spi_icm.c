@@ -12,28 +12,12 @@
  * @addtogroup IMX6ULL
  */
 /*@{*/
-#include <linux/types.h>
 #include <linux/kernel.h>
 #include <linux/delay.h>
-#include <linux/ide.h>
-#include <linux/init.h>
-#include <linux/module.h>
-#include <linux/errno.h>
-#include <linux/gpio.h>
 #include <linux/cdev.h>
-#include <linux/device.h>
-#include <linux/of_gpio.h>
-#include <linux/semaphore.h>
-#include <linux/timer.h>
-#include <linux/i2c.h>
 #include <linux/spi/spi.h>
-#include <linux/of.h>
-#include <linux/of_address.h>
 #include <linux/of_gpio.h>
 #include <linux/platform_device.h>
-#include <asm/mach/map.h>
-#include <asm/uaccess.h>
-#include <asm/io.h>
 #include "kernel_spi_icm.h"
 
 //全局的指令定义
@@ -79,7 +63,7 @@ static struct icm20608_info icm_info;
 static int icm20608_read_regs(struct icm20608_dev *dev, u8 reg, void *buf, int len)
 {
 	int ret;
-	unsigned char txdata[len];
+	unsigned char txdata[64];
 	struct spi_message m;
 	struct spi_transfer *t;
 	struct spi_device *spi = (struct spi_device *)dev->private_data;
@@ -123,7 +107,7 @@ static s32 icm20608_write_regs(struct icm20608_dev *dev, u8 reg, u8 *buf, u8 len
 {
 	int ret;
 
-	unsigned char txdata[len];
+	unsigned char txdata[64];
 	struct spi_message m;
 	struct spi_transfer *t;
 	struct spi_device *spi = (struct spi_device *)dev->private_data;
@@ -378,7 +362,7 @@ static int icm20608_probe(struct spi_device *spi)
  *
  * @return 设备移除处理结果
  */
-static int icm20608_remove(struct spi_device *spi)
+static void icm20608_remove(struct spi_device *spi)
 {
 	/* 删除设备 */
 	cdev_del(&icm_info.dev.cdev);
@@ -387,7 +371,6 @@ static int icm20608_remove(struct spi_device *spi)
 	/* 注销掉类和设备 */
 	device_destroy(icm_info.dev.class, icm_info.dev.devid);
 	class_destroy(icm_info.dev.class);
-	return 0;
 }
 
 /* 传统匹配方式ID列表 */

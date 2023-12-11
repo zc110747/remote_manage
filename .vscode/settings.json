@@ -70,6 +70,11 @@
         "stop_token": "cpp",
         "streambuf": "cpp",
         "typeinfo": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "module.h": "c",
+        "kernel_i2c_ap.h": "c",
+        "i2c.h": "c",
+        "gpio.h": "c",
+        "errno.h": "c"
     }
 }
