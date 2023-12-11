@@ -76,5 +76,6 @@
         "i2c.h": "c",
         "gpio.h": "c",
         "errno.h": "c"
-    }
+    },
+    "C_Cpp.default.compilerPath": ""
 }
