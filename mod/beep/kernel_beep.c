@@ -13,10 +13,18 @@
  */
 /*@{*/
 
+#include <linux/types.h>
 #include <linux/kernel.h>
+#include <linux/delay.h>
+#include <linux/ide.h>
+#include <linux/init.h>
+#include <linux/module.h>
+#include <linux/errno.h>
+#include <linux/gpio.h>
 #include <linux/cdev.h>
 #include <linux/device.h>
 #include <linux/of_gpio.h>
+#include <linux/semaphore.h>
 #include <linux/platform_device.h>
 
 typedef struct 

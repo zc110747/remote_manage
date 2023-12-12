@@ -6,7 +6,7 @@ function process_openssl()
     #判断是否存在ssl库，存在则不编译
     if [ -f ${GLOBAL_INTALL}/lib/libssl.so ]; then
         echo "libssl.so exist, not build!"
-        return 0;
+        return 0
     fi
 
     #下载openssl
@@ -40,7 +40,7 @@ function process_zlib()
     #判断是否存在libz库，存在则不编译
     if [ -f ${GLOBAL_INTALL}/lib/libz.so ]; then
         echo "libz.so exist, not build!"
-        return 0;
+        return 0
     fi
 
     #下载zlib
@@ -68,11 +68,11 @@ function process_openssh()
 {
     openssh_ver=openssh-9.5p1
 
-    # #判断是否存在libz库，存在则不编译
-    # if [ -f ${GLOBAL_INTALL}/lib/libz.so ]; then
-    #     echo "libz.so exist, not build!"
-    #     return 0;
-    # fi
+    #判断是否存在libz库，存在则不编译
+    if [ -f ${PROGRAM_DOWNLOAD}/${openssh_ver}/sshd ]; then
+        echo "openssh exist, not build!"
+        return 0
+    fi
 
     #下载openssh
     cd ${PROGRAM_DOWNLOAD}/
@@ -87,11 +87,11 @@ function process_openssh()
     cd ${openssh_ver}/
 
     #编译openssh
-    # ./configure --host=arm-none-linux-gnueabihf --with-libs --with-zlib=${GLOBAL_INTALL} \
-    #             --with-ssl-dir=${GLOBAL_INTALL} --disable-etc-default-login \
-    #             --prefix=${GLOBAL_INTALL}
+    ./configure --host=arm-none-linux-gnueabihf --with-libs --with-zlib=${GLOBAL_INTALL} \
+                --with-ssl-dir=${GLOBAL_INTALL} --disable-etc-default-login \
+                --prefix=${GLOBAL_INTALL}
 
-    # make -j2
+    make -j2
 
     cp scp sftp ssh sshd ssh-agent ssh-keygen ssh-keyscan ${APP_ROOTFS}/usr/local/bin/
     cp sftp-server ssh-keysign ${APP_ROOTFS}/usr/libexec/
@@ -99,8 +99,133 @@ function process_openssh()
 }
 process_openssh
 
+#安装node服务
+function process_node()
+{
+    node_ver=v20.9.0
+    node_file=node-${node_ver}-linux-armv7l
+
+    if [ -d ${NFS_PATH}/support/node/bin ]; then
+        echo "node already install, finished!"
+        return 0
+    fi
+
+    cd ${PROGRAM_DOWNLOAD}/
+    if [ ! -f ${node_file}.tar.xz ]; then
+        echo "download file $node_file:$node_addr"
+        wget https://nodejs.org/dist/${node_ver}/${node_file}.tar.xz
+    fi
+
+    tar -xvf ${node_file}.tar.xz
+    mkdir -p ${NFS_PATH}/support/node/
+    cp -Rv ${node_file}/* ${NFS_PATH}/support/node/
+}
+process_node
+
+#安装cJson
+function process_cJSON()
+{
+    #下载cjson库
+    #cjson默认使用gcc编译，需要修改支持交叉编译(Makefile)
+    if [ ! -f ${GLOBAL_INTALL}/lib/libcjson.so ]; then
+       
+        cd ${PROGRAM_DOWNLOAD}/
+        cjson_ver=cJSON-master
+        if [ ! -f ${cjson_ver}.tar.bz2 ];then
+            echo "no exist cjson, need clone from github."
+            return -1
+        fi    
+        tar -xvf ${cjson_ver}.tar.bz2
+        cd ${cjson_ver}
+
+        make CC="arm-none-linux-gnueabihf-gcc -std=c89"
+
+        cp -rv *.so* ${GLOBAL_INTALL}/lib/
+        mkdir -p ${GLOBAL_INTALL}/include/cjson/
+        cp -rv *.h ${GLOBAL_INTALL}/include/cjson/
+    else
+        echo "cJson already install."
+    fi
+}
+process_cJSON
+
+#安装mosquitto
+function process_mosquitto()
+{
+    if [ ! -f ${GLOBAL_INTALL}/lib/libcjson.so ]; then
+        echo "libcjson not exist, not compiler mosquitto"
+        return -1;
+    fi
+    
+    if [ -f ${GLOBAL_INTALL}/usr/local/sbin/mosquitto ]; then
+        echo "mosquitto already install, not compiler!"
+        return 0
+    fi
+
+    #下载和解压mosquitto
+    mosquitto_ver=mosquitto-2.0.18
+    cd ${PROGRAM_DOWNLOAD}/
+    if [ ! -f ${mosquitto_ver}.tar.gz ]; then
+        wget https://mosquitto.org/files/source/${mosquitto_ver}.tar.gz
+        sleep 2
+    fi
+    tar -xvf ${mosquitto_ver}.tar.gz
+
+    #编译mosquitto
+    cd ${mosquitto_ver}/
+    export CC=gcc
+    export CXX=g++
+    export CPPFLAGS="-I${GLOBAL_INTALL}/include/ -fPIC"
+    export CFLAGS="-I${GLOBAL_INTALL}/include/ -fPIC"
+    export LDFLAGS="-L${GLOBAL_INTALL}/lib -fPIC -lssl -lcrypto"
+    export DESTDIR="${GLOBAL_INTALL}/"
+    export CROSS_COMPILE=arm-none-linux-gnueabihf-
+    make -j4 && make install   
+}
+process_mosquitto
+
+function process_asio()
+{
+    asio_ver=asio-1.28.0
+
+    if [ ! -d asio ]; then
+        tar -xvf ${asio_ver}.tar.gz
+        sleep 1
+
+        mv ${asio_ver} asio
+    else
+        echo "asio exist, not process!"
+    fi
+}
+process_asio
+
+function process_jsoncpp()
+{
+    json_ver=jsoncpp
+
+    if [ -f ${APPLICATION_BUILDOUT}/libjsoncpp.a ]; then
+        echo "libjsoncpp already build, not process!"
+        return 0
+    fi
+
+    if [ ! -d ${jsoncpp} ]; then
+        tar -xvf ${json_ver}.tar.bz2
+    fi
+
+    cd ${json_ver}
+    make 
+}
+process_jsoncpp
+
 function install_library()
 {
-    
+    mkdir -p ${NFS_PATH}/usr/lib/
+    mkdir -p ${NFS_PATH}/usr/include/
+    mkdir -p ${NFS_PATH}/usr/local/
+    cp -Rv ${GLOBAL_INTALL}/lib/* ${NFS_PATH}/usr/lib/
+    cp -Rv ${GLOBAL_INTALL}/usr/local/lib/* ${NFS_PATH}/usr/lib/
+    cp -Rv ${GLOBAL_INTALL}/usr/local/include/* ${NFS_PATH}/usr/include/
+    cp -Rv ${GLOBAL_INTALL}/include/* ${NFS_PATH}/usr/include/
+    cp -Rv ${GLOBAL_INTALL}/usr/local/* ${NFS_PATH}/usr/local/
 }
 install_library

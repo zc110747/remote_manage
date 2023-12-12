@@ -41,7 +41,6 @@ INCLUDES +=	-I $(ENV_PATH_ROOT)/thirdparts/asio/include/ \
 			-I $(ENV_PATH_ROOT)/thirdparts/jsoncpp/include/ \
 			-I $(ENV_PATH_ROOT)/thirdparts/mosquitto/include/ 
 
-#根据编译版本增加不同库支持
 ifeq ($(APP_CC_COMPILE),g++)
 library = $(ENV_PATH_ROOT)/buildout/i386/libjsoncpp.a
 ifeq (${DEFINE_MQTT},1)
@@ -52,7 +51,7 @@ else
 library = $(ENV_PATH_ROOT)/buildout/arm/libjsoncpp.a
 ifeq (${DEFINE_MQTT},1)
 cpp_objects += mqtt/mqtt_process.o
-library += -L ${ENV_PATH_ROOT}/rootfs/usr/lib -lssl -lcrypto -lmosquitto -lmosquittopp
+library += -L ${NFS_PATH}/usr/lib -lssl -lcrypto -lmosquitto -lmosquittopp
 endif
 endif
 

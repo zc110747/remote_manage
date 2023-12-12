@@ -12,12 +12,21 @@
  * @addtogroup IMX6ULL
  */
 /*@{*/
+
+#include <linux/types.h>
 #include <linux/kernel.h>
 #include <linux/delay.h>
+#include <linux/ide.h>
+#include <linux/init.h>
+#include <linux/module.h>
+#include <linux/errno.h>
+#include <linux/gpio.h>
 #include <linux/cdev.h>
-#include <linux/spi/spi.h>
+#include <linux/device.h>
 #include <linux/of_gpio.h>
+#include <linux/semaphore.h>
 #include <linux/platform_device.h>
+#include <linux/spi/spi.h>
 #include "kernel_spi_icm.h"
 
 //全局的指令定义
@@ -362,7 +371,7 @@ static int icm20608_probe(struct spi_device *spi)
  *
  * @return 设备移除处理结果
  */
-static void icm20608_remove(struct spi_device *spi)
+static int icm20608_remove(struct spi_device *spi)
 {
 	/* 删除设备 */
 	cdev_del(&icm_info.dev.cdev);
@@ -371,6 +380,8 @@ static void icm20608_remove(struct spi_device *spi)
 	/* 注销掉类和设备 */
 	device_destroy(icm_info.dev.class, icm_info.dev.devid);
 	class_destroy(icm_info.dev.class);
+	
+	return 0;
 }
 
 /* 传统匹配方式ID列表 */

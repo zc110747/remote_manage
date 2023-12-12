@@ -26,7 +26,5 @@ thirdparts/mosquitto/z*
 rootfs/run/server/*
 rootfs/run/support/*
 rootfs/run/bin/*
-
 buildout/
-
-/rootfs/run/bin/lower_device
+mod/rs232/*

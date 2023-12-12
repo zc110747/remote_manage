@@ -80,28 +80,6 @@ function build_driver_module()
 }
 alias test_build_driver_module='build_driver_module'
 
-function build_support_library()
-{
-	cd $APPLICATION_THIRDPARTS
-	if [ "${APP_CC_COMPILE}" == "g++" ]; then
-		echo "start build lib:${APPLICATION_BUILDOUT}/libjsoncpp.a"
-		if [ ! -f ${APPLICATION_BUILDOUT}/libjsoncpp.a ]; then
-			cd $APPLICATION_THIRDPARTS/jsoncpp
-			make -j4
-		else
-			echo "x86 libjson exist. not build!"
-		fi
-	else
-		echo "start build lib:${APPLICATION_BUILDOUT}/libjsoncpp.a"
-		if [ ! -f ${APPLICATION_BUILDOUT}/libjsoncpp.a ]; then
-			cd ${APPLICATION_THIRDPARTS}/jsoncpp
-			make -j4
-		else
-			echo "arm libjson exist. not build!"
-		fi
-	fi
-}
-
 function SysBuildApplication()
 {
 	echo frimware path:$ENV_PATH_ROOT
@@ -113,9 +91,6 @@ function SysBuildApplication()
 	#复制配置文件
 	cd $ENV_PATH_ROOT
 	cp config.template.json $APPLICATION_RUN/config.json
-
-	#编译支持的库
-	build_support_library
 
 	#编译并复制main_process进程
 	cd ${APPLICATION_EMBED}/
