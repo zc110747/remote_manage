@@ -27,7 +27,7 @@ thirdparts/mosquitto/z*
 
 rootfs/run/server/*
 rootfs/run/support/*
-rootfs/run/bin/main_process
+rootfs/run/bin/*
 
 buildout/
 

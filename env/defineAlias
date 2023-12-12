@@ -314,10 +314,17 @@ function SysBuildRootfs
 {
 	if [ -d $ENV_ROOTFS_DIR ]; then
 		cd $ENV_ROOTFS_DIR
-		make&&make install
+
+		echo "copy user defined."
+		sudo chmod -Rv 755 ${ENV_PATH_ROOT}/rootfs/etc
+		sudo cp -ravf ${ENV_PATH_ROOT}/rootfs/* ${NFS_PATH}/
+
+		make -j4
+		make install
 
 		sudo cp -ravf $ENV_ROOTFS_DIR/_install/* $NFS_PATH/
 		
+		#copy C/C++ library
 		echo "copy c++ library"
 		cd $GCC_LIB/lib
 		cp -ravf *so* *.a $NFS_PATH/lib/
@@ -326,8 +333,7 @@ function SysBuildRootfs
 		cd $GCC_LIB/libc/lib
 		cp -ravf *so* *.a $NFS_PATH/lib/
 
-		echo "copy user defined."
-		cp -ravf ${ENV_PATH_ROOT}/rootfs/* ${NFS_PATH}/
+		cdn
 	else
 		echo "rootfs directory:$ENV_ROOTFS_DIR not exist!"
 	fi
