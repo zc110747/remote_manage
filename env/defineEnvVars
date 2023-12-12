@@ -102,6 +102,7 @@ if [[ "${supportedPlatforms[0]}" == "$FIRMWARE_CURRENT_PLATFORMS" ]]; then
     export APP_CC_COMPILE=g++
     export APP_AR_COMPILE=ar
     export APPLICATION_BUILDOUT=$ENV_PATH_ROOT/buildout/i386
+    export GLOBAL_INTALL=${PROGRAM_PATH}/install/i386
 
 elif [[ "${supportedPlatforms[1]}" == "$FIRMWARE_CURRENT_PLATFORMS" ]]; then
     #Embed-Linux
@@ -109,7 +110,8 @@ elif [[ "${supportedPlatforms[1]}" == "$FIRMWARE_CURRENT_PLATFORMS" ]]; then
     export APP_CC_COMPILE=arm-none-linux-gnueabihf-g++
     export APP_AR_COMPILE=arm-none-linux-gnueabihf-ar
     export APPLICATION_BUILDOUT=$ENV_PATH_ROOT/buildout/arm
-
+    export GLOBAL_INTALL=${PROGRAM_PATH}/install/arm
+    
 else
     echo "${redText}error platform $FIRMWARE_CURRENT_PLATFORMS not exist in list of support${defText}"
 fi
@@ -119,14 +121,17 @@ fi
 # Not need Change unless program change.
 #-------------------------------------------------------------------------------
 #kernal_mod
-export ENV_PATH_KERNAL_MOD="$ENV_PATH_ROOT/mod"
+export ENV_PATH_KERNAL_MOD="${ENV_PATH_ROOT}/mod"
 
 #application 
-export APPLICATION_RUN=$ENV_PATH_ROOT/rootfs/run
-export APPLICATION_THIRDPARTS=$ENV_PATH_ROOT/thirdparts
-export APPLICATION_EMBED=$ENV_PATH_ROOT/embed
-export APP_MAIN_PORCESS=$APPLICATION_EMBED/main_process
-export APP_BUILD_DRIVER=$ENV_PATH_ROOT/rootfs/run/modules
+export APP_ROOTFS=${ENV_PATH_ROOT}/rootfs
+export APP_ROOTFS_LIB=${APP_ROOTFS}/lib
+export APPLICATION_RUN=${APP_ROOTFS}/run
+export APPLICATION_THIRDPARTS=${ENV_PATH_ROOT}/thirdparts
+export APPLICATION_EMBED=${ENV_PATH_ROOT}/embed
+export APP_MAIN_PORCESS=${APPLICATION_EMBED}/main_process
+export APP_BUILD_DRIVER=${ENV_PATH_ROOT}/rootfs/run/modules
+
 
 export ENV_BUILD=$PROGRAM_APPLICATION/build
 export ENV_BUILD_FIRMWARE=$ENV_BUILD/firmware

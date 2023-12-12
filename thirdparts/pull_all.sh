@@ -13,22 +13,22 @@ function pull_asio()
     asio_addr="https://sourceforge.net/projects/asio/files/asio/$ver%20%28Stable%29/$asio_gz"
     asio_out=asio
 
-    if [ ! -d $asio_out/include ]; then
+    if [ ! -d ${asio_out}/include ]; then
 
         #从服务器下载asio项目文件
-        if [ ! -f $asio_gz ]; then
+        if [ ! -f ${asio_gz} ]; then
             echo "download fimrware $asio_gz: $asio_addr"
-            wget $asio_addr
+            wget ${asio_addr}
         fi
 
         #解压asio文件, 重命名为asio
-        tar -xvf $asio_gz
+        tar -xvf ${asio_gz}
 
-        if [ ! -d $asio_out/ ]; then
-            mkdir -p $asio_out
+        if [ ! -d ${asio_out}/ ]; then
+            mkdir -p ${asio_out}
         fi
-        mv $asio_ver/* $asio_out/
-        rm -rf $asio_ver
+        mv ${asio_ver}/* ${asio_out}/
+        rm -rf ${asio_ver}
 
     else
         echo "asio alread install, skip this step!"

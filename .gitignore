@@ -14,12 +14,10 @@
 *.so
 *.so*
 *.ko
-*.tar.bz2
 *.tar.gz
 
 thirdparts/asio/
 thirdparts/jsoncpp/
-
 thirdparts/mosquitto/m*
 thirdparts/mosquitto/c*
 thirdparts/mosquitto/o*

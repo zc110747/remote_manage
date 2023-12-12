@@ -93,7 +93,7 @@ function build_openssh()
                 --with-ssl-dir=${base_build} --disable-etc-default-login \
                 --prefix=${base_build}/openssh
 
-    make -j2
+    make -j2 && make install
 
     exit_if_last_error
 }
