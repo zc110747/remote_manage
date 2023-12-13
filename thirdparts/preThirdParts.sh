@@ -219,13 +219,13 @@ process_jsoncpp
 
 function install_library()
 {
-    mkdir -p ${NFS_PATH}/usr/lib/
-    mkdir -p ${NFS_PATH}/usr/include/
-    mkdir -p ${NFS_PATH}/usr/local/
-    cp -Rv ${GLOBAL_INTALL}/lib/* ${NFS_PATH}/usr/lib/
-    cp -Rv ${GLOBAL_INTALL}/usr/local/lib/* ${NFS_PATH}/usr/lib/
-    cp -Rv ${GLOBAL_INTALL}/usr/local/include/* ${NFS_PATH}/usr/include/
-    cp -Rv ${GLOBAL_INTALL}/include/* ${NFS_PATH}/usr/include/
-    cp -Rv ${GLOBAL_INTALL}/usr/local/* ${NFS_PATH}/usr/local/
+    sudo mkdir -p ${NFS_PATH}/usr/lib/
+    sudo mkdir -p ${NFS_PATH}/usr/include/
+    sudo mkdir -p ${NFS_PATH}/usr/local/
+    sudo cp -Rv ${GLOBAL_INTALL}/lib/* ${NFS_PATH}/usr/lib/
+    sudo cp -Rv ${GLOBAL_INTALL}/usr/local/lib/* ${NFS_PATH}/usr/lib/
+    sudo cp -Rv ${GLOBAL_INTALL}/usr/local/include/* ${NFS_PATH}/usr/include/
+    sudo cp -Rv ${GLOBAL_INTALL}/include/* ${NFS_PATH}/usr/include/
+    sudo cp -Rv ${GLOBAL_INTALL}/usr/local/* ${NFS_PATH}/usr/local/
 }
 install_library

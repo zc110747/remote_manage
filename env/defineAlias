@@ -39,6 +39,36 @@ exit_if_last_error() {
 }
 alias exit_if_last_error='exit_if_last_error'
 
+mount_chroot()
+{
+	sudo chmod -Rv 777 ${NFS_PATH}/bin/
+	sudo chmod -Rv 777 ${NFS_PATH}/usr/sbin/
+    sudo mount -t proc chproc ${NFS_PATH}/proc
+    sudo mount -t sysfs chsys ${NFS_PATH}/sys
+    sudo mount -t devtmpfs chdev ${NFS_PATH}/dev || sudo mount --bind /dev ${NFS_PATH}/dev
+    sudo mount -t devpts chpts ${NFS_PATH}/dev/pts
+}
+alias mount_chroot='mount_chroot'
+
+umount_chroot()
+{
+    while grep -Eq "${NFS_PATH}.*(dev|proc|sys)" /proc/mounts
+    do
+        sudo umount -l --recursive ${NFS_PATH}/dev >/dev/null 2>&1
+        sudo umount -l ${NFS_PATH}/proc >/dev/null 2>&1
+        sudo umount -l ${NFS_PATH}/sys >/dev/null 2>&1
+        sleep 5
+    done
+}
+alias umount_chroot='umount_chroot'
+
+enter_chroot()
+{
+	cd ${NFS_PATH}
+	LC_ALL=C LANGUAGE=C LANG=C sudo chroot ${NFS_PATH}
+}
+alias enter_chroot='enter_chroot'
+
 #tar the firmware source
 function SysTarFirmwareSource
 {
