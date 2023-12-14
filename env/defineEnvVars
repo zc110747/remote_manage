@@ -65,7 +65,6 @@ while read line; do
 done < $ENV_CONFIG_FILE
 FIRMWARE_CURRENT_PLATFORMS="${array[0]}"
 FMWARE_VESRION="${array[1]}"
-EMBED_DEVICE_IPADDRESS="${array[2]}"
 
 #-------------------------------------------------------------------------------
 # This section defined the word color.
@@ -125,7 +124,6 @@ export ENV_PATH_KERNAL_MOD="${ENV_PATH_ROOT}/mod"
 export APP_ROOTFS=${ENV_PATH_ROOT}/rootfs
 export APP_ROOTFS_LIB=${APP_ROOTFS}/lib
 export APPLICATION_SYS=${APP_ROOTFS}/home/sys
-export APPLICATION_EXE=${APPLICATION_SYS}/executable
 export APPLICATION_THIRDPARTS=${ENV_PATH_ROOT}/thirdparts
 export APPLICATION_EMBED=${ENV_PATH_ROOT}/embed
 export APP_MAIN_PORCESS=${APPLICATION_EMBED}/main_process
@@ -140,5 +138,5 @@ export ENV_BUILD_BIN=$ENV_BUILD_FIRMWARE/bin
 #-------------------------------------------------------------------------------
 echo "Update Environment Data Success!"
 echo "Can use command '${greenText}SysHelpCommand${defText}' for more helps."
-echo "Current Platform is ${greenText}$FIRMWARE_CURRENT_PLATFORMS${defText}, Remote IPAdress is ${greenText}$EMBED_DEVICE_IPADDRESS${defText}."
+echo "Current Platform is ${greenText}$FIRMWARE_CURRENT_PLATFORMS${defText}."
 echo "Current Firmware Version is ${greenText}$FMWARE_VESRION${defText}."

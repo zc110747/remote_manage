@@ -23,5 +23,7 @@ thirdparts/mosquitto/c*
 thirdparts/mosquitto/o*
 thirdparts/mosquitto/z*
 
+rootfs/home/sys/
+
 buildout/
 mod/rs232/*

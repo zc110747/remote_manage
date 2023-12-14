@@ -105,7 +105,7 @@ function process_node()
     node_ver=v20.9.0
     node_file=node-${node_ver}-linux-armv7l
 
-    if [ -d ${NFS_PATH}/support/node/bin ]; then
+    if [ -d ${APPLICATION_SYS}/support/node/bin ]; then
         echo "node already install, finished!"
         return 0
     fi
@@ -117,8 +117,8 @@ function process_node()
     fi
 
     tar -xvf ${node_file}.tar.xz
-    mkdir -p ${NFS_PATH}/support/node/
-    cp -Rv ${node_file}/* ${NFS_PATH}/support/node/
+    mkdir -p ${APPLICATION_SYS}/support/node/
+    cp -Rv ${node_file}/* ${APPLICATION_SYS}/support/node/
 }
 process_node
 
@@ -188,11 +188,11 @@ function process_asio()
 {
     asio_ver=asio-1.28.0
 
-    if [ ! -d asio/ ]; then
+    if [ ! -d ${APPLICATION_THIRDPARTS}/asio/ ]; then
         tar -xvf ${asio_ver}.tar.gz
         sleep 1
 
-        mv ${asio_ver} asio
+        mv ${asio_ver} asio/
     else
         echo "asio exist, not process!"
     fi

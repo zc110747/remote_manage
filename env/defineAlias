@@ -39,6 +39,10 @@ exit_if_last_error() {
 }
 alias exit_if_last_error='exit_if_last_error'
 
+############################################################
+# mount_chroot
+# function: mount for chroot.
+#############################################################
 mount_chroot()
 {
 	sudo chmod -Rv 777 ${NFS_PATH}/bin/
@@ -61,6 +65,10 @@ umount_chroot()
 }
 alias umount_chroot='umount_chroot'
 
+############################################################
+# enter_chroot
+# function: enter the chroot for arm.
+#############################################################
 enter_chroot()
 {
 	cd ${NFS_PATH}
@@ -71,12 +79,15 @@ enter_chroot()
 }
 alias enter_chroot='enter_chroot'
 
-#tar the firmware source
+############################################################
+# SysTarFirmwareSource
+# function: tar the source
+#############################################################
 function SysTarFirmwareSource
 {
 	cd ${ENV_PATH_ROOT}/../
 
-	tar --exclude='remote_manage/.git' --exclude='remote_manage/rootfs/run/support' --exclude='remote_manage/thirdparts' -vcjf remote_manage.tar.bz2 remote_manage/
+	tar --exclude='remote_manage/.git' --exclude='remote_manage/rootfs' --exclude='remote_manage/thirdparts' -vcjf remote_manage.tar.bz2 remote_manage/
 
 	exit_if_last_error
 
@@ -85,17 +96,24 @@ function SysTarFirmwareSource
 }	
 alias SysTarFirmwareSource='SysTarFirmwareSource'
 
-function SysPullAll()
+############################################################
+#SysPreThirdParts
+#function: perpare for third parts install
+#############################################################
+function SysPreThirdParts()
 {
 	echo "------start pull thirdparts libary------"
 
-	cd $ENV_PATH_ROOT/thirdparts
+	cd ${ENV_PATH_ROOT}/thirdparts/
 
-	./pull_all.sh
+	./preThirdParts.sh
 }
-alias SysPullAll='SysPullAll'
+alias SysPreThirdParts='SysPreThirdParts'
 
-#build driver
+############################################################
+#SysBuildApplication
+#function: build application and install
+#############################################################
 function build_driver_module()
 {
 	cd $ENV_PATH_ROOT
@@ -140,107 +158,57 @@ function SysBuildApplication()
 		
 	#package node sever
 	cd ${APPLICATION_EMBED}/
-	if [ ! -d ${APPLICATION_RUN}/server/ ]; then
-		mkdir ${APPLICATION_RUN}/server/ 
-	fi
-	cp -rv node_server/* ${APPLICATION_RUN}/server/
+	cp -rv node_server/* ${APPLICATION_SYS}/server/
 
 	#only arm copy to rootfs to struct, for aarch64, do nothing
 	if [ ${FIRMWARE_CURRENT_PLATFORMS} == "ARM" ]; then
-		cp ${APPLICATION_BUILDOUT}/main_process ${APPLICATION_EXE}/
-		cp ${APPLICATION_BUILDOUT}/lower_device ${APPLICATION_EXE}/
-		cp ${APPLICATION_BUILDOUT}/local_device ${APPLICATION_EXE}/
+		cp ${APPLICATION_BUILDOUT}/main_process ${APPLICATION_SYS}/executable/
+		cp ${APPLICATION_BUILDOUT}/lower_device ${APPLICATION_SYS}/executable/
+		cp ${APPLICATION_BUILDOUT}/local_device ${APPLICATION_SYS}/executable/
 	fi
 
 	cda
 }
 alias SysBuildApplication='SysBuildApplication'
 
-#清除firmware，包含编译的中间文件和打包后的firmware.
-function SysCleanApplication
-{
-	cd $APP_MAIN_PORCESS
-	make clean
-
-	#回到项目的地址
-	cda
-}
-alias SysCleanApplication='SysCleanApplication'
-
-#执行firmware，仅限于linux环境下编译的应用，主要用于测试
-function SysExecuteFirmware
-{
-	$ENV_BUILD_BIN/app_demo -f $ENV_BUILD_FIRMWARE/config.json
-}
-alias SysExecuteFirmware='SysExecuteFirmware'
-
-#关闭firmware，仅限于linux环境下编译的应用，主要用于测试
-function SysKillFirmware
-{
-	echo "kill main_process lower_device"
-	sudo pkill -9 lower_device
-	sudo pkill -9 main_process
-}
-alias SysKillFirmware='SysKillFirmware'
-
-#将配置参数写入到$ENV_CONFIG_FILE，在启动时即可读取
-#一般不单独调用
+############################################################
+#SysSetPlatformARM/SysSetPlatformAARCH64
+#function: update the platform
+#############################################################
 function SysUpdateConfig
 {
 	truncate -s 0 $ENV_CONFIG_FILE
 	echo "$FIRMWARE_CURRENT_PLATFORMS">$ENV_CONFIG_FILE
 	echo "$FMWARE_VESRION">>$ENV_CONFIG_FILE
-	echo "$EMBED_DEVICE_IPADDRESS">>$ENV_CONFIG_FILE
 	exec bash
 }
 
-#设置当前环境为编译嵌入式Linux平台的配置
-function SysSetPlatformEmbedLinux
+function SysSetPlatformARM
 {
-	export FIRMWARE_CURRENT_PLATFORMS="Embed-Linux"
+	export FIRMWARE_CURRENT_PLATFORMS="ARM"
 	SysUpdateConfig
 }
-alias SysSetPlatformEmbedLinux='SysSetPlatformEmbedLinux'
+alias SysSetPlatformARM='SysSetPlatformARM'
 
-#设置当前环境为编译Linux平台的配置
-function SysSetPlatformLinux
+function SysSetPlatformAARCH64
 {
-	export FIRMWARE_CURRENT_PLATFORMS="Linux"
+	export FIRMWARE_CURRENT_PLATFORMS="AARCH64"
 	SysUpdateConfig
 }
-alias SysSetPlatformLinux='SysSetPlatformLinux'
+alias SysSetPlatformAARCH64='SysSetPlatformAARCH64'
 
-#设置嵌入式端设备IP地址，主要配合SysPushApplication使用
-function SysSetRemoteIpAddress
-{
-	if [ $# -eq 1 ]; then
-		export EMBED_DEVICE_IPADDRESS=$1
-		echo "Set Remote IpAddress is $1"
-		SysUpdateConfig
-	else
-		echo "one parameter about ipaddress need!"
-	fi
-}
-alias SysSetRemoteIpAddress='SysSetRemoteIpAddress'
-
-#设置打包的firmware的版本号，升级时使用
-function SysSetApplicationVer
-{
-	if [ $# -eq 1 ]; then
-		export FMWARE_VESRION=$1
-		echo "Set Firmware Version is $1"
-		SysUpdateConfig
-	else
-		echo "one parameter about firmware version need!"
-	fi
-}
-alias SysSetApplicationVer='SysSetApplicationVer'
-
-#编译linux内核
-#对于内核目录，需要提前构建好配置定义，此命令仅进行编译
-#因为最新的gcc编译会无法执行，所以指定了$KERNEL_CC对应的编译器
+############################################################
+#SysBuildKernel/SysCleanKernel
+#function: build and clean the kernel
+#############################################################
 function SysBuildKernel
 {
+	#check wheather build driver
+	if [ "${FIRMWARE_CURRENT_PLATFORMS}" == "AARCH64" ]; then
+		echo "for AARCH64 only support application, kernel command invalid!".
+		return 0
+	fi
+
 	if [ -d $ENV_KERNEL_DIR ]; then
 		cd $ENV_KERNEL_DIR
 
@@ -260,9 +228,14 @@ function SysBuildKernel
 }
 alias SysBuildKernel='SysBuildKernel'
 
-#清除内核编译
 function SysCleanKernel
 {
+	#check wheather build driver
+	if [ "${FIRMWARE_CURRENT_PLATFORMS}" == "AARCH64" ]; then
+		echo "for AARCH64 only support application, kernel command invalid!".
+		return 0
+	fi
+
 	if [ -d $ENV_KERNEL_DIR ]; then
 		cd $ENV_KERNEL_DIR
 		make distclean
@@ -272,11 +245,19 @@ function SysCleanKernel
 }
 alias SysCleanKernel='SysCleanKernel'
 
-#编译uboot
-#对于uboot目录，需要提前构建好配置定义，此命令仅进行编译
+############################################################
+#SysBuildUboot/SysCleanUboot
+#function: build and clean the uboot
+#############################################################
 function SysBuildUboot
 {
 	uboot_file="u-boot.imx"
+
+	#check wheather build driver
+	if [ "${FIRMWARE_CURRENT_PLATFORMS}" == "AARCH64" ]; then
+		echo "for AARCH64 only support application, uboot command invalid!".
+		return 0
+	fi
 
 	if [ -d $ENV_BOOT_DIR ]; then
 		cd $ENV_BOOT_DIR
@@ -296,9 +277,14 @@ function SysBuildUboot
 }
 alias SysBuildUboot='SysBuildUboot'
 
-#清除uboot编译
 function SysCleanUboot
 {
+	#check wheather build driver
+	if [ "${FIRMWARE_CURRENT_PLATFORMS}" == "AARCH64" ]; then
+		echo "for AARCH64 only support application, uboot command invalid!".
+		return 0
+	fi
+
 	if [ -d $ENV_BOOT_DIR ]; then
 		cd $ENV_BOOT_DIR
 		make distclean
@@ -308,41 +294,57 @@ function SysCleanUboot
 }
 alias SysCleanUboot='SysCleanUboot'
 
-#编译rootfs
-#编译后的文件提交到nfs目录下
+############################################################
+#SysBuildRootfs/SysCleanRootfs
+#function: build and clean the kernel
+#############################################################
 function SysBuildRootfs
 {
+	#check wheather build driver
+	if [ "${FIRMWARE_CURRENT_PLATFORMS}" == "AARCH64" ]; then
+		echo "for AARCH64 only support application, rootfs command invalid!".
+		return 0
+	fi
+
 	if [ -d $ENV_ROOTFS_DIR ]; then
 		cd $ENV_ROOTFS_DIR
 
+		#copy use file
 		echo "copy user defined."
 		sudo chmod -Rv 755 ${ENV_PATH_ROOT}/rootfs/etc
 		sudo cp -ravf ${ENV_PATH_ROOT}/rootfs/* ${NFS_PATH}/
 
-		make -j4
-		make install
+		if [ ! -d ${NFS_PATH}/etc/perl ]; then
+			make -j4
+			make install
 
-		sudo cp -ravf $ENV_ROOTFS_DIR/_install/* $NFS_PATH/
-		
-		#copy C/C++ library
-		echo "copy c++ library"
-		cd $GCC_LIB/lib
-		cp -ravf *so* *.a $NFS_PATH/lib/
+			sudo cp -ravf $ENV_ROOTFS_DIR/_install/* $NFS_PATH/
+			
+			#copy C/C++ library
+			echo "copy c++ library"
+			cd $GCC_LIB/lib
+			cp -ravf *so* *.a $NFS_PATH/lib/
 
-		echo "copy c library"
-		cd $GCC_LIB/libc/lib
-		cp -ravf *so* *.a $NFS_PATH/lib/
+			echo "copy c library"
+			cd $GCC_LIB/libc/lib
+			cp -ravf *so* *.a $NFS_PATH/lib/
+		fi
 
-		cdn
+		cda
 	else
 		echo "rootfs directory:$ENV_ROOTFS_DIR not exist!"
 	fi
 }
 alias SysBuildRootfs='SysBuildRootfs'
 
-#清除文件系统
 function SysCleanRootfs
 {
+	#check wheather build driver
+	if [ "${FIRMWARE_CURRENT_PLATFORMS}" == "AARCH64" ]; then
+		echo "for AARCH64 only support application, rootfs command invalid!".
+		return 0
+	fi
+
 	if [ -d $ENV_ROOTFS_DIR ]; then
 		cd $ENV_ROOTFS_DIR
 		make clean
@@ -352,6 +354,26 @@ function SysCleanRootfs
 }
 alias SysCleanRootfs='SysCleanRootfs'
 
+############################################################
+#SysSetApplicationVer
+#function: set the application version.
+#############################################################
+function SysSetApplicationVer
+{
+	if [ $# -eq 1 ]; then
+		export FMWARE_VESRION=$1
+		echo "Set Firmware Version is $1"
+		SysUpdateConfig
+	else
+		echo "one parameter about firmware version need!"
+	fi
+}
+alias SysSetApplicationVer='SysSetApplicationVer'
+
+############################################################
+#SysPackageFirmware
+#function: package firmware command
+#############################################################
 #打包内核 firmware包，文件系统到$DST_PATH，对于新的工程环境，命令执行流程
 #SysCleanUboot
 #SysBuildUboot
@@ -388,27 +410,23 @@ function SysPackageFirmware
 }
 alias SysPackageFirmware='SysPackageFirmware'
 
-#显示帮助信息
+############################################################
+#SysHelpCommand
+#function: phelo command
+#############################################################
 function SysHelpCommand
 {
-	echo "${blueText}SysPullAll${defText}"
-	echo "    ${limityellowText}Pull all thirdpart application for build."
-	echo "${blueText}SysBuildApplication${defText}"
-	echo "    ${limityellowText}Build Application, Package Firmware."
-	echo "${blueText}SysBuildKernel${defText}"
-	echo "    ${limityellowText}Build the Kernal, if exist kernal directory."
-	echo "${blueText}SysSetPlatformEmbedLinux${defText}"
-	echo "    ${limityellowText}Set Current Platform to Embed-Linux Complier."
-	echo "${blueText}SysSetPlatformLinux${defText}"
-	echo "    ${limityellowText}Set Current Platform to Linux Complier."
-	echo "${blueText}SysSetRemoteIpAddress${defText}"
-	echo "    ${limityellowText}example:${cyanText}SysSetRemoteIpAddress 192.168.0.1."
-	echo "    ${limityellowText}Set the remote ipaddress for command <SysPushApplication>"
+	echo "${blueText}SysPreThirdParts${defText}"
+	echo "    ${limityellowText}pull all thirdparts, install library."
+	echo "${blueText}SysSetPlatformARM${defText}"
+	echo "    ${limityellowText}Set Current Platform to ARM Complier(I.MX6ull)."
+	echo "${blueText}SysSetPlatformAARCH64${defText}"
+	echo "    ${limityellowText}Set Current Platform to AARCH64 Complier(H616)."
 	echo "${blueText}SysSetApplicationVer${defText}"
-	echo "    ${limityellowText}example:${cyanText}SysSetRemoteIpAddress 1.0.0.1."
+	echo "    ${limityellowText}example:${cyanText}SysSetApplicationVer 1.0.0.1."
 	echo "    ${limityellowText}Set the verison of the firmware when build"
 	echo "${blueText}SysBuildApplication${defText}"
-	echo "    ${limityellowText}Build the application, copy to nfs directory, also can push to embed-linux device."
+	echo "    ${limityellowText}Build Application, Package Firmware."
 	echo "${blueText}SysCleanApplication${defText}"
 	echo "    ${limityellowText}Clean the app firmware for next."
 	echo "${blueText}SysBuildKernel${defText}"
