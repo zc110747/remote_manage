@@ -41,13 +41,16 @@ INCLUDES +=	-I $(ENV_PATH_ROOT)/thirdparts/asio/include/ \
 			-I $(ENV_PATH_ROOT)/thirdparts/jsoncpp/include/ \
 			-I $(ENV_PATH_ROOT)/thirdparts/mosquitto/include/ 
 
-ifeq ($(APP_CC_COMPILE),g++)
-library = $(ENV_PATH_ROOT)/buildout/i386/libjsoncpp.a
+ifeq (${FIRMWARE_CURRENT_PLATFORMS},aarch64)
+
+#for aarch64, add library 
+library = $(ENV_PATH_ROOT)/buildout/aarch64/libjsoncpp.a
 ifeq (${DEFINE_MQTT},1)
 cpp_objects += mqtt/mqtt_process.o
 library += -lssl -lcrypto -lmosquitto -lmosquittopp
 endif
 else
+#for arm, add library 
 library = $(ENV_PATH_ROOT)/buildout/arm/libjsoncpp.a
 ifeq (${DEFINE_MQTT},1)
 cpp_objects += mqtt/mqtt_process.o

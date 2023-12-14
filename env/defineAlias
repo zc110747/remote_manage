@@ -48,7 +48,6 @@ mount_chroot()
     sudo mount -t devtmpfs chdev ${NFS_PATH}/dev || sudo mount --bind /dev ${NFS_PATH}/dev
     sudo mount -t devpts chpts ${NFS_PATH}/dev/pts
 }
-alias mount_chroot='mount_chroot'
 
 umount_chroot()
 {
@@ -65,6 +64,9 @@ alias umount_chroot='umount_chroot'
 enter_chroot()
 {
 	cd ${NFS_PATH}
+
+	mount_chroot
+
 	LC_ALL=C LANGUAGE=C LANG=C sudo chroot ${NFS_PATH}
 }
 alias enter_chroot='enter_chroot'
@@ -93,8 +95,7 @@ function SysPullAll()
 }
 alias SysPullAll='SysPullAll'
 
-# 编译项目下应用，包含驱动，下位机的主控，服务器程序，打包成firmware
-# 同时复制到nfs路径下，用于驱动板远程访问
+#build driver
 function build_driver_module()
 {
 	cd $ENV_PATH_ROOT
@@ -110,57 +111,50 @@ function build_driver_module()
 }
 alias test_build_driver_module='build_driver_module'
 
+#build Application
 function SysBuildApplication()
 {
-	echo frimware path:$ENV_PATH_ROOT
-	echo kernal dir:$ENV_KERNEL_DIR 
+	#check wheather library support
+	if [ ! -f ${NFS_PATH}/usr/lib/libssl.a ]; then
+		echo "support library for application not exist, run ${redText}thirdparts/preThirdParts.sh${defText} install."
+		return -1
+	fi
 
-	#编译驱动地址
-	build_driver_module
+	#check wheather build driver
+	if [ "${FIRMWARE_CURRENT_PLATFORMS}" == "ARM" ]; then
+		build_driver_module
+	else
+		echo "driver only support for i.mx6ull, not build!".
+	fi
+	echo "kernal dir:${ENV_KERNEL_DIR}"
+	echo "firmware path:${ENV_PATH_ROOT}"
 
-	#复制配置文件
+	#copy config file
 	cd $ENV_PATH_ROOT
-	cp config.template.json $APPLICATION_RUN/config.json
+	cp config.template.json ${APPLICATION_RUN}/configs/config.json
 
-	#编译并复制main_process进程
+	#build executable
 	cd ${APPLICATION_EMBED}/
 	make -j${CPU_CORE}
 	exit_if_last_error
 		
-	#打包服务器程序(包含node的后台和前端页面)
+	#package node sever
 	cd ${APPLICATION_EMBED}/
-	if [ ! -d $APPLICATION_RUN/server/ ]; then
-		mkdir $APPLICATION_RUN/server/ 
+	if [ ! -d ${APPLICATION_RUN}/server/ ]; then
+		mkdir ${APPLICATION_RUN}/server/ 
 	fi
-	cp -rv node_server/* $APPLICATION_RUN/server/
+	cp -rv node_server/* ${APPLICATION_RUN}/server/
 
-	#将编译好的项目复制到nfs目录指定位置
-	#采用nfs启动后即可执行
-	if [ ${FIRMWARE_CURRENT_PLATFORMS} == "Embed-Linux" ]; then
-		
-		#复制可执行程序
-		cp ${APPLICATION_BUILDOUT}/main_process $APPLICATION_RUN/bin/
-		cp ${APPLICATION_BUILDOUT}/lower_device $APPLICATION_RUN/bin/
-		
-		if [ -d $NFS_RUN_PATH ]; then
-			cp -rv $APPLICATION_RUN/* $NFS_RUN_PATH/
-		else
-			echo "nfs directory $NFS_RUN_PATH not exist, not copy!"
-		fi
+	#only arm copy to rootfs to struct, for aarch64, do nothing
+	if [ ${FIRMWARE_CURRENT_PLATFORMS} == "ARM" ]; then
+		cp ${APPLICATION_BUILDOUT}/main_process ${APPLICATION_EXE}/
+		cp ${APPLICATION_BUILDOUT}/lower_device ${APPLICATION_EXE}/
+		cp ${APPLICATION_BUILDOUT}/local_device ${APPLICATION_EXE}/
 	fi
 
 	cda
 }
 alias SysBuildApplication='SysBuildApplication'
-
-#将打包好的文件通过ssh推送到嵌入式linux设备端
-#需要嵌入式linux设备端支持ssh服务，且$EMBED_DEVICE_IPADDRESS一致
-function SysPushApplication
-{
-	echo filepath:$ENV_BUILD, ipaddress:$EMBED_DEVICE_IPADDRESS
-	scp -r $ENV_BUILD/remote_manage_v$FMWARE_VESRION.tar.bz2 root@$EMBED_DEVICE_IPADDRESS:/tmp/
-}
-alias SysPushApplication='SysPushApplication'
 
 #清除firmware，包含编译的中间文件和打包后的firmware.
 function SysCleanApplication
@@ -415,8 +409,6 @@ function SysHelpCommand
 	echo "    ${limityellowText}Set the verison of the firmware when build"
 	echo "${blueText}SysBuildApplication${defText}"
 	echo "    ${limityellowText}Build the application, copy to nfs directory, also can push to embed-linux device."
-	echo "${blueText}SysPushApplication${defText}"
-	echo "    ${limityellowText}Push firmware to remote embed-linux device."
 	echo "${blueText}SysCleanApplication${defText}"
 	echo "    ${limityellowText}Clean the app firmware for next."
 	echo "${blueText}SysBuildKernel${defText}"

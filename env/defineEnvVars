@@ -25,9 +25,10 @@ export KERNEL_CC=$OLD_GCC_PATH/arm-linux-gnueabihf-
 export NEW_GCC_PATH=$PROGRAM_SUPPORT/compiler/bin/
 export NEW_KERNEL_CC=$NEW_GCC_PATH/arm-none-linux-gnueabihf-
 export GCC_LIB=$PROGRAM_SUPPORT/compiler/arm-none-linux-gnueabihf
+export AARCH_GCC_PATH=${PROGRAM_SUPPORT}/aarch64_compiler/bin/
 
 #Add directory to PATH
-export PATH=$PATH:$NEW_GCC_PATH:$OLD_GCC_PATH
+export PATH=$PATH:${NEW_GCC_PATH}:${OLD_GCC_PATH}:${AARCH_GCC_PATH}
 
 #uboot infos
 export ENV_BOOT_DIR=$PROGRAM_SUPPORT/uboot
@@ -87,7 +88,7 @@ readonly underlineText="$(tput smul)"
 # Now define an global platforms for all the type support
 # Linux：used for PC software
 # Embed-Linux: used for Embed Software
-export FIRMWARE_SUPPORT_PLATFORMS="Linux Embed-Linux"
+export FIRMWARE_SUPPORT_PLATFORMS="ARM AARCH64"
 
 # Now define an array that contains the space-separated list defined above.
 declare -a supportedPlatforms=($FIRMWARE_SUPPORT_PLATFORMS)
@@ -96,22 +97,19 @@ declare -a supportedPlatforms=($FIRMWARE_SUPPORT_PLATFORMS)
 # This section defines the compiler and compiler config.
 # Only Change if need.
 #-------------------------------------------------------------------------------
-if [[ "${supportedPlatforms[0]}" == "$FIRMWARE_CURRENT_PLATFORMS" ]]; then
-    #Linux
-    export APP_C_COMPILE=gcc
-    export APP_CC_COMPILE=g++
-    export APP_AR_COMPILE=ar
-    export APPLICATION_BUILDOUT=$ENV_PATH_ROOT/buildout/i386
-    export GLOBAL_INTALL=${PROGRAM_PATH}/install/i386
-
-elif [[ "${supportedPlatforms[1]}" == "$FIRMWARE_CURRENT_PLATFORMS" ]]; then
+if [[ "${supportedPlatforms[0]}" == "${FIRMWARE_CURRENT_PLATFORMS}" ]]; then
     #Embed-Linux
     export APP_C_COMPILE=arm-none-linux-gnueabihf-gcc
     export APP_CC_COMPILE=arm-none-linux-gnueabihf-g++
     export APP_AR_COMPILE=arm-none-linux-gnueabihf-ar
     export APPLICATION_BUILDOUT=$ENV_PATH_ROOT/buildout/arm
     export GLOBAL_INTALL=${PROGRAM_PATH}/install/arm
-    
+elif [[ "${supportedPlatforms[1]}" == "${FIRMWARE_CURRENT_PLATFORMS}" ]]; then
+    export APP_C_COMPILE=aarch64-linux-gnu-gcc
+    export APP_CC_COMPILE=aarch64-linux-gnu-g++
+    export APP_AR_COMPILE=aarch64-linux-gnu-ar
+    export APPLICATION_BUILDOUT=$ENV_PATH_ROOT/buildout/aarch64
+    export GLOBAL_INTALL=${PROGRAM_PATH}/install/aarch64
 else
     echo "${redText}error platform $FIRMWARE_CURRENT_PLATFORMS not exist in list of support${defText}"
 fi
@@ -126,12 +124,12 @@ export ENV_PATH_KERNAL_MOD="${ENV_PATH_ROOT}/mod"
 #application 
 export APP_ROOTFS=${ENV_PATH_ROOT}/rootfs
 export APP_ROOTFS_LIB=${APP_ROOTFS}/lib
-export APPLICATION_RUN=${APP_ROOTFS}/run
+export APPLICATION_SYS=${APP_ROOTFS}/home/sys
+export APPLICATION_EXE=${APPLICATION_SYS}/executable
 export APPLICATION_THIRDPARTS=${ENV_PATH_ROOT}/thirdparts
 export APPLICATION_EMBED=${ENV_PATH_ROOT}/embed
 export APP_MAIN_PORCESS=${APPLICATION_EMBED}/main_process
-export APP_BUILD_DRIVER=${ENV_PATH_ROOT}/rootfs/run/modules
-
+export APP_BUILD_DRIVER=${APP_ROOTFS}/home/sys/modules
 
 export ENV_BUILD=$PROGRAM_APPLICATION/build
 export ENV_BUILD_FIRMWARE=$ENV_BUILD/firmware

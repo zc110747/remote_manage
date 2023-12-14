@@ -12,6 +12,7 @@
 
 #备用下载文件目录
 DOWNLOAD_PATH=/mnt/d/download
+AARCH_GCC_TOOLCHAIN=gcc-arm-11.2-2022.02-x86_64-aarch64-none-linux-gnu
 GCC_TOOLCHAIN=gcc-arm-11.2-2022.02-x86_64-arm-none-linux-gnueabihf
 OLD_GCC_TOOLCHAIN=gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf
 UBOOT_FILE=uboot-imx-lf_v2022.04
@@ -47,6 +48,7 @@ if [ ! -d "$GLOBAL_PROGRAM_PATH" ]; then
     mkdir -p ${GLOBAL_PROGRAM_INSTALL}/arm
     mkdir -p ${GLOBAL_PROGRAM_INSTALL}/i386
     mkdir -p ${GLOBAL_PROGRAM_SUPPORT}/compiler
+    mkdir -p ${GLOBAL_PROGRAM_SUPPORT}/aarch64_compiler
     mkdir -p ${GLOBAL_PROGRAM_SUPPORT}/old_compiler
     mkdir -p ${GLOBAL_PROGRAM_SUPPORT}/uboot
     mkdir -p ${GLOBAL_PROGRAM_SUPPORT}/kernel
@@ -82,6 +84,32 @@ if [ x$1 != x ] && [ $1 == "all" ]; then
     sudo apt-get install libc6-dev-i386 net-tools -y
     sudo apt-get install lsb-core lib32stdc++6 -y
 fi
+
+function support_aarch64_compiler()
+{
+    LOCAL_GCC_TOOLCHAIN=${DOWNLOAD_PATH}/${AARCH_GCC_TOOLCHAIN}.tar.xz
+    GCC_SOURCE_ADDR=https://mirrors.tuna.tsinghua.edu.cn/armbian-releases/_toolchain/${AARCH_GCC_TOOLCHAIN}.tar.xz
+
+    if [ ! -d ${GLOBAL_PROGRAM_SUPPORT}/aarch64_compiler/bin ]; then
+        cd ${GLOBAL_PROGRAM_DOWNLOAD}/tmp/
+
+        if [ -f ${LOCAL_GCC_TOOLCHAIN} ]; then
+            echo "copy gcc from local address:${LOCAL_GCC_TOOLCHAIN}"
+            cp ${LOCAL_GCC_TOOLCHAIN} ./
+        else
+            echo "wget from address:${GCC_SOURCE_ADDR}"
+            wget ${GCC_SOURCE_ADDR}
+        fi
+
+        tar -xvf ${AARCH_GCC_TOOLCHAIN}.tar.xz
+        cp -rf ${AARCH_GCC_TOOLCHAIN}/* ${GLOBAL_PROGRAM_SUPPORT}/aarch64_compiler/
+        rm -rf ${AARCH_GCC_TOOLCHAIN}/
+        mv ${AARCH_GCC_TOOLCHAIN}.tar.xz ../
+    else
+        echo "Compiler ${greenText}${AARCH_GCC_TOOLCHAIN}${defText} Check Ok!"
+    fi
+}
+support_aarch64_compiler
 
 #下载arm-none-linux-gnueabihf-交叉编译器到compiler目录
 function support_new_compiler()

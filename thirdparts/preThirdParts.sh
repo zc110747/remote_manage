@@ -188,7 +188,7 @@ function process_asio()
 {
     asio_ver=asio-1.28.0
 
-    if [ ! -d asio ]; then
+    if [ ! -d asio/ ]; then
         tar -xvf ${asio_ver}.tar.gz
         sleep 1
 

@@ -23,8 +23,5 @@ thirdparts/mosquitto/c*
 thirdparts/mosquitto/o*
 thirdparts/mosquitto/z*
 
-rootfs/run/server/*
-rootfs/run/support/*
-rootfs/run/bin/*
 buildout/
 mod/rs232/*
