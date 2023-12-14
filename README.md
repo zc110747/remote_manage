@@ -5,7 +5,7 @@
 本项目包含嵌入式Linux从平台构建，项目管理，内核驱动，应用开发的大部分功能，项目支持**Linux(x86), Linux(arm-nxp im6ull), Linux(aarch64-全志h618)**平台，使用相应的编译工具进行编译。项目运行需要支持库**libssl.so, libcrypto.so, libcjson.so, libmosquitto.so, libmosquittopp.so**, 上述库的编译参考thirdparts目录下的说明进行编译。
 
 - 项目地址: <https://github.com/zc110747/remote_manage.git>
-- 嵌入式Linux系统学习文档地址: <https://github.com/zc110747/build_embed_linux_system.git>
+- 配合的文档地址: <https://github.com/zc110747/build_embed_linux_system.git>
 
 ## 项目框架
 
@@ -32,16 +32,17 @@ sudo chmod -Rv 777 *.sh
 重新开启命令行，如果加载如下所示，表示已经成功安装，项目需要在普通用户模式下执行，root权限无法加载。
 
 ```shell
+
 Loading CDE Plugin...
 -------------------------------------------------------------------------
 Load Plugin Success!
-Update the Plugin by filepath /home/[root]/.shellrc.
-Root Path:/home/program/application/remote_manage
+Update the Plugin by filepath /home/[root]/.bashrc.
+Root Path:/usr/application/remote_manage
 Load the Env Data...
 Update Environment Data Success!
 Can use command 'SysHelpCommand' for more helps.
-Current Platform is Embed-Linux, Remote IPAdress is 192.168.1.24.        
-Current Firmware Version is 1.0.0.7.
+Current Platform is ARM.
+Current Firmware Version is 1.0.0.8.
 Update the Alias Command...
 Update the Alias Command Success!
 -------------------------------------------------------------------------
@@ -53,37 +54,27 @@ cda
 SysPullAll
 ```
 
-在使用该平台前，需要搭建好支持uboot，kernal，rootfs编译的嵌入式Linux系统，并构建平台运行执行的环境(包含设备树，node执行环境)，后续会用网盘分享我个人编译好的一套系统，如果自己希望构建，参考document/linux summy notes/3.嵌入式Linux编译.md，对于已经构建好能够执行的嵌入式Linux平台(阿尔法开发板为例)，使用如下命令可进行编译和上传文件包.
+在使用该平台前，需要搭建好支持uboot，kernal，rootfs编译的嵌入式Linux系统，并构建平台运行执行的环境(包含设备树，node执行环境)，如果希望从头开始构建系统，可以参考我专门的系列教程，另外本项目也是配合教程去学习。对于已经构建好能够执行的嵌入式Linux平台(阿尔法开发板为例)，使用如下命令可进行编译和上传文件包.
 
 ```shell
 SysBulidApplication
-SysPushFirmware
 ```
 
 即可完成项目的编译。
 另外可通过SysHelpCommand查询支持的命令, SysSetPlatformEmbedLinux和SysSetPlatformLinux切换编译不同平台的应用文件，目前支持命令如下所示.
 
 ```shell
-SysPullAll
-    Pull all thirdpart application for build.
-SysBuildApplication
-    Build Application, Package Firmware.
-SysBuildKernel
-    Build the Kernal, if exist kernal directory.
-SysSetPlatformEmbedLinux
-    Set Current Platform to Embed-Linux Complier.
-SysSetPlatformLinux
-    Set Current Platform to Linux Complier.
-SysSetRemoteIpAddress
-    example:SysSetRemoteIpAddress 192.168.0.1.
-    Set the remote ipaddress for command <SysPushApplication>
+SysPreThirdParts
+    pull all thirdparts, install library.
+SysSetPlatformARM
+    Set Current Platform to ARM Complier(I.MX6ull).
+SysSetPlatformAARCH64
+    Set Current Platform to AARCH64 Complier(H616).
 SysSetApplicationVer
-    example:SysSetRemoteIpAddress 1.0.0.1.
+    example:SysSetApplicationVer 1.0.0.1.
     Set the verison of the firmware when build
 SysBuildApplication
-    Build the application, copy to nfs directory, also can push to embed-linux device.
-SysPushApplication
-    Push firmware to remote embed-linux device.
+    Build Application, Package Firmware.
 SysCleanApplication
     Clean the app firmware for next.
 SysBuildKernel
