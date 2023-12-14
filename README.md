@@ -22,6 +22,9 @@ git clone https://github.com/zc110747/remote_manage.git
 #enter the directory
 cd remote_mange/
 
+#set executable command for sh
+sudo chmod -Rv 777 *.sh
+
 #prepare for the environment
 ./preBuildEnvironment.sh all
 ```

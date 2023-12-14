@@ -188,6 +188,7 @@ function process_asio()
 {
     asio_ver=asio-1.28.0
 
+    cd ${APPLICATION_THIRDPARTS}/
     if [ ! -d ${APPLICATION_THIRDPARTS}/asio/ ]; then
         tar -xvf ${asio_ver}.tar.gz
         sleep 1
@@ -208,11 +209,12 @@ function process_jsoncpp()
         return 0
     fi
 
-    if [ ! -d ${jsoncpp} ]; then
+    cd ${APPLICATION_THIRDPARTS}/
+    if [ ! -d ${json_ver}/ ]; then
         tar -xvf ${json_ver}.tar.bz2
     fi
 
-    cd ${json_ver}
+    cd ${json_ver}/
     make 
 }
 process_jsoncpp

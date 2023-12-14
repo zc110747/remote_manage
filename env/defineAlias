@@ -106,6 +106,9 @@ function SysPreThirdParts()
 
 	cd ${ENV_PATH_ROOT}/thirdparts/
 
+	#set shell run
+	sudo chmod 777 preThirdParts.sh
+	
 	./preThirdParts.sh
 }
 alias SysPreThirdParts='SysPreThirdParts'
