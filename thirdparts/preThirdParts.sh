@@ -229,5 +229,6 @@ function install_library()
     sudo cp -Rv ${GLOBAL_INTALL}/usr/local/include/* ${NFS_PATH}/usr/include/
     sudo cp -Rv ${GLOBAL_INTALL}/include/* ${NFS_PATH}/usr/include/
     sudo cp -Rv ${GLOBAL_INTALL}/usr/local/* ${NFS_PATH}/usr/local/
+    sudo cp -Rv ${GLOBAL_INTALL}/etc/* ${NFS_PATH}/etc/
 }
 install_library

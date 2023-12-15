@@ -75,6 +75,8 @@ enter_chroot()
 
 	mount_chroot
 
+	LC_ALL=C LANGUAGE=C LANG=C sudo chroot ${NFS_PATH} chown root:root /usr/bin/sudo
+	LC_ALL=C LANGUAGE=C LANG=C sudo chroot ${NFS_PATH} chmod u+s /usr/bin/sudo
 	LC_ALL=C LANGUAGE=C LANG=C sudo chroot ${NFS_PATH}
 }
 alias enter_chroot='enter_chroot'
@@ -152,7 +154,7 @@ function SysBuildApplication()
 
 	#copy config file
 	cd $ENV_PATH_ROOT
-	cp config.template.json ${APPLICATION_RUN}/configs/config.json
+	cp config.template.json ${APPLICATION_SYS}/configs/config.json
 
 	#build executable
 	cd ${APPLICATION_EMBED}/
@@ -165,9 +167,12 @@ function SysBuildApplication()
 
 	#only arm copy to rootfs to struct, for aarch64, do nothing
 	if [ ${FIRMWARE_CURRENT_PLATFORMS} == "ARM" ]; then
-		cp ${APPLICATION_BUILDOUT}/main_process ${APPLICATION_SYS}/executable/
-		cp ${APPLICATION_BUILDOUT}/lower_device ${APPLICATION_SYS}/executable/
-		cp ${APPLICATION_BUILDOUT}/local_device ${APPLICATION_SYS}/executable/
+		cp -rv ${APPLICATION_BUILDOUT}/* ${APPLICATION_SYS}/executable/
+
+		#update executable run
+		if [ -d ${NFS_PATH}/home/sys/executable ]; then
+			cp -rv ${APPLICATION_BUILDOUT}/* ${NFS_PATH}/home/sys/executable/
+		fi
 	fi
 
 	cda
@@ -315,13 +320,14 @@ function SysBuildRootfs
 		#copy use file
 		echo "copy user defined."
 		sudo chmod -Rv 755 ${ENV_PATH_ROOT}/rootfs/etc
+		sudo chmod -Rv 755 ${APPLICATION_SYS}/
 		sudo cp -ravf ${ENV_PATH_ROOT}/rootfs/* ${NFS_PATH}/
 
 		if [ ! -d ${NFS_PATH}/etc/perl ]; then
 			make -j4
 			make install
 
-			sudo cp -ravf $ENV_ROOTFS_DIR/_install/* $NFS_PATH/
+			sudo cp -ravf ${ENV_ROOTFS_DIR}/_install/* $NFS_PATH/
 			
 			#copy C/C++ library
 			echo "copy c++ library"

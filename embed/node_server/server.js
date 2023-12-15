@@ -23,7 +23,7 @@ let netInfo = {
 };
 //for internal link, need use loopback host
 const local_ipaddr = "127.0.0.1"; 
-const filepath = "../config.json";
+const filepath = "/home/sys/configs/config.json";
 
 function server_process(fileContents)
 {
