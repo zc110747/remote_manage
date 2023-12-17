@@ -124,6 +124,7 @@ void device_manage::update()
 
     //mqtt publish
     #if MODULE_DEFINE_MQTT == 1
+        update_device_string();
         mqtt_publish(outer_str_);
     #endif
 }
@@ -149,7 +150,7 @@ void device_manage::update_device_string()
 
     root["angle"] = outer_info_.angle_; 
 
-    outer_str_ = root.asString(); 
+    outer_str_ = root.toStyledString(); 
 }
 
 void device_manage::process_hardware(Event *pEvent)
