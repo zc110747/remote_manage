@@ -9,6 +9,7 @@ modules:
 			if [ ${with_kernel} -eq 0 ]; then \
 				make -j4 ARCH=arm CROSS_COMPILE=${KERNEL_CC} -C $${dir}; \
 			else \
+				make clean -C $${dir}; \
 				make -j4 -C $${dir}; \
 			fi \
 		fi \

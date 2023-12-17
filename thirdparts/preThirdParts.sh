@@ -8,7 +8,7 @@ fi
 function process_openssl()
 {
     openssl_ver=openssl-3.1.4
-
+  
     #判断是否存在ssl库，存在则不编译
     if [ -f ${GLOBAL_INTALL}/lib/libssl.so ]; then
         echo "libssl.so exist, not build!"
@@ -27,6 +27,10 @@ function process_openssl()
     fi
 
     cd ${openssl_ver}/
+
+    if [ -f Makefile ]; then
+        make clean
+    fi
 
     #编译openssl
     export CC=gcc
@@ -62,6 +66,10 @@ function process_zlib()
 
     cd ${zlib_ver}/
 
+    if [ -f Makefile ]; then
+        make clean
+    fi
+
     #编译zlib
     export CHOST=${cross_compiler}
     ./configure --prefix=${GLOBAL_INTALL}
@@ -90,7 +98,11 @@ function process_openssh()
     if [ ! -d ${openssh_ver} ]; then
         tar -xvf ${openssh_ver}.tar.gz
     fi
+    
     cd ${openssh_ver}/
+    if [ -f Makefile ]; then
+        make clean
+    fi
 
     #编译openssh
     ./configure --host=arm-none-linux-gnueabihf --with-libs --with-zlib=${GLOBAL_INTALL} \
@@ -142,9 +154,14 @@ function process_cJSON()
             return -1
         fi    
         tar -xvf ${cjson_ver}.tar.bz2
-        cd ${cjson_ver}
+        
+        cd ${cjson_ver}/
+        
+        if [ -f Makefile ]; then
+            make clean
+        fi
 
-        make CC="${cross_compiler}-gcc -std=c89"rm-none-linux-gnueabihf-
+        make CC="${cross_compiler}-gcc -std=c89"
 
         cp -rv *.so* ${GLOBAL_INTALL}/lib/
         mkdir -p ${GLOBAL_INTALL}/include/cjson/
@@ -179,6 +196,11 @@ function process_mosquitto()
 
     #编译mosquitto
     cd ${mosquitto_ver}/
+
+    if [ -f Makefile ]; then
+        make clean
+    fi
+
     export CC=gcc
     export CXX=g++
     export CPPFLAGS="-I${GLOBAL_INTALL}/include/ -fPIC"
