@@ -21,6 +21,10 @@
 #include "time_manage.hpp"
 #include "center_manage.hpp"
 
+#if MODULE_DEFINE_MQTT == 1
+#include "mqtt_process.hpp"
+#endif
+
 device_manage* device_manage::instance_pointer_ = nullptr;
 device_manage* device_manage::get_instance()
 {
@@ -117,6 +121,35 @@ void device_manage::update()
         }
         center_manage::get_instance()->send_hardware_update_message();
     }
+
+    //mqtt publish
+    #if MODULE_DEFINE_MQTT == 1
+        mqtt_publish(outer_str_);
+    #endif
+}
+
+void device_manage::update_device_string()
+{
+    Json::Value root;
+
+    root["led"] = outer_info_.led_io_;
+    root["beep"] = outer_info_.beep_io_;
+
+    root["ap"]["ir"] = outer_info_.ap_info_.ir;
+    root["ap"]["als"] = outer_info_.ap_info_.als;
+    root["ap"]["ps"] = outer_info_.ap_info_.ps;   
+
+    root["icm"]["gyro_x"] = outer_info_.icm_info_.gyro_x_act;  
+    root["icm"]["gyro_y"] = outer_info_.icm_info_.gyro_y_act;   
+    root["icm"]["gyro_z"] = outer_info_.icm_info_.gyro_z_act;  
+    root["icm"]["accel_x"] = outer_info_.icm_info_.accel_x_act;  
+    root["icm"]["accel_y"] = outer_info_.icm_info_.accel_y_act;   
+    root["icm"]["accel_z"] = outer_info_.icm_info_.accel_z_act;    
+    root["icm"]["temp_act"] = outer_info_.icm_info_.temp_act; 
+
+    root["angle"] = outer_info_.angle_; 
+
+    outer_str_ = root.asString(); 
 }
 
 void device_manage::process_hardware(Event *pEvent)
@@ -167,10 +200,6 @@ bool device_manage::process_event(Event *pEvent)
     return true;
 }
 
-#if MODULE_DEFINE_MQTT == 1
-#include "mqtt_process.hpp"
-#endif
-
 void device_manage::run()
 {
     int size;
@@ -206,10 +235,6 @@ void device_manage::run()
                 size,
                 reinterpret_cast<Event *>(buffer)->get_id());
             process_event(reinterpret_cast<Event *>(buffer));
-
-#if MODULE_DEFINE_MQTT == 1
-            mqtt_publish("device run");
-#endif
         }
         else
         {

@@ -157,6 +157,10 @@ public:
     /// \return the information of the device.
     device_read_info get_device_info();
 
+    /// \brief update_device_string
+    /// - update device string info.
+    void update_device_string();
+
     /// \brief send_message
     /// - This method is used to send message for the device management.
     /// \param pEvent - the point of the event to send.
@@ -203,6 +207,10 @@ private:
     /// \brief inter_info_
     /// - extend info used to compare and update the device info.
     device_read_info outer_info_;
+
+    /// \brief outer_str_
+    /// - extend outer string.
+    std::string outer_str_;
 
     /// \brief mutex_
     /// - mutex used to protect the update for outer_info_.
