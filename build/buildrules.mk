@@ -47,10 +47,10 @@ objects+=${c_objects}
 objects+=${cpp_objects}
 
 ###library for store the buildout
-ifeq ($(APP_C_COMPILE),gcc)
-lib_dist ?= $(ENV_PATH_ROOT)/buildout/i386
-else
+ifeq ($(FIRMWARE_CURRENT_PLATFORMS),ARM)
 lib_dist ?= $(ENV_PATH_ROOT)/buildout/arm
+else
+lib_dist ?= $(ENV_PATH_ROOT)/buildout/aarch64
 endif
 
 # build information

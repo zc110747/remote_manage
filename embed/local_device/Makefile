@@ -30,10 +30,10 @@ INCLUDES = 	-I include/ \
 INCLUDES +=	-I $(ENV_PATH_ROOT)/thirdparts/asio/include/ \
 			-I $(ENV_PATH_ROOT)/thirdparts/jsoncpp/include/ 
 
-ifeq ($(APP_CC_COMPILE),g++)
-library = $(ENV_PATH_ROOT)/buildout/i386/libjsoncpp.a
-else
+ifeq ($(FIRMWARE_CURRENT_PLATFORMS),ARM)
 library = $(ENV_PATH_ROOT)/buildout/arm/libjsoncpp.a
+else
+library = $(ENV_PATH_ROOT)/buildout/aarch64/libjsoncpp.a
 endif
 
 # This is the file name of the executables and path where 

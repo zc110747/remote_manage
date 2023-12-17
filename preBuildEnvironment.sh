@@ -54,7 +54,11 @@ if [ ! -d "$GLOBAL_PROGRAM_PATH" ]; then
     mkdir -p ${GLOBAL_PROGRAM_SUPPORT}/kernel
     mkdir -p ${GLOBAL_PROGRAM_SUPPORT}/rootfs 
     mkdir -p ${GLOBAL_PROGRAM_PATH}/build/nfs_root
+    mkdir -p ${GLOBAL_PROGRAM_PATH}/build/nfs_root/arm
+    mkdir -p ${GLOBAL_PROGRAM_PATH}/build/nfs_root/aarch64    
     mkdir -p ${GLOBAL_PROGRAM_PATH}/build/tftp_root
+    mkdir -p ${GLOBAL_PROGRAM_PATH}/build/tftp_root/arm
+    mkdir -p ${GLOBAL_PROGRAM_PATH}/build/tftp_root/aarch64
 
     sudo chmod -Rv 777 ${GLOBAL_PROGRAM_PATH}/
 else

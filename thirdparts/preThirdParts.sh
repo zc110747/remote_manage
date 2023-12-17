@@ -1,3 +1,9 @@
+if [ ${FIRMWARE_CURRENT_PLATFORMS} == "arm" ]; then
+    export cross_compiler=arm-none-linux-gnueabihf
+else
+    export cross_compiler=aarch64-none-linux-gnu
+fi
+
 #解压和编译openssl
 function process_openssl()
 {
@@ -26,7 +32,7 @@ function process_openssl()
     export CC=gcc
     export CXX=g++
 
-    ./config --cross-compile-prefix=arm-none-linux-gnueabihf- no-asm --prefix=${GLOBAL_INTALL} linux-armv4
+    ./config --cross-compile-prefix=${cross_compiler}- no-asm --prefix=${GLOBAL_INTALL} linux-armv4
 
     make -j2 && make install
 }
@@ -57,7 +63,7 @@ function process_zlib()
     cd ${zlib_ver}/
 
     #编译zlib
-    export CHOST=arm-none-linux-gnueabihf
+    export CHOST=${cross_compiler}
     ./configure --prefix=${GLOBAL_INTALL}
     make -j4 && make install
 }
@@ -138,7 +144,7 @@ function process_cJSON()
         tar -xvf ${cjson_ver}.tar.bz2
         cd ${cjson_ver}
 
-        make CC="arm-none-linux-gnueabihf-gcc -std=c89"
+        make CC="${cross_compiler}-gcc -std=c89"rm-none-linux-gnueabihf-
 
         cp -rv *.so* ${GLOBAL_INTALL}/lib/
         mkdir -p ${GLOBAL_INTALL}/include/cjson/
@@ -179,7 +185,7 @@ function process_mosquitto()
     export CFLAGS="-I${GLOBAL_INTALL}/include/ -fPIC"
     export LDFLAGS="-L${GLOBAL_INTALL}/lib -fPIC -lssl -lcrypto"
     export DESTDIR="${GLOBAL_INTALL}/"
-    export CROSS_COMPILE=arm-none-linux-gnueabihf-
+    export CROSS_COMPILE=${cross_compiler}-
     make -j4 && make install   
 }
 process_mosquitto
@@ -216,7 +222,9 @@ function process_jsoncpp()
 
     cd ${json_ver}/
     make 
-}
+}    cp scp sftp ssh sshd ssh-agent ssh-keygen ssh-keyscan ${APP_ROOTFS}/usr/local/bin/
+    cp sftp-server ssh-keysign ${APP_ROOTFS}/usr/libexec/rm-none-linux-gnueabihf-
+    cp ssh_config sshd_config ${APP_ROOTFS}/usr/local/etc/
 process_jsoncpp
 
 function install_library()

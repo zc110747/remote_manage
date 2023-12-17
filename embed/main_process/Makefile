@@ -41,7 +41,7 @@ INCLUDES +=	-I $(ENV_PATH_ROOT)/thirdparts/asio/include/ \
 			-I $(ENV_PATH_ROOT)/thirdparts/jsoncpp/include/ \
 			-I $(ENV_PATH_ROOT)/thirdparts/mosquitto/include/ 
 
-ifeq (${FIRMWARE_CURRENT_PLATFORMS},aarch64)
+ifeq (${FIRMWARE_CURRENT_PLATFORMS},AARCH64)
 
 #for aarch64, add library 
 library = $(ENV_PATH_ROOT)/buildout/aarch64/libjsoncpp.a

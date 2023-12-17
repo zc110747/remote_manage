@@ -1,3 +1,5 @@
+
+
 CHIP_ARCH=armhf
 qemu_arch=arm
 OPT_OS_VER=bookworm

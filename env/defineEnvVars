@@ -43,9 +43,6 @@ export ENV_KERNEL_DTB=$ENV_KERNEL_DIR/arch/arm/boot/dts/imx6ull-14x14-emmc-4.3-8
 export ENV_ROOTFS_DIR=$PROGRAM_SUPPORT/rootfs
 
 #build output info
-export TFTP_PATH=$PROGRAM_BUILD/tftp_root
-export NFS_PATH=$PROGRAM_BUILD/nfs_root
-export NFS_RUN_PATH="$NFS_PATH/run/"
 export DST_PATH="/home/freedom/Desktop/Firmware"
 export ENV_CONFIG_FILE="$ENV_PATH_ENVIRONMENT/EnvConfig.mk"
 
@@ -103,15 +100,21 @@ if [[ "${supportedPlatforms[0]}" == "${FIRMWARE_CURRENT_PLATFORMS}" ]]; then
     export APP_AR_COMPILE=arm-none-linux-gnueabihf-ar
     export APPLICATION_BUILDOUT=$ENV_PATH_ROOT/buildout/arm
     export GLOBAL_INTALL=${PROGRAM_PATH}/install/arm
+    export NFS_PATH=$PROGRAM_BUILD/nfs_root/arm
+    export TFTP_PATH=$PROGRAM_BUILD/tftp_root/arm
 elif [[ "${supportedPlatforms[1]}" == "${FIRMWARE_CURRENT_PLATFORMS}" ]]; then
-    export APP_C_COMPILE=aarch64-linux-gnu-gcc
-    export APP_CC_COMPILE=aarch64-linux-gnu-g++
-    export APP_AR_COMPILE=aarch64-linux-gnu-ar
+    export APP_C_COMPILE=aarch64-none-linux-gnu-gcc
+    export APP_CC_COMPILE=aarch64-none-linux-gnu-g++
+    export APP_AR_COMPILE=aarch64-none-linux-gnu-ar
     export APPLICATION_BUILDOUT=$ENV_PATH_ROOT/buildout/aarch64
     export GLOBAL_INTALL=${PROGRAM_PATH}/install/aarch64
+    export NFS_PATH=$PROGRAM_BUILD/nfs_root/aarch64
+    export TFTP_PATH=$PROGRAM_BUILD/tftp_root/aarch64
 else
     echo "${redText}error platform $FIRMWARE_CURRENT_PLATFORMS not exist in list of support${defText}"
 fi
+
+export NFS_RUN_PATH="$NFS_PATH/run/"
 
 #-------------------------------------------------------------------------------
 # This section defines the path for the program

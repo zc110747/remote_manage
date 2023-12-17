@@ -308,11 +308,6 @@ alias SysCleanUboot='SysCleanUboot'
 #############################################################
 function SysBuildRootfs
 {
-	#check wheather build driver
-	if [ "${FIRMWARE_CURRENT_PLATFORMS}" == "AARCH64" ]; then
-		echo "for AARCH64 only support application, rootfs command invalid!".
-		return 0
-	fi
 
 	if [ -d $ENV_ROOTFS_DIR ]; then
 		cd $ENV_ROOTFS_DIR
