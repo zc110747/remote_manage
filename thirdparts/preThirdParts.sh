@@ -1,4 +1,4 @@
-if [ ${FIRMWARE_CURRENT_PLATFORMS} == "arm" ]; then
+if [ ${FIRMWARE_CURRENT_PLATFORMS} == "ARM" ]; then
     export cross_compiler=arm-none-linux-gnueabihf
 else
     export cross_compiler=aarch64-none-linux-gnu
@@ -222,9 +222,7 @@ function process_jsoncpp()
 
     cd ${json_ver}/
     make 
-}    cp scp sftp ssh sshd ssh-agent ssh-keygen ssh-keyscan ${APP_ROOTFS}/usr/local/bin/
-    cp sftp-server ssh-keysign ${APP_ROOTFS}/usr/libexec/rm-none-linux-gnueabihf-
-    cp ssh_config sshd_config ${APP_ROOTFS}/usr/local/etc/
+}
 process_jsoncpp
 
 function install_library()

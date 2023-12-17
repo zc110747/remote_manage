@@ -1,7 +1,13 @@
 
 
-CHIP_ARCH=armhf
-qemu_arch=arm
+if [ ${FIRMWARE_CURRENT_PLATFORMS} == "ARM" ]; then
+    CHIP_ARCH=armhf
+    qemu_arch=arm
+else
+    CHIP_ARCH=arm64
+    qemu_arch=aarch64
+fi
+
 OPT_OS_VER=bookworm
 
 sudo apt-get install debootstrap debian-archive-keyring qemu-user-static -y
