@@ -206,7 +206,6 @@ void device_manage::run()
     int size;
     char buffer[READ_BUFFER_SIZE];
 
-    PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "device_manage start!");
     time_manage::get_instance()->register_action(DEVICE_ID_TIME_UPDATE_PREOID, TIME_TICK(1000), TIME_ACTION_ALWAYS, [&](int id){
         Event event(id);
         send_message(reinterpret_cast<char *>(&event), sizeof(event));
@@ -227,6 +226,8 @@ void device_manage::run()
         }
     });
 
+    PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "device_manage start!");
+    
     for(;;)
     {
         size = device_fifo_point_->read(buffer, READ_BUFFER_SIZE);

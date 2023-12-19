@@ -69,10 +69,10 @@ int mqtt_process::publish_msg(const std::string &str)
 {
 	int ret = 0;
 
-	if(is_connet_)
+	if(is_connet_ && str.length() > 0)
 	{
 		ret = publish(NULL, info_.pub_topic.c_str(), str.length(), str.c_str(), info_.qos);
-		PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "publisher, topic:%s, ret:%d!", info_.pub_topic.c_str(), ret);
+		PRINT_LOG(LOG_DEBUG, xGetCurrentTicks(), "publisher, topic:%s, ret:%d!", info_.pub_topic.c_str(), ret);
 	}
 	
 	return ret;

@@ -12,6 +12,8 @@ OPT_OS_VER=bookworm
 
 sudo apt-get install debootstrap debian-archive-keyring qemu-user-static -y
 
+
+
 run_as_client() {
     $@ > /dev/null 2>&1
 }
@@ -49,4 +51,5 @@ cd ${NFS_PATH}
 
 mount_chroot
 LC_ALL=C LANGUAGE=C LANG=C sudo chroot ${NFS_PATH} /debootstrap/debootstrap --second-stage --verbose
+LC_ALL=C LANGUAGE=C LANG=C sudo chroot ${NFS_PATH} apt-get install vim libatomic1 -y
 umount_chroot

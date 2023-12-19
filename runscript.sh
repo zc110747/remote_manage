@@ -31,4 +31,7 @@ case "${CONF_DIR}" in
         SysBuildUboot
         cd ${runpath}
     ;;
+    "rootfs")
+        ${runpath}/thirdparts/preRootfs.sh
+    ;;
 esac
