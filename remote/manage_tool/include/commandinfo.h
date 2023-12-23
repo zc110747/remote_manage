@@ -1,8 +1,8 @@
 ﻿#ifndef COMMANDINFO_H
 #define COMMANDINFO_H
 
-#include "typedef.h"
 #include <functional>
+#include "typedef.h"
 
 #define CMD_LIST_SIZE           8
 

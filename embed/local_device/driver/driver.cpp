@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//  (c) copyright 2022-by Persional Inc.  
+//  (c) copyright 2022-by Persional Inc.
 //  All Rights Reserved
 //
 //  Name:
@@ -14,17 +14,17 @@
 //  Assumptions:
 //
 //  Revision History:
-//      12/19/2022   Create New Version	
+//      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
 #include "driver.hpp"
 
 driver_manage* driver_manage::instance_pointer_ = nullptr;
 driver_manage* driver_manage::get_instance()
 {
-    if(instance_pointer_ == nullptr)
+    if (instance_pointer_ == nullptr)
     {
         instance_pointer_ = new(std::nothrow) driver_manage;
-        if(instance_pointer_ == nullptr)
+        if (instance_pointer_ == nullptr)
         {
             //do something
         }
@@ -35,6 +35,7 @@ driver_manage* driver_manage::get_instance()
 bool driver_manage::init()
 {
     bool ret = true;
+    
     system_config *pConfig = system_config::get_instance();
 
     ret &= led_zero_.init(pConfig->get_led_config().dev, O_RDWR | O_NONBLOCK);
@@ -44,14 +45,14 @@ bool driver_manage::init()
     ret &= rtc_dev_.init(pConfig->get_rtc_config().dev,  O_RDONLY | O_NONBLOCK);
     ret &= key_zero_.init(pConfig->get_key_config().dev, O_RDWR | O_NONBLOCK);
 
-    if(ret)
+    if (ret)
     {
         led_zero_.write_io_status(pConfig->get_led_config().init);
         beep_zero_.write_io_status(pConfig->get_beep_config().init);
         PRINT_LOG(LOG_INFO, 0, "Device driver_manage Init Success!");
     }
     
-    return ret;
+    return true;
 }
 
 

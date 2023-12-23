@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//  (c) copyright 2022-by Persional Inc.  
+//  (c) copyright 2022-by Persional Inc.
 //  All Rights Reserved
 //
 //  Name:
@@ -16,9 +16,8 @@
 //  Revision History:
 //      11/20/2023   Create New Version
 /////////////////////////////////////////////////////////////////////////////
-
-#include "common_unit.hpp"
 #include "asio.hpp"
+#include "common_unit.hpp"
 
 #define CLIENT_RX_MAX_BUFFER_SIZE		1024
 #define CLIENT_TX_MAX_BUFFER_SIZE		1024
@@ -29,7 +28,10 @@ public:
 	/// \brief asio_client
     explicit asio_client()
     :io_context_(2), socket_(io_context_)
-    {}
+    {
+        memset(rx_buffer_, 0, CLIENT_RX_MAX_BUFFER_SIZE);
+        memset(tx_buffer_, 0, CLIENT_TX_MAX_BUFFER_SIZE);
+    }
 
     /// \brief destructor
     ~asio_client() = delete;
@@ -91,11 +93,11 @@ private:
 
     /// \brief rx_buffer_
     /// - rx buffer for receive. 	
-	char rx_buffer_[CLIENT_RX_MAX_BUFFER_SIZE];
+    char rx_buffer_[CLIENT_RX_MAX_BUFFER_SIZE];
 
-	/// \brief tx_buffer_
+    /// \brief tx_buffer_
     /// - tx buffer for receive. 	
-	char tx_buffer_[CLIENT_TX_MAX_BUFFER_SIZE];
+    char tx_buffer_[CLIENT_TX_MAX_BUFFER_SIZE];
 
     /// \brief io_context_
 	/// - manage the context of the server.

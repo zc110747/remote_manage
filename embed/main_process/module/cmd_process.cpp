@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//  (c) copyright 2022-by Persional Inc.  
+//  (c) copyright 2022-by Persional Inc.
 //  All Rights Reserved
 //
 //  Name:
@@ -14,7 +14,7 @@
 //  Assumptions:
 //
 //  Revision History:
-//      12/19/2022   Create New Version	
+//      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
 #include "cmd_process.hpp"
 #include "center_manage.hpp"
@@ -48,9 +48,9 @@ const static std::map<cmd_format_t, std::string> CmdHelpMapM = {
 
 bool cmd_process::parse_data(char *ptr, int size)
 {
-    if(ptr[0] != '!')
+    if (ptr[0] != '!')
     {
-        PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "error command:%s", ptr);
+        PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "error command:%s", ptr);
         return false;
     }
 
@@ -58,7 +58,7 @@ bool cmd_process::parse_data(char *ptr, int size)
 
     //replace first ' ' by '\0'
     char *pStart = ptr;
-    while((*pStart != ' ') && (*pStart != '\0'))
+    while ((*pStart != ' ') && (*pStart != '\0'))
         pStart++;
     pStart[0] = '\0';
     
@@ -68,8 +68,8 @@ bool cmd_process::parse_data(char *ptr, int size)
     strDst.resize(strVal.size());
     std::transform(strVal.begin(), strVal.end(), strDst.begin(), ::tolower);
 
-    PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "rx command:%s", ptr);
-    if(CmdMapM.count(strDst) == 0)
+    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "rx command:%s", ptr);
+    if (CmdMapM.count(strDst) == 0)
     {
         return false;
     }
@@ -82,19 +82,19 @@ bool cmd_process::parse_data(char *ptr, int size)
 bool cmd_process::process_data()
 {
     bool ret = true;
-    switch(cmd_format_)
+    switch (cmd_format_)
     {
         case CmdReadDev:
             { 
                 auto info = device_manage::get_instance()->get_device_info();
                 
-                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "LedStatus:%d!", info.led_io_);
-                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "beepStatus:%d!", info.beep_io_);
-                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "ApInfo, ir:%d, als:%d, ps:%d!",
+                PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "LedStatus:%d!", info.led_io_);
+                PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "beepStatus:%d!", info.beep_io_);
+                PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "ApInfo, ir:%d, als:%d, ps:%d!",
                         info.ap_info_.ir,
                         info.ap_info_.als,
                         info.ap_info_.ps);
-                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "ICMInfo, gx,gy,gz:%.2f,%.2f,%.2f;ax,ay,az:%.2f,%.2f,%.2f;temp:%.2f!",
+                PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "ICMInfo, gx,gy,gz:%.2f,%.2f,%.2f;ax,ay,az:%.2f,%.2f,%.2f;temp:%.2f!",
                         info.icm_info_.gyro_x_act,
                         info.icm_info_.gyro_y_act,
                         info.icm_info_.gyro_z_act,
@@ -108,37 +108,37 @@ bool cmd_process::process_data()
             {
                 auto pSysConfig = system_config::get_instance();
                 auto pVersion = pSysConfig->get_version().c_str();
-                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "FW_Version:%d, %d, %d, %d", pVersion[0], pVersion[1], pVersion[2], pVersion[3]);
-                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Logger Level:%d ", (int)LoggerManage::get_instance()->get_level());
+                PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "FW_Version:%d, %d, %d, %d", pVersion[0], pVersion[1], pVersion[2], pVersion[3]);
+                PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "Logger Level:%d ", (int)log_manage::get_instance()->get_level());
             }
             break;
         case CmdSetDev:
             {
                 uint32_t device = 0, action = 0;
                 sscanf(cmd_data_pointer_, "%d,%d", &device, &action);
-                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "SetDev:%d, %d!", device, action);
+                PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "SetDev:%d, %d!", device, action);
                 center_manage::get_instance()->send_hardware_config_message(device, action);
             }
             break;
         case cmdSetLevel:
             { 
                 uint8_t level = cmd_data_pointer_[0] - '0';
-                if(level > 5)
+                if (level > 5)
                     level = 5;
-                LoggerManage::get_instance()->set_level((LOG_LEVEL)level);
-                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Set Logger Level:%d!", level);
+                log_manage::get_instance()->set_level((LOG_LEVEL)level);
+                PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "Set Logger Level:%d!", level);
             }
             break;
         case CmdConnect:
             {
-                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Connect with Remote Success!");
+                PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "Connect with Remote Success!");
             }
             break;
         case CmdGetHelp:
             {
-                for(auto &[x, y] : CmdHelpMapM)
+                for (auto &[x, y] : CmdHelpMapM)
                 {
-                    PRINT_LOG(LOG_INFO, xGetCurrentTicks(), y.c_str());
+                    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), y.c_str());
                     std::this_thread::sleep_for(std::chrono::microseconds(100));
                 }
             }
@@ -148,9 +148,9 @@ bool cmd_process::process_data()
             break;
     }
 
-    if(!ret)
+    if (!ret)
     {
-        PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Invalid Formate:%d, data:%s", cmd_format_, cmd_data_pointer_);
+        PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "Invalid Formate:%d, data:%s", cmd_format_, cmd_data_pointer_);
     }
     return ret;
 }

@@ -35,7 +35,7 @@ function server_process(fileContents)
 
     //server on process
     server.on('request', function (request, response) {
-        if(static_engine.engine_process(request, response)){
+        if (static_engine.engine_process(request, response)){
                 //console.log("static engine process success!");
         }
         else{
@@ -46,7 +46,7 @@ function server_process(fileContents)
     //建立web服务器, 支持动态和静态处理
     //访问的界面文件在webpage/目录下
     server.listen(netInfo.web_port, netInfo.ipaddr, function (err) {
-        if(err) throw err;
+        if (err) throw err;
         console.log(`server start ok, server ip:${netInfo.ipaddr}, port:${netInfo.web_port}`);
     }); 
 
@@ -59,7 +59,7 @@ function start_server()
     console.log("node server start!")
     
     fs.readFile(filepath, 'utf-8', (err, fileContents) => {
-        if(err) throw err;
+        if (err) throw err;
 
         server_process(fileContents);
     });

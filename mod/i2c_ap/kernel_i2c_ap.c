@@ -84,7 +84,7 @@ static int ap3216_read_regs(struct ap3216_dev *dev, u8 reg, void *buf, int len)
 	msg[1].len = len;					/* 要读取的数据长度*/
 
 	ret = i2c_transfer(client->adapter, msg, 2);
-	if(ret == 2) {
+	if (ret == 2) {
 		ret = 0;
 	} else {
 		printk("i2c rd failed=%d reg=%06x len=%d\n",ret, reg, len);
@@ -123,23 +123,30 @@ void ap3216_readdata(struct ap3216_info *p_info)
     unsigned char buf[6];
 	
 	/* 循环读取所有传感器数据 */
-    for(i = 0; i < 6; i++)	
+    for (i = 0; i < 6; i++)	
     {
         buf[i] = ap3216_read_reg(&p_info->dev, AP3216C_IRDATALOW + i);	
     }
 
-    if(buf[0]&(1<<7)) 	/* IR_OF位为1,则数据无效 */
-		p_info->ir = 0;					
-	else 				/* 读取IR传感器的数据   		*/
-		p_info->ir = ((unsigned short)buf[1] << 2) | (buf[0] & 0X03); 			
+    if (buf[0]&(1<<7))
+	{
+		p_info->ir = 0;
+	}
+	else
+	{
+		p_info->ir = ((unsigned short)buf[1] << 2) | (buf[0] & 0X03);
+	}
 	
-	p_info->als = ((unsigned short)buf[3] << 8) | buf[2];	/* 读取ALS传感器的数据 			 */  
+	p_info->als = ((unsigned short)buf[3] << 8) | buf[2];	/* 读取ALS传感器的数据*/  
 	
-    if(buf[4]&(1<<6))	/* IR_OF位为1,则数据无效 			*/
-		p_info->ps = 0;    													
-	else 				/* 读取PS传感器的数据    */
-		p_info->ps = ((unsigned short)(buf[5] & 0X3F) << 4) | (buf[4] & 0X0F); 
-	
+    if (buf[4]&(1<<6))	/*IR_OF位为1,则数据无效*/
+	{
+		p_info->ps = 0;		
+	}											
+	else 				/*读取PS传感器的数据*/
+	{
+		p_info->ps = ((unsigned short)(buf[5] & 0X3F) << 4) | (buf[4] & 0X0F); 	
+	}
 }
 
 /**

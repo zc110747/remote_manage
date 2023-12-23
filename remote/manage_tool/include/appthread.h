@@ -10,10 +10,12 @@ class CAppThreadInfo:public QThread
     Q_OBJECT
 
 public:
-    CAppThreadInfo(){
+    CAppThreadInfo()
+    {
         m_pQueue = new CProtocolQueue();
     }
-    ~CAppThreadInfo(){
+    ~CAppThreadInfo()
+    {
         delete  m_pQueue;
         m_pQueue = nullptr;
     }
@@ -21,7 +23,7 @@ public:
 
     int QueuePost(SSendBuffer *pSendBuffer)
     {
-        if(m_pQueue != nullptr)
+        if (m_pQueue != nullptr)
         {
             return m_pQueue->QueuePost(pSendBuffer);
         }
@@ -37,7 +39,6 @@ protected:
 
 private:
     volatile bool m_nIsStop{false};
-
 };
 
 void AppThreadInit(void);

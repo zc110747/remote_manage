@@ -2772,7 +2772,7 @@ quint16 QUIHelper::getRevCrc_16(quint8 *data, int len, quint16 init, const quint
     quint16 cRc_16 = init;
     quint8 temp;
 
-    while(len-- > 0) {
+    while (len-- > 0) {
         temp = cRc_16 >> 8;
         cRc_16 = (cRc_16 << 8) ^ table[(temp ^ *data++) & 0xff];
     }
@@ -2786,7 +2786,7 @@ quint16 QUIHelper::getCrc_16(quint8 *data, int len, quint16 init, const quint16 
     quint16 cRc_16 = init;
     quint8 temp;
 
-    while(len-- > 0) {
+    while (len-- > 0) {
         temp = cRc_16 & 0xff;
         cRc_16 = (cRc_16 >> 8) ^ table[(temp ^ *data++) & 0xff];
     }

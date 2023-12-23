@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//  (c) copyright 2022-by Persional Inc.  
+//  (c) copyright 2022-by Persional Inc.
 //  All Rights Reserved
 //
 //  Name:
@@ -27,10 +27,10 @@
 system_config* system_config::instance_pointer_ = nullptr;
 system_config* system_config::get_instance()
 {
-    if(instance_pointer_ == nullptr)
+    if (instance_pointer_ == nullptr)
     {
         instance_pointer_ = new(std::nothrow) system_config();
-        if(instance_pointer_ == nullptr)
+        if (instance_pointer_ == nullptr)
         {
             //to do error process
         }
@@ -51,7 +51,7 @@ bool system_config::init(const char* path)
     default_init();
 
     ifs.open(path);
-    if(!ifs.is_open())
+    if (!ifs.is_open())
     {
         return false;
     }

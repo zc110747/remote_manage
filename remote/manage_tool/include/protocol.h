@@ -1,9 +1,9 @@
 ﻿#ifndef PROTOCOL_H
 #define PROTOCOL_H
 
-#include "typedef.h"
 #include <QMutex>
 #include <QThread>
+#include "typedef.h"
 
 class SSendBuffer
 {
@@ -19,8 +19,7 @@ public:
         m_nProtocolStatus = nProtocolStatus;
         m_qPathInfo = qPathInfo;
     }
-    ~SSendBuffer(){
-    }
+    ~SSendBuffer() {}
 
     bool m_bUploadStatus{false};
     uint8_t *m_pBuffer;
@@ -35,28 +34,30 @@ public:
 class CProtocolQueue
 {
 public:
-    CProtocolQueue(){
+    CProtocolQueue()
+    {
         m_nFreeList = MAX_QUEUE;
         m_nWriteIndex = 0;
         m_nReadIndex = 0;
         m_qLockMutex = new QMutex;
     }
-    ~CProtocolQueue(){
-    };
+    ~CProtocolQueue() {}
 
-    bool isEmpty(){
+    bool isEmpty()
+    {
         int m_nSize;
         m_qLockMutex->lock();
         m_nSize = m_nFreeList;
         m_qLockMutex->unlock();
 
-        if(m_nSize == MAX_QUEUE){
+        if (m_nSize == MAX_QUEUE){
             return true;
         }
         return false;
     }
 
-    void clear(){
+    void clear()
+    {
         m_qLockMutex->lock();
         m_nFreeList = MAX_QUEUE;
         m_nWriteIndex = 0;
@@ -66,7 +67,7 @@ public:
 
     int QueuePost(SSendBuffer *pSendBuffer)
     {
-        if(m_nFreeList == 0)
+        if (m_nFreeList == 0)
         {
             return QUEUE_INFO_FULL;
         }
@@ -76,7 +77,7 @@ public:
         m_nWriteIndex++;
 
         //队列循环
-        if(m_nWriteIndex == MAX_QUEUE){
+        if (m_nWriteIndex == MAX_QUEUE){
             m_nWriteIndex = 0;
         }
         m_nFreeList--;
@@ -85,8 +86,9 @@ public:
         return QUEUE_INFO_OK;
     }
 
-    int QueuePend(SSendBuffer *pSendbuffer){
-        if(m_nFreeList < MAX_QUEUE)
+    int QueuePend(SSendBuffer *pSendbuffer)
+    {
+        if (m_nFreeList < MAX_QUEUE)
         {
             m_qLockMutex->lock();
             pSendbuffer->m_pBuffer = qinfo_ptr[m_nReadIndex]->m_pBuffer;
@@ -102,7 +104,7 @@ public:
             m_nReadIndex++;
 
             //队列循环
-            if(m_nReadIndex == MAX_QUEUE){
+            if (m_nReadIndex == MAX_QUEUE){
                 m_nReadIndex = 0;
             }
             m_nFreeList++;
@@ -110,11 +112,13 @@ public:
             //qDebug()<<"queue receive";
             return  QUEUE_INFO_OK;
         }
-        else{
+        else
+        {
             QThread::msleep(100);
             return QUEUE_INFO_EMPTY;
         }
-    };
+    }
+
 private:
     volatile int m_nFreeList;
     volatile int m_nWriteIndex;
@@ -126,24 +130,28 @@ private:
 class protocol_info
 {
 public:
-    protocol_info(uint8_t *pRxBuffer, uint8_t *pTxBuffer, uint8_t nMaxBufSize){
+    protocol_info(uint8_t *pRxBuffer, uint8_t *pTxBuffer, uint8_t nMaxBufSize)
+    {
         m_pRxBuffer = pRxBuffer;
         m_pRxDataBuffer = &pRxBuffer[RECV_DATA_HEAD];
         m_pTxBuffer = pTxBuffer;
         m_MaxBufSize = nMaxBufSize;
         m_pQueue = new CProtocolQueue();
-    };
-    ~protocol_info(){
+    }
+    ~protocol_info()
+    {
         delete  m_pQueue;
         m_pQueue = nullptr;
-    };
+    }
 
     int CreateSendBuffer(uint8_t nId, uint16_t nSize, uint8_t *pStart, bool bWriteThrough);
     uint16_t calculate_crc(uint8_t *pStart, int nSize);
-    uint16_t GetId(void){
+    uint16_t GetId(void)
+    {
         return m_nId;
     }
-    void SetId(uint16_t nCurId){
+    void SetId(uint16_t nCurId)
+    {
         m_nId = nCurId;
     }
     int CheckReceiveData(bool IsSignalCheckHead);
@@ -156,7 +164,7 @@ public:
     //socket处理的应用
     int PostQueue(SSendBuffer *pSendBuffer)
     {
-        if(m_pQueue != nullptr)
+        if (m_pQueue != nullptr)
         {
             return m_pQueue->QueuePost(pSendBuffer);
         }

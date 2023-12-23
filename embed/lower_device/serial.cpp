@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//  (c) copyright 2022-by Persional Inc.  
+//  (c) copyright 2022-by Persional Inc.
 //  All Rights Reserved
 //
 //  Name:
@@ -25,12 +25,12 @@
 serial_manage* serial_manage::instance_pointer_ = nullptr;
 serial_manage* serial_manage::get_instance()
 {
-	if(instance_pointer_ == nullptr)
+	if (instance_pointer_ == nullptr)
 	{
 		instance_pointer_ = new(std::nothrow) serial_manage();
-		if(instance_pointer_ == nullptr)
+		if (instance_pointer_ == nullptr)
 		{
-			PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "serial_manage new failed!");
+			PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "serial_manage new failed!");
 		}
 	}
 	return instance_pointer_;
@@ -38,12 +38,12 @@ serial_manage* serial_manage::get_instance()
 
 void serial_manage::uart_server_run()
 {
-	PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "%s start", __func__);
+	PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "%s start", __func__);
 
-	for(;;)
+	for (;;)
 	{
 		int size = ::read(com_fd_, rx_buffer_, SERIAL_RX_MAX_BUFFER_SIZE);
-		if(size > 0)
+		if (size > 0)
 		{
 			//put int asio client to send
 			asio_client::get_instance()->send_msg(rx_buffer_, size);
@@ -59,11 +59,11 @@ void serial_manage::uart_tx_run()
 {
     int size;
 
-	PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "%s start", __func__);
-    while(1)
+	PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "%s start", __func__);
+    while (1)
     {
         size = serial_tx_fifo_->read(tx_buffer_, SERIAL_RX_MAX_BUFFER_SIZE);
-        if(size > 0)
+        if (size > 0)
         {
             write_data(tx_buffer_, size);
         }
@@ -83,17 +83,17 @@ bool serial_manage::init()
 {
 	const auto& serial_config = system_config::get_instance()->get_serial_config();
 
-	if((com_fd_ = open(serial_config.dev.c_str(), O_RDWR))<0)
+	if ((com_fd_ = open(serial_config.dev.c_str(), O_RDWR))<0)
 	{	
-		PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Open Device %s failed!", serial_config.dev.c_str());
+		PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "Open Device %s failed!", serial_config.dev.c_str());
 		return false;
 	}
 	else
 	{
-		PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Open Device %s success, id:%d!", serial_config.dev.c_str(), com_fd_);
-		if(set_opt(serial_config.baud, serial_config.dataBits, serial_config.parity, serial_config.stopBits) != 0)
+		PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "Open Device %s success, id:%d!", serial_config.dev.c_str(), com_fd_);
+		if (set_opt(serial_config.baud, serial_config.dataBits, serial_config.parity, serial_config.stopBits) != 0)
 		{
-			PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Serial Option failed!");
+			PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "Serial Option failed!");
 			return false;
 		}
 	}
@@ -105,7 +105,7 @@ bool serial_manage::init()
 	uart_tx_thread_ = std::thread(std::bind(&serial_manage::uart_tx_run, this));
 	uart_tx_thread_.detach();
 
-	PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "serial_manage init success!");
+	PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "serial_manage init success!");
 	return true;
 }
 
@@ -113,7 +113,7 @@ int serial_manage::write_data(char *pbuffer, uint16_t size)
 {
 	int send_size = -1;
 
-	if(com_fd_ >= 0)
+	if (com_fd_ >= 0)
 	{
 		send_size = ::write(com_fd_, pbuffer, size);
 	}
@@ -126,16 +126,16 @@ int serial_manage::set_opt(int nBaud, int nDataBits, std::string cParity, int nS
 	struct termios newtio;
 	struct termios oldtio;
 
-	if(tcgetattr(com_fd_, &oldtio)  !=  0) 
+	if (tcgetattr(com_fd_, &oldtio)  !=  0) 
 	{ 
-		PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Get serial attribute failed!");
+		PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "Get serial attribute failed!");
 		return -1;
 	}
 	bzero(&newtio, sizeof(newtio));
 	newtio.c_cflag |= (CLOCAL|CREAD);
 	newtio.c_cflag &= ~CSIZE;
 
-	switch(nDataBits)
+	switch (nDataBits)
 	{
 		case 7:
 			newtio.c_cflag |= CS7;
@@ -147,7 +147,7 @@ int serial_manage::set_opt(int nBaud, int nDataBits, std::string cParity, int nS
 			break;
 	}
 
-	switch(cParity[0])
+	switch (cParity[0])
 	{
 		case 'O':
 		case 'o':
@@ -167,7 +167,7 @@ int serial_manage::set_opt(int nBaud, int nDataBits, std::string cParity, int nS
 			break;
 	}
 
-	switch(nBaud)
+	switch (nBaud)
 	{
 		case 2400:
 			cfsetispeed(&newtio, B2400);
@@ -199,7 +199,7 @@ int serial_manage::set_opt(int nBaud, int nDataBits, std::string cParity, int nS
 			break;
 	}
 	
-	if(nStopBits == 1)
+	if (nStopBits == 1)
 	{
 		newtio.c_cflag &=  ~CSTOPB;
 	}
@@ -211,19 +211,19 @@ int serial_manage::set_opt(int nBaud, int nDataBits, std::string cParity, int nS
 	newtio.c_cc[VMIN] = 0;
 
 	tcflush(com_fd_, TCIFLUSH);
-	if((tcsetattr(com_fd_, TCSANOW, &newtio))!=0)
+	if ((tcsetattr(com_fd_, TCSANOW, &newtio))!=0)
 	{
-		PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Serial Config Error!");
+		PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "Serial Config Error!");
 		return -1;
 	}
 
-	PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Serial Config Done Success!");
+	PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "Serial Config Done Success!");
 	return 0;
 }
 
 void serial_manage::release()
 {
-	if(com_fd_ >= 0)
+	if (com_fd_ >= 0)
 	{
 		close(com_fd_);
 		com_fd_ = -1;

@@ -28,20 +28,20 @@ public:
     int DeviceRead(uint8_t *pStart, uint16_t nMaxSize){
         uint16_t nReadSize = 0;
 
-        if(m_pTcpSocket->bytesAvailable() > 0)
+        if (m_pTcpSocket->bytesAvailable() > 0)
         {
           nReadSize = m_pTcpSocket->read((char *)pStart, nMaxSize);
         }
         return nReadSize;
-    };
+    }
 
     int DeviceWrite(uint8_t *pStart, uint16_t nSize){
         return m_pTcpSocket->write((char *)pStart, nSize);
-    };
+    }
 
     void SetSocketInfo(QString SIpAddress, int nPort)
     {
-        if(!m_pServerIp->setAddress(SIpAddress)){
+        if (!m_pServerIp->setAddress(SIpAddress)){
             qDebug()<<"SetAddress error\n";
         }
         m_nPort = nPort;

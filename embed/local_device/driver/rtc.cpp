@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//  (c) copyright 2022-by Persional Inc.  
+//  (c) copyright 2022-by Persional Inc.
 //  All Rights Reserved
 //
 //  Name:
@@ -14,10 +14,10 @@
 //  Assumptions:
 //
 //  Revision History:
-//      12/19/2022   Create New Version	
+//      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
-#include "rtc.hpp"
 #include <sys/ioctl.h>
+#include "rtc.hpp"
 
 bool rtc_device::update_rtc_time()
 {
@@ -30,7 +30,7 @@ bool rtc_device::update_rtc_time()
     time(&timep);
     p = localtime_r(&timep, &mytime); //gmtime_r将秒数转换成UTC时钟的时区值
 
-    if(p != NULL)
+    if (p != NULL)
     {
         rtc_time_.tm_sec = p->tm_sec;
         rtc_time_.tm_min = p->tm_min;
@@ -40,10 +40,10 @@ bool rtc_device::update_rtc_time()
 #else
     int retval;
 
-    if(device_fd_>=0)
+    if (device_fd_>=0)
     {
         retval = ioctl(device_fd_, RTC_RD_TIME, &rtc_time_);
-        if(retval >= 0)
+        if (retval >= 0)
             ret = true;
     }
 #endif
@@ -59,11 +59,11 @@ bool rtc_device::init(const std::string &DevicePath, int flags)
 
 int rtc_device::get_current_time()
 {
-    uint64_t second;
+    uint64_t second = 0;
 
-    if(update_rtc_time())
+    if (update_rtc_time())
     {
-        second += rtc_time_.tm_hour*3600;
+        second = rtc_time_.tm_hour*3600;
         second += rtc_time_.tm_min*60;
         second += rtc_time_.tm_sec;
     }

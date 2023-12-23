@@ -30,19 +30,19 @@ function socket_connect(ipaddr, port)
 
     client.on('data', (message)=>{
         let arr = message.toString().replace('\u0000', '').toLowerCase().split(' ');
-        switch(arr[0])
+        switch (arr[0])
         {
             case "!status":
                 {
                     let list = arr[1].split(";");
                     let obj = {};
-                    for(let val of list){
+                    for (let val of list){
                         let dev = val.split('=');
                         obj[dev[0]] = dev[1];
                     }
 
                     for (let key in obj){
-                        if(DeviceInfo.hasOwnProperty(key)){
+                        if (DeviceInfo.hasOwnProperty(key)){
                             DeviceInfo[key] = obj[key]
                         }
                     }
@@ -76,7 +76,7 @@ function sock_send(data)
 {
     let ret = false;
     
-    if(is_connect)
+    if (is_connect)
     {
         client.write(data);
         ret = true;

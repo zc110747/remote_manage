@@ -61,7 +61,7 @@ static beep_driver driver;
 
 static void beep_hardware_set(u8 status)
 {
-    switch(status)
+    switch (status)
     {
         case BEEP_OFF:
             printk(KERN_INFO"beep off\r\n");
@@ -97,7 +97,8 @@ ssize_t beep_read(struct file *filp, char __user *buf, size_t count, loff_t *f_p
 
     databuf[0] = driver.hw.status;
     result = copy_to_user(buf, databuf, 1);
-    if(result < 0) {
+    if (result < 0)
+    {
 		printk(KERN_INFO"kernel read failed!\r\n");
 		return -EFAULT;
 	}
@@ -110,7 +111,8 @@ ssize_t beep_write(struct file *filp, const char __user *buf, size_t count,  lof
 	u8 databuf[2];
 
 	result = copy_from_user(databuf, buf, count);
-	if(result < 0) {
+	if (result < 0)
+    {
 		printk(KERN_INFO"kernel write failed!\r\n");
 		return -EFAULT;
 	}
@@ -122,7 +124,8 @@ ssize_t beep_write(struct file *filp, const char __user *buf, size_t count,  lof
 
 long beep_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 {
-    switch(cmd){
+    switch (cmd)
+    {
         case 0:
             beep_hardware_set(0);
             break;
@@ -154,20 +157,25 @@ static int beep_device_create(void)
     driver.dev.minor = DEFAULT_MINOR;
 
     /*1.申请字符设备号*/
-    if(driver.dev.major){
+    if (driver.dev.major)
+    {
         driver.dev.dev_id = MKDEV(driver.dev.major, driver.dev.minor);
         result = register_chrdev_region(driver.dev.dev_id, 1, DEVICE_NAME);
     }
-    else{
+    else
+    {
         result = alloc_chrdev_region(&driver.dev.dev_id, 0, 1, DEVICE_NAME);
         driver.dev.major = MAJOR(driver.dev.dev_id);
         driver.dev.minor = MINOR(driver.dev.dev_id);
     }
-    if(result < 0){
+
+    if (result < 0)
+    {
         printk(KERN_INFO"dev alloc or set failed\r\n");	
         goto exit;
     }
-    else{
+    else
+    {
         printk(KERN_INFO"dev alloc or set ok, major:%d, minor:%d\r\n", driver.dev.major,  driver.dev.minor);	
     }
     
@@ -175,32 +183,39 @@ static int beep_device_create(void)
     cdev_init(&driver.dev.cdev, &beep_fops);
     driver.dev.cdev.owner = THIS_MODULE;
     result = cdev_add(&driver.dev.cdev, driver.dev.dev_id, 1);
-    if(result != 0){
+    if (result != 0)
+    {
         printk(KERN_INFO"cdev add failed\r\n");
         goto exit_cdev_add;
-    }else{
+    }
+    else
+    {
 	    printk(KERN_INFO"device add Success!\r\n");	
     }
 
     /* 4、创建类 */
 	driver.dev.class = class_create(THIS_MODULE, DEVICE_NAME);
-	if (IS_ERR(driver.dev.class)) {
+	if (IS_ERR(driver.dev.class))
+    {
 		printk(KERN_INFO"class create failed!\r\n");
         result = PTR_ERR(driver.dev.class);
         goto exit_class_create;
 	}
-	else{
+	else
+    {
 		printk(KERN_INFO"class create successed!\r\n");
 	}
 
 	/* 5、创建设备 */
 	driver.dev.device = device_create(driver.dev.class, NULL, driver.dev.dev_id, NULL, DEVICE_NAME);
-	if (IS_ERR(driver.dev.device)) {
+	if (IS_ERR(driver.dev.device))
+    {
 		printk(KERN_INFO"device create failed!\r\n");
         result = PTR_ERR(driver.dev.device);
 		goto exit_device_create;
 	}
-	else{
+	else
+    {
 		printk(KERN_INFO"device create successed!\r\n");
 	}
     return 0;
@@ -221,21 +236,21 @@ static int beep_hardware_init(struct platform_device *pdev)
 
     /*1.获取设备节点*/
     driver.hw.nd = of_find_node_by_path("/usr_beep");
-    if(driver.hw.nd == NULL){
+    if (driver.hw.nd == NULL){
         printk(KERN_INFO"beep node no find\n");
         return -EINVAL;
     }
 
     /*2.获取设备树中的gpio属性编号*/
     driver.hw.gpio = of_get_named_gpio(driver.hw.nd, "beep-gpio", 0);
-    if(driver.hw.gpio < 0){
+    if (driver.hw.gpio < 0){
         printk(KERN_INFO"beep-gpio no find\n");
         return -EINVAL;
     }
 
     /*3.设置beep对应GPIO输出*/
     result = gpio_direction_output(driver.hw.gpio, 1);
-    if(result<0){
+    if (result<0){
         printk(KERN_INFO"beep gpio config error\n");
         return -EINVAL;
     }
@@ -255,7 +270,7 @@ static int beep_probe(struct platform_device *dev)
 
     //硬件初始化
     result = beep_hardware_init(dev);
-    if(result != 0)
+    if (result != 0)
     {
         printk(KERN_INFO"beep hardware init failed, error:%d!\r\n", result);
         return result;
@@ -263,7 +278,7 @@ static int beep_probe(struct platform_device *dev)
 
     //设备创建!result
     result = beep_device_create();
-    if(result != 0)
+    if (result != 0)
     {
         printk(KERN_INFO"beep device create failed, error:%d!\r\n", result);
         return result;
@@ -323,7 +338,7 @@ static int __init beep_module_init(void)
     int status;
 
     status = platform_driver_register(&platform_driver);
-    if(status != 0)
+    if (status != 0)
     {
         printk(KERN_INFO"mdoule init failed:%d\r\n", status);
     }

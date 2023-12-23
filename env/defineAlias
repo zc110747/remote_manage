@@ -20,6 +20,7 @@ alias cdd="cd ${PROGRAM_DOWNLOAD}"
 alias cde="cd ${ENV_PATH_ROOT/embed}"
 alias cdk="cd ${ENV_KERNEL_DIR}"
 alias cdn="cd ${NFS_PATH}"
+alias cdt="cd ${TFTP_PATH}"
 alias cdr="cd ${ENV_ROOTFS_DIR}"
 alias cdu="cd ${ENV_BOOT_DIR}"
 alias cdi="cd ${GLOBAL_INTALL}"
@@ -147,10 +148,10 @@ alias test_build_driver_module='build_driver_module'
 function SysBuildApplication()
 {
 	#check wheather library support
-	if [ ! -f ${NFS_PATH}/usr/lib/libssl.a ]; then
+	if [ ! -f ${NFS_PATH}/usr/lib/libssl.a ] || [ ! -d ${APPLICATION_THIRDPARTS}/asio ]; then
 		echo "support library for application not exist, run command"
-		echo "${redText}SysPreThirdParts${defText}"
-		echo "${redText}SysBuildRootfs${defText}"
+		echo "  ${redText}SysPreThirdParts${defText}"
+		echo "  ${redText}SysBuildRootfs${defText}"
 		echo "install."
 		return -1
 	fi

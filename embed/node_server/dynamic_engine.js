@@ -15,22 +15,22 @@ function device_set_process(query)
     let dev_num = 0;
     let dev_status = 0;
 
-    if(dev.toLowerCase() === 'led')
+    if (dev.toLowerCase() === 'led')
     {
         dev_num = 0;
-        if(status.toLowerCase() == 'off')
+        if (status.toLowerCase() == 'off')
             dev_status = 0;
-        else if(status.toLowerCase() == 'on')
+        else if (status.toLowerCase() == 'on')
             dev_status = 1;
         else
             return false;
     }
-    else if(dev.toLowerCase() === 'beep')
+    else if (dev.toLowerCase() === 'beep')
     {
         dev_num = 1;
-        if(status.toLowerCase() == 'off')
+        if (status.toLowerCase() == 'off')
             dev_status = 0;
-        else if(status.toLowerCase() == 'on')
+        else if (status.toLowerCase() == 'on')
             dev_status = 1;
         else
             return false;
@@ -39,7 +39,7 @@ function device_set_process(query)
         return false;
 
     let outStr = `!setdev ${dev_num},${dev_status}\n`;
-    if(sock_m.sock_send(outStr))
+    if (sock_m.sock_send(outStr))
         return true;
 
     return false;
@@ -49,12 +49,12 @@ function dynamic_engine_process(request, response)
     let Query = url.parse(request.url);
     let is_process_ok = false;
 
-    if(Query.pathname)
+    if (Query.pathname)
     {
         let action = Query.pathname.slice(1);
         //console.log(action + " " + Query.query);
         response.setHeader('Content-Type', 'application/json;charset=utf-8');
-        switch(action)
+        switch (action)
         {
             case 'axiosDeviceSet':
                 is_process_ok = device_set_process(Query.query);

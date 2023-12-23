@@ -3,14 +3,26 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/embed/common",
+                "${workspaceFolder}/embed/common/event",
+                "F:/arm-gcc/include",
+                "F:/arm-gcc/arm-linux-gnueabihf/libc/usr/include",
+                "F:/arm-gcc/arm-linux-gnueabihf/libc/usr/include/linux",
+                "C:/Program Files (x86)/Windows Kits/10/Include/10.0.10150.0/ucrt"
             ],
             "defines": [
                 "_DEBUG",
                 "UNICODE",
                 "_UNICODE",
-                "MODULE_DEFINE_MQTT=1"
-            ]
+                "__ARM_PCS_VFP",
+                "MODULE_DEFINE_MQTT"
+            ],
+            "windowsSdkVersion": "8.1",
+            "compilerPath": "D:/Software/Visual Studio 2015/VC/bin/cl.exe",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "msvc-x64"
         }
     ],
     "version": 4

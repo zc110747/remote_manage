@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//  (c) copyright 2022-by Persional Inc.  
+//  (c) copyright 2022-by Persional Inc.
 //  All Rights Reserved
 //
 //  Name:
@@ -16,7 +16,7 @@
 //  Assumptions:
 //
 //  Revision History:
-//      12/19/2022   Create New Version	
+//      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
 #ifndef __device_base_HPP
 #define __device_base_HPP
@@ -131,19 +131,15 @@ public:
         bool ret = false;
         ssize_t nSize;
 
-        if(device_fd_ >= 0)
+        if (device_fd_ >= 0)
         {
             int readSize = sizeof(data.info);
             
             readSize = readSize<MAX_INFO_SIZE?readSize:MAX_INFO_SIZE;
             nSize = ::read(device_fd_, data.buffer, readSize);
-            if(nSize > 0)
+            if (nSize > 0)
             {
                 ret = true;
-            }
-            else
-            {
-
             }
         }
         return ret;

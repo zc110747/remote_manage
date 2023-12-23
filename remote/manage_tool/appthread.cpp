@@ -1,10 +1,28 @@
-﻿
+﻿//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2022-by Persional Inc.
+//  All Rights Reserved
+//
+//  Name:
+//      appthread.cpp
+//
+//  Purpose:
+//     
+//
+// Author:
+//     	@听心跳的声音
+//
+//  Assumptions:
+//
+//  Revision History:
+//      11/20/2023   Create New Version
+/////////////////////////////////////////////////////////////////////////////
+#include <QFile>
+#include <QScopedArrayPointer>
 #include "appthread.h"
 #include "uartclient.h"
 #include "tcpclient.h"
 #include "commandinfo.h"
-#include <QFile>
-#include <QScopedArrayPointer>
+
 
 static CUdpSocketInfo *pCUdpSocketThreadInfo;
 static CTcpSocketInfo *pCTcpSocketThreadInfo;
@@ -29,14 +47,14 @@ void CAppThreadInfo::run()
     pCTcpSocketThreadInfo = GetTcpClientSocketInfo();
     pCTcpSocketThreadInfo->TcpClientSocketInitForThread();
 
-    for(;;)
+    for (;;)
     {
-        if(m_nIsStop)
+        if (m_nIsStop)
             return;
         nStatus = m_pQueue->QueuePend(&SendBufferInfo);
-        if(nStatus == QUEUE_INFO_OK)
+        if (nStatus == QUEUE_INFO_OK)
         {
-            if(SendBufferInfo.m_nCommand != SYSTEM_UPDATE_CMD)
+            if (SendBufferInfo.m_nCommand != SYSTEM_UPDATE_CMD)
             {
                 SendBufferInfo.m_bUploadStatus = false;
                 InterfaceProcess();
@@ -55,15 +73,15 @@ void CAppThreadInfo::run()
 */
 int InterfaceProcess(void)
 {
-    if(SendBufferInfo.m_nProtocolStatus == PROTOCOL_UART)
+    if (SendBufferInfo.m_nProtocolStatus == PROTOCOL_UART)
     {
        return pCUartProtocolTreadInfo->UartLoopThread(&SendBufferInfo);
     }
-    else if(SendBufferInfo.m_nProtocolStatus == PROTOCOL_TCP)
+    else if (SendBufferInfo.m_nProtocolStatus == PROTOCOL_TCP)
     {
        return pCTcpSocketThreadInfo->TcpClientSocketLoopThread(&SendBufferInfo);
     }
-    else if(SendBufferInfo.m_nProtocolStatus == PROTOCOL_UDP)
+    else if (SendBufferInfo.m_nProtocolStatus == PROTOCOL_UDP)
     {
        return pCUdpSocketThreadInfo->UdpClientSocketLoopThread(&SendBufferInfo);
     }
@@ -127,7 +145,7 @@ void FileUpdateProcess(void)
 
     //处理升级的整个流程实现
     QFile file(SendBufferInfo.m_qPathInfo);
-    if(file.open(QIODevice::ReadOnly))
+    if (file.open(QIODevice::ReadOnly))
     {
         QStringList PathFileNameList = SendBufferInfo.m_qPathInfo.split("/");
         QString PathFileName = PathFileNameList[PathFileNameList.size()-1];
@@ -139,7 +157,7 @@ void FileUpdateProcess(void)
         InterfaceProcess();
         nFileBlock = 0;
 
-        while((nReadSize = file.read((char *)&ArrayBuffer[5], FILE_BLOCK_SIZE)) > 0)
+        while ((nReadSize = file.read((char *)&ArrayBuffer[5], FILE_BLOCK_SIZE)) > 0)
         {
             nFileBlock++;
             nSize = CreateFileUpdateCmd(ArrayBuffer, nReadSize, nFileBlock);

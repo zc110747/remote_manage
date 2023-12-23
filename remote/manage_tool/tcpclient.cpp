@@ -30,13 +30,13 @@ void CTcpSocketInfo::slotDisconnected()
 */
 void CTcpSocketInfo::dataReceived()
 {
-    if(this->CheckReceiveData(false) == RT_OK)
+    if (this->CheckReceiveData(false) == RT_OK)
     {
        #if TEST_DEBUG == 1
        emit send_edit_test(byteArrayToHexString("Recv Buf:",
             m_pRxBuffer, m_RxBufSize, "\n"));
        #endif
-       if(pSendBufferInfo->m_pFunc != nullptr)
+       if (pSendBufferInfo->m_pFunc != nullptr)
        {
             emit send_edit_recv(pSendBufferInfo->m_pFunc(m_pRxDataBuffer, m_RxBufSize-RECV_DATA_HEAD));
        }
@@ -54,10 +54,10 @@ int CTcpSocketInfo::TcpClientSocketLoopThread(SSendBuffer *pSendbuffer)
 
     pSendBufferInfo = pSendbuffer;
 
-    if(pSendBufferInfo->m_bUploadStatus == false)
+    if (pSendBufferInfo->m_bUploadStatus == false)
     {
         m_pTcpSocket->abort();
-        if(m_pTcpSocket->state() != QAbstractSocket::ConnectedState)
+        if (m_pTcpSocket->state() != QAbstractSocket::ConnectedState)
         {
             m_pTcpSocket->connectToHost(*m_pServerIp, m_nPort);
             is_connect = m_pTcpSocket->waitForConnected(300);
@@ -74,7 +74,7 @@ int CTcpSocketInfo::TcpClientSocketLoopThread(SSendBuffer *pSendbuffer)
 
     nLen = this->CreateSendBuffer(this->GetId(), pSendbuffer->m_nSize,
                                   pSendbuffer->m_pBuffer, pSendbuffer->m_IsWriteThrough);
-    if(is_connect)
+    if (is_connect)
     {
         #if TEST_DEBUG == 1
         emit send_edit_test(QString("tcp socket client ok"));
@@ -89,7 +89,7 @@ int CTcpSocketInfo::TcpClientSocketLoopThread(SSendBuffer *pSendbuffer)
         //等待发送和接收完成
         m_pTcpSocket->waitForBytesWritten(1000);
 
-        if(pSendBufferInfo->m_bUploadStatus)
+        if (pSendBufferInfo->m_bUploadStatus)
         {
             m_pTcpSocket->waitForReadyRead();
         }
@@ -98,7 +98,7 @@ int CTcpSocketInfo::TcpClientSocketLoopThread(SSendBuffer *pSendbuffer)
             m_pTcpSocket->waitForReadyRead(2000);
         }
 
-        if(m_pSemphore->tryAcquire(1, 10000))
+        if (m_pSemphore->tryAcquire(1, 10000))
         {
             #if TEST_DEBUG == 1
             qDebug()<<"Tcpclient.cpp:Semphore Read";

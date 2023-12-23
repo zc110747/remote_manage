@@ -12,23 +12,19 @@ BUILD=e
 
 CCFLAGS := -O3 -std=c++17 -fno-strict-aliasing -lrt 
 
-cpp_objects = 	main.o	\
-				asio_client.o \
-				driver/rtc.o \
+cpp_objects = 	main.o \
+			  	device_manage.o \
+			  	driver/device_base.o \
+			  	driver/driver.o \
 				driver/key.o \
-				driver/spi_icm.o \
-				driver/device_base.o \
-				driver/driver.o \
-				module/cmd_process.o  \
-				module/device_manage.o
+				driver/rtc.o \
+				driver/spi_icm.o 
 				
-
 INCLUDES = 	-I include/ \
-			-I module/	\
 			-I driver/
 				
 INCLUDES +=	-I $(ENV_PATH_ROOT)/thirdparts/asio/include/ \
-			-I $(ENV_PATH_ROOT)/thirdparts/jsoncpp/include/ 
+			-I $(ENV_PATH_ROOT)/thirdparts/jsoncpp/include/
 
 ifeq ($(FIRMWARE_CURRENT_PLATFORMS),ARM)
 library = $(ENV_PATH_ROOT)/buildout/arm/libjsoncpp.a

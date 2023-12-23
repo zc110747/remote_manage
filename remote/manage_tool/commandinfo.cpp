@@ -1,8 +1,23 @@
-﻿/*!
-    指令相关的数据存储管理实现
-*/
-#include "commandinfo.h"
+﻿//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2022-by Persional Inc.
+//  All Rights Reserved
+//
+//  Name:
+//      appthread.cpp
+//
+//  Purpose:
+//     
+//
+// Author:
+//     	@听心跳的声音
+//
+//  Assumptions:
+//
+//  Revision History:
+//      11/20/2023   Create New Version
+/////////////////////////////////////////////////////////////////////////////
 #include <QString>
+#include "commandinfo.h"
 
 static SCommandInfo SCommand[CMD_LIST_SIZE];
 
@@ -67,7 +82,7 @@ static std::function<QString(uint8_t *, int)> FuncList[CMD_LIST_SIZE] = {
         struct SRegInfoList *pRegInfoList;
 
         //qDebug()<<nSize;
-        if(nSize > 16)
+        if (nSize > 16)
         {
             pRegInfoList = (struct SRegInfoList *)pRecvData;
             DecodeBuf = QString::fromLocal8Bit("LED显示:%1\n").arg(pRegInfoList->s_base_status.b.led==0?"OFF":"ON"); //LED状态
@@ -99,7 +114,7 @@ static std::function<QString(uint8_t *, int)> FuncList[CMD_LIST_SIZE] = {
 */
 void CommandInfoInit(void)
 {
-    for(int index=0; index<CMD_LIST_SIZE; index++)
+    for (int index=0; index<CMD_LIST_SIZE; index++)
     {
         SCommand[index].m_pbuffer = pSCommandListBuffer[index];
         SCommand[index].m_nSize = nSCommandListSize[index];
@@ -113,7 +128,7 @@ void CommandInfoInit(void)
 */
 SCommandInfo *GetCommandPtr(uint16_t index)
 {
-    if(index < CMD_LIST_SIZE)
+    if (index < CMD_LIST_SIZE)
         return (SCommandInfo *)&SCommand[index];
     else
         return nullptr;

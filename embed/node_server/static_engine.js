@@ -21,7 +21,7 @@ var contentTypeStatic = {
 function engine_process(request, response)
 {
     var pathname = request.url;
-    if(pathname === '/'){
+    if (pathname === '/'){
         pathname = 'index.html'
     }
 

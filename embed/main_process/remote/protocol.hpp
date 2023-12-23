@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//  (c) copyright 2022-by Persional Inc.  
+//  (c) copyright 2022-by Persional Inc.
 //  All Rights Reserved
 //
 //  Name:
@@ -67,7 +67,7 @@ public:
 	protocol_info();
 
 	/// \brief destructor
-	~protocol_info(){};
+	~protocol_info(){}
 
 	/// \brief init
     /// - This method is used to init the object.
@@ -75,7 +75,9 @@ public:
 	/// \param tx_fifo - fifo path for protocol transform
 	/// \param lambda - function for protocol transform internal
     /// \return Wheather initialization is success or failed.
-	bool init(const std::string &rx_fifo, const std::string &tx_fifo, std::function<void(char* ptr, int size)> lambda);
+	bool init(const std::string &rx_fifo, 
+			const std::string &tx_fifo, 
+			std::function<void(char* ptr, int size)> lambda);
 	
 	/// \brief write_rx_fifo
     /// - write buffer to rx fifo.
@@ -96,14 +98,14 @@ public:
 	/// \param buf - point for data write to fifo
 	/// \param size - size of the data write to fifo
     /// \return the size of the data already write.
-	int write_tx_fifo(char *buf, uint16_t size);
+	int write_tx_fifo(char *buf, int size);
 
 	/// \brief read_tx_fifo
     /// - read buffer from tx fifo.
 	/// \param ptr - point to the start of data read from tx fifo.
 	/// \param size - max size of the data can be read.
     /// \return the size of the data already read.
-	int read_tx_fifo(char *buf, uint16_t size);
+	int read_tx_fifo(char *buf, int size);
 
 	/// \brief check_rx_frame
     /// - check the receive data by byte, and verify protocol.

@@ -12,8 +12,6 @@ OPT_OS_VER=bookworm
 
 sudo apt-get install debootstrap debian-archive-keyring qemu-user-static -y
 
-
-
 run_as_client() {
     $@ > /dev/null 2>&1
 }

@@ -43,7 +43,7 @@ namespace Tools
 
         bool checkSocketSendAllow()
         {
-            if(ProtocolComboBox.SelectedIndex == 0)
+            if (ProtocolComboBox.SelectedIndex == 0)
             {
                 if (globalSocketManage.TcpSocket == null)
                 {
@@ -51,7 +51,7 @@ namespace Tools
                 }
                 else
                 {
-                    if(!globalSocketManage.TcpSocket.Connected)
+                    if (!globalSocketManage.TcpSocket.Connected)
                     {
                         return false;
                     }
@@ -75,7 +75,7 @@ namespace Tools
 
             if (text.Length > 0)
             {
-                if(checkSocketSendAllow())
+                if (checkSocketSendAllow())
                 {
                     byte[] sendBytes = new byte[text.Length];
                     sendBytes = Encoding.UTF8.GetBytes(text);
@@ -187,7 +187,7 @@ namespace Tools
                 {
                     if (!is_send)
                     {
-                        if(WriteBox.Text.Length > 0)
+                        if (WriteBox.Text.Length > 0)
                         {
                             if (checkSocketSendAllow())
                             {
@@ -323,7 +323,7 @@ namespace Tools
             while (true)
             {
                 length = globalSocketManage.TcpSocket.Receive(recvBytes, recvBytes.Length, 0);
-                if(length > 0)
+                if (length > 0)
                 {
                     globalSocketManage.rx_count += (ulong)length;
                     RxLable.Text = String.Format($"rx: {globalSocketManage.rx_count.ToString()}");

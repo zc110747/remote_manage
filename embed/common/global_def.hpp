@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//  (c) copyright 2022-by Persional Inc.  
+//  (c) copyright 2022-by Persional Inc.
 //  All Rights Reserved
 //
 //  Name:
@@ -14,7 +14,7 @@
 //  Assumptions:
 //
 //  Revision History:
-//      12/19/2022   Create New Version	
+//      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
@@ -22,6 +22,7 @@ _Pragma("once")
 #define PROCESS_MAIN_PROCESS            0
 #define PROCESS_LOWER_DEVICE            1
 #define PROCESS_LOCAL_DEVICE            2
+#define PROCESS_LOGGER_TOOL             3
 
 //定义全局的返回状态
 #define RT_INVALID_MQ_SIZE              -4

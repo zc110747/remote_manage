@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//  (c) copyright 2022-by Persional Inc.  
+//  (c) copyright 2022-by Persional Inc.
 //  All Rights Reserved
 //
 //  Name:
@@ -14,14 +14,14 @@
 //  Assumptions:
 //
 //  Revision History:
-//      12/19/2022   Create New Version	
+//      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
+#include <cstring>
+#include <type_traits>
 #include "fifo_manage.hpp"
 #include "driver.hpp"
-#include <type_traits>
-#include <cstring>
 #include "event.hpp"
 
 //interal event
@@ -39,7 +39,7 @@ _Pragma("once")
 //process hardware chage
 #define EVENT_DEVICE_LED                0x00
 #define EVENT_DEVICE_BEEP               0x01
-#define READ_BUFFER_SIZE                1024
+#define RX_BUFFER_SIZE                1024
 
 
 struct device_read_info
@@ -72,7 +72,7 @@ struct device_read_info
     {
         static_assert(std::is_trivial_v<device_read_info>, "Not Allow C memory process!");
 
-        if(memcmp((char *)this, (char *)&dev_info, size()) != 0)
+        if (memcmp((char *)this, (char *)&dev_info, size()) != 0)
             return true;
         return false;
     }
@@ -112,7 +112,7 @@ struct device_read_info
         data[6] = (int32_t)icm_info_.temp_act;
         data[7] = (int32_t)angle_;
 
-        for(int i=0; i<8; i++)
+        for (int i=0; i<8; i++)
         {
             buffer[size++] = data[i]>>24;
             buffer[size++] = data[i]>>16;

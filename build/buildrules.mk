@@ -46,6 +46,8 @@ cpp_objects ?=
 objects+=${c_objects}
 objects+=${cpp_objects}
 
+run_dist ?=$(NFS_PATH)/home/sys/executable
+
 ###library for store the buildout
 ifeq ($(FIRMWARE_CURRENT_PLATFORMS),ARM)
 lib_dist ?= $(ENV_PATH_ROOT)/buildout/arm
@@ -92,7 +94,8 @@ else
 endif
 	
 	rm -rf $(objects)
-	mv $(buildout) $(lib_dist)/
+	cp $(buildout) $(lib_dist)/
+	mv $(buildout) $(run_dist)/
 endif
 
 #build static library

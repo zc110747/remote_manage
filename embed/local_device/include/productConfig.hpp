@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//  (c) copyright 2022-by Persional Inc.  
+//  (c) copyright 2022-by Persional Inc.
 //  All Rights Reserved
 //
 //  Name:
@@ -14,19 +14,12 @@
 //  Assumptions:
 //
 //  Revision History:
-//      12/19/2022   Create New Version	
+//      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
 #include "global_def.hpp"
 
 #define PROCESS_RUN                 PROCESS_LOCAL_DEVICE
-
-//------------------------- FIFO List ------------------------------
-#define LOGGER_FIFO_PATH                "/tmp/loc_logger.fifo"              //logger服务模块
-#define DEVICE_MESSAGE_FIFO             "/tmp/device_manage.fifo"        //设备管理模块
-#define ASIO_CLENET_FIFO                "/tmp/loc_client_tx.fifo"
-
-//默认设备ID
-#define DEVICE_ID                       0x01
-
+#define TOOLS_NAME                  "local_device"
+#define PRINT_NOW_HEAD_STR          "[0000 00:00:00][local_device][5]"

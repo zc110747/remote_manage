@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//  (c) copyright 2022-by Persional Inc.  
+//  (c) copyright 2022-by Persional Inc.
 //  All Rights Reserved
 //
 //  Name:
@@ -14,7 +14,7 @@
 //  Assumptions:
 //
 //  Revision History:
-//      12/19/2022   Create New Version	
+//      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
@@ -43,13 +43,28 @@ _Pragma("once")
 #include <mutex>
 #include <algorithm>
 #include <chrono>
-#include <atomic>
 #include <vector>
 #include <functional>
 
 #include "event.hpp"
 #include "thread_queue.hpp"
 #include "productConfig.hpp"
+
+//logger fifo list
+#define LOGGER_RX_FIFO               "/tmp/log_rx.fifo"      //all device => logger(rx fifo)
+
+//local device list
+#define LOCAL_DEVICE_CMD_FIFO        "/tmp/local_dev_cmd.fifo" //main_process => local_device
+#define LOCAL_DEVICE_INFO_FIFO       "/tmp/local_dev_info.fifo" //local_device => main_process
+
+//device name
+#ifndef TOOLS_NAME
+#define TOOLS_NAME                  "common"
+#endif
+
+#ifndef PRINT_NOW_HEAD_STR
+#define PRINT_NOW_HEAD_STR          "[0000 00:00:00][common][5]"
+#endif
 
 #if __cplusplus < 201703
 #error "c++ compiler need newer than g++7, can use 'g++ -v' to see version."

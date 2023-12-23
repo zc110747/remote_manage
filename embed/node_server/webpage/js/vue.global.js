@@ -13694,7 +13694,7 @@ var Vue = (function (exports) {
   }
 
   const transformIf = createStructuralDirectiveTransform(/^(if|else|else-if)$/, (node, dir, context) => {
-      return processIf(node, dir, context, (ifNode, branch, isRoot) => {
+      return processif (node, dir, context, (ifNode, branch, isRoot) => {
           // #1587: We need to dynamically increment the key based on the current
           // node's sibling nodes, since chained v-if/else branches are
           // rendered at the same depth
@@ -13722,7 +13722,7 @@ var Vue = (function (exports) {
       });
   });
   // target-agnostic transform used for both Client and SSR
-  function processIf(node, dir, context, processCodegen) {
+  function processif (node, dir, context, processCodegen) {
       if (dir.name !== 'else' &&
           (!dir.exp || !dir.exp.content.trim())) {
           const loc = dir.exp ? dir.exp.loc : node.loc;

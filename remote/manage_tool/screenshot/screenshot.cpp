@@ -31,7 +31,7 @@ void CScreenShot::initSelectedMenu()
 
 void CScreenShot::Release()
 {
-    if(isMainWinHide)
+    if (isMainWinHide)
     {
         emit send_release();
     }
@@ -43,7 +43,7 @@ void CScreenShot::savePixmap()
 {
     QString fileName;
     fileName = QFileDialog::getSaveFileName(this,tr("保存图片"),QDir::currentPath(),tr("Images (*.jpg *.png *.bmp)"));
-    if(fileName.isNull())
+    if (fileName.isNull())
         return;
 
     shotPixmap.save(fileName);
@@ -91,7 +91,8 @@ void CScreenShot::paintEvent(QPaintEvent *event)
     painter.drawPixmap(screenx,screeny,loadPixmap); //将背景图片画到窗体上
     painter.fillRect(screenx,screeny,screenwidth,screenheight,shadowColor); //画影罩效果
 
-    switch(currentShotState){
+    switch (currentShotState)
+    {
         case initShot:
           drawTipsText();
           break;
@@ -116,7 +117,8 @@ void CScreenShot::paintEvent(QPaintEvent *event)
     drawXYWHInfo(); //打印坐标信息
     painter.end();  //重绘结束
 
-    if(currentShotState == finishMoveShot || currentShotState == finishControl){
+    if (currentShotState == finishMoveShot || currentShotState == finishControl)
+    {
         updateBeginEndPointValue(selectedRect); //当移动完选区后，更新beginPoint,endPoint;为下一次移动做准备工作
     }
 
@@ -125,7 +127,8 @@ void CScreenShot::paintEvent(QPaintEvent *event)
 
 void CScreenShot::keyPressEvent(QKeyEvent *event)
 {
-    if(event->key() == Qt::Key_Escape){
+    if (event->key() == Qt::Key_Escape)
+    {
         initCScreenShot();
         //hide();
         Release();
@@ -135,20 +138,23 @@ void CScreenShot::keyPressEvent(QKeyEvent *event)
 void CScreenShot::mousePressEvent(QMouseEvent *event)
 {
     //当开始进行拖动进行选择区域时,确定开始选取的beginPoint坐标
-    if(event->button() == Qt::LeftButton && currentShotState == initShot){
+    if (event->button() == Qt::LeftButton && currentShotState == initShot)
+    {
         currentShotState = beginShot; //设置当前状态为beginShot状态
         beginPoint = event->pos();
     }
 
     //移动选区改变选区的所在位置
-    if(event->button() == Qt::LeftButton && isInSelectedRect(event->pos()) &&
-    getMoveControlState(event->pos()) == moveControl0){
+    if (event->button() == Qt::LeftButton && isInSelectedRect(event->pos()) &&
+    getMoveControlState(event->pos()) == moveControl0)
+    {
         currentShotState = beginMoveShot; //启用开始移动选取选项,beginMoveShot状态
         moveBeginPoint = event->pos();
     }
 
     //移动控制点改变选区大小
-    if(event->button() == Qt::LeftButton && getMoveControlState(event->pos()) != moveControl0){
+    if (event->button() == Qt::LeftButton && getMoveControlState(event->pos()) != moveControl0
+    ){
         currentShotState = beginControl; //开始移动控制点
         controlValue = getMoveControlState(event->pos());
         moveBeginPoint = event->pos();
@@ -157,20 +163,23 @@ void CScreenShot::mousePressEvent(QMouseEvent *event)
 
 void CScreenShot::mouseReleaseEvent(QMouseEvent *event)
 {
-    if(event->button() == Qt::LeftButton && currentShotState == beginShot){
+    if (event->button() == Qt::LeftButton && currentShotState == beginShot)
+    {
         currentShotState = finishShot;
         endPoint = event->pos();
         update();
     }
 
-    if(event->button() == Qt::LeftButton && currentShotState == beginMoveShot){
+    if (event->button() == Qt::LeftButton && currentShotState == beginMoveShot)
+    {
         currentShotState = finishMoveShot;
         moveEndPoint = event->pos();
         update();
     }
 
     //当前状态为beginControl状态时，设置状态为finishControl
-    if(event->button() == Qt::LeftButton && currentShotState == beginControl){
+    if (event->button() == Qt::LeftButton && currentShotState == beginControl)
+    {
         currentShotState = finishControl;
         moveEndPoint = event->pos();
         update();
@@ -180,13 +189,14 @@ void CScreenShot::mouseReleaseEvent(QMouseEvent *event)
 void CScreenShot::mouseMoveEvent(QMouseEvent *event)
 {
     //当拖动时，动态的更新所选择的区域
-    if(currentShotState == beginShot){
+    if (currentShotState == beginShot){
         endPoint = event->pos();
         update();
     }
 
     //当确定选区后，对选区进行移动操作
-    if(currentShotState == beginMoveShot || currentShotState == beginControl){
+    if (currentShotState == beginMoveShot || currentShotState == beginControl)
+    {
         moveEndPoint = event->pos();
         update();
     }
@@ -197,7 +207,9 @@ void CScreenShot::mouseMoveEvent(QMouseEvent *event)
 
 void CScreenShot::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    if(currentShotState == finishShot || currentShotState == finishMoveShot || currentShotState == finishControl){
+    if (currentShotState == finishShot || currentShotState == finishMoveShot 
+    || currentShotState == finishControl)
+    {
         Release();
     }
     qDebug()<<event->pos();
@@ -237,16 +249,19 @@ void CScreenShot::initCScreenShot()
 
 bool CScreenShot::isInSelectedRect(const QPoint &point)
 {
-  int x,y;
-  QRect selectedRect;
-  if(currentShotState == initShot || currentShotState == beginShot)
-    return false;
+    int x,y;
+    QRect selectedRect;
+    if (currentShotState == initShot || currentShotState == beginShot)
+    {
+        return false;
+    }
 
-  selectedRect = getSelectedRect();
-  x = point.x();
-  y = point.y();
 
-  return selectedRect.contains(x,y);
+    selectedRect = getSelectedRect();
+    x = point.x();
+    y = point.y();
+
+    return selectedRect.contains(x,y);
 }
 
 void CScreenShot::cancelSelectedRect()
@@ -259,12 +274,14 @@ void CScreenShot::contextMenuEvent(QContextMenuEvent *event)
 {
     initSelectedMenu();
 
-    if(isInSelectedRect(event->pos())){
-    contextMenu->addAction(savePixmapAction);
+    if (isInSelectedRect(event->pos()))
+    {
+        contextMenu->addAction(savePixmapAction);
     }
-    else{
-    contextMenu->addAction(cancelAction);
-    contextMenu->addAction(quitAction);
+    else
+    {
+        contextMenu->addAction(cancelAction);
+        contextMenu->addAction(quitAction);
     }
 
     contextMenu->exec(event->pos());
@@ -285,14 +302,17 @@ void CScreenShot::drawTipsText()
 
 QRect CScreenShot::getSelectedRect()
 {
-    if(currentShotState == beginMoveShot){
-     return getMoveAllSelectedRect();
+    if (currentShotState == beginMoveShot)
+    {
+        return getMoveAllSelectedRect();
     }
-    else if(currentShotState == beginControl){
-     return getMoveControlSelectedRect();
+    else if (currentShotState == beginControl)
+    {
+        return getMoveControlSelectedRect();
     }
-    else{
-    return getRect(beginPoint,endPoint);
+    else
+    {
+        return getRect(beginPoint,endPoint);
     }
 }
 
@@ -313,19 +333,24 @@ void CScreenShot::checkMoveEndPoint()
     x = moveEndPoint.x() - moveBeginPoint.x();
     y = moveEndPoint.y() - moveBeginPoint.y();
 
-    if(x + selectedRect.x() < 0){ //当移动后X坐标小于零时，则出现选区丢失，则计算出moveEndPoint的X最大坐标值，进行赋值
+    //当移动后X坐标小于零时，则出现选区丢失，则计算出moveEndPoint的X最大坐标值，进行赋值
+    if (x + selectedRect.x() < 0)
+    { 
         moveEndPoint.setX(qAbs(selectedRect.x()-moveBeginPoint.x()));
     }
 
-    if(y + selectedRect.y() < 0){ //当移动后Y坐标小于零时，则出现选区丢失，则计算出moveEndPoint的Y最大坐标值，进行赋值
+    if (y + selectedRect.y() < 0)
+    { 
         moveEndPoint.setY(qAbs(selectedRect.y() - moveBeginPoint.y()));
     }
 
-    if(x + bottomRightPoint.x() > screenwidth){ //当移动选区后，出现超出整个屏幕的右面时，设置moveEndPoint的X的最大坐标
+    if (x + bottomRightPoint.x() > screenwidth)
+    {
         moveEndPoint.setX(screenwidth - bottomRightPoint.x() + moveBeginPoint.x());
     }
 
-    if(y + bottomRightPoint.y() > screenheight){ //当移动选区后，出现超出整个屏幕的下面时，设置moveEndPoint的Y的最大坐标值
+    if (y + bottomRightPoint.y() > screenheight)
+    {
         moveEndPoint.setY(screenheight - bottomRightPoint.y() + moveBeginPoint.y());
     }
 }
@@ -376,33 +401,40 @@ void CScreenShot::draw8ControlPoint(const QRect &rect)
 
 void CScreenShot::updateMouseShape(const QPoint &point)
 {
-  switch(currentShotState){
-    case initShot:
-    case beginShot:
-      setCursor(Qt::CrossCursor);
-      break;
-    case beginMoveShot:
-      setCursor(Qt::OpenHandCursor);
-      break;
-    case finishShot:
-    case finishMoveShot:
-    case finishControl:
-      if(getSelectedRect().contains(point))
-        setCursor(Qt::OpenHandCursor);
-      else
-        updateMoveControlMouseShape(getMoveControlState(point));
-      break;
-    case beginControl:
-      updateMoveControlMouseShape(controlValue); //调用函数对移动8个控制点进行鼠标状态的改变
-      break;
-    default:
-      setCursor(Qt::ArrowCursor);
-      break;
-  }
+    switch (currentShotState)
+    {
+        case initShot:
+        case beginShot:
+            setCursor(Qt::CrossCursor);
+            break;
+        case beginMoveShot:
+            setCursor(Qt::OpenHandCursor);
+            break;
+        case finishShot:
+        case finishMoveShot:
+        case finishControl:
+            if (getSelectedRect().contains(point))
+            {
+                setCursor(Qt::OpenHandCursor);
+            }
+            else
+            {
+                updateMoveControlMouseShape(getMoveControlState(point));
+            }
+            break;
+        case beginControl:
+            updateMoveControlMouseShape(controlValue); //调用函数对移动8个控制点进行鼠标状态的改变
+        break;
+        default:
+            setCursor(Qt::ArrowCursor);
+        break;
+    }
 }
 
-void CScreenShot::updateMoveControlMouseShape(controlPointEnum controlValue){
-  switch(controlValue){
+void CScreenShot::updateMoveControlMouseShape(controlPointEnum controlValue)
+{
+  switch (controlValue)
+  {
     case moveControl1:
     case moveControl5:
       setCursor(Qt::SizeFDiagCursor);
@@ -427,56 +459,66 @@ void CScreenShot::updateMoveControlMouseShape(controlPointEnum controlValue){
 
 CScreenShot::controlPointEnum CScreenShot::getMoveControlState(const QPoint &point)
 {
-  CScreenShot::controlPointEnum result = moveControl0;
-  if(currentShotState == initShot || currentShotState == beginShot)  {
-    result = moveControl0;
-  }
-  else if(tlRect.contains(point)){
-    result = moveControl1;
-  }
-  else if(tcRect.contains(point)){
-    result = moveControl2;
-  }
-  else if(trRect.contains(point)){
-    result = moveControl3;
-  }
-  else if(rcRect.contains(point)){
-    result = moveControl4;
-  }
-  else if(brRect.contains(point)){
-    result = moveControl5;
-  }
-  else if(bcRect.contains(point)){
-    result = moveControl6;
-  }
-  else if(blRect.contains(point)){
-    result = moveControl7;
-  }
-  else if(lcRect.contains(point)){
-    result = moveControl8;
-  }
-  else{
-    result = moveControl0;
-  }
-
-  return result;
+    CScreenShot::controlPointEnum result = moveControl0;
+    if (currentShotState == initShot || currentShotState == beginShot)
+    {
+        result = moveControl0;
+    }
+    else if (tlRect.contains(point))
+    {
+        result = moveControl1;
+    }
+    else if (tcRect.contains(point))
+    {
+        result = moveControl2;
+    }
+    else if (trRect.contains(point))
+    {
+        result = moveControl3;
+    }
+    else if (rcRect.contains(point))
+    {
+        result = moveControl4;
+    }
+    else if (brRect.contains(point))
+    {
+        result = moveControl5;
+    }
+    else if (bcRect.contains(point))
+    {
+        result = moveControl6;
+    }
+    else if (blRect.contains(point))
+    {
+        result = moveControl7;
+    }
+    else if (lcRect.contains(point))
+    {
+        result = moveControl8;
+    }
+    else
+    {
+        result = moveControl0;
+    }
+    
+    return result;
 }
 
 QRect CScreenShot::getMoveAllSelectedRect(void)
 {
-  QRect result;
-  QPoint tmpBeginPoint,tmpEndPoint;
-  int moveX,moveY;
-  checkMoveEndPoint(); //对移动选区进行判断，当移动的选区超出边界，则停止移动
-  moveX = moveEndPoint.x() - moveBeginPoint.x();
-  moveY = moveEndPoint.y() - moveBeginPoint.y();
-  tmpBeginPoint.setX(beginPoint.x() + moveX);
-  tmpBeginPoint.setY(beginPoint.y() + moveY);
-  tmpEndPoint.setX(endPoint.x() + moveX);
-  tmpEndPoint.setY(endPoint.y() + moveY);
+    QRect result;
+    QPoint tmpBeginPoint,tmpEndPoint;
+    int moveX,moveY;
+    checkMoveEndPoint(); //对移动选区进行判断，当移动的选区超出边界，则停止移动
+    moveX = moveEndPoint.x() - moveBeginPoint.x();
+    moveY = moveEndPoint.y() - moveBeginPoint.y();
+    tmpBeginPoint.setX(beginPoint.x() + moveX);
+    tmpBeginPoint.setY(beginPoint.y() + moveY);
+    tmpEndPoint.setX(endPoint.x() + moveX);
+    tmpEndPoint.setY(endPoint.y() + moveY);
 
-  result = getRect(tmpBeginPoint, tmpEndPoint);
-  return result;
+    result = getRect(tmpBeginPoint, tmpEndPoint);
+    return result;
 }
 
 QRect CScreenShot::getMoveControlSelectedRect(void)
@@ -484,51 +526,52 @@ QRect CScreenShot::getMoveControlSelectedRect(void)
   int x,y,w,h;
   QRect rect = getRect(beginPoint,endPoint);
   QRect result;
-  switch(controlValue){
+  switch (controlValue)
+  {
     case moveControl1:
-      result = getRect(rect.bottomRight(),moveEndPoint);
-      return result;
-      break;
+        result = getRect(rect.bottomRight(),moveEndPoint);
+        return result;
+        break;
     case moveControl2:
-      x = rect.x();
-      y = getMinValue(moveEndPoint.y(),rect.bottomLeft().y());
-      w = rect.width();
-      h = qAbs(moveEndPoint.y() - rect.bottomRight().y());
-      break;
+        x = rect.x();
+        y = getMinValue(moveEndPoint.y(),rect.bottomLeft().y());
+        w = rect.width();
+        h = qAbs(moveEndPoint.y() - rect.bottomRight().y());
+        break;
     case moveControl3:
-      result = getRect(rect.bottomLeft(),moveEndPoint);
-      return result;
-      break;
+        result = getRect(rect.bottomLeft(),moveEndPoint);
+        return result;
+        break;
     case moveControl4:
-      x = getMinValue(rect.x(),moveEndPoint.x());
-      y = rect.y();
-      w = qAbs(rect.bottomLeft().x() - moveEndPoint.x());
-      h = rect.height();
-      break;
+        x = getMinValue(rect.x(),moveEndPoint.x());
+        y = rect.y();
+        w = qAbs(rect.bottomLeft().x() - moveEndPoint.x());
+        h = rect.height();
+        break;
     case moveControl5:
-      result = getRect(rect.topLeft(),moveEndPoint);
-      return result;
-      break;
+        result = getRect(rect.topLeft(),moveEndPoint);
+        return result;
+        break;
     case moveControl6:
-      x = rect.x();
-      y = getMinValue(rect.y(),moveEndPoint.y());
-      w = rect.width();
-      h = qAbs(moveEndPoint.y() - rect.topLeft().y());
-      break;
+        x = rect.x();
+        y = getMinValue(rect.y(),moveEndPoint.y());
+        w = rect.width();
+        h = qAbs(moveEndPoint.y() - rect.topLeft().y());
+        break;
     case moveControl7:
-      result = getRect(moveEndPoint,rect.topRight());
-      return result;
-      break;
+        result = getRect(moveEndPoint,rect.topRight());
+        return result;
+        break;
     case moveControl8:
-      x = getMinValue(moveEndPoint.x(),rect.bottomRight().x());
-      y = rect.y();
-      w = qAbs(rect.bottomRight().x() - moveEndPoint.x());
-      h = rect.height();
-      break;
+        x = getMinValue(moveEndPoint.x(),rect.bottomRight().x());
+        y = rect.y();
+        w = qAbs(rect.bottomRight().x() - moveEndPoint.x());
+        h = rect.height();
+        break;
     default:
-      result = getRect(beginPoint,endPoint);
-      return result;
-      break;
+        result = getRect(beginPoint,endPoint);
+        return result;
+        break;
   }
 
   return QRect(x,y,w,h); //获取选区
@@ -541,40 +584,42 @@ int CScreenShot::getMinValue(int num1, int num2)
 
 void CScreenShot::drawSelectedPixmap(void)
 {
-  painter.drawRect(selectedRect); //画选中的矩形框
-  shotPixmap = loadPixmap.copy(selectedRect);  //更新选区的Pixmap
-  if(selectedRect.width() > 0 && selectedRect.height()){
-    painter.drawPixmap(selectedRect.topLeft(),shotPixmap); //画选中区域的图片
-  }
-  draw8ControlPoint(selectedRect); //画出选区的8个控制点
+    painter.drawRect(selectedRect); //画选中的矩形框
+    shotPixmap = loadPixmap.copy(selectedRect);  //更新选区的Pixmap
+    if (selectedRect.width() > 0 && selectedRect.height())
+    {
+        painter.drawPixmap(selectedRect.topLeft(),shotPixmap); //画选中区域的图片
+    }
+    draw8ControlPoint(selectedRect); //画出选区的8个控制点
 }
 
 void CScreenShot::drawXYWHInfo(void)
 {
-  int x,y;
-  QColor color = QColor(239, 234, 228, 200);
-  QRect rect;
-  QString strTipsText;
-  switch(currentShotState)
-  {
-    case beginShot:
-    case finishShot:
-    case beginMoveShot:
-    case finishMoveShot:
-    case beginControl:
-    case finishControl:
-        x = selectedRect.x() + 5;
-        y = selectedRect.y() > infoHeight ? selectedRect.y()-infoHeight:selectedRect.y();
-        rect = QRect(x, y, infoWidth, infoHeight);
-        strTipsText = QString(tr(" 坐标信息\n x:%1 y:%2\n w:%3 h:%4")).arg(selectedRect.x(), 4).arg(selectedRect.y(),4)
-                    .arg(selectedRect.width(),4).arg(selectedRect.height(),4);
-        painter.fillRect(rect, color);
-        painter.setPen(QPen(Qt::black));//设置画笔的颜色为黑色
-        painter.drawText(rect, Qt::AlignLeft|Qt::AlignVCenter, strTipsText);
-    break;
-    default:
-    break;
-  }
+    int x,y;
+    QColor color = QColor(239, 234, 228, 200);
+    QRect rect;
+    QString strTipsText;
+
+    switch (currentShotState)
+    {
+        case beginShot:
+        case finishShot:
+        case beginMoveShot:
+        case finishMoveShot:
+        case beginControl:
+        case finishControl:
+            x = selectedRect.x() + 5;
+            y = selectedRect.y() > infoHeight ? selectedRect.y()-infoHeight:selectedRect.y();
+            rect = QRect(x, y, infoWidth, infoHeight);
+            strTipsText = QString(tr(" 坐标信息\n x:%1 y:%2\n w:%3 h:%4")).arg(selectedRect.x(), 4).arg(selectedRect.y(),4)
+            .arg(selectedRect.width(),4).arg(selectedRect.height(),4);
+            painter.fillRect(rect, color);
+            painter.setPen(QPen(Qt::black));//设置画笔的颜色为黑色
+            painter.drawText(rect, Qt::AlignLeft|Qt::AlignVCenter, strTipsText);
+        break;
+        default:
+        break;
+    }
 }
 
 void ScreenShotInit(void)

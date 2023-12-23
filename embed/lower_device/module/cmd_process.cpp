@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//  (c) copyright 2022-by Persional Inc.  
+//  (c) copyright 2022-by Persional Inc.
 //  All Rights Reserved
 //
 //  Name:
@@ -14,11 +14,11 @@
 //  Assumptions:
 //
 //  Revision History:
-//      12/19/2022   Create New Version	
+//      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
 
 #include "cmd_process.hpp"
-#include "logger_server.hpp"
+#include "logger_manage.hpp"
 
 /*
 !readdev    [index] #index=[0~3 led,beep,ap,icm]
@@ -43,9 +43,9 @@ const static std::map<cmd_format_t, std::string> CmdHelpMapM = {
 
 bool cmd_process::parse_data(char *ptr, int size)
 {
-    if(ptr[0] != '!')
+    if (ptr[0] != '!')
     {
-        PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "error command:%s", ptr);
+        PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "error command:%s", ptr);
         return false;
     }
 
@@ -53,7 +53,7 @@ bool cmd_process::parse_data(char *ptr, int size)
 
     //replace first ' ' by '\0'
     char *pStart = ptr;
-    while((*pStart != ' ') && (*pStart != '\0'))
+    while ((*pStart != ' ') && (*pStart != '\0'))
         pStart++;
     pStart[0] = '\0';
     
@@ -63,8 +63,8 @@ bool cmd_process::parse_data(char *ptr, int size)
     strDst.resize(strVal.size());
     std::transform(strVal.begin(), strVal.end(), strDst.begin(), ::tolower);
 
-    PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "rx command:%s", ptr);
-    if(CmdMapM.count(strDst) == 0)
+    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "rx command:%s", ptr);
+    if (CmdMapM.count(strDst) == 0)
     {
         return false;
     }
@@ -77,30 +77,30 @@ bool cmd_process::parse_data(char *ptr, int size)
 bool cmd_process::process_data()
 {
     bool ret = true;
-    switch(cmd_format_)
+    switch (cmd_format_)
     {
         case CmdGetOS:
             {
                 auto pSysConfig = system_config::get_instance();
                 auto pVersion = pSysConfig->get_version().c_str();
-                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "FW_Version:%d, %d, %d, %d", pVersion[0], pVersion[1], pVersion[2], pVersion[3]);
-                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Logger Level:%d ", (int)LoggerManage::get_instance()->get_level());
+                PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "FW_Version:%d, %d, %d, %d", pVersion[0], pVersion[1], pVersion[2], pVersion[3]);
+                PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "Logger Level:%d ", (int)log_manage::get_instance()->get_level());
             }
             break;
         case cmdSetLevel:
             { 
                 uint8_t level = cmd_data_pointer_[0] - '0';
-                if(level > 5)
+                if (level > 5)
                     level = 5;
-                LoggerManage::get_instance()->set_level((LOG_LEVEL)level);
-                PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Set Logger Level:%d!", level);
+                log_manage::get_instance()->set_level((LOG_LEVEL)level);
+                PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "Set Logger Level:%d!", level);
             }
             break;
         case CmdGetHelp:
             {
-                for(auto &[x, y] : CmdHelpMapM)
+                for (auto &[x, y] : CmdHelpMapM)
                 {
-                    PRINT_LOG(LOG_INFO, xGetCurrentTicks(), y.c_str());
+                    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), y.c_str());
                     std::this_thread::sleep_for(std::chrono::microseconds(100));
                 }
             }
@@ -110,9 +110,9 @@ bool cmd_process::process_data()
             break;
     }
 
-    if(!ret)
+    if (!ret)
     {
-        PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Invalid Formate:%d, data:%s", cmd_format_, cmd_data_pointer_);
+        PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "Invalid Formate:%d, data:%s", cmd_format_, cmd_data_pointer_);
     }
     return ret;
 }

@@ -147,15 +147,7 @@ function process_cJSON()
     #cjson默认使用gcc编译，需要修改支持交叉编译(Makefile)
     if [ ! -f ${GLOBAL_INTALL}/lib/libcjson.so ]; then
        
-        cd ${PROGRAM_DOWNLOAD}/
-        cjson_ver=cJSON-master
-        if [ ! -f ${cjson_ver}.tar.bz2 ];then
-            echo "no exist cjson, need clone from github."
-            return -1
-        fi    
-        tar -xvf ${cjson_ver}.tar.bz2
-        
-        cd ${cjson_ver}/
+        cd ${APPLICATION_THIRDPARTS}/cJSON-master/
         
         if [ -f Makefile ]; then
             make clean
@@ -166,6 +158,8 @@ function process_cJSON()
         cp -rv *.so* ${GLOBAL_INTALL}/lib/
         mkdir -p ${GLOBAL_INTALL}/include/cjson/
         cp -rv *.h ${GLOBAL_INTALL}/include/cjson/
+
+        make clean
     else
         echo "cJson already install."
     fi
@@ -249,14 +243,20 @@ process_jsoncpp
 
 function install_library()
 {
-    sudo mkdir -p ${NFS_PATH}/usr/lib/
-    sudo mkdir -p ${NFS_PATH}/usr/include/
-    sudo mkdir -p ${NFS_PATH}/usr/local/
-    sudo cp -Rv ${GLOBAL_INTALL}/lib/* ${NFS_PATH}/usr/lib/
-    sudo cp -Rv ${GLOBAL_INTALL}/usr/local/lib/* ${NFS_PATH}/usr/lib/
-    sudo cp -Rv ${GLOBAL_INTALL}/usr/local/include/* ${NFS_PATH}/usr/include/
-    sudo cp -Rv ${GLOBAL_INTALL}/include/* ${NFS_PATH}/usr/include/
-    sudo cp -Rv ${GLOBAL_INTALL}/usr/local/* ${NFS_PATH}/usr/local/
-    sudo cp -Rv ${GLOBAL_INTALL}/etc/* ${NFS_PATH}/etc/
+    sudo cp -Rv ${GLOBAL_INTALL}/usr/local/lib/* ${GLOBAL_INTALL}/lib/
+
+    if [ "${FIRMWARE_CURRENT_PLATFORMS}" == "ARM" ]; then
+        sudo mkdir -p ${NFS_PATH}/usr/lib/
+        sudo mkdir -p ${NFS_PATH}/usr/include/
+        sudo mkdir -p ${NFS_PATH}/usr/local/
+        sudo cp -Rv ${GLOBAL_INTALL}/lib/* ${NFS_PATH}/usr/lib/
+        sudo cp -Rv ${GLOBAL_INTALL}/usr/local/lib/* ${NFS_PATH}/usr/lib/
+        sudo cp -Rv ${GLOBAL_INTALL}/usr/local/include/* ${NFS_PATH}/usr/include/
+        sudo cp -Rv ${GLOBAL_INTALL}/include/* ${NFS_PATH}/usr/include/
+        sudo cp -Rv ${GLOBAL_INTALL}/usr/local/* ${NFS_PATH}/usr/local/
+        sudo cp -Rv ${GLOBAL_INTALL}/etc/* ${NFS_PATH}/etc/
+    else
+        echo "only arm platform do nfs path".
+    fi
 }
 install_library

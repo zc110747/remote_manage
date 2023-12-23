@@ -1,10 +1,11 @@
 /*!
     主界面相关显示应用
 */
-#include "mainwindow.h"
+
 #include <QApplication>
 #include <QIcon>
 #include <QTextCodec>
+#include "mainwindow.h"
 
 int main(int argc, char *argv[])
 {

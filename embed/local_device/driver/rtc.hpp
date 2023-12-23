@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//  (c) copyright 2022-by Persional Inc.  
+//  (c) copyright 2022-by Persional Inc.
 //  All Rights Reserved
 //
 //  Name:
@@ -14,12 +14,12 @@
 //  Assumptions:
 //
 //  Revision History:
-//      12/19/2022   Create New Version	
+//      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
-#include "device_base.hpp"
 #include <linux/rtc.h>
+#include "device_base.hpp"
 
 class rtc_device:public device_base
 {
@@ -53,4 +53,3 @@ private:
     /// - the time when init, used to calculate seconds.
     uint64_t start_time_{0};
 };
-

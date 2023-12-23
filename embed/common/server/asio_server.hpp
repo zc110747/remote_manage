@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//  (c) copyright 2022-by Persional Inc.  
+//  (c) copyright 2022-by Persional Inc.
 //  All Rights Reserved
 //
 //  Name:
@@ -14,7 +14,7 @@
 //  Assumptions:
 //
 //  Revision History:
-//      12/19/2022   Create New Version	
+//      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 #if !__has_include("asio.hpp")
@@ -26,6 +26,8 @@ _Pragma("once")
 #include <memory>
 #include <iostream>
 #include <mutex>
+
+#define MAX_LENGTH 	1024
 
 class session;
 using share_session_pointer = std::shared_ptr<session>;
@@ -98,7 +100,9 @@ public:
     /// \brief constructor
     session(asio::ip::tcp::socket socket, session_group& group)
     :socket_(std::move(socket)), group_(group)
-    {}
+    {
+		memset(data_, 0, MAX_LENGTH);
+	}
 
     /// \brief start
     /// - This method is used to start a connect and read.
@@ -125,8 +129,7 @@ private:
 
     /// \brief data_
     /// - data_ used to save read data
-    enum { max_length = 1024 };
-    char data_[max_length];
+    char data_[MAX_LENGTH];
 
     /// \brief group_
     /// - group_ used to save all session.

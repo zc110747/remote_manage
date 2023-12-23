@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//  (c) copyright 2022-by Persional Inc.  
+//  (c) copyright 2022-by Persional Inc.
 //  All Rights Reserved
 //
 //  Name:
@@ -16,7 +16,7 @@
 //  Assumptions:
 //
 //  Revision History:
-//      12/19/2022   Create New Version	
+//      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
 #include "center_manage.hpp"
 #include "internal_process.hpp"
@@ -25,12 +25,12 @@
 
 center_manage* center_manage::get_instance()
 {
-    if(instance_pointer_ == nullptr)
+    if (instance_pointer_ == nullptr)
     {
         instance_pointer_ = new(std::nothrow) center_manage;
-        if(instance_pointer_ == nullptr)
+        if (instance_pointer_ == nullptr)
         {
-             PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "device_manage new error!");
+             PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "device_manage new error!");
         }
     }
     return instance_pointer_;
@@ -46,14 +46,15 @@ int center_manage::send_message(uint16_t event_id, uint8_t *msg_pointer, uint16_
     uint16_t send_size = size + sizeof(Event);
 
     char *event_msg = new(std::nothrow) char[send_size];
-    if(event_msg == nullptr)
+    if (event_msg == nullptr)
         return 0;
 
     ((Event *)(event_msg))->set_id(event_id);
     memcpy(event_msg+sizeof(Event), msg_pointer, size);
 
     send_size = center_fifo_point_->write(event_msg, send_size);
-    delete event_msg;
+    
+    delete[] event_msg;
 
     return send_size;
 }
@@ -91,7 +92,7 @@ bool center_manage::process_event(Event *pEvent)
     uint16_t id = pEvent->get_id();
     uint8_t *pbuffer = (uint8_t *)pEvent;
 
-    switch(id)
+    switch (id)
     {
     case WORKFLOW_ID_HARDWARE_UPDATE:
         {
@@ -109,7 +110,7 @@ bool center_manage::process_event(Event *pEvent)
         }
         break;
     default:
-        PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Invalid Device Command:%d!", id);
+        PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "Invalid Device Command:%d!", id);
         break;
     }
     return true;
@@ -121,12 +122,12 @@ void center_manage::run()
     char buffer[1024];
     int size;
     
-    for(;;)
+    for (;;)
     {
-        size = center_fifo_point_->read(buffer, READ_BUFFER_SIZE);
-        if(size > 0)
+        size = center_fifo_point_->read(buffer, RX_BUFFER_SIZE);
+        if (size > 0)
         {
-            PRINT_LOG(LOG_DEBUG, xGetCurrentTicks(), "center_manage Command, %d!", size);
+            PRINT_LOG(LOG_DEBUG, xGetCurrentTimes(), "center_manage Command, %d!", size);
             process_event(reinterpret_cast<Event *>(buffer));
         }
         else
@@ -142,7 +143,7 @@ bool center_manage::init()
     std::thread(std::bind(&center_manage::run, this)).detach();
     
     center_fifo_point_ = std::make_unique<fifo_manage>(CENTER_UNIT_FIFO, S_FIFO_WORK_MODE);
-    if(!center_fifo_point_->create())
+    if (!center_fifo_point_->create())
     {
         return false;
     }

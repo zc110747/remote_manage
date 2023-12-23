@@ -6,7 +6,7 @@ bool COpencvImgProcess::load_image(QLabel *label, QString Path)
 {
 #if USE_OPENCV == 1
     cv::Mat ImgMat = cv::imread(Path.toStdString(), 1);
-    if(!ImgMat.data)
+    if (!ImgMat.data)
     {
         qDebug()<<"img load failed, Path:"<<Path;
         return false;
@@ -15,7 +15,7 @@ bool COpencvImgProcess::load_image(QLabel *label, QString Path)
     return true;
 #else
     QImage image;
-    if(!(image.load(Path))){
+    if (!(image.load(Path))){
         qDebug()<<"Image load failed, Path:"<<Path;
         return false;
     }
@@ -45,14 +45,14 @@ void COpencvImgProcess::load_image(QLabel *label, const QImage &image)
 
 QImage COpencvImgProcess::cvMattoQImage(const cv::Mat& mat)
 {
-    switch(mat.type())
+    switch (mat.type())
     {
         case CV_8UC1:
         {
             static QVector<QRgb> sColorVector;
-            if(sColorVector.isEmpty())
+            if (sColorVector.isEmpty())
             {
-                for(int i=0; i<256; i++)
+                for (int i=0; i<256; i++)
                 {
                     sColorVector.push_back(qRgb(i, i, i));
                 }
@@ -88,7 +88,7 @@ cv::Mat QImagetocvMat(const QImage &image)
 {
     cv::Mat ImgMat;
 
-    switch(image.format())
+    switch (image.format())
     {
         case QImage::Format_ARGB32:
         case QImage::Format_RGB32:
@@ -115,7 +115,7 @@ bool COpencvImgProcess::blur_image(QLabel *label, QString Path)
     cv::Mat ImgMat = cv::imread(Path.toStdString(), 1);
     cv::Mat ImgMatOut;
 
-    if(!ImgMat.data){
+    if (!ImgMat.data){
         qDebug()<<"img load failed, Path:"<<Path;
         return false;
     }
@@ -135,7 +135,7 @@ bool COpencvImgProcess::erode_image(QLabel *label, QString Path)
     cv::Mat ImgMatOut;
     cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(10, 10));
 
-    if(!ImgMat.data){
+    if (!ImgMat.data){
         qDebug()<<"img load failed, Path:"<<Path;
         return false;
     }
@@ -152,7 +152,7 @@ bool COpencvImgProcess::dilate_image(QLabel *label, QString Path)
     cv::Mat ImgMatOut;
     cv::Mat element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(7, 7));
 
-    if(!ImgMat.data){
+    if (!ImgMat.data){
         qDebug()<<"img load failed, Path:"<<Path;
         return false;
     }
@@ -168,7 +168,7 @@ bool COpencvImgProcess::canny_image(QLabel *label, QString Path)
     cv::Mat ImgMat = cv::imread(Path.toStdString(), 1);
     cv::Mat GrayImgMat, BlurImgMat, CannyImgMat;
 
-    if(!ImgMat.data){
+    if (!ImgMat.data){
         qDebug()<<"img load failed, Path:"<<Path;
         return false;
     }
@@ -187,7 +187,7 @@ bool COpencvImgProcess::gray_image(QLabel *label, QString Path)
     cv::Mat ImgMat = cv::imread(Path.toStdString(), 1);
     cv::Mat GrayImgMat, BlurImgMat;
 
-    if(!ImgMat.data){
+    if (!ImgMat.data){
         qDebug()<<"img load failed, Path:"<<Path;
         return false;
     }
@@ -207,7 +207,7 @@ bool COpencvImgProcess::line_scale_image(QLabel *label, QString Path)
     cv::Mat GrayImgMat, lineScaleImageMat;
     int tmp = 0;
 
-    if(!ImgMat.data){
+    if (!ImgMat.data){
         qDebug()<<"img load failed, Path:"<<Path;
         return false;
     }
@@ -246,7 +246,7 @@ bool COpencvImgProcess::noline_scale_image(QLabel *label, QString Path)
     cv::Mat GrayImgMat, nolineScaleImageMat;
     int tmp = 0;
 
-    if(!ImgMat.data){
+    if (!ImgMat.data){
         qDebug()<<"img load failed, Path:"<<Path;
         return false;
     }
@@ -273,7 +273,7 @@ bool COpencvImgProcess::equalizeHist_image(QLabel *label, QString Path)
     cv::Mat ImgMat = cv::imread(Path.toStdString(), 1);
     cv::Mat GrayImgMat, EqualizeHistImageMat;
 
-    if(!ImgMat.data){
+    if (!ImgMat.data){
         qDebug()<<"img load failed, Path:"<<Path;
         return false;
     }
@@ -295,7 +295,7 @@ bool COpencvImgProcess::warpaffine_image(QLabel *label, QString Path)
     cv::Mat rot_mat( 2, 3, CV_32FC1 );
     cv::Mat warp_mat( 2, 3, CV_32FC1 );
 
-    if(!ImgMat.data){
+    if (!ImgMat.data){
         qDebug()<<"img load failed, Path:"<<Path;
         return false;
     }
@@ -329,7 +329,7 @@ bool COpencvImgProcess::houghlines_image(QLabel *label, QString Path)
 {
     cv::Mat ImgMat = cv::imread(Path.toStdString(), 1);
 
-    if(!ImgMat.data){
+    if (!ImgMat.data){
         qDebug()<<"img load failed, Path:"<<Path;
         return false;
     }
@@ -340,7 +340,7 @@ bool COpencvImgProcess::houghlines_image(QLabel *label, QString Path)
 
     std::vector<cv::Vec4i> lines;
     HoughLinesP(HoughlinesImgMat, lines, 1, CV_PI/180, 50, 50, 10 );
-    for( size_t i = 0; i < lines.size(); i++ )
+    for ( size_t i = 0; i < lines.size(); i++ )
     {
       cv::Vec4i l = lines[i];
       cv::line( LineImgMat, cv::Point(l[0], l[1]), cv::Point(l[2], l[3]), cv::Scalar(0,0,255), 3, 16);
@@ -355,7 +355,7 @@ bool COpencvImgProcess::hist_image(QLabel *label, QString Path)
     cv::Mat ImgMat = cv::imread(Path.toStdString(), 1);
     cv::Mat HsvImgMat, HueImgMat;
 
-    if(!ImgMat.data){
+    if (!ImgMat.data){
         qDebug()<<"img load failed, Path:"<<Path;
         return false;
     }
@@ -382,7 +382,7 @@ bool COpencvImgProcess::hist_image(QLabel *label, QString Path)
     int bin_w = cvRound( (double) w / histSize );
     cv::Mat histImgMat = cv::Mat::zeros( w, h, CV_8UC3 );
 
-    for(int i=0; i<histSize; i++)
+    for (int i=0; i<histSize; i++)
     {
         rectangle( histImgMat, cv::Point( i*bin_w, h ),
                    cv::Point( (i+1)*bin_w, h - cvRound( hist.at<float>(i)*h/255.0 ) ),

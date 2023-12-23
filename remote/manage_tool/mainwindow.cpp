@@ -83,7 +83,7 @@ void MainWindow::QFrame_Init()
     //ui->label_image->setStyleSheet("border-image:url(:/image/test.jpg);");
 
     qDebug()<<QDir::currentPath();
-    if(OpencvImgProcess.load_image(ui->label_image, QString(QDir::currentPath()+"/image/test.jpg")))
+    if (OpencvImgProcess.load_image(ui->label_image, QString(QDir::currentPath()+"/image/test.jpg")))
     {
         ui->label_img_log->setText(QString::fromUtf8("log:图像加载成功"));
         OpencvImgProcess.set_file_extra("");
@@ -201,12 +201,12 @@ void MainWindow::append_text_edit_recv(QString s)
 void MainWindow::append_text_edit_test(QString s)
 {
     //对于超长数据，截取后显示
-    if(s.size() > 150)
+    if (s.size() > 150)
     {
         s = s.mid(0, 40) + "..." + s.mid(s.size()-20, s.size());
     }
 
-    if(ui->text_edit_test->document()->lineCount() > 20)
+    if (ui->text_edit_test->document()->lineCount() > 20)
     {
         ui->text_edit_test->setText(s);
     }
@@ -262,7 +262,7 @@ void CmdSendBuffer(uint8_t *pStart, uint16_t nSize, int nCommand, bool isThrough
     QString Strbuf;
     SSendBuffer *pSendbuf = new SSendBuffer(pStart, nSize, nCommand, isThrough, pfunc, protocol_flag, pathInfo);
 
-    if(pAppThreadInfo->QueuePost(pSendbuf) != QUEUE_INFO_OK)
+    if (pAppThreadInfo->QueuePost(pSendbuf) != QUEUE_INFO_OK)
     {
         delete pSendbuf;
     }
@@ -274,7 +274,7 @@ void CmdSendBuffer(uint8_t *pStart, uint16_t nSize, int nCommand, bool isThrough
 void MainWindow::on_btn_led_on_clicked()
 {
     SCommandInfo *pCmdInfo = GetCommandPtr(LED_ON_CMD);
-    if(pCmdInfo != nullptr)
+    if (pCmdInfo != nullptr)
         CmdSendBuffer(pCmdInfo->m_pbuffer, pCmdInfo->m_nSize, pCmdInfo->m_nCommand, false, pCmdInfo->m_pFunc);
 }
 
@@ -284,7 +284,7 @@ void MainWindow::on_btn_led_on_clicked()
 void MainWindow::on_btn_led_off_clicked()
 {
     SCommandInfo *pCmdInfo = GetCommandPtr(LED_OFF_CMD);
-    if(pCmdInfo != nullptr)
+    if (pCmdInfo != nullptr)
         CmdSendBuffer(pCmdInfo->m_pbuffer, pCmdInfo->m_nSize, pCmdInfo->m_nCommand, false, pCmdInfo->m_pFunc);
 }
 
@@ -294,7 +294,7 @@ void MainWindow::on_btn_led_off_clicked()
 void MainWindow::on_btn_beep_on_clicked()
 {
     SCommandInfo *pCmdInfo = GetCommandPtr(BEEP_ON_CMD);
-    if(pCmdInfo != nullptr)
+    if (pCmdInfo != nullptr)
         CmdSendBuffer(pCmdInfo->m_pbuffer, pCmdInfo->m_nSize, pCmdInfo->m_nCommand, false, pCmdInfo->m_pFunc);
 }
 
@@ -304,7 +304,7 @@ void MainWindow::on_btn_beep_on_clicked()
 void MainWindow::on_btn_beep_off_clicked()
 {
     SCommandInfo *pCmdInfo = GetCommandPtr(BEEP_OFF_CMD);
-    if(pCmdInfo != nullptr)
+    if (pCmdInfo != nullptr)
         CmdSendBuffer(pCmdInfo->m_pbuffer, pCmdInfo->m_nSize, pCmdInfo->m_nCommand, false, pCmdInfo->m_pFunc);
 }
 
@@ -314,7 +314,7 @@ void MainWindow::on_btn_beep_off_clicked()
 void MainWindow::on_btn_reboot_clicked()
 {
     SCommandInfo *pCmdInfo = GetCommandPtr(DEV_REBOOT_CMD);
-    if(pCmdInfo != nullptr)
+    if (pCmdInfo != nullptr)
         CmdSendBuffer(pCmdInfo->m_pbuffer, pCmdInfo->m_nSize, pCmdInfo->m_nCommand, false, pCmdInfo->m_pFunc);
 }
 
@@ -324,7 +324,7 @@ void MainWindow::on_btn_reboot_clicked()
 void MainWindow::on_btn_refresh_clicked()
 {
     SCommandInfo *pCmdInfo = GetCommandPtr(GET_INFO_CMD);
-    if(pCmdInfo != nullptr)
+    if (pCmdInfo != nullptr)
         CmdSendBuffer(pCmdInfo->m_pbuffer, pCmdInfo->m_nSize, pCmdInfo->m_nCommand, false, pCmdInfo->m_pFunc);
 }
 
@@ -339,7 +339,7 @@ void MainWindow::on_btn_send_cmd_clicked()
     QStringList QStrArr = ui->line_edit_cmd->text().split(" ");
 
     nSize = QStrArr.size();
-    for(int index=0; index<nSize;index++){
+    for (int index=0; index<nSize;index++){
         nCacheBuf[index] = QStrArr[index].toInt(&bStatus, 16);
     }
 
@@ -399,7 +399,7 @@ void MainWindow::on_btn_uart_open_clicked()
     pMainUartProtocolInfo->m_pSerialPortCom = new QextSerialPort(ui->combo_box_com->currentText(), QextSerialPort::Polling);
     pMainUartProtocolInfo->m_bComStatus = pMainUartProtocolInfo->m_pSerialPortCom->open(QIODevice::ReadWrite);
 
-    if(pMainUartProtocolInfo->m_bComStatus)
+    if (pMainUartProtocolInfo->m_bComStatus)
     {
         //清除缓存区
         pMainUartProtocolInfo->m_pSerialPortCom ->flush();
@@ -453,10 +453,10 @@ QString byteArrayToHexString(QString head, const uint8_t* str, uint16_t size, QS
     QString result = head;
     QString s;
 
-    for(int i = 0; i < size; ++i)
+    for (int i = 0; i < size; ++i)
     {
         s = QString("%1").arg(str[i], 0, 16);
-        if(s.length() == 1)
+        if (s.length() == 1)
             result.append("0x0");
         else
             result.append("0x");
@@ -482,7 +482,7 @@ void MainWindow::on_btn_socket_open_clicked()
     ui->line_edit_ipaddr->setDisabled(true);
     ui->line_edit_local_ipaddr->setDisabled(true);
     ui->combo_box_socket_type->setDisabled(true);
-    if(ui->combo_box_socket_type->currentText() == QString("TCP"))
+    if (ui->combo_box_socket_type->currentText() == QString("TCP"))
     {
         pMainTcpSocketThreadInfo->SetId(ui->line_edit_dev_id->text().toShort());
         pMainTcpSocketThreadInfo->SetSocketInfo(ui->line_edit_ipaddr->text(), ui->line_edit_port->text().toInt());
@@ -514,10 +514,10 @@ void MainWindow::on_btn_socket_close_clicked()
     ui->line_edit_port->setEnabled(true);
     ui->line_edit_ipaddr->setEnabled(true);
     ui->line_edit_local_ipaddr->setEnabled(true);
-    if(protocol_flag == PROTOCOL_UDP)
+    if (protocol_flag == PROTOCOL_UDP)
     {
         SCommandInfo *pCmdInfo = GetCommandPtr(ABORT_CMD);
-        if(pCmdInfo != nullptr)
+        if (pCmdInfo != nullptr)
             CmdSendBuffer(pCmdInfo->m_pbuffer, pCmdInfo->m_nSize, pCmdInfo->m_nCommand, false, pCmdInfo->m_pFunc);
     }
     else
@@ -530,7 +530,7 @@ void MainWindow::on_btn_socket_close_clicked()
 void MainWindow::on_btn_filepath_update_clicked()
 {
     SCommandInfo *pCmdInfo = GetCommandPtr(SYSTEM_UPDATE_CMD);
-    if(pCmdInfo != nullptr)
+    if (pCmdInfo != nullptr)
         CmdSendBuffer(pCmdInfo->m_pbuffer, pCmdInfo->m_nSize, pCmdInfo->m_nCommand, false, pCmdInfo->m_pFunc,
                       ui->combo_box_filepath->itemText( ui->combo_box_filepath->currentIndex()));
 }
@@ -549,14 +549,14 @@ void MainWindow::on_btn_filepath_choose_clicked()
     pFileDialog->setDirectory(QDir::currentPath());
     pFileDialog->setNameFilter(tr("all file (*)"));
 
-    if(pFileDialog->exec() == QDialog::Accepted)
+    if (pFileDialog->exec() == QDialog::Accepted)
     {
         directory = pFileDialog->selectedFiles()[0];
     }
 
-    if(!directory.isEmpty())
+    if (!directory.isEmpty())
     {
-        if(ui->combo_box_filepath->findText(directory) == -1)
+        if (ui->combo_box_filepath->findText(directory) == -1)
         {
             ui->combo_box_filepath->addItem(directory);
         }
@@ -575,14 +575,14 @@ void MainWindow::on_btn_img_choose_clicked()
     pFileDialog->setDirectory(QDir::currentPath());
     pFileDialog->setNameFilter(tr("images file (*.jpg *.png *.bmp)"));
 
-    if(pFileDialog->exec() == QDialog::Accepted)
+    if (pFileDialog->exec() == QDialog::Accepted)
     {
         directory = pFileDialog->selectedFiles()[0];
     }
 
-    if(!directory.isEmpty())
+    if (!directory.isEmpty())
     {
-        if(ui->combox_img_path->findText(directory) == -1)
+        if (ui->combox_img_path->findText(directory) == -1)
         {
             ui->combox_img_path->addItem(directory);
         }
@@ -593,12 +593,12 @@ void MainWindow::on_btn_img_choose_clicked()
 void MainWindow::on_btn_img_show_clicked()
 {
     QString path = ui->combox_img_path->currentText();
-    if(path.isEmpty())
+    if (path.isEmpty())
     {
         path = QString(QDir::currentPath()+"/image/test.jpg");
     }
 
-    if(OpencvImgProcess.load_image(ui->label_image, path))
+    if (OpencvImgProcess.load_image(ui->label_image, path))
     {
         ui->label_img_log->setText(QString::fromUtf8("log:图像加载成功"));
         OpencvImgProcess.set_file_extra("");
@@ -617,12 +617,12 @@ void MainWindow::on_btn_img_base_clicked()
 void MainWindow::on_btn_img_blur_clicked()
 {
     QString path = ui->combox_img_path->currentText();
-    if(path.isEmpty())
+    if (path.isEmpty())
     {
         path = QString(QDir::currentPath()+"/image/test.jpg");
     }
 
-    if(OpencvImgProcess.blur_image(ui->label_image, path))
+    if (OpencvImgProcess.blur_image(ui->label_image, path))
     {
         #if USE_OPENCV == 1
         ui->label_img_log->setText(QString::fromUtf8("log:图像均值滤波处理成功"));
@@ -640,12 +640,12 @@ void MainWindow::on_btn_img_blur_clicked()
 void MainWindow::on_btn_img_erode_clicked()
 {
     QString path = ui->combox_img_path->currentText();
-    if(path.isEmpty())
+    if (path.isEmpty())
     {
         path = QString(QDir::currentPath()+"/image/test.jpg");
     }
 
-    if(OpencvImgProcess.erode_image(ui->label_image, path))
+    if (OpencvImgProcess.erode_image(ui->label_image, path))
     {
         #if USE_OPENCV == 1
         ui->label_img_log->setText(QString::fromUtf8("log:图像腐蚀处理成功"));
@@ -663,12 +663,12 @@ void MainWindow::on_btn_img_erode_clicked()
 void MainWindow::on_btn_img_dilate_clicked()
 {
     QString path = ui->combox_img_path->currentText();
-    if(path.isEmpty())
+    if (path.isEmpty())
     {
         path = QString(QDir::currentPath()+"/image/test.jpg");
     }
 
-    if(OpencvImgProcess.dilate_image(ui->label_image, path))
+    if (OpencvImgProcess.dilate_image(ui->label_image, path))
     {
         #if USE_OPENCV == 1
         ui->label_img_log->setText(QString::fromUtf8("log:图像膨胀处理成功"));
@@ -686,12 +686,12 @@ void MainWindow::on_btn_img_dilate_clicked()
 void MainWindow::on_btn_img_canny_clicked()
 {
     QString path = ui->combox_img_path->currentText();
-    if(path.isEmpty())
+    if (path.isEmpty())
     {
         path = QString(QDir::currentPath()+"/image/test.jpg");
     }
 
-    if(OpencvImgProcess.canny_image(ui->label_image, path))
+    if (OpencvImgProcess.canny_image(ui->label_image, path))
     {
         #if USE_OPENCV == 1
         ui->label_img_log->setText(QString::fromUtf8("log:图像边缘检测处理成功"));
@@ -709,12 +709,12 @@ void MainWindow::on_btn_img_canny_clicked()
 void MainWindow::on_btn_img_gray_clicked()
 {
     QString path = ui->combox_img_path->currentText();
-    if(path.isEmpty())
+    if (path.isEmpty())
     {
         path = QString(QDir::currentPath()+"/image/test.jpg");
     }
 
-    if(OpencvImgProcess.gray_image(ui->label_image, path))
+    if (OpencvImgProcess.gray_image(ui->label_image, path))
     {
         #if USE_OPENCV == 1
         ui->label_img_log->setText(QString::fromUtf8("log:图像灰度转换处理成功"));
@@ -740,12 +740,12 @@ void MainWindow::on_btn_img_save_clicked()
 void MainWindow::on_btn_img_line_scale_clicked()
 {
     QString path = ui->combox_img_path->currentText();
-    if(path.isEmpty())
+    if (path.isEmpty())
     {
         path = QString(QDir::currentPath()+"/image/test.jpg");
     }
 
-    if(OpencvImgProcess.line_scale_image(ui->label_image, path))
+    if (OpencvImgProcess.line_scale_image(ui->label_image, path))
     {
         #if USE_OPENCV == 1
         ui->label_img_log->setText(QString::fromUtf8("log:图像线性转换处理成功"));
@@ -763,12 +763,12 @@ void MainWindow::on_btn_img_line_scale_clicked()
 void MainWindow::on_btn_img_noline_scale_clicked()
 {
     QString path = ui->combox_img_path->currentText();
-    if(path.isEmpty())
+    if (path.isEmpty())
     {
         path = QString(QDir::currentPath()+"/image/test.jpg");
     }
 
-    if(OpencvImgProcess.noline_scale_image(ui->label_image, path))
+    if (OpencvImgProcess.noline_scale_image(ui->label_image, path))
     {
         #if USE_OPENCV == 1
         ui->label_img_log->setText(QString::fromUtf8("log:图像非线性转换处理成功"));
@@ -786,12 +786,12 @@ void MainWindow::on_btn_img_noline_scale_clicked()
 void MainWindow::on_btn_img_equalizeHist_clicked()
 {
     QString path = ui->combox_img_path->currentText();
-    if(path.isEmpty())
+    if (path.isEmpty())
     {
         path = QString(QDir::currentPath()+"/image/test.jpg");
     }
 
-    if(OpencvImgProcess.equalizeHist_image(ui->label_image, path))
+    if (OpencvImgProcess.equalizeHist_image(ui->label_image, path))
     {
         #if USE_OPENCV == 1
         ui->label_img_log->setText(QString::fromUtf8("log:图像直方图均衡处理成功"));
@@ -810,12 +810,12 @@ void MainWindow::on_btn_img_equalizeHist_clicked()
 void MainWindow::on_btn_img_wrap_clicked()
 {
     QString path = ui->combox_img_path->currentText();
-    if(path.isEmpty())
+    if (path.isEmpty())
     {
         path = QString(QDir::currentPath()+"/image/test.jpg");
     }
 
-    if(OpencvImgProcess.warpaffine_image(ui->label_image, path))
+    if (OpencvImgProcess.warpaffine_image(ui->label_image, path))
     {
         #if USE_OPENCV == 1
         ui->label_img_log->setText(QString::fromUtf8("log:图像仿射变换处理成功"));
@@ -833,12 +833,12 @@ void MainWindow::on_btn_img_wrap_clicked()
 void MainWindow::on_btn_img_HoughLines_clicked()
 {
     QString path = ui->combox_img_path->currentText();
-    if(path.isEmpty())
+    if (path.isEmpty())
     {
         path = QString(QDir::currentPath()+"/image/test.jpg");
     }
 
-    if(OpencvImgProcess.houghlines_image(ui->label_image, path))
+    if (OpencvImgProcess.houghlines_image(ui->label_image, path))
     {
         #if USE_OPENCV == 1
         ui->label_img_log->setText(QString::fromUtf8("log:图像霍夫线检测成功"));
@@ -856,12 +856,12 @@ void MainWindow::on_btn_img_HoughLines_clicked()
 void MainWindow::on_btn_img_backProj_clicked()
 {
     QString path = ui->combox_img_path->currentText();
-    if(path.isEmpty())
+    if (path.isEmpty())
     {
         path = QString(QDir::currentPath()+"/image/test.jpg");
     }
 
-    if(OpencvImgProcess.hist_image(ui->label_image, path))
+    if (OpencvImgProcess.hist_image(ui->label_image, path))
     {
         #if USE_OPENCV == 1
         ui->label_img_log->setText(QString::fromUtf8("log:图像直方图计算成功"));
@@ -878,7 +878,7 @@ void MainWindow::on_btn_img_backProj_clicked()
 
 void MainWindow::on_btn_img_capture_clicked()
 {
-    if(ui->checkBox_capture->checkState() == Qt::CheckState::Checked)
+    if (ui->checkBox_capture->checkState() == Qt::CheckState::Checked)
     {
         this->hide();
         pCScreenShotInfo->SetMainWinStatus(true);

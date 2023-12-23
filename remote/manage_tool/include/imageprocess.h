@@ -1,9 +1,10 @@
 #ifndef IMAGEPROCESS_H
 #define IMAGEPROCESS_H
 
-#include "typedef.h"
 
 #include <QFileDialog>
+
+#include "typedef.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -16,8 +17,8 @@
 class COpencvImgProcess
 {
 public:
-    COpencvImgProcess(){};
-    ~COpencvImgProcess(){};
+    COpencvImgProcess(){}
+    ~COpencvImgProcess(){}
 
     //根据地址加载图像
     bool load_image(QLabel *label, QString Path);
@@ -72,48 +73,48 @@ public:
     //图像均值滤波
     bool blur_image(QLabel *label, QString Path){
         return load_image(label, Path);
-    };
+    }
 
     //图像灰度转换
     bool gray_image(QLabel *label, QString Path){
         return load_image(label, Path);
-    };
+    }
 
     //图像腐蚀 -- 高亮部分缩小
     bool erode_image(QLabel *label, QString Path){
         return load_image(label, Path);
-    };
+    }
 
     //图像膨胀 -- 高亮部分扩大
     bool dilate_image(QLabel *label, QString Path){
        return load_image(label, Path);
-    };
+    }
 
     //边缘检测
     bool canny_image(QLabel *label, QString Path){
         return load_image(label, Path);
-    };
+    }
 
 
     //线性扩展
     bool line_scale_image(QLabel *label, QString Path){
         return load_image(label, Path);
-    };
+    }
 
     //非线性扩展
     bool noline_scale_image(QLabel *label, QString Path){
         return load_image(label, Path);
-    };
+    }
 
     //直方图均衡
     bool equalizeHist_image(QLabel *label, QString Path){
         return load_image(label, Path);
-    };
+    }
 
     //仿射变换
     bool warpaffine_image(QLabel *label, QString Path){
         return load_image(label, Path);
-    };
+    }
 
     //霍夫线变换
     bool houghlines_image(QLabel *label, QString Path){

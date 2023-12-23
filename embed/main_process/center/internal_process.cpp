@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//  (c) copyright 2022-by Persional Inc.  
+//  (c) copyright 2022-by Persional Inc.
 //  All Rights Reserved
 //
 //  Name:
@@ -23,12 +23,12 @@
 internal_process*  internal_process::instance_pointer_ = nullptr;
 internal_process* internal_process::get_instance()
 {
-    if(instance_pointer_ == nullptr)
+    if (instance_pointer_ == nullptr)
     {
         instance_pointer_ = new(std::nothrow) internal_process();
-        if(instance_pointer_ == nullptr)
+        if (instance_pointer_ == nullptr)
         {
-            PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "internal_process new error!");
+            PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "internal_process new error!");
         }
     }
     return instance_pointer_;
@@ -44,7 +44,7 @@ void internal_process::run()
     try
     {
         InterServer.init(ipaddr, std::to_string(port), [this](char* ptr, int length){
-            if(cmd_process_.parse_data(ptr, length))
+            if (cmd_process_.parse_data(ptr, length))
             {
                 //用于处理命令，告知应用
                 cmd_process_.process_data();
@@ -57,7 +57,7 @@ void internal_process::run()
     }
     catch (std::exception& e)
     {
-        PRINT_LOG(LOG_DEBUG, xGetCurrentTicks(), "Exception:%s", e.what());
+        PRINT_LOG(LOG_DEBUG, xGetCurrentTimes(), "Exception:%s", e.what());
     }
 }
 
@@ -76,9 +76,9 @@ bool internal_process::send(char *pbuffer, int size)
     auto session_list =  InterServer.get_session_list();
 
     //数据发送到所有连接的端口
-    for(const auto session:session_list)
+    for (const auto session:session_list)
     {
-        if(session != nullptr)
+        if (session != nullptr)
         {
             session->do_write(pbuffer, size);
             ret = true;
@@ -131,7 +131,7 @@ void internal_process::update_device_status(const device_read_info &info)
 
 void internal_process::process_info_callback()
 {
-    switch(cmd_process_.get_format())
+    switch (cmd_process_.get_format())
     {
         case CmdSetDev:
             auto info = device_manage::get_instance()->get_device_info();

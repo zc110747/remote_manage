@@ -1,11 +1,17 @@
-#include<unistd.h>
-#include<sys/types.h>
-#include<sys/stat.h>
+/*
+ * File      : ap_i2c_test.c
+ * test for ap i2c driver.
+ * COPYRIGHT (C) 2023, zc
+ *
+ * Change Logs:
+ * Date           Author       Notes
+ * 2023-11-22     zc           the first version
+ */
 #include<fcntl.h>
 #include<stdio.h>
-#include<stdlib.h>
+#include<unistd.h>
 
-#define I2C_DRIVER_NAME "/dev/ap3216"	
+#define I2C_DRIVER_NAME "/dev/ap3216"
 
 int main(int argc, char *argv[])
 {
@@ -15,7 +21,7 @@ int main(int argc, char *argv[])
 	int nSize = 0;
 
 	fd = open(I2C_DRIVER_NAME, O_RDWR);
-	if(fd < 0) 
+	if (fd < 0)
 	{
 		printf("can't open file %s\r\n", I2C_DRIVER_NAME);
 		return -1;
@@ -24,8 +30,8 @@ int main(int argc, char *argv[])
 	while (1)
 	{
 		nSize = read(fd, databuf, sizeof(databuf));
-		if(nSize >= 0)
-		{ 			
+		if (nSize >= 0)
+		{
 			ir =  databuf[0]; 	/* ir传感器数据 */
 			als = databuf[1]; 	/* als传感器数据 */
 			ps =  databuf[2]; 	/* ps传感器数据 */
@@ -34,7 +40,8 @@ int main(int argc, char *argv[])
 		}
 		usleep(200000); /*100ms */
 	}
-	close(fd);	/* 关闭文件 */	
+	
+	close(fd);
 	return 0;
 }
 

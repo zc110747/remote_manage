@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//  (c) copyright 2022-by Persional Inc.  
+//  (c) copyright 2022-by Persional Inc.
 //  All Rights Reserved
 //
 //  Name:
@@ -37,12 +37,12 @@ bool protocol_info::init(
 {
 	//rx fifo
 	rx_fifo_ptr_ = std::make_unique<fifo_manage>(rx_fifo, S_FIFO_WORK_MODE);
-	if(!rx_fifo_ptr_->create())
+	if (!rx_fifo_ptr_->create())
 		return false;
 	
 	//tx fifo
 	tx_fifo_ptr_ = std::make_unique<fifo_manage>(tx_fifo, S_FIFO_WORK_MODE);
-	if(!tx_fifo_ptr_->create())
+	if (!tx_fifo_ptr_->create())
 		return false;
 
 	handler_ = lambda;
@@ -64,25 +64,25 @@ ENUM_PROTOCOL_STATUS protocol_info::check_rx_frame(uint8_t data)
 	uint16_t len;
 
 	//未接收状态，检测第一个head字节
-	if(rx_status_ == PROTOCOL_FRAME_EMPTY)
+	if (rx_status_ == PROTOCOL_FRAME_EMPTY)
 	{
-		if(data == PACKED_HEAD[0])
+		if (data == PACKED_HEAD[0])
 		{
 			rx_buffer_[0] = data;
 			rx_buffer_size_ = 1;
 			rx_status_ = PROTOCOL_FRAME_HEAD_RX;
-			rx_timeout_ = xGetCurrentTicks();
+			rx_timeout_ = xGetCurrentTimes();
 		}
 	}
 	//接收到一个head字节，检测第二个字节
-	else if(rx_status_ == PROTOCOL_FRAME_HEAD_RX)
+	else if (rx_status_ == PROTOCOL_FRAME_HEAD_RX)
 	{
 		//处理0x5a 0x5a 0x5b的case
-		if(data == PACKED_HEAD[0])
+		if (data == PACKED_HEAD[0])
 		{
 			//do nothing
 		}
-		else if(data == PACKED_HEAD[1])
+		else if (data == PACKED_HEAD[1])
 		{
 			rx_buffer_[rx_buffer_size_++] = data;
 			rx_status_ = PROTOCOL_FRAME_DATA_RX;
@@ -94,24 +94,24 @@ ENUM_PROTOCOL_STATUS protocol_info::check_rx_frame(uint8_t data)
 	else
 	{
 		rx_buffer_[rx_buffer_size_++] = data;
-		if(rx_buffer_size_ >= 5)
+		if (rx_buffer_size_ >= 5)
 		{
 			len = rx_buffer_[5];
 			
 			//接收长度符合协议
-			if(rx_buffer_size_ == len+PROTOCOL_FRAME_LENGHT)
+			if (rx_buffer_size_ == len+PROTOCOL_FRAME_LENGHT)
 			{
 				uint16_t crc_calc, crc_value;
 				crc_value = (((uint16_t)rx_buffer_[rx_buffer_size_-2])<<8) | rx_buffer_[rx_buffer_size_-1];
 				crc_calc = calculate_crc(&rx_buffer_[2], rx_buffer_size_-4);
-				if(crc_value == crc_calc)
+				if (crc_value == crc_calc)
 				{
 					rx_status_ = ROTOCOL_FRAME_FINISHED;
 				}
 				else
 				{
 					rx_status_ = PROTOCOL_FRAME_EMPTY;
-					PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Console Crc Error:0x%x, 0x%x", crc_value, crc_calc);
+					PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "Console Crc Error:0x%x, 0x%x", crc_value, crc_calc);
 				}
 			}
 		}
@@ -126,32 +126,32 @@ void protocol_info::process_rx_frame()
 	uint16_t sequence_num = (((uint16_t)rx_buffer_[2])<<8) | rx_buffer_[3];
 	
 	//empty data
-	if(rx_buffer_size_ == PROTOCOL_FRAME_LENGHT)
+	if (rx_buffer_size_ == PROTOCOL_FRAME_LENGHT)
 	{
-		if(rx_func == FUNCTION_ACK)
+		if (rx_func == FUNCTION_ACK)
 		{
 			//for support retry
 		}
-		else if(rx_func == 0) //empty headbeats packetage
+		else if (rx_func == 0) //empty headbeats packetage
 		{
 			//recall ack
 			send_func_data(sequence_num, FUNCTION_ACK);
 		}
 	}
-	else if(rx_func == 0)
+	else if (rx_func == 0)
 	{
 		//recall ack
 		uint16_t event_id = 0;
 		send_func_data(sequence_num, FUNCTION_ACK);
 
-		if(rx_buffer_[5] >= 2)
+		if (rx_buffer_[5] >= 2)
 		{
 			event_id = (((uint16_t)rx_buffer_[6])<<8) | rx_buffer_[7];
 			center_manage::get_instance()->send_message(event_id, &rx_buffer_[8], rx_buffer_[5]-2);
 		}
 		else
 		{
-			PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "protocol rx length is too small!");
+			PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "protocol rx length is too small!");
 		}
 	}
 }
@@ -162,12 +162,12 @@ void protocol_info::clear_rx_info()
 	rx_buffer_size_ = 0;
 }
 
-int protocol_info::read_tx_fifo(char *buf, uint16_t size)
+int protocol_info::read_tx_fifo(char *buf, int size)
 {
 	return tx_fifo_ptr_->read(buf, size);
 }
 
-int protocol_info::write_tx_fifo(char *buf, uint16_t size)
+int protocol_info::write_tx_fifo(char *buf, int size)
 {
 	return tx_fifo_ptr_->write(buf, size);
 }
@@ -178,7 +178,7 @@ int protocol_info::send_data(char *pIntput, uint16_t len)
 	uint16_t tx_size;
 
 	tx_size = create_output_frame(tx_buffer, pIntput, len);
-	if(tx_size > 0)
+	if (tx_size > 0)
 	{
 		write_tx_fifo(tx_buffer, tx_size);
 	}

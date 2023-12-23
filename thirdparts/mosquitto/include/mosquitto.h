@@ -2388,7 +2388,7 @@ libmosq_EXPORT int mosquitto_string_to_command(const char *str, int *cmd);
  * >
  * > mosquitto_sub_topic_tokenise("$SYS/broker/uptime", &topics, &topic_count);
  * >
- * > for(i=0; i<token_count; i++){
+ * > for (i=0; i<token_count; i++){
  * >     printf("%d: %s\n", i, topics[i]);
  * > }
  *
@@ -2931,8 +2931,8 @@ libmosq_EXPORT int mosquitto_property_identifier(const mosquitto_property *prope
  * list, e.g.:
  *
  * (start code)
- * for(prop = proplist; prop != NULL; prop = mosquitto_property_next(prop)){
- * 	if(mosquitto_property_identifier(prop) == MQTT_PROP_CONTENT_TYPE){
+ * for (prop = proplist; prop != NULL; prop = mosquitto_property_next(prop)){
+ * 	if (mosquitto_property_identifier(prop) == MQTT_PROP_CONTENT_TYPE){
  * 		...
  * 	}
  * }
@@ -2981,7 +2981,7 @@ libmosq_EXPORT const mosquitto_property *mosquitto_property_next(const mosquitto
  *	// proplist is obtained from a callback
  *	mosquitto_property *prop;
  *	prop = mosquitto_property_read_byte(proplist, identifier, &value, false);
- *	while(prop){
+ *	while (prop){
  *		printf("value: %s\n", value);
  *		prop = mosquitto_property_read_byte(prop, identifier, &value);
  *	}

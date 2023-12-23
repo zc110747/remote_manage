@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//  (c) copyright 2022-by Persional Inc.  
+//  (c) copyright 2022-by Persional Inc.
 //  All Rights Reserved
 //
 //  Name:
@@ -14,11 +14,11 @@
 //  Assumptions:
 //
 //  Revision History:
-//      12/19/2022   Create New Version	
+//      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
 #include "asio_server.hpp"
 #include "time_manage.hpp"
-#include "logger_server.hpp"
+#include "logger_manage.hpp"
 
 ///////////////////////////// session group ////////////////////////
 void session_group::init(std::function<void(char* ptr, int size)> handler)
@@ -45,7 +45,7 @@ share_session_pointer session_group::get_session()
 
     {
         std::lock_guard<std::mutex> lock(mutex_);
-        if(set_.size() == 0)
+        if (set_.size() == 0)
             current_Session = nullptr;
         else
             current_Session = *set_.begin(); //only send message to first session
@@ -65,7 +65,7 @@ void session_group::run(char *pbuf, int size)
 
 bool session_group::is_valid()
 {
-  if(set_.size() != 0)
+  if (set_.size() != 0)
     return true;
   return false;
 }
@@ -73,7 +73,7 @@ bool session_group::is_valid()
 void session_group::do_write(char *buffer, int size)
 {
   std::lock_guard<std::mutex> lock(mutex_);
-  if(set_.size() != 0)
+  if (set_.size() != 0)
   {
     share_session_pointer session_ptr = *set_.begin();  
     session_ptr->do_write(buffer, size);
@@ -90,7 +90,7 @@ void session::start()
 void session::do_read()
 {
   auto self(shared_from_this());
-  socket_.async_read_some(asio::buffer(data_, max_length),
+  socket_.async_read_some(asio::buffer(data_, MAX_LENGTH),
       [this, self](std::error_code ec, std::size_t length)
       {
           if (!ec)
@@ -114,7 +114,7 @@ void session::do_write(char *pdate, std::size_t length)
   asio::async_write(socket_, asio::buffer(pdate, length),
       [this, self](std::error_code ec, std::size_t /*length*/)
       {
-        if(!ec)
+        if (!ec)
         {
             //do write callback
         }
@@ -149,7 +149,7 @@ share_session_pointer asio_server::get_valid_session()
 void asio_server::close_all_session()
 {
   auto session = group_.get_session();
-  while(session != nullptr)
+  while (session != nullptr)
   {
       session->do_close();
       group_.leave(session);
@@ -172,7 +172,7 @@ void asio_server::init(const std::string& address, const std::string& port, std:
     //update for rx handler
     group_.init(handler);
 
-    PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "asio_server start, bind:%s:%s!", address.c_str(), port.c_str());
+    PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "asio_server start, bind:%s:%s!", address.c_str(), port.c_str());
     
     // Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
     asio::ip::tcp::resolver resolver(io_context_);
@@ -201,7 +201,7 @@ void asio_server::do_accept()
             //if accept, close other socket
             close_all_session();
             std::make_shared<session>(std::move(socket), group_)->start();
-            PRINT_LOG(LOG_FATAL, xGetCurrentTicks(), "Connect from client!");
+            PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "Connect from client!");
         }
 
         do_accept();

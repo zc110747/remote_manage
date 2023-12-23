@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//  (c) copyright 2022-by Persional Inc.  
+//  (c) copyright 2022-by Persional Inc.
 //  All Rights Reserved
 //
 //  Name:
@@ -19,18 +19,18 @@
 //      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
 #include "time_manage.hpp"
-#include "logger_server.hpp"
+#include "logger_manage.hpp"
 
 time_manage *time_manage::instance_pointer_ = nullptr;
 
 time_manage *time_manage::get_instance()
 {
-    if(instance_pointer_ == nullptr)
+    if (instance_pointer_ == nullptr)
     {
         instance_pointer_ = new(std::nothrow) time_manage();
-        if(instance_pointer_ == nullptr)
+        if (instance_pointer_ == nullptr)
         {
-            PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "time_manage new error!");
+            PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "time_manage new error!");
         }
     }
     return instance_pointer_;
@@ -44,9 +44,9 @@ void time_manage::run()
     ticks_ += peroid_;
 
     std::lock_guard<std::mutex> lock{mutex_};
-    while(iter != time_action_vec_.end())
+    while (iter != time_action_vec_.end())
     {
-        if(iter->get_action_times() == 0)
+        if (iter->get_action_times() == 0)
         {
             iter = time_action_vec_.erase(iter);
         }
@@ -74,9 +74,9 @@ bool time_manage::remove_action(uint32_t id)
     auto iter = time_action_vec_.begin();  
 
     std::lock_guard<std::mutex> lock{mutex_};
-    while(iter != time_action_vec_.end())
+    while (iter != time_action_vec_.end())
     {
-        if(iter->get_event_id() == id)
+        if (iter->get_event_id() == id)
         {
             iter = time_action_vec_.erase(iter);
         }
@@ -106,3 +106,9 @@ uint32_t xGetCurrentPeroid(void)
 {
     return time_manage::get_instance()->get_current_period();
 }
+
+uint32_t xGetCurrentTimes(void)
+{
+    return xGetCurrentTicks()/1000;
+}
+

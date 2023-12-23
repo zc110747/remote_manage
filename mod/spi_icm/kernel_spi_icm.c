@@ -236,7 +236,7 @@ static ssize_t icm20608_read(struct file *filp, char __user *buf, size_t cnt, lo
 	data[6] = p_info->temp_adc;
 	err = copy_to_user(buf, data, sizeof(data));
 
-	if(err != 0) 
+	if (err != 0) 
 		return err;
 	return cnt;
 }
@@ -275,20 +275,20 @@ static int icm_hardware_init(struct spi_device *spi)
 
 	/* 获取设备树中cs片选信号 */
 	icm_info.dev.nd = of_find_node_by_path("/soc/aips-bus@02000000/spba-bus@02000000/ecspi@02010000");
-	if(icm_info.dev.nd== NULL) {
+	if (icm_info.dev.nd== NULL) {
 		printk("ecspi3 node not find!\r\n");
 		return -EINVAL;
 	} 
 
 	/* 2、 获取设备树中的gpio属性，得到BEEP所使用的BEEP编号 */
 	icm_info.dev.cs_gpio = of_get_named_gpio(icm_info.dev.nd, "cs-gpio", 0);
-	if(icm_info.dev.cs_gpio < 0) {
+	if (icm_info.dev.cs_gpio < 0) {
 		printk("can't get cs-gpio");
 		return -EINVAL;
 	}
 
 	/* 3、设置GPIO1_IO20为输出，并且输出高电平 */
-	if(gpio_direction_output(icm_info.dev.cs_gpio, 1) < 0) {
+	if (gpio_direction_output(icm_info.dev.cs_gpio, 1) < 0) {
 		printk("can't set gpio!\r\n");
 	}
 
@@ -330,7 +330,7 @@ static int icm20608_probe(struct spi_device *spi)
 	int ret = 0;
 
 	ret = icm_hardware_init(spi);
-	if(ret != 0){
+	if (ret != 0){
 		printk("icm hardware init failed!\r\n");
 		return -EINVAL;
 	}

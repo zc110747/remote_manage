@@ -27,27 +27,27 @@ public:
     int DeviceRead(uint8_t *pStart, uint16_t nMaxSize){
         uint16_t nReadSize = 0;
 
-        if(m_pUdpSocket->hasPendingDatagrams())
+        if (m_pUdpSocket->hasPendingDatagrams())
         {
           nReadSize = m_pUdpSocket->readDatagram((char *)pStart, nMaxSize, m_pServerIp, &m_nPort);
         }
         return nReadSize;
-    };
+    }
 
     int DeviceWrite(uint8_t *pStart, uint16_t nSize){
         //qDebug()<<*m_pServerIp<<"Port"<<m_nPort;
 
         return m_pUdpSocket->writeDatagram((char *)pStart, nSize, *m_pServerIp, m_nPort);
-    };
+    }
 
     void SetSocketInfo(QString SServerIpAddress, QString SLocalIpAddress, quint16 nPort)
     {
         m_nPort = nPort;
-        if(!m_pServerIp->setAddress(SServerIpAddress)){
+        if (!m_pServerIp->setAddress(SServerIpAddress)){
             qDebug()<<"SetAddress error\n";
         }
 
-        if(!m_pLocalIp->setAddress(SLocalIpAddress)){
+        if (!m_pLocalIp->setAddress(SLocalIpAddress)){
             qDebug()<<"SetAddress error\n";
         }
         //qDebug()<<SServerIpAddress<<"Port"<<nPort;

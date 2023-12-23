@@ -1,16 +1,16 @@
-#include "stdio.h"
-#include "unistd.h"
-#include "sys/types.h"
-#include "sys/stat.h"
-#include "sys/ioctl.h"
-#include "fcntl.h"
-#include "stdlib.h"
-#include "string.h"
-#include <poll.h>
-#include <sys/select.h>
-#include <sys/time.h>
-#include <signal.h>
+/*
+ * File      : icm_spi_test.c
+ * test for icm spi driver.
+ * COPYRIGHT (C) 2023, zc
+ *
+ * Change Logs:
+ * Date           Author       Notes
+ * 2023-11-22     zc           the first version
+ */
+
 #include <fcntl.h>
+#include <stdio.h>
+#include <unistd.h>
 
 #define ICM_DEV_NAME "/dev/icm20608"
 /*
@@ -34,15 +34,16 @@ int main(int argc, char *argv[])
 	int ret = 0;
 
 	fd = open(ICM_DEV_NAME, O_RDWR);
-	if(fd < 0) {
+	if (fd < 0) {
 		printf("can't open file %s\r\n", ICM_DEV_NAME);
 		return -1;
 	}
 
-	while (1) {
+	while (1) 
+	{
 		ret = read(fd, databuf, sizeof(databuf));
-		if(ret >= 0) { 			/* 数据读取成功 */
-
+		if (ret >= 0) 
+		{
 			gyro_x_adc = databuf[0];
 			gyro_y_adc = databuf[1];
 			gyro_z_adc = databuf[2];
@@ -72,6 +73,7 @@ int main(int argc, char *argv[])
 		}
 		sleep(1);
 	}
+	
 	close(fd);	/* 关闭文件 */	
 	return 0;
 }

@@ -42,7 +42,7 @@ Vue.createApp({
         },
 
         changeShow: function(val){
-            if(val == 0)
+            if (val == 0)
                 this.isShow = true;
             else
                 this.isShow = false;
@@ -50,7 +50,7 @@ Vue.createApp({
 
         dataRefresh: function(){
             let t = this;
-            if(this.intervalId != null){
+            if (this.intervalId != null){
                 return;
             }
             this.intervalId = setInterval(() => {
@@ -60,7 +60,7 @@ Vue.createApp({
                 }).then(res=>{
                     console.log(res.data)
                     for (let key in res.data){
-                        if(t.deviceInfo.hasOwnProperty(key)){
+                        if (t.deviceInfo.hasOwnProperty(key)){
                             t.deviceInfo[key] = res.data[key]
                         }
                     }

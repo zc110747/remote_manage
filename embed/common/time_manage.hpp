@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//  (c) copyright 2022-by Persional Inc.  
+//  (c) copyright 2022-by Persional Inc.
 //  All Rights Reserved
 //
 //  Name:
@@ -53,7 +53,7 @@ public:
     /// - This method is used to stop one timer_struct thread
     void stop()
     {
-        if(stop_loop_)
+        if (stop_loop_)
             return;
         
         stop_loop_ = true;
@@ -61,18 +61,17 @@ public:
     }
 
 private:
-
     /// \brief stop
     /// - This method is used to run the truth thread.
     void run()
     {
         stop_loop_ = false;
 
-        while(!stop_loop_)
+        while (!stop_loop_)
         {
             std::unique_lock<std::mutex> lock{mutex_};
             auto stauts = cond.wait_for(lock, std::chrono::milliseconds(millisecond_));
-            if(stauts == std::cv_status::timeout)
+            if (stauts == std::cv_status::timeout)
             {
                 timeout_handler_();
             }
@@ -129,9 +128,9 @@ public:
     /// - This method is used to run every time loop.
     void action()
     {
-        if(action_times_ >0 && is_match())
+        if (action_times_ >0 && is_match())
         {
-            if(action_times_ != TIME_ACTION_ALWAYS)
+            if (action_times_ != TIME_ACTION_ALWAYS)
             {
                 action_times_--;
             }
@@ -158,7 +157,7 @@ private:
     {
         tick_count_++;
 
-        if(tick_count_ >= tick_compare_)
+        if (tick_count_ >= tick_compare_)
         {
             tick_count_ = 0;
             return true;
@@ -271,3 +270,4 @@ private:
 
 uint32_t xGetCurrentTicks(void);
 uint32_t xGetCurrentPeroid(void);
+uint32_t xGetCurrentTimes(void); //time second.

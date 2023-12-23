@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//  (c) copyright 2022-by Persional Inc.  
+//  (c) copyright 2022-by Persional Inc.
 //  All Rights Reserved
 //
 //  Name:
@@ -22,11 +22,21 @@ _Pragma("once")
 
 #define S_FIFO_WORK_MODE               (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)  
 
+typedef enum
+{
+    FIFO_MODE_WR_CREATE = 0,
+    FIFO_MODE_R_CREATE,
+    FIFO_MODE_W_CREATE, 
+    FIFO_MODE_WR,
+    FIFO_MODE_R,
+    FIFO_MODE_W,
+}ENUM_FIFO_MODE;
+
 class fifo_manage final
 {
 public:
     /// \brief constructor
-    fifo_manage(const std::string& fstr, int mode);
+    fifo_manage(const std::string& fstr, int mode, ENUM_FIFO_MODE fifomode=FIFO_MODE_WR_CREATE);
 
     /// \brief destructor
     ~fifo_manage();
@@ -48,11 +58,23 @@ public:
     /// \param buf - pointer to the start of write data.
     /// \param bufsize -size of the data write to fifo.
     /// \return data alread write to fifo
-    int write(char *buf, int bufsize);
+    int write(const char *buf, int bufsize);
 
     /// \brief release
     /// - This method is used to close the fifo already open.
     void release();   
+
+    /// \brief is_write_valid
+    /// - This method is used to check wheather write valid.
+    bool is_write_valid()
+    {
+        if (writefd_ < 0)
+        {
+            return false;
+        }
+
+        return true;
+    }
 
 private:
     /// \brief fifo_path_
@@ -63,11 +85,15 @@ private:
     /// - the open mode of the fifo
     int mode_;
 
+    /// \brief mode_
+    /// - the fifo run mode
+    ENUM_FIFO_MODE fifo_mode_;
+
     /// \brief readfd_
     /// - the fd of the fifo to read. 
-    int readfd_;
+    int readfd_{-1};
 
     /// \brief writefd_
     /// - the fd of the fifo to write. 
-    int writefd_;
+    int writefd_{-1};
 };

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//  (c) copyright 2022-by Persional Inc.  
+//  (c) copyright 2022-by Persional Inc.
 //  All Rights Reserved
 //
 //  Name:
@@ -19,14 +19,14 @@
 
 #include <map>
 #include "key.hpp"
-#include "logger_server.hpp"
+#include "logger_manage.hpp"
 #include "common.hpp"
 
 static std::map<int, std::function<void(int)>> FuncList;
 
 static void sigio_signal_func(int signum)
 {
-    for(auto &&func : FuncList)
+    for (auto &&func : FuncList)
     {
         func.second(func.first);
     }
@@ -38,7 +38,7 @@ bool key_device::init(const std::string &DevicePath, int flags)
     device_path_ = DevicePath;
 
     device_fd_ = ::open(device_path_.c_str(), flags);
-    if(device_fd_ < 0)
+    if (device_fd_ < 0)
     {
         PRINT_LOG(LOG_INFO, 0, "open %s device failed!", device_path_.c_str());
         return false;
@@ -47,7 +47,7 @@ bool key_device::init(const std::string &DevicePath, int flags)
     {
         PRINT_LOG(LOG_INFO, 0, "open %s device success, fd:%d!", device_path_.c_str(), device_fd_);
 
-        if(is_first_run)
+        if (is_first_run)
         {
             PRINT_LOG(LOG_INFO, 0, "sigio register!");
             signal(SIGIO, sigio_signal_func);
@@ -62,7 +62,7 @@ bool key_device::init(const std::string &DevicePath, int flags)
 
 bool key_device::register_func(std::function<void(int)> func)
 {
-    if(device_fd_ >= 0)
+    if (device_fd_ >= 0)
     {
         FuncList.insert(std::make_pair(device_fd_, func));
         PRINT_LOG(LOG_INFO, 0, "key register, totol:%d!", FuncList.size());

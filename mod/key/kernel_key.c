@@ -133,14 +133,16 @@ void key_timer_func(unsigned long arg)
     unsigned char value;
 
     value = gpio_get_value(key_driver_info.key_gpio);
-    if(value == 0){
+    if (value == 0)
+    {
         atomic_set(&key_driver_info.key_value, KEY0_VALUE);
         atomic_set(&key_driver_info.key_interrupt, 1);
         printk(KERN_INFO"key interrupt!\r\n");
     }
 
-    if(atomic_read(&key_driver_info.key_interrupt)){
-        if(key_driver_info.key_async_queue)
+    if (atomic_read(&key_driver_info.key_interrupt))
+    {
+        if (key_driver_info.key_async_queue)
             kill_fasync(&key_driver_info.key_async_queue, SIGIO, POLL_IN);
     }
 }
@@ -158,14 +160,16 @@ static int key_gpio_init(void)
 
     /*1.获取设备节点*/
     key_driver_info.nd = of_find_node_by_path(TREE_NODE_NAME);
-    if(key_driver_info.nd == NULL){
+    if (key_driver_info.nd == NULL)
+    {
         printk(KERN_INFO"Node %s no find!\n", TREE_NODE_NAME);
         return -EINVAL;
     }
 
     /*2.获取设备树中的gpio属性编号*/
     key_driver_info.key_gpio = of_get_named_gpio(key_driver_info.nd, TREE_GPIO_NAME, 0);
-    if(key_driver_info.key_gpio < 0){
+    if (key_driver_info.key_gpio < 0) 
+    {
         printk(KERN_INFO"Gpio %s no find\n", TREE_GPIO_NAME);
         return -EINVAL;
     }
@@ -173,7 +177,8 @@ static int key_gpio_init(void)
     /*3.设置key对应GPIO为输入状态*/
     devm_gpio_request(key_driver_info.device, key_driver_info.key_gpio, "key0");
     ret = gpio_direction_input(key_driver_info.key_gpio);
-    if(ret < 0){
+    if (ret < 0)
+    {
         printk(KERN_INFO"Key gpio request and config error\n");
         return -EINVAL;
     }
@@ -185,7 +190,8 @@ static int key_gpio_init(void)
                             key_driver_info.key_irq_num, key0_handler, 
                             IRQF_TRIGGER_FALLING,       "key0", 
                             &key_driver_info);
-    if(ret<0){
+    if (ret<0)
+    {
         printk(KERN_INFO"key interrupt config error\n");
         return -EINVAL;
     }
@@ -216,7 +222,7 @@ static void key_gpio_release(void)
     devm_gpio_free(key_driver_info.device, key_driver_info.key_gpio);
 
     /*释放中断资源*/
-    if(key_driver_info.key_irq_num > 0)
+    if (key_driver_info.key_irq_num > 0)
     {
         devm_free_irq(key_driver_info.device, key_driver_info.key_irq_num, &key_driver_info);
         key_driver_info.key_irq_num = -1;
@@ -233,7 +239,7 @@ static void key_gpio_release(void)
  */
 int key_open(struct inode *inode, struct file *filp)
 {
-    if(!atomic_dec_and_test(&key_driver_info.lock))
+    if (!atomic_dec_and_test(&key_driver_info.lock))
     {
         atomic_inc(&key_driver_info.lock); //atomic_dec_and_test会执行减操作，此处恢复
         return -EBUSY;
@@ -274,13 +280,14 @@ ssize_t key_read(struct file *filp, char __user *buf, size_t count, loff_t *f_po
     int ret;
     struct key_info *dev = (struct key_info*)filp->private_data;
 
-    if (filp->f_flags & O_NONBLOCK)	{ /* 非阻塞访问 */
+    if (filp->f_flags & O_NONBLOCK)	
+    {
         /* 没有按键按下，返回-EAGAIN */
-		if(atomic_read(&dev->key_interrupt) == 0)	
+		if (atomic_read(&dev->key_interrupt) == 0)	
 			return -EAGAIN;
-	} 
+	}
     else 
-    {						
+    {					
 		/* 加入等待队列，等待被唤醒,也就是有按键按下 */
  		ret = wait_event_interruptible(dev->key_wait, atomic_read(&dev->key_interrupt)); 
 		if (ret) 
@@ -294,7 +301,8 @@ ssize_t key_read(struct file *filp, char __user *buf, size_t count, loff_t *f_po
     atomic_set(&dev->key_value, KEYINVALD_VALUE);
     atomic_set(&dev->key_interrupt, 0);
     result = copy_to_user(buf, &databuf, 1);
-    if(result < 0) {
+    if (result < 0)
+    {
 		printk(KERN_INFO"kernel read failed!\r\n");
 		return -EFAULT;
 	}
@@ -344,16 +352,20 @@ static int key_probe(struct platform_device *dev)
     key_driver_info.minor = DEFAULT_MINOR;
 
     /*1.申请字符设备号*/
-    if(key_driver_info.major){
+    if (key_driver_info.major)
+    {
         key_driver_info.dev_id = MKDEV(key_driver_info.major, key_driver_info.minor);
         result = register_chrdev_region(key_driver_info.dev_id, DEVICE_KEY_CNT, DEVICE_KEY_NAME);
     }
-    else{
+    else
+    {
         result = alloc_chrdev_region(&key_driver_info.dev_id, 0, DEVICE_KEY_CNT, DEVICE_KEY_NAME);
         key_driver_info.major = MAJOR(key_driver_info.dev_id);
         key_driver_info.minor = MINOR(key_driver_info.dev_id);
     }
-    if(result < 0){
+
+    if (result < 0)
+    {
         DRIVE_DEBUG(KERN_INFO"Device alloc or set failed!\r\n");	
         goto exit;
     }
@@ -365,7 +377,7 @@ static int key_probe(struct platform_device *dev)
     cdev_init(&key_driver_info.cdev, &key_fops);
     key_driver_info.cdev.owner = THIS_MODULE;
     result = cdev_add(&key_driver_info.cdev, key_driver_info.dev_id, DEVICE_KEY_CNT);
-    if(result != 0){
+    if (result != 0){
         DRIVE_DEBUG(KERN_INFO"Device cdev_add failed!\r\n");
         goto exit_cdev_add;
     }
@@ -373,7 +385,8 @@ static int key_probe(struct platform_device *dev)
     
     /* 3、创建类 */
 	key_driver_info.class = class_create(THIS_MODULE, DEVICE_KEY_NAME);
-	if (IS_ERR(key_driver_info.class)) {
+	if (IS_ERR(key_driver_info.class))
+    {
 		DRIVE_DEBUG(KERN_INFO"class create failed!\r\n");
         result = PTR_ERR(key_driver_info.class);
 		goto exit_class_create;
@@ -383,7 +396,8 @@ static int key_probe(struct platform_device *dev)
 	/* 4、创建设备 */
 	key_driver_info.device = device_create(key_driver_info.class, NULL, key_driver_info.dev_id, 
                                         NULL, DEVICE_KEY_NAME);
-	if (IS_ERR(key_driver_info.device)) {
+	if (IS_ERR(key_driver_info.device))
+    {
 		DRIVE_DEBUG(KERN_INFO"device create failed!\r\n");
         result = PTR_ERR(key_driver_info.device);
 		goto exit_device_create;
@@ -392,7 +406,8 @@ static int key_probe(struct platform_device *dev)
 
     //key按键相关初始化(带中断)
     result = key_gpio_init();
-    if(result != 0){
+    if (result != 0)
+    {
         printk(KERN_INFO"Key gpio init failed!\r\n");
         goto exit_key_gpio_init;
     }
@@ -458,8 +473,11 @@ static int __init key_module_init(void)
 {
     int status;
     status = platform_driver_register(&key_driver);
-    if(status != 0)
+    if (status != 0)
+    {
         printk("%d\r\n", status);
+    }
+
     return status;
 }
 

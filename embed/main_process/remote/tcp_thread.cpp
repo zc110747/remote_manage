@@ -1,5 +1,5 @@
 ﻿//////////////////////////////////////////////////////////////////////////////
-//  (c) copyright 2022-by Persional Inc.  
+//  (c) copyright 2022-by Persional Inc.
 //  All Rights Reserved
 //
 //  Name:
@@ -27,7 +27,7 @@ void tcp_thread_manage::tcp_server_run()
     const auto& ipaddr = system_config::get_instance()->get_ipaddress();
     const auto& port = system_config::get_instance()->get_local_port();
 
-    PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "tcp info:%s:%d", ipaddr.c_str(), port);
+    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "tcp info:%s:%d", ipaddr.c_str(), port);
     try
     {
         socket_tcp_server.init(ipaddr, std::to_string(port), [this](char* ptr, int length){
@@ -37,7 +37,7 @@ void tcp_thread_manage::tcp_server_run()
     }
     catch (std::exception& e)
     {
-        PRINT_LOG(LOG_DEBUG, xGetCurrentTicks(), "tcp_thread_manage, Exception:%s", e.what());
+        PRINT_LOG(LOG_DEBUG, xGetCurrentTimes(), "tcp_thread_manage, Exception:%s", e.what());
     }
 }
 
@@ -46,18 +46,18 @@ void tcp_thread_manage::tcp_rx_run()
     char data;
     ENUM_PROTOCOL_STATUS status;
 
-    while(1)
+    while (1)
     {
-        if(tcp_protocol_pointer_->read_rx_fifo(&data, 1) > 0)
+        if (tcp_protocol_pointer_->read_rx_fifo(&data, 1) > 0)
         {
             status = tcp_protocol_pointer_->check_rx_frame(data);
-            if(status == ROTOCOL_FRAME_FINISHED)
+            if (status == ROTOCOL_FRAME_FINISHED)
             {
                 //if process, clear data received.
                 tcp_protocol_pointer_->process_rx_frame();
                 tcp_protocol_pointer_->clear_rx_info();
             }
-            else if(status == PROTOCOL_FRAME_EMPTY)
+            else if (status == PROTOCOL_FRAME_EMPTY)
             {
                 tcp_protocol_pointer_->clear_rx_info();
             }
@@ -71,7 +71,7 @@ void tcp_thread_manage::tcp_rx_run()
 
 int tcp_thread_manage::send_msg(char *buffer, uint16_t size)
 {
-    if(socket_tcp_server.is_valid())
+    if (socket_tcp_server.is_valid())
     {
         return tcp_protocol_pointer_->send_data(buffer, size);
     }
@@ -80,23 +80,18 @@ int tcp_thread_manage::send_msg(char *buffer, uint16_t size)
 
 void tcp_thread_manage::tcp_tx_run()
 {
-    ENUM_PROTOCOL_STATUS status;
     int size;
     char buffer[TX_BUFFER_SIZE];
 
-    while(1)
+    while (1)
     {
         size = tcp_protocol_pointer_->read_tx_fifo(buffer, TX_BUFFER_SIZE);
-        if(size > 0)
+        if (size > 0)
         {
-            if(socket_tcp_server.is_valid())
+            if (socket_tcp_server.is_valid())
             {
                 socket_tcp_server.do_write(buffer, size);
             }
-        }
-        else
-        {
-            //do nothing
         }
     }
 }
@@ -105,18 +100,18 @@ bool tcp_thread_manage::init()
 {
     //must creat fifo before thread start
     tcp_protocol_pointer_ = std::make_unique<protocol_info>();
-    if(tcp_protocol_pointer_ == nullptr)
+    if (tcp_protocol_pointer_ == nullptr)
     {
-        PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "tcp_protocol_pointer_ create failed!");
+        PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "tcp_protocol_pointer_ create failed!");
         return false;
     }
 
     auto ret = tcp_protocol_pointer_->init(SOCKET_TCP_RX_FIFO, SOCKET_TCP_TX_FIFO,  [](char *ptr, int size){
         socket_tcp_server.do_write(ptr, size);
     });
-    if(!ret)
+    if (!ret)
     {
-        PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "tcp_protocol_pointer_ init failed!");
+        PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "tcp_protocol_pointer_ init failed!");
         return false;
     }
 
@@ -127,19 +122,19 @@ bool tcp_thread_manage::init()
     tcp_tx_thread_ = std::thread(std::bind(&tcp_thread_manage::tcp_tx_run, this));
     tcp_tx_thread_.detach();
 
-    PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "tcp thread init success!");
+    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "tcp thread init success!");
     return true;
 }
 
 tcp_thread_manage* tcp_thread_manage::instance_pointer_ = nullptr;
 tcp_thread_manage* tcp_thread_manage::get_instance()
 {
-    if(instance_pointer_ == nullptr)
+    if (instance_pointer_ == nullptr)
     {
         instance_pointer_ = new(std::nothrow) tcp_thread_manage;
-        if(instance_pointer_ == nullptr)
+        if (instance_pointer_ == nullptr)
         {
-            PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Tcp thread manage new failed!");
+            PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "Tcp thread manage new failed!");
         }
     }
     return instance_pointer_;

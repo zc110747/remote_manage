@@ -1,10 +1,16 @@
-
-#include<unistd.h>
-#include<sys/types.h>
-#include<sys/stat.h>
+/*
+ * File      : led_test.c
+ * test for led driver.
+ * COPYRIGHT (C) 2023, zc
+ *
+ * Change Logs:
+ * Date           Author       Notes
+ * 2023-11-22     zc           the first version
+ */
 #include<fcntl.h>
 #include<stdio.h>
 #include<stdlib.h>
+#include<unistd.h>
 
 /**
  * 测试LED工作
@@ -19,13 +25,13 @@ int main(int argc, const char *argv[])
     int fd;
 
     fd = open("/dev/led", O_RDWR | O_NDELAY);
-    if(fd == -1)
+    if (fd == -1)
     {
         printf("/dev/led open error");
         return -1;
     }
 
-    if(argc > 1){   
+    if (argc > 1){   
         val = atoi(argv[1]);
     }
 

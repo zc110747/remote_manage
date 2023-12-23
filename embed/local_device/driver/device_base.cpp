@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//  (c) copyright 2022-by Persional Inc.  
+//  (c) copyright 2022-by Persional Inc.
 //  All Rights Reserved
 //
 //  Name:
@@ -16,7 +16,7 @@
 //  Assumptions:
 //
 //  Revision History:
-//      12/19/2022   Create New Version	
+//      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
 #include "device_base.hpp"
 
@@ -43,7 +43,7 @@ device_base::~device_base()
 bool device_base::open(int flags)
 {
     device_fd_ = ::open(device_path_.c_str(), flags);
-    if(device_fd_ == -1)
+    if (device_fd_ == -1)
     {
         PRINT_LOG(LOG_INFO, 0, "open %s device failed!", device_path_.c_str());
         return false;
@@ -61,7 +61,7 @@ bool device_base::init(const std::string &DevicePath, int flags)
 
 void device_base::close()
 {
-    if(device_fd_ != 1)
+    if (device_fd_ != 1)
     {
         device_fd_ = -1;
         ::close(device_fd_);
@@ -73,10 +73,10 @@ bool io_base::read_io_status()
     bool ret = false;
     ssize_t nSize;
 
-    if(device_fd_ >= 0)
+    if (device_fd_ >= 0)
     {
         nSize = ::read(device_fd_, &status_, 1);  //将数据写入ledBase
-        if(nSize > 0)
+        if (nSize > 0)
         {
             ret = true;
         }
@@ -89,10 +89,10 @@ bool io_base::write_io_status(uint8_t status)
     bool ret = false;
     ssize_t nSize;
 
-    if(device_fd_ >= 0)
+    if (device_fd_ >= 0)
     {
         nSize = ::write(device_fd_, &status, 1);  //将数据写入ledBase
-        if(nSize > 0)
+        if (nSize > 0)
         {
             ret = true;
         }
@@ -114,9 +114,9 @@ bool io_base::trigger()
 {
     bool ret = false;
     
-    if(read_io_status())
+    if (read_io_status())
     {
-        if(status_)
+        if (status_)
             ret = off();
         else
             ret = on();

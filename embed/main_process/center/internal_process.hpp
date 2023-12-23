@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//  (c) copyright 2022-by Persional Inc.  
+//  (c) copyright 2022-by Persional Inc.
 //  All Rights Reserved
 //
 //  Name:
@@ -19,8 +19,9 @@
 _Pragma("once")
 
 #include "common.hpp"
-#include "logger_server.hpp"
+#include "logger_manage.hpp"
 #include "device_manage.hpp"
+#include "cmd_process.hpp"
 
 class internal_process final
 {

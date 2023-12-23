@@ -44,7 +44,6 @@ if [ ! -d "$GLOBAL_PROGRAM_PATH" ]; then
 
     #构建系统需要的环境信息
     mkdir -p ${GLOBAL_PROGRAM_DOWNLOAD}/tmp
-    mkdir -p ${GLOBAL_PROGRAM_THIRDPARTS}
     mkdir -p ${GLOBAL_PROGRAM_INSTALL}/arm
     mkdir -p ${GLOBAL_PROGRAM_INSTALL}/i386
     mkdir -p ${GLOBAL_PROGRAM_SUPPORT}/compiler
@@ -67,7 +66,6 @@ fi
 
 echo "now put file used into the environment."
 echo "  ${greenText}${GLOBAL_PROGRAM_DOWNLOAD}/${defText}           :下载的各类软件，安装包或者编译的库源码"
-echo "  ${greenText}${GLOBAL_PROGRAM_THIRDPARTS}/${defText}         :第三方库解压后存放目录，用于编译"
 echo "  ${greenText}${GLOBAL_PROGRAM_INSTALL}/${defText}            :用于安装库的目录"
 echo "  ${greenText}${GLOBAL_PROGRAM_SUPPORT}/compiler/${defText}   :交叉编译工具, 将arm-gcc解压后内部文件复制到此目录下"
 echo "  ${greenText}${GLOBAL_PROGRAM_SUPPORT}/uboot/${defText}      :uboot目录, 用于编译uboot的源码"

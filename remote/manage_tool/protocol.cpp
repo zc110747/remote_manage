@@ -54,9 +54,9 @@ static uint16_t const crc16_table[256] = {
 */
 int protocol_info::CreateSendBuffer(uint8_t nId, uint16_t nSize, uint8_t *pStart, bool bWriteThrough)
 {
-    if(m_pTxBuffer != nullptr)
+    if (m_pTxBuffer != nullptr)
     {
-        if(bWriteThrough == false)
+        if (bWriteThrough == false)
         {
             uint16_t nTotalSize, nIndex;
             uint16_t nCrcVal;
@@ -78,9 +78,9 @@ int protocol_info::CreateSendBuffer(uint8_t nId, uint16_t nSize, uint8_t *pStart
             m_pTxBuffer[nTotalSize++] = (uint8_t)(random>>8);
             m_pTxBuffer[nTotalSize++] = (uint8_t)(random&0xff);
 
-            if(nSize != 0 && pStart != NULL)
+            if (nSize != 0 && pStart != NULL)
             {
-                for(nIndex=0; nIndex<nSize; nIndex++)
+                for (nIndex=0; nIndex<nSize; nIndex++)
                 {
                     m_pTxBuffer[nTotalSize++] = *(pStart+nIndex);
                 }
@@ -137,7 +137,7 @@ uint16_t crc16(uint16_t crc, uint8_t const *buffer, uint16_t len)
 uint16_t protocol_info::calculate_crc(uint8_t *pStart, int nSize)
 {
     uint16_t nCrcOut;
-    if(pStart == NULL || nSize == 0)
+    if (pStart == NULL || nSize == 0)
     {
         return 0;
     }
@@ -161,10 +161,10 @@ int protocol_info::CheckReceiveData(bool IsSignalCheckHead)
 
     do
     {
-        if(m_RxBufSize == 0 && IsSignalCheckHead == false)
+        if (m_RxBufSize == 0 && IsSignalCheckHead == false)
         {
             nRead = DeviceRead(&m_pRxBuffer[m_RxBufSize], 1);
-            if(nRead > 0 && m_pRxBuffer[0] == PROTOCOL_RECV_HEAD)
+            if (nRead > 0 && m_pRxBuffer[0] == PROTOCOL_RECV_HEAD)
             {
                 m_RxBufSize++;
                 m_RxTimout = 0;
@@ -176,12 +176,12 @@ int protocol_info::CheckReceiveData(bool IsSignalCheckHead)
             }
         }
 
-        if(m_RxBufSize > 0 || IsSignalCheckHead == true)
+        if (m_RxBufSize > 0 || IsSignalCheckHead == true)
         {
             nRead = DeviceRead(&m_pRxBuffer[m_RxBufSize], m_MaxBufSize-m_RxBufSize);
-            if(nRead > 0)
+            if (nRead > 0)
             {
-                if(IsSignalCheckHead == true && m_pRxBuffer[0] != PROTOCOL_RECV_HEAD)
+                if (IsSignalCheckHead == true && m_pRxBuffer[0] != PROTOCOL_RECV_HEAD)
                 {
                     m_RxBufSize = 0;
                     return RT_FAIL;
@@ -189,18 +189,18 @@ int protocol_info::CheckReceiveData(bool IsSignalCheckHead)
 
                 m_RxTimout = 0;
                 m_RxBufSize += nRead;
-                if(nRead >= PROTOCOL_RECV_HEAD_SIZE)
+                if (nRead >= PROTOCOL_RECV_HEAD_SIZE)
                 {
                     int nLen;
 
                     m_RxDataSize =  m_pRxBuffer[1]<<8 | m_pRxBuffer[2];
                     nLen = m_RxDataSize + PROTOCOL_RECV_HEAD_SIZE + PROTOCOL_CRC_SIZE;
-                    if(m_RxBufSize >= nLen)
+                    if (m_RxBufSize >= nLen)
                     {
                         /*计算head后到CRC尾之前的所有数据的CRC值*/
                         CrcRecv = (m_pRxBuffer[nLen-2]<<8) + m_pRxBuffer[nLen-1];
                         CrcCacl = calculate_crc(&m_pRxBuffer[1], nLen-PROTOCOL_CRC_SIZE-1);
-                        if(CrcRecv == CrcCacl)
+                        if (CrcRecv == CrcCacl)
                         {
                             #if TEST_DEBUG == 1
                             qDebug()<<"Protocol.cpp:Receive Ok";
@@ -221,16 +221,16 @@ int protocol_info::CheckReceiveData(bool IsSignalCheckHead)
             }
         }
 
-        if(m_RxTimout != 0)
+        if (m_RxTimout != 0)
         {
             QThread::msleep(1);
-            if(m_RxTimout > PROTOCOL_TIMEOUT)
+            if (m_RxTimout > PROTOCOL_TIMEOUT)
             {
                qDebug()<<QString("Receive timeout");
                return RT_TIMEOUT;
             }
         }
-    }while(1);
+    }while (1);
 
     return RT_OK;
 }

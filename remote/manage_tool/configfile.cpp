@@ -1,17 +1,33 @@
-
-#include "configfile.h"
+//////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2022-by Persional Inc.
+//  All Rights Reserved
+//
+//  Name:
+//      appthread.cpp
+//
+//  Purpose:
+//     
+//
+// Author:
+//     	@å¬å¿ƒè·³çš„å£°éŸ³
+//
+//  Assumptions:
+//
+//  Revision History:
+//      11/20/2023   Create New Version
+/////////////////////////////////////////////////////////////////////////////
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonParseError>
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonValue>
-
+#include "configfile.h"
 
 static struct SSystemConfig SystemConfigInfo;
 
 /*!
-   »ñÈ¡½çÃæµÄÅäÖÃÎÄ¼şĞÅÏ¢
+   ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½Ï¢
 */
 struct SSystemConfig *GetSystemConfigInfo(void)
 {
@@ -19,27 +35,27 @@ struct SSystemConfig *GetSystemConfigInfo(void)
 }
 
 /*!
-   ½çÃæµÄÅäÖÃÎÄ¼şĞÅÏ¢³õÊ¼»¯
+   ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½Ê¼ï¿½ï¿½
 */
 void SystemConfigInfoInit(void)
 {
     QFile file(DEFAULT_CONFIG_FILE);
 
     file.open(QIODevice::ReadOnly | QIODevice::Text);
-    if(file.isOpen())
+    if (file.isOpen())
     {
         QString JsonConfigString = file.readAll();
         file.close();
 
-        //½âÎöJsonµÄÅäÖÃĞÅÏ¢
+        //ï¿½ï¿½ï¿½ï¿½Jsonï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
         QJsonParseError parseJsonErr;
         QJsonDocument document = QJsonDocument::fromJson(JsonConfigString.toUtf8(),&parseJsonErr);
 
-        if(parseJsonErr.error == QJsonParseError::NoError)
+        if (parseJsonErr.error == QJsonParseError::NoError)
         {
             QJsonObject jsonObject = document.object();
             qDebug()<<jsonObject;
-            if(jsonObject.contains(QStringLiteral("Serial")))
+            if (jsonObject.contains(QStringLiteral("Serial")))
             {
                 QJsonValue jsonValueList = jsonObject.value(QStringLiteral("Serial"));
                 SystemConfigInfo.m_SCom = jsonValueList.toObject()["Com"].toString();
@@ -49,13 +65,13 @@ void SystemConfigInfoInit(void)
                 SystemConfigInfo.m_SParity = jsonValueList.toObject()["Parity"].toString();
             }
 
-            if(jsonObject.contains(QStringLiteral("Device")))
+            if (jsonObject.contains(QStringLiteral("Device")))
             {
                 QJsonValue jsonValueList = jsonObject.value(QStringLiteral("ID"));
                 SystemConfigInfo.m_SDeviceID = jsonValueList.toObject()["ID"].toString();
             }
 
-            if(jsonObject.contains(QStringLiteral("Socket")))
+            if (jsonObject.contains(QStringLiteral("Socket")))
             {
                 QJsonValue jsonValueList = jsonObject.value(QStringLiteral("Socket"));
                 SystemConfigInfo.m_SProtocol = jsonValueList.toObject()["Protocol"].toString();
@@ -78,14 +94,14 @@ void SystemConfigInfoInit(void)
 }
 
 /*!
-   Éú³ÉJsonÊı¾İ£¬²¢Ğ´ÈëÎÄ¼ş
+   ï¿½ï¿½ï¿½ï¿½Jsonï¿½ï¿½ï¿½İ£ï¿½ï¿½ï¿½Ğ´ï¿½ï¿½ï¿½Ä¼ï¿½
 */
 void SystemConfigUpdate(void)
 {
     QFile file(DEFAULT_CONFIG_FILE);
 
     file.open(QIODevice::WriteOnly | QIODevice::Text);
-    if(file.isOpen())
+    if (file.isOpen())
     {
         QJsonObject MainObject;
         QJsonObject rootSerialObj;

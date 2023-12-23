@@ -2,10 +2,25 @@
 
 ## 项目说明
 
-本项目包含嵌入式Linux从平台构建，项目管理，内核驱动，应用开发的大部分功能，项目支持**Linux(x86), Linux(arm-nxp im6ull), Linux(aarch64-全志h618)**平台，使用相应的编译工具进行编译。项目运行需要支持库**libssl.so, libcrypto.so, libcjson.so, libmosquitto.so, libmosquittopp.so**, 上述库的编译参考thirdparts目录下的说明进行编译。
+本项目用于实现具有远程访问，权限控制，调试管理，本机硬件读取和设置，下位机管理的嵌入式Linux应用和驱动开发综合产品。内部实现平台构建，项目管理，内核驱动开发，应用开发等部分，项目支持在arm和aarch64平台，并提供相应的构建工具和编译平台，本项目已经验证的芯片平台。
+
+- ARM平台: NXP I.MX6ull, 正点原子阿尔法开发板.
+- AARCH64平台: 全志H616, WalnutPi.
 
 - 项目地址: <https://github.com/zc110747/remote_manage.git>
 - 配合的文档地址: <https://github.com/zc110747/build_embed_linux_system.git>
+
+产品的目录如下所示：
+
+- build             Makefile编译脚本。
+- buildout          嵌入式端编译文件输出目录。
+- doc               设计文档资料
+- embed             嵌入式Linux应用
+- env               用于构建环境的脚本
+- mod               嵌入式Linux驱动和设备树
+- remote            PC端应用
+- rootfs            支持文件系统运行的其它文件，在执行构建时拷贝到目的文件系统中
+- thirdparts        支持应用编译的第三方库。
 
 ## 项目框架
 
@@ -23,9 +38,10 @@ git clone https://github.com/zc110747/remote_manage.git
 cd remote_mange/
 
 #set executable command for sh
-sudo chmod -Rv 777 *.sh
+sudo chmod 777 *.sh
 
 #prepare for the environment
+#此命令会安装必要的库，并基于/home/program构建一套包含编译工具，命令行等的方案
 ./preBuildEnvironment.sh all
 ```
 
@@ -46,30 +62,37 @@ Current Firmware Version is 1.0.0.8.
 Update the Alias Command...
 Update the Alias Command Success!
 -------------------------------------------------------------------------
-
-#进入当前项目目录
-cda
-
-#下载第三方应用, 编译当前平台的库文件
-SysPullAll
 ```
 
-在使用该平台前，需要搭建好支持uboot，kernal，rootfs编译的嵌入式Linux系统，并构建平台运行执行的环境(包含设备树，node执行环境)，如果希望从头开始构建系统，可以参考我专门的系列教程，另外本项目也是配合教程去学习。对于已经构建好能够执行的嵌入式Linux平台(阿尔法开发板为例)，使用如下命令可进行编译和上传文件包.
+如果出现了上述打印信息，表示编译环境加载完成，此时执行如下命令安装系统运行需要的库。
 
 ```shell
+#安装Debian系统和编译需要的第三方库
+SysPreThirdParts
+```
+
+上述命令会从对应软件官网下载指定的文件，国内可能访问较慢，可以将文件复制到"/home/program/download"中直接解压编译安装，对应文件包含如下:
+
+- openssl <https://www.openssl.org/source/openssl-3.1.4.tar.gz>
+- zlib <http://www.zlib.net/zlib-1.3.tar.gz>
+- mosquitto <https://mosquitto.org/files/source/mosquitto-2.0.18.tar.gz>
+
+此外还有一些库使用国内镜像库或者保存在本项目中，可以不直接下载，下面可以进行应用的编译。
+
+```shell
+#编译当前的所有应用
 SysBulidApplication
 ```
 
-即可完成项目的编译。
 另外可通过SysHelpCommand查询支持的命令, SysSetPlatformEmbedLinux和SysSetPlatformLinux切换编译不同平台的应用文件，目前支持命令如下所示.
 
 ```shell
 SysPreThirdParts
-    pull all thirdparts, install library.
+    pull all thirdparts, install library and debain rootfs.
 SysSetPlatformARM
-    Set Current Platform to ARM Complier(I.MX6ull).
+    Set Current Platform to ARM Complier(NXP I.MX6ull).
 SysSetPlatformAARCH64
-    Set Current Platform to AARCH64 Complier(H616).
+    Set Current Platform to AARCH64 Complier(全志 H616).
 SysSetApplicationVer
     example:SysSetApplicationVer 1.0.0.1.
     Set the verison of the firmware when build
@@ -95,29 +118,13 @@ SysHelpCommand
     Show the help command.
 ```
 
-如果编译报错，可参考*document/构建Linux编译环境.md*目录下说明.
-
-1. 上述命令支持需要在指定的目录里仿真对应的文件，如果不存在会打印对应的目录，需要将对应的文件放置在指定目录中。
-2. 如果编译失败，应该是g++版本过低，中说明如何更新arm-linux-gnueabihf-g++版本，目前测试通过使用的是7.5.0版本。
-3. 在编译完成后，通过ssh将打包后文件传送到嵌入式平台，并上传到/tmp目录下，执行SysPushFirmware命令即可实现Code更新。
-4. 嵌入式linux平台需要支持node服务器，可参考server/README.md构建，另外需要支持环回接口即127.0.0.1本地连接, 需要rcS文件添加如下端口。
+1. 上述命令支持需要在指定的目录里存在对应的文件，执行失败则可能需要安装，执行命令"./preBuildEnvironment.sh all"。
+2. 嵌入式linux平台需要支持node服务器，可参考server/README.md构建，另外需要支持环回接口即127.0.0.1本地连接, 需要rcS文件添加如下端口。
 
 ```shell
 ifconfig lo up
 ifconfig lo netmask 255.255.255.0
 ```
-
-## 项目结构
-
-- build             编译脚本文件，后续编译Makefile基于此实现
-- buildout          编译打包输出目录
-- doc               设计文档资料说明
-- embed             嵌入式Linux平台应用
-- env               用于构建编译环境的脚本
-- mod               内核驱动模块实现
-- remote            用于远程访问的PC客户端应用
-- rootfs            用于文件系统中带支持脚本和库文件
-- thirdparts        支持平台运行的库，程序等
 
 ## 设计文档
 
@@ -144,7 +151,7 @@ PC应用端设计
 
 整个项目由上位机(windows平台和web平台), 主控设备(嵌入式linux平台)和其它设备平台(STM32单片机)组成.
 
-- 主控设备基于正点原子阿尔法开发板实现，使用imx6ull内核.
+- 主控设备提供数据管理，logger打印，mqtt服务以及本地和远程设备管理功能。
 - windows平台主要提供对于开发板的远程管理，基于QT设计，用于本地的软件访问和管理.
 - web平台基于vue开发，主要用于本地的web访问和管理.
 - 其它设备平台基于STM32单片机设计.
@@ -155,16 +162,25 @@ PC应用端设计
 
 对于虚拟机环境使用过VMware, VirtualBox和WSL，其中VMware和Virtualbox使用体验都差不多，需要依赖跨系统复制，ssh或samba来回进行切换，不过在Linux平台使用vscode开发已经大大加快了开发效率。WSL则直接可以访问Windows平台程序，不过wsl1因为是模拟Linux接口，所以有很多Linux组件不支持，所以一定不要使用wsl1做交叉编译的环境，对于wsl2,也要确定是在Hyper-V环境下运行，可以综合两部分的优点。
 
-Linux系统使用了16.04LTS, 20.04 LTS, 22.04LTS, **建议满足条件下选择最新的LTS版本(本项目22.04LTS环境测试正常)**，这是自己编译新的Linux库或者工具软件，旧版本Linux往往因为libc/licxx的版本问题，如果使用较新的源码，会导致编译链接时失败，另外自己千万不要去更新libc/licxx带最新，有可能导致系统命令链接失败，无法执行，基本只能重装，这就是我使用Linux，编译和交叉编译遇到的最大问题，如果你所有使用的范围都在apt-get覆盖的范围，那么Linux使用很简单，不过当你自己编译某个工具，就比较复杂了, 这里以编译mosquitto举个例子，编译mosquitto，需要openssl和Cjson的支持，而编译openssl需要perl新版本的支持，也就是需要4个软件的安装才能完成最后的编译，还需要将动态库放置在指定位置系统才能正常工作，不同的Linux版本，编译器版本以及库安装情况，编译面临的错误都会不一致，我的建议是给定环境，给定系统，确定后后续都在此系统编译，遇到问题就进行相应安装和更新，并记录，后期就可以少遇到问题。
+Linux则建议使用满足条件下的最新LTS版本(本项目基于**Ubuntu 22.04.3 LTS**环境开发调试)，包含脚本加载，库编译，代码和驱动编译都进行了验证。旧版本Linux可能因为库或者软件版本问题，导致编译链接时失败。另外不要手动去替换libc/licxx这类，因为有可能导致系统命令链接失败，这种情况基本只能重装，虽然现在基本都一键式傻瓜安装，不过时间还是要花费的。如果硬盘足够大，建议第一次完整构建好环境后，将虚拟机系统进行备份，这样即使操作失误导致系统损坏，删除损坏的系统，重新恢复下原虚拟机系统即可。
 
-软件源为国内镜像源，我目前使用的是清华镜像源，地址如下:<https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/>
+对于Linux，你使用的所有工具都在apt-get覆盖的程序库内，将会很简单。不过当你自己编译某个工具，就比较复杂了, 这里以编译mosquitto举个例子，首先需要openssl和Cjson的支持，而编译openssl需要perl新版本的支持，也就是需要4个软件的安装才能完成最后的编译，还需要将动态库放置在指定位置系统才能正常工作。不同的Linux版本，编译器以及库安装情况，导致编译时面对的错误都会不一致。这是Linux系统的不统一导致的，目前没有好的办法，使用相同的系统，通过脚本进行统一构建，并保持更新，只能算相对较统一的方法。
 
-交叉编译工具主要用于编译uboot，kernal，文件系统，应用和库，uboot和kernal如果使用较早版本则有限制，使用新的编译器会包含删除的功能，导致无法编译通过，用老的编译工具即可，文件系统和应用，库需要用一个编译器版本，它们的执行依赖文件系统中的lib库，版本不匹配可能会导致接口缺少而无法正常工作。本项目开发使用的环境如下。
+Linux系统使用国内镜像源。
+
+- 地址: <https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/>
+
+交叉编译工具主要用于编译uboot，kernal，文件系统，应用和库，uboot和kernal如果使用较早版本则有限制，使用新的编译器会包含删除的功能，导致无法编译通过，用老的编译工具即可，文件系统和应用，库需要用一个编译器版本，它们的执行依赖文件系统中的lib库，版本不匹配可能会导致接口缺少而无法正常工作。本项目开发使用的环境如下：
 
 ```shell
-虚拟机 - VMvare
-Linux系统 - 22.04LTS
+虚拟机 - VMvare/WSL2
+Linux系统 - Ubuntu 22.04 LTS
 软件源 - 清华源
-交叉编译(uboot/kernal) - gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf 
-交叉编译(rootfs/application/lib) - gcc-arm-11.2-2022.02-x86_64-arm-none-linux-gnueabihf
+
+#ARM
+交叉编译(kernal) - gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf 
+交叉编译(uboot/rootfs/application/lib) - gcc-arm-11.2-2022.02-x86_64-arm-none-linux-gnueabihf
+
+#AARCH64
+交叉编译(kernal/uboot/rootfs/application/lib) - gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf 
 ```

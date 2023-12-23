@@ -15,18 +15,18 @@ int CUartProtocolInfo::UartLoopThread(SSendBuffer *pSendbuffer)
 {
     int nLen;
 
-    if(m_bComStatus)
+    if (m_bComStatus)
     {
         nLen = this->CreateSendBuffer(this->GetId(), pSendbuffer->m_nSize,
                                                    pSendbuffer->m_pBuffer, pSendbuffer->m_IsWriteThrough);
         this->DeviceWrite(tx_buffer, nLen);
         emit send_edit_test(byteArrayToHexString("Sendbuf:", tx_buffer, nLen, "\n"));
 
-        if(this->CheckReceiveData(false) == RT_OK)
+        if (this->CheckReceiveData(false) == RT_OK)
         {
            emit send_edit_test(byteArrayToHexString("Recv Buf:",
                 m_pRxBuffer, m_RxBufSize, "\n"));
-            if(pSendbuffer->m_pFunc != nullptr)
+            if (pSendbuffer->m_pFunc != nullptr)
             {
                  emit send_edit_recv(pSendbuffer->m_pFunc(m_pRxDataBuffer, m_RxBufSize-RECV_DATA_HEAD));
             }

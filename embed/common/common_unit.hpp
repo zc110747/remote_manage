@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//  (c) copyright 2022-by Persional Inc.  
+//  (c) copyright 2022-by Persional Inc.
 //  All Rights Reserved
 //
 //  Name:
@@ -14,7 +14,7 @@
 //  Assumptions:
 //
 //  Revision History:
-//      12/19/2022   Create New Version	
+//      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
@@ -24,6 +24,6 @@ _Pragma("once")
 #include "time_manage.hpp"
 #include "fifo/fifo_manage.hpp"
 #include "jsonconfig/jsonconfig.hpp"
-#include "logger/logger_server.hpp"
+#include "logger/logger_manage.hpp"
 
 uint16_t crc16(uint16_t crc, uint8_t const *buffer, uint16_t len);

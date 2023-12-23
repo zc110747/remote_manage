@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-//  (c) copyright 2022-by Persional Inc.  
+//  (c) copyright 2022-by Persional Inc.
 //  All Rights Reserved
 //
 //  Name:
@@ -14,15 +14,16 @@
 //  Assumptions:
 //
 //  Revision History:
-//      12/19/2022   Create New Version	
+//      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
 #include "global_def.hpp"
+
 #define PROCESS_RUN                 PROCESS_MAIN_PROCESS
+#define TOOLS_NAME                  "main_process"
 
 //------------------------- FIFO List ------------------------------
-#define LOGGER_FIFO_PATH            "/tmp/logger.fifo"              //logger服务模块
 #define DEVICE_MESSAGE_FIFO         "/tmp/device_manage.fifo"        //设备管理模块
 #define CENTER_UNIT_FIFO            "/tmp/center_manage.fifo"
 
