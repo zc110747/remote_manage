@@ -22,6 +22,7 @@ _Pragma("once")
 
 #define PROCESS_RUN                 PROCESS_MAIN_PROCESS
 #define TOOLS_NAME                  "main_process"
+#define PRINT_NOW_HEAD_STR          "[0000 00:00:00][main_process][5]"
 
 //------------------------- FIFO List ------------------------------
 #define DEVICE_MESSAGE_FIFO         "/tmp/device_manage.fifo"        //设备管理模块

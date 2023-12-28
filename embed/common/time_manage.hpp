@@ -73,7 +73,10 @@ private:
             auto stauts = cond.wait_for(lock, std::chrono::milliseconds(millisecond_));
             if (stauts == std::cv_status::timeout)
             {
-                timeout_handler_();
+                if (timeout_handler_)
+                {
+                    timeout_handler_();
+                }
             }
             else
             {

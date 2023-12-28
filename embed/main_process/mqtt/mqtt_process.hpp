@@ -14,15 +14,15 @@ typedef struct
 	int qos{1};
 }mqtt_info;
 
-class mqtt_process : public mosqpp::mosquittopp
+class mqtt_device : public mosqpp::mosquittopp
 {
 public:
     /// \brief constructor
 	/// \param info -- info used to initialize the mqtt service.
-	mqtt_process(const mqtt_info &info);
+	mqtt_device(const mqtt_info &info, std::function<void(char *ptr, int size)> handler);
 
 	/// \brief destructor
-	~mqtt_process();
+	~mqtt_device();
 
     /// \brief on_connect
     /// - This method is used do mqtt connect
@@ -52,6 +52,11 @@ public:
 	bool start();
 
 private:
+	/// \brief mqtt_run
+    /// - mqtt loop run thread.
+	void mqtt_run();
+
+private:
 	/// \brief info_
     /// - info used to store mqtt config.
 	mqtt_info info_;
@@ -64,9 +69,49 @@ private:
     /// - mqtt run thread object. 
 	std::thread thread_;
 
- 	/// \brief mqtt_run
-    /// - mqtt loop run thread.
-	void mqtt_run();
+	/// \brief buffer_
+    /// - buffer store subscription information. 	
+	char buffer_[512];
+
+	/// \brief buffer_
+    /// - buffer store subscription information. 
+    std::function<void(char *ptr, int size)> func_handler_;
+};
+
+class mqtt_manage
+{
+public:
+    /// \brief constructor
+    mqtt_manage() = default;
+    mqtt_manage(const mqtt_manage&)=delete;
+
+    /// - destructor, delete not allow for singleton pattern.
+    virtual ~mqtt_manage() = delete;
+    
+    /// \brief get_instance
+    /// - This method is used to get the pattern of the class.
+    /// \return the singleton pattern point of the object.
+    static mqtt_manage* get_instance();
+
+    /// \brief init
+    /// - This method is used to init the object.
+    /// \return Wheather initialization is success or failed.
+    bool init();
+
+    /// \brief init
+    /// - This method is used to publisher string.
+    /// \param str -- memssage publisher the string.
+    /// \return Wheather initialization is success or failed.
+	int mqtt_publish(const std::string &str);
+
+private:
+    /// \brief instance_pointer_
+    /// - object used to implement the singleton pattern.
+    static mqtt_manage* instance_pointer_;
+
+    /// \brief mqtt_device_ptr
+    /// - mqtt device manage pointer.
+	std::unique_ptr<mqtt_device> mqtt_device_ptr;
 };
 
 bool mqtt_init(void);

@@ -190,6 +190,12 @@ public:
     
     //node info
     const int get_node_web_port()               const    {return parameter_.node_sever.web_port;}
+
+private:
+    /// \brief check_ipaddress
+    /// - This method is used to check ipaddress wheather in list.
+    bool check_ipaddress(const std::string& ipaddr); 
+
 private:
     /// \brief instance_pointer_
     /// - object used to implement the singleton pattern.

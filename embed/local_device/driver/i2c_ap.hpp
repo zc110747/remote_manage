@@ -20,13 +20,6 @@ _Pragma("once")
 
 #include "device_base.hpp"
 
-typedef struct _SApInfo
-{
-    uint16_t ir;     /*红外线强度*/
-    uint16_t als;    /*环境光强度*/
-    uint16_t ps;     /*接近距离*/
-}ap_info;
-
 class ap_device:public info_base<ap_info>
 {
 public:

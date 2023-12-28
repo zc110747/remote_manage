@@ -21,20 +21,11 @@ cpp_objects = 	main.o \
 				remote/tcp_thread.o	\
 				remote/protocol.o	\
 				module/cmd_process.o  \
-				driver/rtc.o \
-				driver/key.o \
-				driver/spi_icm.o \
-				driver/device_base.o \
-				driver/driver.o \
-				center/internal_process.o \
-				center/device_manage.o   \
-				center/center_manage.o
+				module/device_process.o 
 
 INCLUDES = 	-I remote/ 				\
-			-I driver/ 				\
 			-I include/ 			\
 			-I module/ 				\
-			-I center/				\
 			-I mqtt/
 				
 INCLUDES +=	-I $(ENV_PATH_ROOT)/thirdparts/asio/include/ \

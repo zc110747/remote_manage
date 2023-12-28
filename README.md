@@ -22,8 +22,6 @@
 - rootfs            支持文件系统运行的其它文件，在执行构建时拷贝到目的文件系统中
 - thirdparts        支持应用编译的第三方库。
 
-[目前版本发布信息点此跳转](./buildout/README.md)
-
 ## 项目框架
 
 ![image](doc/image/mainFrame.png)

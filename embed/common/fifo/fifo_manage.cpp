@@ -76,11 +76,11 @@ bool fifo_manage::create()
     || fifo_mode_ == FIFO_MODE_W_CREATE
     || fifo_mode_ == FIFO_MODE_W)
     {
-        writefd_ = open(fifo_path_.c_str(), O_WRONLY);
+        writefd_ = open(fifo_path_.c_str(), O_RDWR);
         if (writefd_ < 0)
         {
             release();
-            PRINT_NOW("%s:fifo open %s tx error:%d\n", PRINT_NOW_HEAD_STR, fifo_path_.c_str(), writefd_);
+            PRINT_NOW("%s:fifo open %s tx error:%d!\n", PRINT_NOW_HEAD_STR, fifo_path_.c_str(), writefd_);
             return false;
         }
         else

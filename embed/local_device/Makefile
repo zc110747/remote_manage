@@ -18,10 +18,12 @@ cpp_objects = 	main.o \
 			  	driver/driver.o \
 				driver/key.o \
 				driver/rtc.o \
-				driver/spi_icm.o 
+				driver/spi_icm.o \
+				module/cmd_process.o 
 				
 INCLUDES = 	-I include/ \
-			-I driver/
+			-I driver/ \
+			-I module/
 				
 INCLUDES +=	-I $(ENV_PATH_ROOT)/thirdparts/asio/include/ \
 			-I $(ENV_PATH_ROOT)/thirdparts/jsoncpp/include/

@@ -84,6 +84,13 @@
         "variant": "cpp",
         "*.ipp": "cpp",
         "productconfig.hpp": "c",
-        "global_def.hpp": "c"
+        "global_def.hpp": "c",
+        "complex": "cpp",
+        "errno.h": "c",
+        "resource.h": "c",
+        "statfs.h": "c",
+        "stdio.h": "c",
+        "sysinfo.h": "c",
+        "in.h": "c"
     }
 }

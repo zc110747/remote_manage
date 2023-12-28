@@ -121,6 +121,10 @@ static bool system_init(int is_default, const char* path)
 	if (is_default == 0)
 	{
 		system_config::get_instance()->init(path);
+		if (!ret)
+		{
+			return false;
+		}
 	}
 	else
 	{

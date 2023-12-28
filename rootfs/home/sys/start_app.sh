@@ -7,14 +7,16 @@ pkill -9 mosquitto
 #start application
 mosquitto -c /etc/mosquitto/mosquitto.conf &
 
-sleep 10
+sleep 1
 
 #start all device
 /home/sys/executable/logger_tool -f /home/sys/configs/config.json &
+sleep 2
+/home/sys/executable/local_device -f /home/sys/configs/config.json &
+sleep 2
 /home/sys/executable/main_process -f /home/sys/configs/config.json &
-
-sleep 5
+sleep 2
 
 #run server.js
 cd /home/sys/server
-/home/sys/support/node/bin/node server.js &
+#/home/sys/support/node/bin/node server.js &

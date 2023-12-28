@@ -21,9 +21,10 @@ _Pragma("once")
 
 typedef enum
 {
+    CmdReadDev = 0,
+    CmdSetDev,
     cmdSetLevel,
     CmdGetHelp,
-    cmdGetOS,
 }cmd_format_t;
 
 class cmd_process
@@ -61,10 +62,6 @@ private:
     /// \return Wheather process is success or failed.
     bool process_data();
 
-    /// \brief show_os
-    /// - This method is show current os information.
-    void show_os();
-
 private:
     /// \brief instance_pointer_
     /// - object used to implement the singleton pattern.
@@ -90,7 +87,7 @@ private:
     /// - cmd process thread object. 
     std::thread cmd_process_thread_;
 
-    /// \brief logger_main_process_tx_fifo_
+    /// \brief logger_loc_dev_tx_fifo_
     /// - fifo used for logger server rx and write to local device.
-    std::unique_ptr<fifo_manage> logger_main_process_tx_fifo_{nullptr};
+    std::unique_ptr<fifo_manage> logger_loc_dev_tx_fifo_{nullptr};
 };

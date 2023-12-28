@@ -47,7 +47,6 @@ alias exit_if_last_error='exit_if_last_error'
 mount_chroot()
 {
 	sudo chmod -Rv 777 ${NFS_PATH}/bin/
-	sudo chmod -Rv 777 ${NFS_PATH}/usr/sbin/
     sudo mount -t proc chproc ${NFS_PATH}/proc
     sudo mount -t sysfs chsys ${NFS_PATH}/sys
     sudo mount -t devtmpfs chdev ${NFS_PATH}/dev || sudo mount --bind /dev ${NFS_PATH}/dev

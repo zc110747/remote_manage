@@ -30,6 +30,9 @@ buildout/
 
 mod/rs232/*
 embed/lower_device/lower_device
+embed/main_process/main_process
+embed/local_device/local_device
 embed/logger_tool/logger_tool
 embed/node_server/node_modules
 embed/node_server/*.json
+embed/local_device/test/device_info

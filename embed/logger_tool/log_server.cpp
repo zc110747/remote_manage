@@ -22,6 +22,7 @@
 #include "time_manage.hpp"
 #include "jsonconfig.hpp"
 #include "asio_server.hpp"
+#include "log_process.hpp"
 
 #define FMT_HEADER_ONLY
 #include "fmt/core.h"
@@ -34,18 +35,18 @@ void log_server::logger_rx_server_run()
     const auto& ipaddr = system_config::get_instance()->get_ipaddress();
     const auto& port = system_config::get_instance()->get_logger_port();
 
-    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "logger server start, ipaddr:%s:%d!", ipaddr.c_str(), port);
+    PRINT_NOW("%s:logger server start, ipaddr:%s:%d!\n", PRINT_NOW_HEAD_STR, ipaddr.c_str(), port);
 
     try
     {
         internal_log_server.init(ipaddr, std::to_string(port), [this](char* ptr, int length){
-            send_buffer(ptr, length);
+            log_process::get_instance()->send_buffer(ptr, length);
         });
         internal_log_server.run();
     }
     catch (std::exception& e)
     {
-        PRINT_LOG(LOG_DEBUG, xGetCurrentTimes(), "Exception:%s", e.what());
+        PRINT_NOW("%s:Exception:%s\n", PRINT_NOW_HEAD_STR, e.what());
     }
 }
 

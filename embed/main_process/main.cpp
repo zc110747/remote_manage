@@ -19,12 +19,10 @@
 //		
 /////////////////////////////////////////////////////////////////////////////
 #include <getopt.h>
-#include "center_manage.hpp"
 #include "common_unit.hpp"
-#include "device_manage.hpp"
-#include "driver.hpp"
-#include "internal_process.hpp"
-#include "remote.hpp"
+#include "device_process.hpp"
+#include "tcp_thread.hpp"
+#include "cmd_process.hpp"
 
 #if MODULE_DEFINE_MQTT == 1
 #include "mqtt_process.hpp"
@@ -64,7 +62,7 @@ static void option_process(int argc, char *argv[])
 				if (optarg != nullptr)
 				{
 					sConfigFile = std::string(optarg);
-					printf("set file:%s!\n", sConfigFile.c_str());
+					PRINT_NOW("%s:set file:%s!\n", PRINT_NOW_HEAD_STR, sConfigFile.c_str());
 				}
 				break;
 			case '?':
@@ -98,7 +96,7 @@ int main(int argc, char* argv[])
     auto result = daemon(1, 1);
 	if (result < 0)
 	{
-		PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "daemon error!");
+		PRINT_NOW("%s:daemon error!\n", PRINT_NOW_HEAD_STR);
 		return result;
 	}
 	
@@ -112,7 +110,7 @@ int main(int argc, char* argv[])
 		}
 	}
 	
-	PRINT_NOW("Process app_demo stop, error:%s\n", strerror(errno));
+	PRINT_NOW("%s:process main_process stop, error:%s\n", PRINT_NOW_HEAD_STR, strerror(errno));
 	return result;
 }
 
@@ -126,28 +124,29 @@ static bool system_init(int is_default, const char* path)
 	//选中配置文件
 	if (is_default == 0)
 	{
-		system_config::get_instance()->init(path);
+		ret = system_config::get_instance()->init(path);
+		if (!ret)
+		{
+			return false;
+		}
 	}
 	else
 	{
 		system_config::get_instance()->default_init();
 		PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "System Config use default!");
 	}
-	std::cout<<*(system_config::get_instance())<<std::endl;
+	//std::cout<<*(system_config::get_instance())<<std::endl;
 
 	ret &= log_manage::get_instance()->init();
-	ret &= driver_manage::get_instance()->init();
-	ret &= device_manage::get_instance()->init();
-	ret &= tcp_thread_manage::get_instance()->init();
 	ret &= time_manage::get_instance()->init();
-	ret &= center_manage::get_instance()->init();
-
-	ret &= internal_process::get_instance()->init();
 
 #if MODULE_DEFINE_MQTT == 1
-	ret &= mqtt_init();
+	ret &= mqtt_manage::get_instance()->init();
 #endif
-
+ 	ret &= device_process::get_instance()->init();
+ 	ret &= tcp_thread_manage::get_instance()->init();
+	ret &= cmd_process::get_instance()->init();
+	
 	return ret;
 }
 

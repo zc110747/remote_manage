@@ -19,17 +19,27 @@
 #include "cmd_process.hpp"
 #include "common_unit.hpp"
 
+/*
+!readdev    [index] #index=[0~3 led,beep,ap,icm]
+!setdev     [index],[data] #index=[0~1 led,beep]  
+!getNet     [index] #index=[0~2 udp,tcp,logger] 
+!testDev    [index] #index=[0~3 led,beep,ap,icm]      
+!getSerial  
+!? or !help
+*/
 const static std::map<std::string, cmd_format_t> CmdMapM = {
-    {"getos",       cmdGetOS},
-    {"setlevel",    cmdSetLevel},
-    {"?",           CmdGetHelp},
-    {"help",        CmdGetHelp},
+    {"readdev",    CmdReadDev},
+    {"setdev",     CmdSetDev},
+    {"setlevel",   cmdSetLevel},
+    {"?",          CmdGetHelp},
+    {"help",       CmdGetHelp},
 };
 
 const static std::map<cmd_format_t, std::string> CmdHelpMapM = {
-    {cmdGetOS,      "!mainprocess getos"},
-    {cmdSetLevel,   "!mainprocess setlevel [lev 0-5]",},
-    {CmdGetHelp,    "!mainprocess ? or !mainprocess help"},
+    {CmdReadDev,    "!localdevice readdev"},
+    {CmdSetDev,     "!localdevice setdev [index],[action]"},
+    {cmdSetLevel,   "!localdevice setlevel [lev 0-5]",},
+    {CmdGetHelp,    "!localdevice ? or !locd help"},
 };
 
 cmd_process* cmd_process::instance_pointer_ = nullptr;
@@ -48,12 +58,12 @@ cmd_process* cmd_process::get_instance()
 
 bool cmd_process::init()
 {
-    logger_main_process_tx_fifo_ = std::make_unique<fifo_manage>(LOGGER_MP_TX_FIFO, 
+    logger_loc_dev_tx_fifo_ = std::make_unique<fifo_manage>(LOGGER_LOC_DEV_TX_FIFO, 
                                                     S_FIFO_WORK_MODE, 
                                                     FIFO_MODE_R);
-    if (logger_main_process_tx_fifo_ == nullptr)
+    if (logger_loc_dev_tx_fifo_ == nullptr)
         return false;
-    if (!logger_main_process_tx_fifo_->create())
+    if (!logger_loc_dev_tx_fifo_->create())
         return false;
 
     cmd_process_thread_ = std::thread(std::bind(&cmd_process::run, this));
@@ -88,20 +98,14 @@ bool cmd_process::parse_data()
     return true;
 }
 
-void cmd_process::show_os()
-{
-    auto pSysConfig = system_config::get_instance();
-    PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "FW_Version:%s", pSysConfig->get_version().c_str());
-    PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "Logger Level:%d ", (int)log_manage::get_instance()->get_level());
-}
-
 bool cmd_process::process_data()
 {
     bool ret = true;
     switch (cmd_format_)
     {
-        case cmdGetOS:
-            show_os();
+        case CmdReadDev:
+            break;
+        case CmdSetDev:
             break;
         case cmdSetLevel:
             break;
@@ -125,7 +129,7 @@ void cmd_process::run()
 
     while(1)
     {
-        len = logger_main_process_tx_fifo_->read(rx_buffer_, DEVICE_RX_BUFFER_SIZE);
+        len = logger_loc_dev_tx_fifo_->read(rx_buffer_, DEVICE_RX_BUFFER_SIZE);
         if (len > 0)
         {
             rx_buffer_[len] = '\0';

@@ -86,12 +86,11 @@ int main(int argc, char *argv[])
 	bool result = true;
 
 	option_process(argc, argv);
-
-    //守护进程，用于进程后台执行
+	
     auto val = daemon(1, 1);
     if (val < 0)
     {
-        PRINT_NOW("daemon error!");
+        PRINT_NOW("%s:daemon error!", PRINT_NOW_HEAD_STR);
         return val;
     }
 
@@ -121,16 +120,19 @@ static bool system_init(int is_default, const char* path)
 	if (is_default == 0)
 	{
 		ret = system_config::get_instance()->init(path);
+		if (!ret)
+		{
+			return false;
+		}
 	}
 	else
 	{
 		system_config::get_instance()->default_init();
 	}
 
-	//系统初始化
 	ret &= time_manage::get_instance()->init();
 	ret &= log_process::get_instance()->init();
-	ret &= log_manage::get_instance()->init();
+	ret &= log_manage::get_instance()->init();	//在log_process后执行，需要等待fifo创建
 	ret &= log_server::get_instance()->init();
 	
 	//std::cout<<*(system_config::get_instance())<<std::endl;

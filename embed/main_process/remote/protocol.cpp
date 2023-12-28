@@ -17,7 +17,6 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "protocol.hpp"
-#include "center_manage.hpp"
 #include "common_unit.hpp"
 
 const uint8_t PACKED_HEAD[] = {0x5a, 0x5b};
@@ -147,7 +146,7 @@ void protocol_info::process_rx_frame()
 		if (rx_buffer_[5] >= 2)
 		{
 			event_id = (((uint16_t)rx_buffer_[6])<<8) | rx_buffer_[7];
-			center_manage::get_instance()->send_message(event_id, &rx_buffer_[8], rx_buffer_[5]-2);
+			//center_manage::get_instance()->send_message(event_id, &rx_buffer_[8], rx_buffer_[5]-2);
 		}
 		else
 		{

@@ -20,28 +20,6 @@ _Pragma("once")
 
 #include "device_base.hpp"
 
-typedef struct
-{
-    int gyro_x_adc;     /*陀螺仪x轴角速度*/
-    int gyro_y_adc;     /*陀螺仪y轴角速度*/
-    int gyro_z_adc;     /*陀螺仪z轴角速度*/ 
-    int accel_x_adc;    /*加速度计x轴加速度*/
-    int accel_y_adc;    /*加速度计y轴加速度*/
-    int accel_z_adc;    /*加速度计z轴加速度*/
-    int temp_adc;       /*温度信息*/
-}icm_adc_info;
-
-typedef struct
-{
-    float gyro_x_act;     /*陀螺仪x轴角速度*/
-    float gyro_y_act;     /*陀螺仪y轴角速度*/
-    float gyro_z_act;     /*陀螺仪z轴角速度*/ 
-    float accel_x_act;    /*加速度计x轴加速度*/
-    float accel_y_act;    /*加速度计y轴加速度*/
-    float accel_z_act;    /*加速度计z轴加速度*/     
-    float temp_act;       /*温度信息*/
-}icm_info;
-
 class icm_device : public info_base<icm_adc_info>
 {
 public:

@@ -20,12 +20,12 @@ export PROGRAM_DOWNLOAD=$PROGRAM_PATH/download
 
 #GCC compile path info
 #support old gcc to build kernel(version low, update linux kernel next)
-export OLD_GCC_PATH=$PROGRAM_SUPPORT/old_compiler/bin/
+export OLD_GCC_PATH=$PROGRAM_SUPPORT/old_compiler/bin
 export KERNEL_CC=$OLD_GCC_PATH/arm-linux-gnueabihf-
-export NEW_GCC_PATH=$PROGRAM_SUPPORT/compiler/bin/
+export NEW_GCC_PATH=$PROGRAM_SUPPORT/compiler/bin
 export NEW_KERNEL_CC=$NEW_GCC_PATH/arm-none-linux-gnueabihf-
 export GCC_LIB=$PROGRAM_SUPPORT/compiler/arm-none-linux-gnueabihf
-export AARCH_GCC_PATH=${PROGRAM_SUPPORT}/aarch64_compiler/bin/
+export AARCH_GCC_PATH=${PROGRAM_SUPPORT}/aarch64_compiler/bin
 
 #Add directory to PATH
 export PATH=$PATH:${NEW_GCC_PATH}:${OLD_GCC_PATH}:${AARCH_GCC_PATH}
