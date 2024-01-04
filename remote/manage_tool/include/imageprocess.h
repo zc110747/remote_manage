@@ -136,7 +136,7 @@ private:
 
     //将Opencv内部图像转变为QImage对象
     QImage cvMattoQImage(const cv::Mat& mat);
-    cv::Mat QImagetocvMat(const QImage &image);			// QImage 改成 Mat
+    cv::Mat QImagetocvMat(const QImage &image);            // QImage 改成 Mat
 #endif
 };
 

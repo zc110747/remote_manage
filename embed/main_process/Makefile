@@ -17,20 +17,20 @@ DEFINE_MQTT =1
 CCFLAGS := -O3 -std=c++17 -fno-strict-aliasing -lrt 
 CCFLAGS += -DMODULE_DEFINE_MQTT=${DEFINE_MQTT}
 
-cpp_objects = 	main.o \
-				remote/tcp_thread.o	\
-				remote/protocol.o	\
-				module/cmd_process.o  \
-				module/device_process.o 
+cpp_objects =   main.o                  \
+                remote/tcp_thread.o     \
+                remote/protocol.o       \
+                module/cmd_process.o    \
+                module/device_process.o 
 
-INCLUDES = 	-I remote/ 				\
-			-I include/ 			\
-			-I module/ 				\
-			-I mqtt/
-				
-INCLUDES +=	-I $(ENV_PATH_ROOT)/thirdparts/asio/include/ \
-			-I $(ENV_PATH_ROOT)/thirdparts/jsoncpp/include/ \
-			-I $(ENV_PATH_ROOT)/thirdparts/mosquitto/include/ 
+INCLUDES =  -I remote/                  \
+            -I include/                 \
+            -I module/                  \
+            -I mqtt/
+                
+INCLUDES += -I $(ENV_PATH_ROOT)/thirdparts/asio/include/ \
+            -I $(ENV_PATH_ROOT)/thirdparts/jsoncpp/include/ \
+            -I $(ENV_PATH_ROOT)/thirdparts/mosquitto/include/ 
 
 ifeq (${FIRMWARE_CURRENT_PLATFORMS},AARCH64)
 

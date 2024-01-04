@@ -207,7 +207,7 @@ void CScreenShot::mouseMoveEvent(QMouseEvent *event)
 
 void CScreenShot::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    if (currentShotState == finishShot || currentShotState == finishMoveShot 
+    if (currentShotState == finishShot || currentShotState == finishMoveShot
     || currentShotState == finishControl)
     {
         Release();
@@ -335,12 +335,12 @@ void CScreenShot::checkMoveEndPoint()
 
     //当移动后X坐标小于零时，则出现选区丢失，则计算出moveEndPoint的X最大坐标值，进行赋值
     if (x + selectedRect.x() < 0)
-    { 
+    {
         moveEndPoint.setX(qAbs(selectedRect.x()-moveBeginPoint.x()));
     }
 
     if (y + selectedRect.y() < 0)
-    { 
+    {
         moveEndPoint.setY(qAbs(selectedRect.y() - moveBeginPoint.y()));
     }
 
@@ -500,7 +500,7 @@ CScreenShot::controlPointEnum CScreenShot::getMoveControlState(const QPoint &poi
     {
         result = moveControl0;
     }
-    
+
     return result;
 }
 

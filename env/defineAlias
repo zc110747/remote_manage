@@ -177,16 +177,6 @@ function SysBuildApplication()
 	cd ${APPLICATION_EMBED}/
 	cp -rv node_server/* ${APPLICATION_SYS}/server/
 
-	#only arm copy to rootfs to struct, for aarch64, do nothing
-	if [ ${FIRMWARE_CURRENT_PLATFORMS} == "ARM" ]; then
-		cp -rv ${APPLICATION_BUILDOUT}/* ${APPLICATION_SYS}/executable/
-
-		#update executable run
-		if [ -d ${NFS_PATH}/home/sys/executable ]; then
-			cp -rv ${APPLICATION_BUILDOUT}/* ${NFS_PATH}/home/sys/executable/
-		fi
-	fi
-
 	cda
 }
 alias SysBuildApplication='SysBuildApplication'
@@ -338,11 +328,11 @@ function SysBuildRootfs
 			#copy C/C++ library
 			echo "copy c++ library"
 			cd $GCC_LIB/lib
-			cp -ravf *so* *.a $NFS_PATH/lib/
+			cp -ravf *so* $NFS_PATH/lib/
 
 			echo "copy c library"
 			cd $GCC_LIB/libc/lib
-			cp -ravf *so* *.a $NFS_PATH/lib/
+			cp -ravf *so* $NFS_PATH/lib/
 		fi
 
 		cda

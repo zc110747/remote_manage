@@ -25,8 +25,10 @@ thirdparts/mosquitto/z*
 
 rootfs/home/sys/
 rootfs/home/sys/server/*
+rootfs/usr/local/bin/*
 
-buildout/
+buildout/aarch64/
+buildout/arm/
 
 mod/rs232/*
 embed/lower_device/lower_device
@@ -35,4 +37,4 @@ embed/local_device/local_device
 embed/logger_tool/logger_tool
 embed/node_server/node_modules
 embed/node_server/*.json
-embed/local_device/test/device_info
+embed/test/device_info

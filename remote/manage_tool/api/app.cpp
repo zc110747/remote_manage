@@ -1,4 +1,4 @@
-﻿#include "app.h"
+﻿#include "app.hpp"
 #include "quiwidget.h"
 
 QString App::ConfigFile = "config.ini";

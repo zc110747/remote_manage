@@ -28,13 +28,13 @@ _Pragma("once")
 
 typedef enum
 {
-	LOG_TRACE = 0,
-	LOG_DEBUG,
-	LOG_INFO,
-	LOG_WARN,
-	LOG_ERROR,
-	LOG_FATAL,
-}LOG_LEVEL;
+    LOG_TRACE = 0,
+    LOG_DEBUG,
+    LOG_INFO,
+    LOG_WARN,
+    LOG_ERROR,
+    LOG_FATAL,
+    }LOG_LEVEL;
 
 class log_manage final
 {
@@ -76,19 +76,20 @@ public:
     /// \brief get_level
     /// - This method get the level can send
     /// \return logger level can send.
-    LOG_LEVEL get_level()            {return log_level_;} 
+    LOG_LEVEL get_level()            {return log_level_;}
 
     /// \brief convert_timer
     /// - This method convert second to home.
     /// \param timer - timer by second to convert.
-    /// \return string after convert.  
+    /// \return string after convert.
     std::string convert_timer(uint32_t timer);
 
 private:
     /// \brief get_memory_buffer_pointer
     /// - get buffer pointer of the memory.
     /// \param size - size of the memory pointer
-    char *get_memory_buffer_pointer(uint16_t size); 
+    char *get_memory_buffer_pointer(uint16_t size);
+
 private:
     /// \brief instance_pointer_
     /// - object used to implement the singleton pattern.

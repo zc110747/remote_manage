@@ -5,6 +5,6 @@
 #include <QtWidgets>
 #endif
 
-#include "app.h"
+#include "app.hpp"
 
 #pragma execution_character_set("utf-8")

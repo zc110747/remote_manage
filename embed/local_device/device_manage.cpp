@@ -35,13 +35,13 @@ device_manage* device_manage::get_instance()
 }
 
 bool device_manage::init()
-{   
+{
     inter_info_.clear();
     outer_info_.clear();
 
     //command receive fifo
-    device_cmd_fifo_point_ = std::make_unique<fifo_manage>(LOCAL_DEVICE_CMD_FIFO, 
-                                                        S_FIFO_WORK_MODE, 
+    device_cmd_fifo_point_ = std::make_unique<fifo_manage>(LOCAL_DEVICE_CMD_FIFO,
+                                                        S_FIFO_WORK_MODE,
                                                         FIFO_MODE_WR_CREATE);
     if (device_cmd_fifo_point_ == nullptr)
     {
@@ -55,8 +55,8 @@ bool device_manage::init()
     }
 
     //info translate fifo
-    device_info_fifo_point_ = std::make_unique<fifo_manage>(LOCAL_DEVICE_INFO_FIFO, 
-                                                            S_FIFO_WORK_MODE, 
+    device_info_fifo_point_ = std::make_unique<fifo_manage>(LOCAL_DEVICE_INFO_FIFO,
+                                                            S_FIFO_WORK_MODE,
                                                             FIFO_MODE_W_CREATE);
     if (device_info_fifo_point_ == nullptr)
     {
@@ -67,7 +67,7 @@ bool device_manage::init()
     {
         PRINT_NOW("%s:fifo %s create failed\r\n", PRINT_NOW_HEAD_STR, LOCAL_DEVICE_INFO_FIFO);
         return false;
-    }  
+    }
 
     //start thread
     std::thread(std::bind(&device_manage::run, this)).detach();
@@ -128,16 +128,14 @@ void device_manage::process_event(Event *pEvent)
     PRINT_LOG(LOG_DEBUG, xGetCurrentTicks(), "Device event:%d!", id);
     switch (id)
     {
-    case DEVICE_LOOP_EVENT:
-        update();
-        break;
-    
-    case DEVICE_HW_SET_EVENT:
-        process_hardware(pEvent);
-        break;
-
-    default:
-        break;
+        case DEVICE_LOOP_EVENT:
+            update();
+            break;
+        case DEVICE_HW_SET_EVENT:
+            process_hardware(pEvent);
+            break;
+        default:
+            break;
     }
 }
 
@@ -153,21 +151,21 @@ void device_manage::process_hardware(Event *pEvent)
 
     switch (device)
     {
-    case DEVICE_LED:
-        {
-            auto led_ptr = driver_manage::get_instance()->get_led_zero();
-            led_ptr->write_io_status(action);
-        }
-        break;
-    case DEVICE_BEEP:
-        {
-            auto beep_ptr=driver_manage::get_instance()->get_beep_zero();
-            beep_ptr->write_io_status(action);
-        }
-        break;
-    default:
-        PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Invalid Device:%d!", device);
-        break;
+        case DEVICE_LED:
+            {
+                auto led_ptr = driver_manage::get_instance()->get_led_zero();
+                led_ptr->write_io_status(action);
+            }
+            break;
+        case DEVICE_BEEP:
+            {
+                auto beep_ptr=driver_manage::get_instance()->get_beep_zero();
+                beep_ptr->write_io_status(action);
+            }
+            break;
+        default:
+            PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Invalid Device:%d!", device);
+            break;
     }
 }
 
@@ -179,7 +177,7 @@ int device_manage::send_message(char* pEvent, int size)
 void device_manage::run()
 {
     int size;
-    
+
     PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "device_manage start!");
     time_manage::get_instance()->register_action(DEVICE_LOOP_EVENT, TIME_TICK(1000), TIME_ACTION_ALWAYS, [&](int id){
         Event event(id);

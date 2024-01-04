@@ -91,6 +91,8 @@
         "statfs.h": "c",
         "stdio.h": "c",
         "sysinfo.h": "c",
-        "in.h": "c"
+        "in.h": "c",
+        "stdint.h": "c",
+        "netdb.h": "c"
     }
 }

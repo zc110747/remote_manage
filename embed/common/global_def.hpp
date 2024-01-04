@@ -28,9 +28,9 @@ _Pragma("once")
 #define RT_INVALID_MQ_SIZE              -4
 #define RT_INVALID_BUF_SIZE             -3
 #define RT_INVALID_MQ                   -2
-#define RT_OK               	        0
-#define RT_FAIL             	        1
-#define RT_EMPTY            	        2
+#define RT_OK                           0
+#define RT_FAIL                         1
+#define RT_EMPTY                        2
 #define RT_TIMEOUT                      3
 #define RT_INVALID                      4
 

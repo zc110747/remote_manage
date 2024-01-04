@@ -127,7 +127,7 @@ void cmd_process::run()
 {
     int len;
 
-    while(1)
+    while (1)
     {
         len = logger_loc_dev_tx_fifo_->read(rx_buffer_, DEVICE_RX_BUFFER_SIZE);
         if (len > 0)

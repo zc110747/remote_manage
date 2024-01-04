@@ -292,31 +292,32 @@ bool COpencvImgProcess::warpaffine_image(QLabel *label, QString Path)
     cv::Point2f srcTri[3];
     cv::Point2f dstTri[3];
 
-    cv::Mat rot_mat( 2, 3, CV_32FC1 );
-    cv::Mat warp_mat( 2, 3, CV_32FC1 );
+    cv::Mat rot_mat(2, 3, CV_32FC1);
+    cv::Mat warp_mat(2, 3, CV_32FC1);
 
-    if (!ImgMat.data){
+    if (!ImgMat.data)
+    {
         qDebug()<<"img load failed, Path:"<<Path;
         return false;
     }
 
     WrapImgMat = cv::Mat::zeros(ImgMat.rows, ImgMat.cols, ImgMat.type());
 
-    srcTri[0] = cv::Point2f( 0,0 );
-    srcTri[1] = cv::Point2f( ImgMat.cols - 1, 0 );
-    srcTri[2] = cv::Point2f( 0, ImgMat.rows - 1 );
+    srcTri[0] = cv::Point2f(0, 0);
+    srcTri[1] = cv::Point2f(ImgMat.cols - 1, 0);
+    srcTri[2] = cv::Point2f(0, ImgMat.rows - 1);
 
-    dstTri[0] = cv::Point2f( ImgMat.cols*0.0, ImgMat.rows*0.33 );
-    dstTri[1] = cv::Point2f( ImgMat.cols*0.85, ImgMat.rows*0.25 );
-    dstTri[2] = cv::Point2f( ImgMat.cols*0.15, ImgMat.rows*0.7 );
-    warp_mat = cv::getAffineTransform( srcTri, dstTri );
-    cv::warpAffine( ImgMat,  WrapImgMat, warp_mat, WrapImgMat.size() );
+    dstTri[0] = cv::Point2f(ImgMat.cols*0.0, ImgMat.rows*0.33);
+    dstTri[1] = cv::Point2f(ImgMat.cols*0.85, ImgMat.rows*0.25);
+    dstTri[2] = cv::Point2f(ImgMat.cols*0.15, ImgMat.rows*0.7);
+    warp_mat = cv::getAffineTransform(srcTri, dstTri);
+    cv::warpAffine(ImgMat,  WrapImgMat, warp_mat, WrapImgMat.size());
 
-    cv::Point center = cv::Point( WrapImgMat.cols/2, WrapImgMat.rows/2 );
+    cv::Point center = cv::Point(WrapImgMat.cols/2, WrapImgMat.rows/2);
     double angle = -50.0;
     double scale = 0.6;
 
-    rot_mat = getRotationMatrix2D( center, angle, scale );
+    rot_mat = getRotationMatrix2D(center, angle, scale);
 
     warpAffine(WrapImgMat, WrapRotateImgMat, rot_mat, WrapImgMat.size());
 
@@ -339,11 +340,11 @@ bool COpencvImgProcess::houghlines_image(QLabel *label, QString Path)
     cv::cvtColor(HoughlinesImgMat, LineImgMat, cv::COLOR_GRAY2BGR);
 
     std::vector<cv::Vec4i> lines;
-    HoughLinesP(HoughlinesImgMat, lines, 1, CV_PI/180, 50, 50, 10 );
-    for ( size_t i = 0; i < lines.size(); i++ )
+    HoughLinesP(HoughlinesImgMat, lines, 1, CV_PI/180, 50, 50, 10);
+    for (size_t i = 0; i < lines.size(); i++)
     {
       cv::Vec4i l = lines[i];
-      cv::line( LineImgMat, cv::Point(l[0], l[1]), cv::Point(l[2], l[3]), cv::Scalar(0,0,255), 3, 16);
+      cv::line(LineImgMat, cv::Point(l[0], l[1]), cv::Point(l[2], l[3]), cv::Scalar(0,0,255), 3, 16);
     }
 
     load_image(label, LineImgMat);
@@ -372,21 +373,21 @@ bool COpencvImgProcess::hist_image(QLabel *label, QString Path)
     float hue_range[] = { 0, 180 };
     const float* ranges = { hue_range };
 
-    cv::calcHist(&HueImgMat, 1, 0, cv::Mat(), hist, 1, &histSize, &ranges, true, false );
-    cv::normalize( hist, hist, 0, 255, cv::NORM_MINMAX, -1, cv::Mat() );
+    cv::calcHist(&HueImgMat, 1, 0, cv::Mat(), hist, 1, &histSize, &ranges, true, false);
+    cv::normalize(hist, hist, 0, 255, cv::NORM_MINMAX, -1, cv::Mat());
 
     cv::MatND backproj;
-    cv::calcBackProject(&HueImgMat, 1, 0, hist, backproj, &ranges, 1, true );
+    cv::calcBackProject(&HueImgMat, 1, 0, hist, backproj, &ranges, 1, true);
 
     int w = 400; int h = 400;
-    int bin_w = cvRound( (double) w / histSize );
-    cv::Mat histImgMat = cv::Mat::zeros( w, h, CV_8UC3 );
+    int bin_w = cvRound((double) w / histSize);
+    cv::Mat histImgMat = cv::Mat::zeros(w, h, CV_8UC3);
 
     for (int i=0; i<histSize; i++)
     {
-        rectangle( histImgMat, cv::Point( i*bin_w, h ),
-                   cv::Point( (i+1)*bin_w, h - cvRound( hist.at<float>(i)*h/255.0 ) ),
-                   cv::Scalar( 0, 0, 255 ), -1 );
+        rectangle(histImgMat, cv::Point(i*bin_w, h),
+                   cv::Point((i+1)*bin_w, h - cvRound(hist.at<float>(i)*h/255.0)),
+                   cv::Scalar(0, 0, 255), -1);
     }
 
     load_image(label, histImgMat);

@@ -9,7 +9,7 @@
 //      asio客户端模块
 //
 // Author:
-//     	@听心跳的声音
+//      @听心跳的声音
 //
 //  Assumptions:
 //
@@ -61,7 +61,7 @@ void asio_client::asio_client_tx_run()
 {
     int size;
 
-	PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "%s start", __func__);
+    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "%s start", __func__);
     while (1)
     {
         size = client_tx_fifo_->read(tx_buffer_, CLIENT_TX_MAX_BUFFER_SIZE);
@@ -82,7 +82,7 @@ void asio_client::asio_client_rx_run()
     const auto& ipaddress = system_config::get_instance()->get_local_ipaddress();
     const auto& port = system_config::get_instance()->get_serial_config().net_port;
 
-	PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "%s start", __func__);
+    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "%s start", __func__);
 
     while (1)
     {
@@ -119,12 +119,12 @@ void asio_client::asio_client_rx_run()
 
 int asio_client::write_data(char *pbuffer, uint16_t size)
 {
-	int send_size = -1;
+    int send_size = -1;
 
-	if (is_client_link_)
-	{
-		send_size = asio::write(socket_, asio::buffer(pbuffer, size));
-	}
+    if (is_client_link_)
+    {
+        send_size = asio::write(socket_, asio::buffer(pbuffer, size));
+    }
 
-	return send_size;
+    return send_size;
 }

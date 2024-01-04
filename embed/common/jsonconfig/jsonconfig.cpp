@@ -12,7 +12,7 @@
 //      3.提供接口，允许上位机写入配置信息，并保存到config.json文件中, 并支持一键复位
 //
 // Author:
-//     	@听心跳的声音
+//      @听心跳的声音
 //
 //  Assumptions:
 //
@@ -67,7 +67,7 @@ bool system_config::check_ipaddress(const std::string &ipaddr)
         { // IPv4 or IPv6  
             if (getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST) == 0) 
             {  
-                PRINT_NOW("%s:%s IP地址:%s\n", PRINT_NOW_HEAD_STR, ifa->ifa_name, host);
+                PRINT_NOW("%s:%s IpAddress:%s\n", PRINT_NOW_HEAD_STR, ifa->ifa_name, host);
                 if (ipaddr == std::string(host))
                 {
                     is_check = true;

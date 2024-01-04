@@ -9,7 +9,7 @@
 //     
 //
 // Author:
-//     	@听心跳的声音
+//         @听心跳的声音
 //
 //  Assumptions:
 //
@@ -22,7 +22,6 @@
 #include "uartclient.h"
 #include "tcpclient.h"
 #include "commandinfo.h"
-
 
 static CUdpSocketInfo *pCUdpSocketThreadInfo;
 static CTcpSocketInfo *pCTcpSocketThreadInfo;

@@ -54,6 +54,3 @@ bool driver_manage::init()
     
     return true;
 }
-
-
-	

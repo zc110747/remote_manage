@@ -16,7 +16,8 @@
                 "UNICODE",
                 "_UNICODE",
                 "__ARM_PCS_VFP",
-                "MODULE_DEFINE_MQTT"
+                "MODULE_DEFINE_MQTT",
+                "USE_OPENCV=1"
             ],
             "windowsSdkVersion": "8.1",
             "compilerPath": "D:/Software/Visual Studio 2015/VC/bin/cl.exe",

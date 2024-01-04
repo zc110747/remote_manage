@@ -2210,7 +2210,7 @@ void QUIHelper::writeInfo(const QString &info, const QString &filePath)
 void QUIHelper::writeError(const QString &info, const QString &filePath)
 {
     //正式运行屏蔽掉输出错误信息,调试阶段才需要
-    return;
+    //return;
     QString fileName = QString("%1/%2/%3_runerror_%4.txt").arg(QUIHelper::appPath())
                        .arg(filePath).arg(QUIHelper::appName()).arg(QDate::currentDate().toString("yyyyMM"));
 

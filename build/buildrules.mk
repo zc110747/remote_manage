@@ -95,6 +95,11 @@ endif
 	
 	rm -rf $(objects)
 	cp $(buildout) $(lib_dist)/
+
+	if [ ! -d $(run_dist) ]; then \
+		mkdir -m 777 -p $(run_dist); \
+	fi
+	
 	mv $(buildout) $(run_dist)/
 endif
 

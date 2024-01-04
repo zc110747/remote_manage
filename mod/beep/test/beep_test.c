@@ -31,7 +31,8 @@ int main(int argc, const char *argv[])
         return -1;
     }
 
-    if (argc > 1){   
+    if (argc > 1)
+    {
         val = atoi(argv[1]);
     }
 

@@ -6,10 +6,9 @@
 //      appthread.cpp
 //
 //  Purpose:
-//     
 //
 // Author:
-//     	@听心跳的声音
+//      @听心跳的声音
 //
 //  Assumptions:
 //
@@ -26,17 +25,12 @@
 
 static struct SSystemConfig SystemConfigInfo;
 
-/*!
-   ��ȡ����������ļ���Ϣ
-*/
+
 struct SSystemConfig *GetSystemConfigInfo(void)
 {
     return &SystemConfigInfo;
 }
 
-/*!
-   ����������ļ���Ϣ��ʼ��
-*/
 void SystemConfigInfoInit(void)
 {
     QFile file(DEFAULT_CONFIG_FILE);
@@ -47,7 +41,6 @@ void SystemConfigInfoInit(void)
         QString JsonConfigString = file.readAll();
         file.close();
 
-        //����Json��������Ϣ
         QJsonParseError parseJsonErr;
         QJsonDocument document = QJsonDocument::fromJson(JsonConfigString.toUtf8(),&parseJsonErr);
 
@@ -93,9 +86,6 @@ void SystemConfigInfoInit(void)
     }
 }
 
-/*!
-   ����Json���ݣ���д���ļ�
-*/
 void SystemConfigUpdate(void)
 {
     QFile file(DEFAULT_CONFIG_FILE);

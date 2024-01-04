@@ -72,7 +72,7 @@ function process_zlib()
 
     #编译zlib
     export CHOST=${cross_compiler}
-    ./configure --prefix=${GLOBAL_INTALL}
+    ./configure --prefix=${GLOBAL_INTALL} 
     make -j4 && make install
 }
 process_zlib
@@ -82,8 +82,10 @@ function process_openssh()
 {
     openssh_ver=openssh-9.5p1
 
+    echo "start openssh software build!"
+    
     #判断是否存在libz库，存在则不编译
-    if [ -f ${PROGRAM_DOWNLOAD}/${openssh_ver}/sshd ]; then
+    if [ -f ${APP_ROOTFS}/usr/local/bin/sshd ]; then
         echo "openssh exist, not build!"
         return 0
     fi
@@ -105,11 +107,11 @@ function process_openssh()
     fi
 
     #编译openssh
-    ./configure --host=arm-none-linux-gnueabihf --with-libs --with-zlib=${GLOBAL_INTALL} \
+    ./configure --host=${cross_compiler} --with-libs --with-zlib=${GLOBAL_INTALL} \
                 --with-ssl-dir=${GLOBAL_INTALL} --disable-etc-default-login \
                 --prefix=${GLOBAL_INTALL}
 
-    make -j2
+    make -j4
 
     cp scp sftp ssh sshd ssh-agent ssh-keygen ssh-keyscan ${APP_ROOTFS}/usr/local/bin/
     cp sftp-server ssh-keysign ${APP_ROOTFS}/usr/libexec/
@@ -120,10 +122,15 @@ process_openssh
 #安装node服务
 function process_node()
 {
-    node_ver=v20.9.0
-    node_file=node-${node_ver}-linux-armv7l
+    node_ver=v20.10.0
 
-    if [ -d ${APPLICATION_SYS}/support/node/bin ]; then
+    if [ ${FIRMWARE_CURRENT_PLATFORMS} == "ARM" ]; then
+        node_file=node-${node_ver}-linux-armv7l
+    else
+        node_file=node-${node_ver}-linux-arm64
+    fi
+
+    if [ -d ${NFS_PATH}/usr/bin/node/bin ]; then
         echo "node already install, finished!"
         return 0
     fi
@@ -135,8 +142,8 @@ function process_node()
     fi
 
     tar -xvf ${node_file}.tar.xz
-    mkdir -p ${APPLICATION_SYS}/support/node/
-    cp -Rv ${node_file}/* ${APPLICATION_SYS}/support/node/
+    sudo mkdir -m 777 -p ${NFS_PATH}/usr/bin/node
+    cp -Rv ${node_file}/* ${NFS_PATH}/usr/bin/node/
 }
 process_node
 
@@ -245,18 +252,14 @@ function install_library()
 {
     sudo cp -Rv ${GLOBAL_INTALL}/usr/local/lib/* ${GLOBAL_INTALL}/lib/
 
-    if [ "${FIRMWARE_CURRENT_PLATFORMS}" == "ARM" ]; then
-        sudo mkdir -p ${NFS_PATH}/usr/lib/
-        sudo mkdir -p ${NFS_PATH}/usr/include/
-        sudo mkdir -p ${NFS_PATH}/usr/local/
-        sudo cp -Rv ${GLOBAL_INTALL}/lib/* ${NFS_PATH}/usr/lib/
-        sudo cp -Rv ${GLOBAL_INTALL}/usr/local/lib/* ${NFS_PATH}/usr/lib/
-        sudo cp -Rv ${GLOBAL_INTALL}/usr/local/include/* ${NFS_PATH}/usr/include/
-        sudo cp -Rv ${GLOBAL_INTALL}/include/* ${NFS_PATH}/usr/include/
-        sudo cp -Rv ${GLOBAL_INTALL}/usr/local/* ${NFS_PATH}/usr/local/
-        sudo cp -Rv ${GLOBAL_INTALL}/etc/* ${NFS_PATH}/etc/
-    else
-        echo "only arm platform do nfs path".
-    fi
+    sudo mkdir -p ${NFS_PATH}/usr/lib/
+    sudo mkdir -p ${NFS_PATH}/usr/include/
+    sudo mkdir -p ${NFS_PATH}/usr/local/
+    sudo cp -Rv ${GLOBAL_INTALL}/lib/* ${NFS_PATH}/usr/lib/
+    sudo cp -Rv ${GLOBAL_INTALL}/usr/local/lib/* ${NFS_PATH}/usr/lib/
+    sudo cp -Rv ${GLOBAL_INTALL}/usr/local/include/* ${NFS_PATH}/usr/include/
+    sudo cp -Rv ${GLOBAL_INTALL}/include/* ${NFS_PATH}/usr/include/
+    sudo cp -Rv ${GLOBAL_INTALL}/usr/local/* ${NFS_PATH}/usr/local/
+    sudo cp -Rv ${GLOBAL_INTALL}/etc/* ${NFS_PATH}/etc/
 }
 install_library

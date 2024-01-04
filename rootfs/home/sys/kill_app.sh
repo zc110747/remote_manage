@@ -1,8 +1,12 @@
+#/usr/bin/bash
 
-#关闭node
-pkill -9 node
+app_list=("node server.js" "main_process" "logger_tool" "local_device" "mosquitto")
 
-#关闭系统执行命令
-pkill -9 lower_device
-pkill -9 main_process
-pkill -9 logger_tool
+for app in "${app_list[@]}"; do
+    run_id=$(ps aux | grep '${app}' | grep -v grep | awk '{print $2}')
+    echo "${app}, id:${run_id}"
+
+    if [ ! -z ${run_id} ]; then
+        kill -9 ${run_id}
+    fi
+done

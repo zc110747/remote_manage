@@ -105,8 +105,8 @@ int protocol_info::CreateSendBuffer(uint8_t nId, uint16_t nSize, uint8_t *pStart
 /**
  * 函数声明模板
  *
- * @param   crc:	previous CRC value
- * @param   data:	data
+ * @param   crc:    previous CRC value
+ * @param   data:    data
  *
  * @return NULL
  */
@@ -118,9 +118,9 @@ static inline uint16_t crc16_byte(uint16_t crc, const uint8_t data)
 /**
  * 函数声明模板
  *
- * @param   crc:	previous CRC value
- * @param   buffer:	data pointer
- * @param   len:	number of bytes in the buffer
+ * @param   crc:    previous CRC value
+ * @param   buffer: data pointer
+ * @param   len:    number of bytes in the buffer
  *
  * @return NULL
  */

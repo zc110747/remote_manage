@@ -1,4 +1,7 @@
-﻿#include "mainwindow.h"
+﻿#include <QDir>
+#include <QFileDialog>
+
+#include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "protocol.h"
 #include "uartclient.h"
@@ -9,8 +12,6 @@
 #include "configfile.h"
 #include "imageprocess.h"
 #include "screenshot/screenshot.h"
-#include <QDir>
-#include <QFileDialog>
 
 static CUartProtocolInfo *pMainUartProtocolInfo;
 static CTcpSocketInfo *pMainTcpSocketThreadInfo;
@@ -34,7 +35,6 @@ MainWindow::MainWindow(QWidget *parent)
     init();
     initStyle();
     CommandInfoInit();
-
 }
 
 MainWindow::~MainWindow()
@@ -531,8 +531,10 @@ void MainWindow::on_btn_filepath_update_clicked()
 {
     SCommandInfo *pCmdInfo = GetCommandPtr(SYSTEM_UPDATE_CMD);
     if (pCmdInfo != nullptr)
+    {
         CmdSendBuffer(pCmdInfo->m_pbuffer, pCmdInfo->m_nSize, pCmdInfo->m_nCommand, false, pCmdInfo->m_pFunc,
-                      ui->combo_box_filepath->itemText( ui->combo_box_filepath->currentIndex()));
+                      ui->combo_box_filepath->itemText(ui->combo_box_filepath->currentIndex()));
+    }
 }
 
 /*!

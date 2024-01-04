@@ -46,7 +46,7 @@ public:
 
     /// \brief send_buffer
     /// - This method is used update buffer to device.
-    /// \return Wheather send is success or failed.  
+    /// \return Wheather send is success or failed.
     int send_buffer(char *ptr, int length);
 
 private:
@@ -64,7 +64,7 @@ private:
     static log_process *instance_pointer_;
 
     /// \brief logger_rx_thread_
-    /// - logger rx thread object. 
+    /// - logger rx thread object.
     std::thread logger_rx_thread_;
 
     /// \brief logger_rx_fifo_

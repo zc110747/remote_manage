@@ -28,7 +28,7 @@ _Pragma("once")
 class driver_manage
 {
 public:
-	/// \brief constructor
+    /// \brief constructor
     driver_manage() = default;
 
     /// - destructor, delete not allow for singleton pattern.

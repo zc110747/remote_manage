@@ -58,7 +58,7 @@ void log_process::logger_rx_run()
     int len;
 
     PRINT_NOW("%s:logger rx run start!\n", PRINT_NOW_HEAD_STR);
-    
+
     while (1)
     {
         len = logger_rx_fifo_->read(rx_buffer, RX_MAX_BUFFER_SIZE);
@@ -95,8 +95,8 @@ log_process* log_process::get_instance()
 bool log_process::init()
 {
     //init and Create logger fifo, must before thread run.
-    logger_rx_fifo_ = std::make_unique<fifo_manage>(LOGGER_RX_FIFO, 
-                                                    S_FIFO_WORK_MODE, 
+    logger_rx_fifo_ = std::make_unique<fifo_manage>(LOGGER_RX_FIFO,
+                                                    S_FIFO_WORK_MODE,
                                                     FIFO_MODE_R_CREATE);
     if (logger_rx_fifo_ == nullptr)
         return false;
@@ -104,8 +104,8 @@ bool log_process::init()
         return false;
 
     //gui tx fifo
-    logger_gui_tx_fifo_ = std::make_unique<fifo_manage>(LOGGER_GUI_TX_FIFO, 
-                                                    S_FIFO_WORK_MODE, 
+    logger_gui_tx_fifo_ = std::make_unique<fifo_manage>(LOGGER_GUI_TX_FIFO,
+                                                    S_FIFO_WORK_MODE,
                                                     FIFO_MODE_W_CREATE);
     if (logger_gui_tx_fifo_ == nullptr)
         return false;
@@ -113,8 +113,8 @@ bool log_process::init()
         return false;
 
     //local device tx fifo
-    logger_locd_tx_fifo_ = std::make_unique<fifo_manage>(LOGGER_LOC_DEV_TX_FIFO, 
-                                                    S_FIFO_WORK_MODE, 
+    logger_locd_tx_fifo_ = std::make_unique<fifo_manage>(LOGGER_LOC_DEV_TX_FIFO,
+                                                    S_FIFO_WORK_MODE,
                                                     FIFO_MODE_W_CREATE);
     if (logger_locd_tx_fifo_ == nullptr)
         return false;
@@ -122,8 +122,8 @@ bool log_process::init()
         return false;
 
     //lower device tx fifo
-    logger_low_dev_tx_fifo_ = std::make_unique<fifo_manage>(LOGGER_LOW_DEV_TX_FIFO, 
-                                                    S_FIFO_WORK_MODE, 
+    logger_low_dev_tx_fifo_ = std::make_unique<fifo_manage>(LOGGER_LOW_DEV_TX_FIFO,
+                                                    S_FIFO_WORK_MODE,
                                                     FIFO_MODE_W_CREATE);
     if (logger_low_dev_tx_fifo_ == nullptr)
         return false;
@@ -131,8 +131,8 @@ bool log_process::init()
         return false;
 
     //main process tx_fifo
-    logger_mp_tx_fifo_ = std::make_unique<fifo_manage>(LOGGER_MP_TX_FIFO, 
-                                                    S_FIFO_WORK_MODE, 
+    logger_mp_tx_fifo_ = std::make_unique<fifo_manage>(LOGGER_MP_TX_FIFO,
+                                                    S_FIFO_WORK_MODE,
                                                     FIFO_MODE_W_CREATE);
     if (logger_mp_tx_fifo_ == nullptr)
         return false;
@@ -149,7 +149,7 @@ void log_process::show_help()
 {
     std::string out_str = "\n";
 
-    for(const auto [x, y]:command_help_map)
+    for (const auto [x, y]:command_help_map)
     {
         out_str += fmt::format("{0}\n", y);
     }
@@ -167,7 +167,7 @@ int log_process::send_buffer(char *ptr, int length)
     CMD_DEVICE cmd = CMD_NULL;
     int len = 0;
 
-    for(const auto& command:command_map)
+    for (const auto& command:command_map)
     {
         if (strncmp (command.first.c_str(), ptr, command.first.length()) == 0)
         {

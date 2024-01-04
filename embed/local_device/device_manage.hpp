@@ -73,7 +73,7 @@ private:
     /// - This method is used to process the hardware command.
     /// \param pEvent - the point of the event to process.
     void process_hardware(Event *pEvent);
-    
+
 private:
     /// \brief instance_pointer_
     /// - object used to implement the singleton pattern.

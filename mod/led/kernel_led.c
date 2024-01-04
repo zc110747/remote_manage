@@ -33,8 +33,8 @@ typedef struct
     int major;              /*主设备号*/
     int minor;              /*从设备号*/
     struct cdev cdev;       /*设备接口*/
-    struct class *class;	/*设备类指针*/
-    struct device *device;	/*设备指针*/
+    struct class *class;    /*设备类指针*/
+    struct device *device;  /*设备指针*/
 }device_info;
 
 typedef struct 
@@ -55,9 +55,9 @@ static led_driver driver;
 #define LED_ON                             1
 
 //自定义设备号
-#define DEFAULT_MAJOR                       0          /*默认主设备号*/
-#define DEFAULT_MINOR                       0          /*默认从设备号*/
-#define DEVICE_NAME			                "led"     /* 设备名, 应用将以/dev/led访问 */
+#define DEFAULT_MAJOR                       0       /*默认主设备号*/
+#define DEFAULT_MINOR                       0       /*默认从设备号*/
+#define DEVICE_NAME                         "led"   /* 设备名, 应用将以/dev/led访问 */
 
 static void led_hardware_set(u8 status)
 {
@@ -65,12 +65,12 @@ static void led_hardware_set(u8 status)
     {
         case LED_OFF:
             printk(KERN_INFO"led off\n");
-            gpio_set_value(driver.hw.gpio, 1);	
+            gpio_set_value(driver.hw.gpio, 1);
             driver.hw.status = 0;
             break;
         case LED_ON:
             printk(KERN_INFO"led on\n");
-            gpio_set_value(driver.hw.gpio, 0);	
+            gpio_set_value(driver.hw.gpio, 0);
             driver.hw.status = 1;
             break;
         default:
@@ -99,27 +99,27 @@ ssize_t led_read(struct file *filp, char __user *buf, size_t count, loff_t *f_po
     result = copy_to_user(buf, databuf, 1);
     if (result < 0) 
     {
-		printk(KERN_INFO"kernel read failed!\n");
-		return -EFAULT;
-	}
+        printk(KERN_INFO"kernel read failed!\n");
+        return -EFAULT;
+    }
     return 1;
 }
 
 ssize_t led_write(struct file *filp, const char __user *buf, size_t count,  loff_t *f_pos)
 {
-	int result;
-	u8 databuf[2];
+    int result;
+    u8 databuf[2];
 
-	result = copy_from_user(databuf, buf, count);
-	if (result < 0) 
+    result = copy_from_user(databuf, buf, count);
+    if (result < 0)
     {
-		printk(KERN_INFO"kernel write failed!\n");
-		return -EFAULT;
-	}
-	
+        printk(KERN_INFO"kernel write failed!\n");
+        return -EFAULT;
+    }
+
     /*硬件操作*/
-	led_hardware_set(databuf[0]);
-	return 0;
+    led_hardware_set(databuf[0]);
+    return 0;
 }
 
 long led_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
@@ -171,12 +171,12 @@ static int led_device_create(void)
 
     if (result < 0)
     {
-        printk(KERN_INFO"dev alloc or set failed\r\n");	
+        printk(KERN_INFO"dev alloc or set failed\r\n");
         goto exit;
     }
     else
     {
-        printk(KERN_INFO"dev alloc or set ok, major:%d, minor:%d\r\n", driver.dev.major,  driver.dev.minor);	
+        printk(KERN_INFO"dev alloc or set ok, major:%d, minor:%d\r\n", driver.dev.major,  driver.dev.minor);
     }
     
     /*2.添加设备到相应总线上*/
@@ -188,44 +188,44 @@ static int led_device_create(void)
         printk(KERN_INFO"cdev add failed\r\n");
         goto exit_cdev_add;
     }else{
-	    printk(KERN_INFO"device add Success!\r\n");	
+    printk(KERN_INFO"device add Success!\r\n");
     }
 
     /* 4、创建类 */
-	driver.dev.class = class_create(THIS_MODULE, DEVICE_NAME);
-	if (IS_ERR(driver.dev.class)) 
+    driver.dev.class = class_create(THIS_MODULE, DEVICE_NAME);
+    if (IS_ERR(driver.dev.class)) 
     {
-		printk(KERN_INFO"class create failed!\r\n");
+        printk(KERN_INFO"class create failed!\r\n");
         result = PTR_ERR(driver.dev.class);
         goto exit_class_create;
-	}
-	else
+    }
+    else
     {
-		printk(KERN_INFO"class create successed!\r\n");
-	}
+        printk(KERN_INFO"class create successed!\r\n");
+    }
 
-	/* 5、创建设备 */
-	driver.dev.device = device_create(driver.dev.class, NULL, driver.dev.dev_id, NULL, DEVICE_NAME);
-	if (IS_ERR(driver.dev.device)) 
+    /* 5、创建设备 */
+    driver.dev.device = device_create(driver.dev.class, NULL, driver.dev.dev_id, NULL, DEVICE_NAME);
+    if (IS_ERR(driver.dev.device)) 
     {
-		printk(KERN_INFO"device create failed!\r\n");
+        printk(KERN_INFO"device create failed!\r\n");
         result = PTR_ERR(driver.dev.device);
-		goto exit_device_create;
-	}
-	else
+        goto exit_device_create;
+    }
+    else
     {
-		printk(KERN_INFO"device create successed!\r\n");
-	}
+        printk(KERN_INFO"device create successed!\r\n");
+    }
     return 0;
 
-exit_device_create:
-	class_destroy(driver.dev.class);
-exit_class_create:
-    cdev_del(&driver.dev.cdev);
-exit_cdev_add:
-    unregister_chrdev_region(driver.dev.dev_id, 1);
-exit:
-    return result;
+    exit_device_create:
+        class_destroy(driver.dev.class);
+    exit_class_create:
+        cdev_del(&driver.dev.cdev);
+    exit_cdev_add:
+        unregister_chrdev_region(driver.dev.dev_id, 1);
+    exit:
+        return result;
 }
 
 static int led_hardware_init(struct platform_device *pdev)
@@ -290,10 +290,10 @@ static int led_probe(struct platform_device *dev)
 static void led_device_destory(void)
 {
     device_destroy(driver.dev.class, driver.dev.dev_id);
-	class_destroy(driver.dev.class);
+    class_destroy(driver.dev.class);
 
-	cdev_del(&driver.dev.cdev);
-	unregister_chrdev_region(driver.dev.dev_id, 1);   
+    cdev_del(&driver.dev.cdev);
+    unregister_chrdev_region(driver.dev.dev_id, 1);   
 }
 
 static void led_hardware_release(void)
@@ -313,8 +313,8 @@ static int led_remove(struct platform_device *dev)
 
 /* 查询设备树的匹配函数 */
 static const struct of_device_id led_of_match[] = {
-	{ .compatible = "usr-led" },
-	{ /* Sentinel */ }
+    { .compatible = "usr-led" },
+    { /* Sentinel */ }
 };
 
 static struct platform_driver platform_driver = {
@@ -349,7 +349,7 @@ static void __exit led_module_exit(void)
 
 module_init(led_module_init);
 module_exit(led_module_exit);
-MODULE_AUTHOR("wzdxf");				    //模块作者
-MODULE_LICENSE("GPL v2");               //模块许可协议
-MODULE_DESCRIPTION("platform driver for led");      //模块许描述
-MODULE_ALIAS("led_driver");            //模块别名
+MODULE_AUTHOR("wzdxf");                         //模块作者
+MODULE_LICENSE("GPL v2");                       //模块许可协议
+MODULE_DESCRIPTION("platform driver for led");  //模块许描述
+MODULE_ALIAS("led_driver");                     //模块别名
