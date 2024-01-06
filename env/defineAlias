@@ -79,9 +79,13 @@ enter_chroot()
 	#enter chroot
 	mount_chroot
 
-	LC_ALL=C LANGUAGE=C LANG=C sudo chroot ${NFS_PATH} chown root:root /usr/bin/sudo
-	LC_ALL=C LANGUAGE=C LANG=C sudo chroot ${NFS_PATH} chmod u+s /usr/bin/sudo
-	LC_ALL=C LANGUAGE=C LANG=C sudo chroot ${NFS_PATH}
+	if [ -f ${NFS_PATH}/bin/bash ]; then
+		LC_ALL=C LANGUAGE=C LANG=C sudo chroot ${NFS_PATH} chown root:root /usr/bin/sudo
+		LC_ALL=C LANGUAGE=C LANG=C sudo chroot ${NFS_PATH} chmod u+s /usr/bin/sudo
+		LC_ALL=C LANGUAGE=C LANG=C sudo chroot ${NFS_PATH}
+	else
+		LC_ALL=C LANGUAGE=C LANG=C sudo chroot ${NFS_PATH} /bin/sh
+	fi	
 }
 alias enter_chroot='enter_chroot'
 
