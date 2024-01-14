@@ -71,8 +71,10 @@ alias umount_chroot='umount_chroot'
 #############################################################
 enter_chroot()
 {
-	cd ${NFS_PATH}
+	cd ${NFS_PATH}/
 
+	SysMountRootfs
+	
 	#exit the chroot
 	umount_chroot
 
@@ -116,7 +118,7 @@ function SysPreThirdParts()
 
 	cd ${ENV_PATH_ROOT}/thirdparts/
 
-	if [ ! -d ${NFS_PATH}/etc/perl ]; then
+	if [ ! -d ${NFS_PATH}/bin ]; then
 		sudo chmod 777 preRootfs.sh
 		./preRootfs.sh
 	fi
@@ -127,6 +129,28 @@ function SysPreThirdParts()
 	./preThirdParts.sh
 }
 alias SysPreThirdParts='SysPreThirdParts'
+
+############################################################
+#SysMountRootfs
+#function: mount rootfs
+#############################################################
+function SysMountRootfs()
+{
+	cda 
+
+	umount_chroot
+
+	mstate=$(mount | grep ${NFS_PATH})
+
+	if [ -n "$mstate" ]; then
+		sudo umount ${NFS_PATH}/
+	fi
+
+	sudo mount -o loop ${PROGRAM_IMG}/${ROOTFS_VER} ${NFS_PATH}/
+
+	cdn
+}
+alias SysMountRootfs='SysMountRootfs'
 
 ############################################################
 #SysBuildApplication
@@ -151,7 +175,7 @@ alias test_build_driver_module='build_driver_module'
 function SysBuildApplication()
 {
 	#check wheather library support
-	if [ ! -f ${NFS_PATH}/usr/lib/libssl.a ] || [ ! -d ${APPLICATION_THIRDPARTS}/asio ]; then
+	if [ ! -f ${GLOBAL_INTALL}/lib/libssl.a ] || [ ! -d ${APPLICATION_THIRDPARTS}/asio ]; then
 		echo "support library for application not exist, run command"
 		echo "  ${redText}SysPreThirdParts${defText}"
 		echo "  ${redText}SysBuildRootfs${defText}"
@@ -194,22 +218,56 @@ function SysUpdateConfig
 	truncate -s 0 $ENV_CONFIG_FILE
 	echo "$FIRMWARE_CURRENT_PLATFORMS">$ENV_CONFIG_FILE
 	echo "$FMWARE_VESRION">>$ENV_CONFIG_FILE
+	echo "$ROOTFS_RUN">>$ENV_CONFIG_FILE
 	exec bash
 }
 
-function SysSetPlatformARM
+function SysSetPlatform
 {
-	export FIRMWARE_CURRENT_PLATFORMS="ARM"
-	SysUpdateConfig
-}
-alias SysSetPlatformARM='SysSetPlatformARM'
+    if [ x$1 != x ]; then
+        
+        current_platform="ARM"
+        case "$1" in
+            "ARM")
+                current_platform="ARM"
+            ;;
+            "AARCH64")
+                current_platform="AARCH64"
+            ;;
+        esac
 
-function SysSetPlatformAARCH64
-{
-	export FIRMWARE_CURRENT_PLATFORMS="AARCH64"
-	SysUpdateConfig
+        export FIRMWARE_CURRENT_PLATFORMS=$current_platform       
+        SysUpdateConfig
+    else
+        echo "set platform must with parameter ${greenText}'ARM AARCH64'${defText}'"
+    fi
 }
-alias SysSetPlatformAARCH64='SysSetPlatformAARCH64'
+alias SysSetPlatform='SysSetPlatform'
+
+function SysSetRootfs
+{
+    if [ x$1 != x ]; then
+        
+        current_rootfs="debain"
+        case "$1" in
+            "busybox")
+                current_rootfs="busybox"
+            ;;
+			"buildroot")
+                current_rootfs="buildroot"
+            ;;
+            "debain")
+                current_rootfs="debain"
+            ;;
+        esac
+
+        export ROOTFS_RUN=$current_rootfs       
+        SysUpdateConfig
+    else
+        echo "set rootfs must with parameter ${greenText}'busybox buildroot debain'${defText}'"
+    fi
+}
+alias SysSetRootfs='SysSetRootfs'
 
 ############################################################
 #SysBuildKernel/SysCleanKernel
@@ -226,9 +284,9 @@ function SysBuildKernel
 	if [ -d $ENV_KERNEL_DIR ]; then
 		cd $ENV_KERNEL_DIR
 
-		echo "compiler:$KERNEL_CC"
-		make ARCH=arm CROSS_COMPILE=$KERNEL_CC imx_v7_defconfig
-		make V=1 ARCH=arm CROSS_COMPILE=$KERNEL_CC all -j4
+		echo "compiler:$NEW_KERNEL_CC"
+		make ARCH=arm CROSS_COMPILE=$NEW_KERNEL_CC imx_v7_defconfig
+		make V=1 ARCH=arm CROSS_COMPILE=$NEW_KERNEL_CC all -j4
 
 		if [ -f $ENV_KERNEL_ZIMAGE ]; then
 			cp -avf $ENV_KERNEL_ZIMAGE $TFTP_PATH/
@@ -314,35 +372,39 @@ alias SysCleanUboot='SysCleanUboot'
 #############################################################
 function SysBuildRootfs
 {
-	if [ -d $ENV_ROOTFS_DIR ]; then
-		cd $ENV_ROOTFS_DIR
+    echo "build or create rootfs:$ROOTFS_RUN"
 
-		#copy use file
-		echo "copy user defined."
-		sudo chmod -Rv 755 ${ENV_PATH_ROOT}/rootfs/etc
-		sudo chmod -Rv 755 ${APPLICATION_SYS}/
-		sudo cp -ravf ${ENV_PATH_ROOT}/rootfs/* ${NFS_PATH}/
+    if [ $ROOTFS_RUN == "busybox" ]; then
 
-		if [ ! -d ${NFS_PATH}/etc/perl ]; then
-			make -j4
-			make install
+        cd $ENV_ROOTFS_DIR/
+        make -j4 && make install
 
-			sudo cp -ravf ${ENV_ROOTFS_DIR}/_install/* $NFS_PATH/
-			
-			#copy C/C++ library
-			echo "copy c++ library"
-			cd $GCC_LIB/lib
-			cp -ravf *so* $NFS_PATH/lib/
+		cd ${NFS_PATH}/
+		sudo mkdir -m 755 dev etc lib proc root sys tmp run
 
-			echo "copy c library"
-			cd $GCC_LIB/libc/lib
-			cp -ravf *so* $NFS_PATH/lib/
-		fi
+        #copy rootfs to the next directory
+        sudo chmod -Rv 755 ${ENV_PATH_ROOT}/rootfs/etc
+        sudo cp -ravf ${ENV_PATH_ROOT}/rootfs/* ${NFS_PATH}/
+        sudo cp -ravf ${ENV_ROOTFS_DIR}/_install/* $NFS_PATH/
 
-		cda
-	else
-		echo "rootfs directory:$ENV_ROOTFS_DIR not exist!"
-	fi
+        #copy C/C++ library
+        echo "copy c++ library"
+        cd $GCC_LIB/lib
+        sudo cp -ravf *so* $NFS_PATH/lib/
+
+        echo "copy c library"
+        cd $GCC_LIB/libc/lib
+        sudo cp -ravf *so* $NFS_PATH/lib/
+    elif [ $ROOTFS_RUN == "buildroot" ]; then
+        #copy rootfs to the next directory
+        sudo chmod -Rv 755 ${ENV_PATH_ROOT}/rootfs/ 
+    else
+        #copy rootfs to the next directory
+        sudo chmod -Rv 755 ${ENV_PATH_ROOT}/rootfs/
+        sudo cp -ravf ${ENV_PATH_ROOT}/rootfs/home/* ${NFS_PATH}/home/
+		sudo cp -ravf ${ENV_PATH_ROOT}/rootfs/etc/mosquitto/ ${NFS_PATH}/etc/
+        sudo cp -ravf ${ENV_PATH_ROOT}/rootfs/root/.bashrc ${NFS_PATH}/root/
+    fi
 }
 alias SysBuildRootfs='SysBuildRootfs'
 
@@ -427,10 +489,8 @@ function SysHelpCommand
 {
 	echo "${blueText}SysPreThirdParts${defText}"
 	echo "    ${limityellowText}pull all thirdparts, install library."
-	echo "${blueText}SysSetPlatformARM${defText}"
-	echo "    ${limityellowText}Set Current Platform to ARM Complier(I.MX6ull)."
-	echo "${blueText}SysSetPlatformAARCH64${defText}"
-	echo "    ${limityellowText}Set Current Platform to AARCH64 Complier(H616)."
+	echo "${blueText}SysSetPlatform${defText}"
+	echo "    ${limityellowText}Set Platform to ARM/AARCH64 Complier."
 	echo "${blueText}SysSetApplicationVer${defText}"
 	echo "    ${limityellowText}example:${cyanText}SysSetApplicationVer 1.0.0.1."
 	echo "    ${limityellowText}Set the verison of the firmware when build"

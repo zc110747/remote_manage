@@ -23,9 +23,10 @@ thirdparts/mosquitto/c*
 thirdparts/mosquitto/o*
 thirdparts/mosquitto/z*
 
-rootfs/home/sys/
 rootfs/home/sys/server/*
-rootfs/usr/local/bin/*
+rootfs/home/sys/webpage/*
+rootfs/home/sys/configs/*
+!rootfs/etc/*
 
 buildout/aarch64/
 buildout/arm/
@@ -38,3 +39,6 @@ embed/logger_tool/logger_tool
 embed/node_server/node_modules
 embed/node_server/*.json
 embed/test/device_info
+
+sdk/*
+!sdk/*.md

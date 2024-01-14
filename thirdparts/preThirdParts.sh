@@ -85,7 +85,7 @@ function process_openssh()
     echo "start openssh software build!"
     
     #判断是否存在libz库，存在则不编译
-    if [ -f ${APP_ROOTFS}/usr/local/bin/sshd ]; then
+    if [ -f ${NFS_PATH}/usr/local/bin/sshd ]; then
         echo "openssh exist, not build!"
         return 0
     fi
@@ -113,9 +113,21 @@ function process_openssh()
 
     make -j4
 
-    cp scp sftp ssh sshd ssh-agent ssh-keygen ssh-keyscan ${APP_ROOTFS}/usr/local/bin/
-    cp sftp-server ssh-keysign ${APP_ROOTFS}/usr/libexec/
-    cp ssh_config sshd_config ${APP_ROOTFS}/usr/local/etc/
+    if [ ! -d ${NFS_PATH}/usr/local/bin/ ]; then
+        sudo mkdir -m 755 -p ${NFS_PATH}/usr/local/bin/
+    fi
+
+    if [ ! -d ${NFS_PATH}/usr/libexec/ ]; then
+        sudo mkdir -m 755 -p ${NFS_PATH}/usr/libexec/
+    fi
+
+    if [ ! -d ${NFS_PATH}/usr/local/etc/ ]; then
+        sudo mkdir -m 755 -p ${NFS_PATH}/usr/local/etc/
+    fi
+
+    sudo cp scp sftp ssh sshd ssh-agent ssh-keygen ssh-keyscan ${NFS_PATH}/usr/local/bin/
+    sudo cp sftp-server ssh-keysign ${NFS_PATH}/usr/libexec/
+    sudo cp ssh_config sshd_config ${NFS_PATH}/usr/local/etc/
 }
 process_openssh
 

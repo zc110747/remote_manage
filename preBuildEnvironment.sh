@@ -1,6 +1,7 @@
 #/bin/sh
 ##############################################################################
 #这个脚本用于构建支持项目环境应用的系统
+#系统位于当前目录sdk下
 #包含自动安装编译工具(GCC), uboot, kernel, rootfs到指定地址，安装完成后即可配合env
 #中定义的系统指令进行编译环境的构建，整个系统的编译工具，uboot，kernel和rootfs都已经
 #指定。
@@ -11,7 +12,7 @@
 ################################################################################
 
 #备用下载文件目录
-DOWNLOAD_PATH=/mnt/d/download
+DOWNLOAD_PATH=/home/program/download
 AARCH_GCC_TOOLCHAIN=gcc-arm-11.2-2022.02-x86_64-aarch64-none-linux-gnu
 GCC_TOOLCHAIN=gcc-arm-11.2-2022.02-x86_64-arm-none-linux-gnueabihf
 OLD_GCC_TOOLCHAIN=gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf
@@ -20,15 +21,15 @@ KERNEL_FILE=linux-imx-lf-6.1.y
 ROOTFS_FILE=busybox-1.36.1
 
 #全局的环境目录创建
-GLOBAL_PROGRAM_PATH=/home/program
-GLOBAL_PROGRAM_THIRDPARTS=${GLOBAL_PROGRAM_PATH}/thirdparts
-GLOBAL_PROGRAM_INSTALL=${GLOBAL_PROGRAM_PATH}/install
-GLOBAL_PROGRAM_SUPPORT=${GLOBAL_PROGRAM_PATH}/support
+LOCAL_PATH=$(pwd)
+GLOBAL_PROGRAM_PATH=${LOCAL_PATH}/sdk
+
+#保存下载的文件
 GLOBAL_PROGRAM_DOWNLOAD=${GLOBAL_PROGRAM_PATH}/download
 GLOBAL_PROGRAM_BUILD=${GLOBAL_PROGRAM_PATH}/build
-GLOBAL_PROGRAM_APPLICATION=${GLOBAL_PROGRAM_PATH}/application
-
-CURRENT_PATH=$(pwd)
+GLOBAL_PROGRAM_INSTALL=${GLOBAL_PROGRAM_PATH}/install
+GLOBAL_PROGRAM_SUPPORT=${GLOBAL_PROGRAM_PATH}/support
+GLOBAL_PROGRAM_IMG=${GLOBAL_PROGRAM_PATH}/img
 
 #定义全局color
 readonly defText="$(tput sgr0)"
@@ -36,28 +37,41 @@ readonly redText="$(tput setaf 1)"
 readonly greenText="$(tput setaf 2)"
 
 #创建编译环境
-if [ ! -d "$GLOBAL_PROGRAM_PATH" ]; then
+if [ ! -d "$GLOBAL_PROGRAM_BUILD" ]; then
     
     echo "start create the environment."
     sudo mkdir $GLOBAL_PROGRAM_PATH
     sudo chmod 777 $GLOBAL_PROGRAM_PATH
 
-    #构建系统需要的环境信息
+    #安装img文件
+    mkdir -p ${GLOBAL_PROGRAM_IMG}/
+
+    #构建系统需要的环境信息 
+    #下载目录，存放下载的第三方库
     mkdir -p ${GLOBAL_PROGRAM_DOWNLOAD}/tmp
+    
+    #存放编译后的安装目录，特别时交叉编译环境
     mkdir -p ${GLOBAL_PROGRAM_INSTALL}/arm
-    mkdir -p ${GLOBAL_PROGRAM_INSTALL}/i386
-    mkdir -p ${GLOBAL_PROGRAM_SUPPORT}/compiler
-    mkdir -p ${GLOBAL_PROGRAM_SUPPORT}/aarch64_compiler
-    mkdir -p ${GLOBAL_PROGRAM_SUPPORT}/old_compiler
-    mkdir -p ${GLOBAL_PROGRAM_SUPPORT}/uboot
-    mkdir -p ${GLOBAL_PROGRAM_SUPPORT}/kernel
-    mkdir -p ${GLOBAL_PROGRAM_SUPPORT}/rootfs 
-    mkdir -p ${GLOBAL_PROGRAM_PATH}/build/nfs_root
-    mkdir -p ${GLOBAL_PROGRAM_PATH}/build/nfs_root/arm
-    mkdir -p ${GLOBAL_PROGRAM_PATH}/build/nfs_root/aarch64    
-    mkdir -p ${GLOBAL_PROGRAM_PATH}/build/tftp_root
-    mkdir -p ${GLOBAL_PROGRAM_PATH}/build/tftp_root/arm
-    mkdir -p ${GLOBAL_PROGRAM_PATH}/build/tftp_root/aarch64
+    mkdir -p ${GLOBAL_PROGRAM_INSTALL}/aarch64
+
+    #存放编译支持的目录，如编译工具，脚本，文件系统
+    mkdir -p ${GLOBAL_PROGRAM_SUPPORT}/arm/compiler/
+    mkdir -p ${GLOBAL_PROGRAM_SUPPORT}/arm/old_compiler/
+    mkdir -p ${GLOBAL_PROGRAM_SUPPORT}/arm/uboot/
+    mkdir -p ${GLOBAL_PROGRAM_SUPPORT}/arm/kernel/
+    mkdir -p ${GLOBAL_PROGRAM_SUPPORT}/arm/rootfs/ 
+
+    mkdir -p ${GLOBAL_PROGRAM_SUPPORT}/aarch64/compiler/
+    mkdir -p ${GLOBAL_PROGRAM_SUPPORT}/aarch64/uboot/
+    mkdir -p ${GLOBAL_PROGRAM_SUPPORT}/aarch64/kernel/
+    mkdir -p ${GLOBAL_PROGRAM_SUPPORT}/aarch64/rootfs/ 
+
+    #存放编译好的nfs和tftp目录
+    mkdir -p ${GLOBAL_PROGRAM_BUILD}/img/
+    mkdir -p ${GLOBAL_PROGRAM_BUILD}/nfs_root/arm   
+    mkdir -p ${GLOBAL_PROGRAM_BUILD}/nfs_root/aarch64
+    mkdir -p ${GLOBAL_PROGRAM_BUILD}/tftp_root/arm/
+    mkdir -p ${GLOBAL_PROGRAM_BUILD}/tftp_root/aarch64/
 
     sudo chmod -Rv 777 ${GLOBAL_PROGRAM_PATH}/
 else
@@ -92,7 +106,7 @@ function support_aarch64_compiler()
     LOCAL_GCC_TOOLCHAIN=${DOWNLOAD_PATH}/${AARCH_GCC_TOOLCHAIN}.tar.xz
     GCC_SOURCE_ADDR=https://mirrors.tuna.tsinghua.edu.cn/armbian-releases/_toolchain/${AARCH_GCC_TOOLCHAIN}.tar.xz
 
-    if [ ! -d ${GLOBAL_PROGRAM_SUPPORT}/aarch64_compiler/bin ]; then
+    if [ ! -d ${GLOBAL_PROGRAM_SUPPORT}/aarch64/compiler/bin ]; then
         cd ${GLOBAL_PROGRAM_DOWNLOAD}/tmp/
 
         if [ -f ${LOCAL_GCC_TOOLCHAIN} ]; then
@@ -104,7 +118,7 @@ function support_aarch64_compiler()
         fi
 
         tar -xvf ${AARCH_GCC_TOOLCHAIN}.tar.xz
-        cp -rf ${AARCH_GCC_TOOLCHAIN}/* ${GLOBAL_PROGRAM_SUPPORT}/aarch64_compiler/
+        cp -rf ${AARCH_GCC_TOOLCHAIN}/* ${GLOBAL_PROGRAM_SUPPORT}/aarch64/compiler/
         rm -rf ${AARCH_GCC_TOOLCHAIN}/
         mv ${AARCH_GCC_TOOLCHAIN}.tar.xz ../
     else
@@ -119,7 +133,7 @@ function support_new_compiler()
     LOCAL_GCC_TOOLCHAIN=${DOWNLOAD_PATH}/${GCC_TOOLCHAIN}.tar.xz
     GCC_SOURCE_ADDR=https://mirrors.tuna.tsinghua.edu.cn/armbian-releases/_toolchain/${GCC_TOOLCHAIN}.tar.xz
 
-    if [ ! -d ${GLOBAL_PROGRAM_SUPPORT}/compiler/bin ]; then
+    if [ ! -d ${GLOBAL_PROGRAM_SUPPORT}/arm/compiler/bin ]; then
         cd $GLOBAL_PROGRAM_DOWNLOAD/tmp/
 
         if [ -f ${LOCAL_GCC_TOOLCHAIN} ]; then
@@ -131,7 +145,7 @@ function support_new_compiler()
         fi
 
         tar -xvf ${GCC_TOOLCHAIN}.tar.xz
-        cp -rf ${GCC_TOOLCHAIN}/* ${GLOBAL_PROGRAM_SUPPORT}/compiler/
+        cp -rf ${GCC_TOOLCHAIN}/* ${GLOBAL_PROGRAM_SUPPORT}/arm/compiler/
         rm -rf ${GCC_TOOLCHAIN}/
         mv ${GCC_TOOLCHAIN}.tar.xz ../
     else
@@ -146,7 +160,7 @@ function support_old_compiler()
     LOCAL_OLD_GCC_TOOLCHAIN=${DOWNLOAD_PATH}/${OLD_GCC_TOOLCHAIN}.tar.xz
     OLD_GCC_SOURCE_ADDR=https://mirrors.tuna.tsinghua.edu.cn/armbian-releases/_toolchain/${OLD_GCC_TOOLCHAIN}.tar.xz
 
-    if [ ! -d ${GLOBAL_PROGRAM_SUPPORT}/old_compiler/bin ]; then
+    if [ ! -d ${GLOBAL_PROGRAM_SUPPORT}/arm/old_compiler/bin ]; then
         cd ${GLOBAL_PROGRAM_DOWNLOAD}/tmp/
 
         #compiler download exist, tar and add.
@@ -159,7 +173,7 @@ function support_old_compiler()
         fi
 
         tar -xvf ${OLD_GCC_TOOLCHAIN}.tar.xz
-        cp -rf ${OLD_GCC_TOOLCHAIN}/* ${GLOBAL_PROGRAM_SUPPORT}/old_compiler/
+        cp -rf ${OLD_GCC_TOOLCHAIN}/* ${GLOBAL_PROGRAM_SUPPORT}/arm/old_compiler/
         rm -rf ${OLD_GCC_TOOLCHAIN}/
         mv ${OLD_GCC_TOOLCHAIN}.tar.xz ../
     else
@@ -171,7 +185,7 @@ support_old_compiler
 #进行uboot环境的构建
 function uboot_check()
 {
-    if [ ! -d ${GLOBAL_PROGRAM_SUPPORT}/uboot/include ]; then 
+    if [ ! -d ${GLOBAL_PROGRAM_SUPPORT}/arm/uboot/include ]; then 
         cd ${GLOBAL_PROGRAM_DOWNLOAD}/tmp/
 
         LOCAL_UBOOT=${DOWNLOAD_PATH}/${UBOOT_FILE}.zip
@@ -180,7 +194,7 @@ function uboot_check()
             cp ${LOCAL_UBOOT} ./
 
             unzip ${LOCAL_UBOOT}
-            cp -rf ${UBOOT_FILE}/* ${GLOBAL_PROGRAM_SUPPORT}/uboot/
+            cp -rf ${UBOOT_FILE}/* ${GLOBAL_PROGRAM_SUPPORT}/arm/uboot/
             rm -rf ${UBOOT_FILE}/
             mv ${UBOOT_FILE}.zip ../
         else
@@ -195,7 +209,7 @@ uboot_check
 #进行kernel环境的构建
 function kernel_check()
 {
-    if [ ! -d ${GLOBAL_PROGRAM_SUPPORT}/kernel/include ]; then 
+    if [ ! -d ${GLOBAL_PROGRAM_SUPPORT}/arm/kernel/include ]; then 
         cd ${GLOBAL_PROGRAM_DOWNLOAD}/tmp/
 
         LOCAL_KERNEL=${DOWNLOAD_PATH}/${KERNEL_FILE}.zip
@@ -204,7 +218,7 @@ function kernel_check()
             cp ${LOCAL_KERNEL} ./
 
             unzip ${LOCAL_KERNEL}
-            cp -rf ${KERNEL_FILE}/* ${GLOBAL_PROGRAM_SUPPORT}/kernel/
+            cp -rf ${KERNEL_FILE}/* ${GLOBAL_PROGRAM_SUPPORT}/arm/kernel/
             rm -rf ${KERNEL_FILE}/
             mv ${KERNEL_FILE}.zip ../
         else
@@ -219,7 +233,7 @@ kernel_check
 #检查rootfs文件系统
 function rootfs_check()
 {
-    if [ ! -d ${GLOBAL_PROGRAM_SUPPORT}/rootfs/arch ]; then
+    if [ ! -d ${GLOBAL_PROGRAM_SUPPORT}/arm/rootfs/arch ]; then
         cd ${GLOBAL_PROGRAM_DOWNLOAD}/tmp/
 
         LOCAL_ROOTFS=${DOWNLOAD_PATH}/${ROOTFS_FILE}.tar.bz2
@@ -228,7 +242,7 @@ function rootfs_check()
             cp ${LOCAL_ROOTFS} ./
 
             tar -xvf  ${LOCAL_ROOTFS}
-            cp -rf ${ROOTFS_FILE}/* ${GLOBAL_PROGRAM_SUPPORT}/rootfs/
+            cp -rf ${ROOTFS_FILE}/* ${GLOBAL_PROGRAM_SUPPORT}/arm/rootfs/
             rm -rf ${ROOTFS_FILE}/
             mv ${ROOTFS_FILE}.tar.bz2 ../
         else
@@ -244,27 +258,28 @@ rootfs_check
 function copy_bashrc()
 {
     cd
-    BASHRC_TEMPLATE=$CURRENT_PATH/env/.bashrc_template
-    BASHRC_TMP=$CURRENT_PATH/env/.bashrc_tmp
-    BASHRC=$CURRENT_PATH/env/.bashrc 
+    BASHRC_TEMPLATE=$LOCAL_PATH/env/.bashrc_template
+    BASHRC_TMP=$LOCAL_PATH/env/.bashrc_tmp
+    BASHRC=$LOCAL_PATH/env/.bashrc 
 
     if [ -f $BASHRC ]; then
         rm -rf $BASHRC
     fi
 
-    if [ -f ".bashrc" ] && [ -f $CURRENT_PATH/env/.bashrc_template ]; then
+    if [ -f ".bashrc" ] && [ -f $LOCAL_PATH/env/.bashrc_template ]; then
         echo "copy user bashrc to the linux system."
-        echo $CURRENT_PATH
+        echo $LOCAL_PATH
         
-        echo "export ENV_PATH_ROOT=$CURRENT_PATH">>$BASHRC_TMP
+        echo "export ENV_PATH_ROOT=$LOCAL_PATH">>$BASHRC_TMP
         cat $BASHRC_TMP $BASHRC_TEMPLATE>>$BASHRC
         
         rm -f $BASHRC_TMP
         mv .bashrc .bashrc.temp
         mv $BASHRC .bashrc
+        
     else
-        echo "bashrc not exist, just $CURRENT_PATH/env/.bashrc in environment to Directory $(pwd)"
+        echo "bashrc not exist, just $LOCAL_PATH/env/.bashrc in environment to Directory $(pwd)"
     fi
-    cd $CURRENT_PATH
+    cd $LOCAL_PATH
 }
 copy_bashrc

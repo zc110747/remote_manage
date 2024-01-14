@@ -16,7 +16,7 @@
 #include <linux/types.h>
 #include <linux/kernel.h>
 #include <linux/delay.h>
-#include <linux/ide.h>
+//#include <linux/ide.h>
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/errno.h>
@@ -31,7 +31,7 @@
 
 //全局的指令定义
 #define AP3216_NAME            "ap3216"
-#define I2C_AP_CNT1
+#define I2C_AP_CNT              1
 
 //ap3216设备信息
 struct ap3216_dev

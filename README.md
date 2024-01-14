@@ -69,9 +69,12 @@ Update the Alias Command Success!
 ```shell
 #安装Debian系统和编译需要的第三方库
 SysPreThirdParts
+
+#导入文件系统
+SysBuildRootfs
 ```
 
-上述命令会从对应软件官网下载指定的文件，国内可能访问较慢，可以将文件复制到"/home/program/download"中直接解压编译安装，对应文件包含如下:
+上述命令会从对应软件官网下载指定的文件，国内可能访问较慢，可以将文件复制到"[$(pwd)]/sdk/download"中直接解压编译安装，对应文件包含如下:
 
 - openssl <https://www.openssl.org/source/openssl-3.1.4.tar.gz>
 - zlib <http://www.zlib.net/zlib-1.3.tar.gz>

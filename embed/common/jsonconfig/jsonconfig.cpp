@@ -45,7 +45,7 @@ system_config* system_config::get_instance()
     return instance_pointer_;
 }
 
-bool system_config::check_ipaddress(const std::string &ipaddr)
+bool system_config::check_configfile(const std::string &ipaddr)
 {
     struct ifaddrs *ifaddr, *ifa;
     char host[NI_MAXHOST];  
@@ -67,7 +67,7 @@ bool system_config::check_ipaddress(const std::string &ipaddr)
         { // IPv4 or IPv6  
             if (getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST) == 0) 
             {  
-                PRINT_NOW("%s:%s IpAddress:%s\n", PRINT_NOW_HEAD_STR, ifa->ifa_name, host);
+                PRINT_NOW("%s:%s IpAddress:%s, %s\n", PRINT_NOW_HEAD_STR, ifa->ifa_name, host, ipaddr.c_str());
                 if (ipaddr == std::string(host))
                 {
                     is_check = true;
@@ -77,6 +77,11 @@ bool system_config::check_ipaddress(const std::string &ipaddr)
         }  
     }  
     freeifaddrs(ifaddr);
+
+    if(parameter_.main_process.mqtt_device.id.empty())
+    {
+        is_check = false;
+    }
     return is_check;
 }
 
@@ -155,7 +160,7 @@ bool system_config::init(const char* path)
     
     ifs.close();
 
-    return check_ipaddress(parameter_.ipaddress);
+    return check_configfile(parameter_.ipaddress);
 }
 
 void system_config::default_init() noexcept
