@@ -40,7 +40,15 @@
 		}
 	},
 	"node_server" : {
-		"web_port" 		:15101
+		"web_port" 		:15101,
+		"mqtt_device"	:{
+			"id"   : "cl_node",
+			"port" : 1883,
+			"sub_topic" : "/info/pub",
+			"pub_topic" : "/info/sub",
+			"keepalive": 60,
+			"qos":1
+		}
 	},
 	"lower_device" :{
 		"logger_port"	:15201,

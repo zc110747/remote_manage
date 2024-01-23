@@ -1,3 +1,4 @@
+#!bin/sh
 
 #stop all device
 pkill -9 logger_tool

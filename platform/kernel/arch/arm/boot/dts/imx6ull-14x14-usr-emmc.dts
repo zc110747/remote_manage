@@ -7,7 +7,7 @@
  * of the License, or (at your option) any later version.
  */
 
-#include "imx6ull-14x14-evk.dts"
+#include "imx6ull-14x14-usr.dts"
 
 &usdhc2 {
 	pinctrl-names = "default", "state_100mhz", "state_200mhz";
@@ -16,6 +16,7 @@
 	pinctrl-2 = <&pinctrl_usdhc2_8bit_200mhz>;
 	bus-width = <8>;
 	non-removable;
+	no-1-8-v;
 	status = "okay";
 };
 

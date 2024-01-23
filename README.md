@@ -8,18 +8,20 @@
 - AARCH64平台: 全志H616, WalnutPi.
 
 - 项目地址: <https://github.com/zc110747/remote_manage.git>
-- 配合的文档地址: <https://github.com/zc110747/build_embed_linux_system.git>
+- 配合学习的文档: <https://github.com/zc110747/build_embed_linux_system.git>
 
 产品的目录如下所示：
 
 - build             Makefile编译脚本。
 - buildout          嵌入式端编译文件输出目录。
-- doc               设计文档资料
+- desktop           桌面端访问应用
+- doc               系统文档资料
 - embed             嵌入式Linux应用
 - env               用于构建环境的脚本
 - mod               嵌入式Linux驱动和设备树
-- remote            PC端应用
-- rootfs            支持文件系统运行的其它文件，在执行构建时拷贝到目的文件系统中
+- platform          平台化文件，安装官方平台后导入
+- rootfs            自定义文件系统扩展文件
+- sdk               第三方文件，系统运行的支持平台
 - thirdparts        支持应用编译的第三方库。
 
 ## 项目框架
@@ -41,9 +43,24 @@ cd remote_mange/
 sudo chmod 777 *.sh
 
 #prepare for the environment
-#此命令会安装必要的库，并基于/home/program构建一套包含编译工具，命令行等的方案
+#此命令会安装必要的库，并在项目sdk/目录下构建系统开发环境
 ./preBuildEnvironment.sh all
 ```
+
+关于sdk目录内容的说明如下所示。
+
+- build/ 系统平台编译后文件。
+  - build/nfs_root/ 挂载文件系统的目录，nfs访问也基于此目录
+  - build/tftp_root/ 编译后的uboot，zImage和设备树文件目录
+- download/ 下载的包保存的目录
+  - download/tmp/ 用于解压包的缓存目录
+- img/  rootfs生成的硬盘格式文件保存目录(如果不存在，当第一次启动命令行会自动生成)
+- install/ 第三方库交叉编译默认安装目录，在创建文件系统时会导入
+  - install/aarch64/ arm64格式库安装目录
+  - install/arm/    arm格式库安装目录
+- support/ 包含系统运行需要的compiler, u-boot, kernel, busybox/buildroot文件系统构建工具。
+  - support/aarch64/ arm64应用运行支持环境
+  - support/arm/    arm应用运行支持环境
 
 重新开启命令行，如果加载如下所示，表示已经成功安装，项目需要在普通用户模式下执行，root权限无法加载。
 
@@ -53,11 +70,12 @@ Loading CDE Plugin...
 -------------------------------------------------------------------------
 Load Plugin Success!
 Update the Plugin by filepath /home/[root]/.bashrc.
-Root Path:/usr/application/remote_manage
+Root Path:/usr/application/coding_git/remote_manage
 Load the Env Data...
 Update Environment Data Success!
 Can use command 'SysHelpCommand' for more helps.
 Current Platform is ARM.
+Current ROOTFS is debain.
 Current Firmware Version is 1.0.0.8.
 Update the Alias Command...
 Update the Alias Command Success!
@@ -67,11 +85,11 @@ Update the Alias Command Success!
 如果出现了上述打印信息，表示编译环境加载完成，此时执行如下命令安装系统运行需要的库。
 
 ```shell
+#根据系统配置挂载文件系统
+SysMoutRoots
+
 #安装Debian系统和编译需要的第三方库
 SysPreThirdParts
-
-#导入文件系统
-SysBuildRootfs
 ```
 
 上述命令会从对应软件官网下载指定的文件，国内可能访问较慢，可以将文件复制到"[$(pwd)]/sdk/download"中直接解压编译安装，对应文件包含如下:
@@ -119,14 +137,6 @@ SysPackageFirmware
     Package the uboot, kernal, rootfs and application, can use tools download.
 SysHelpCommand
     Show the help command.
-```
-
-1. 上述命令支持需要在指定的目录里存在对应的文件，执行失败则可能需要安装，执行命令"./preBuildEnvironment.sh all"。
-2. 嵌入式linux平台需要支持node服务器，可参考server/README.md构建，另外需要支持环回接口即127.0.0.1本地连接, 需要rcS文件添加如下端口。
-
-```shell
-ifconfig lo up
-ifconfig lo netmask 255.255.255.0
 ```
 
 ## 设计文档
@@ -181,8 +191,10 @@ Linux系统 - Ubuntu 22.04 LTS
 软件源 - 清华源
 
 #ARM
-交叉编译(kernal) - gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf 
-交叉编译(uboot/rootfs/application/lib) - gcc-arm-11.2-2022.02-x86_64-arm-none-linux-gnueabihf
+交叉编译(uboot/kernel/rootfs/application/lib) - gcc-arm-11.2-2022.02-x86_64-arm-none-linux-gnueabihf
+u-boot: nxp-imx/uboot-imx/lf_v2022.04(https://codeload.github.com/nxp-imx/uboot-imx/zip/refs/heads/lf_v2022.04)
+kernel: nxp-imx/linux-imx/lf-6.1.y(https://codeload.github.com/nxp-imx/linux-imx/zip/refs/heads/lf-6.1.y)
+rootfs: buildroot(https://buildroot.org/downloads/buildroot-2023.02.9.tar.gz)
 
 #AARCH64
 交叉编译(kernal/uboot/rootfs/application/lib) - gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf 

@@ -93,7 +93,9 @@
         "sysinfo.h": "c",
         "in.h": "c",
         "stdint.h": "c",
-        "netdb.h": "c"
+        "netdb.h": "c",
+        "fs.h": "c",
+        "wait.h": "c"
     },
     "files.exclude": {
         "**/.git": true,
@@ -102,6 +104,17 @@
         "**/CVS": true,
         "**/.DS_Store": true,
         "**/Thumbs.db": true,
+        "**/*.dtb":true,
+        "**/*.tmp":true,
+        "**/*.cmd":true,
+        "sdk/support/arm/kernel/arch/arm/boot/dts/[a-h]*":true,
+        "sdk/support/arm/kernel/arch/arm/boot/dts/[j-z]*":true,
+        "sdk/support/arm/kernel/arch/arm/boot/dts/imx[0-5]*":true,
+        "sdk/support/arm/kernel/arch/arm/boot/dts/imx[7-9]*":true,
+        "sdk/support/arm/kernel/arch/arm/boot/dts/imx6[a-t]*":true,
+        "sdk/support/arm/kernel/arch/arm/boot/dts/imx6ul-[a-z]*":true,
+        "sdk/support/arm/kernel/arch/arm/boot/dts/imx6ull-[a-z]*":true,
+        "sdk/support/arm/kernel/arch/arm/boot/dts/in*":true,
     },
     "search.exclude": {
         "**/node_modules": true,

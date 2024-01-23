@@ -194,7 +194,7 @@ function SysBuildApplication()
 
 	#copy config file
 	cd $ENV_PATH_ROOT
-	cp config.template.json ${APPLICATION_SYS}/configs/config.json
+	cp config.template.json ${NFS_PATH}/home/sys/configs/config.json
 
 	#build executable
 	cd ${APPLICATION_EMBED}/
@@ -203,7 +203,7 @@ function SysBuildApplication()
 		
 	#package node sever
 	cd ${APPLICATION_EMBED}/
-	cp -rv node_server/* ${APPLICATION_SYS}/server/
+	cp -rv node_server/* ${NFS_PATH}/home/sys/server/
 
 	cda
 }

@@ -16,7 +16,6 @@
 #include <linux/types.h>
 #include <linux/kernel.h>
 #include <linux/delay.h>
-#include <linux/ide.h>
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/errno.h>
@@ -29,6 +28,7 @@
 #include <linux/timer.h>
 #include <linux/of_irq.h>
 #include <linux/irq.h>
+#include <linux/interrupt.h>
 //异步事件相关
 #include <linux/wait.h> 
 #include <linux/poll.h>
@@ -39,6 +39,7 @@
 #include <asm/mach/map.h>
 #include <asm/uaccess.h>
 #include <asm/io.h>
+
 
 
 #define _DBEUG  1
@@ -102,7 +103,7 @@ static void tasklet_do_func(unsigned long data)
 {
    printk(KERN_INFO"key interrupt tasklet do:%ld!\r\n", data);
 }
-DECLARE_TASKLET(tasklet_func, tasklet_do_func, 0);
+DECLARE_TASKLET_OLD(tasklet_func, tasklet_do_func);
 
 /**
  *按键触发中断函数
@@ -114,7 +115,8 @@ DECLARE_TASKLET(tasklet_func, tasklet_do_func, 0);
  */
 static irqreturn_t key0_handler(int irq, void *dev_id)
 {
-    mod_timer(&key_driver_info.key_timer, jiffies + msecs_to_jiffies(10));	/* 10ms定时 */
+    key_driver_info.key_timer.expires =jiffies + msecs_to_jiffies(10);
+    add_timer(&key_driver_info.key_timer);
     
     /*触发事件*/
     //tasklet_schedule(&tasklet_func);
@@ -128,7 +130,7 @@ static irqreturn_t key0_handler(int irq, void *dev_id)
  *
  * @return NULL
  */
-void key_timer_func(unsigned long arg)
+void key_timer_func(struct timer_list *arg)
 {
     unsigned char value;
 
@@ -201,8 +203,7 @@ static int key_gpio_init(void)
     atomic_set(&key_driver_info.key_value, KEYINVALD_VALUE);
 
     /*5.创建用于去抖动判断的定时器*/
-    init_timer(&key_driver_info.key_timer);
-    key_driver_info.key_timer.function = key_timer_func;
+    timer_setup(&key_driver_info.key_timer, key_timer_func, 0);
 
     /*6.初始化队列*/
     init_waitqueue_head(&key_driver_info.key_wait);
@@ -218,15 +219,15 @@ static int key_gpio_init(void)
  */
 static void key_gpio_release(void)
 {
-    /*释放GPIO资源*/
-    devm_gpio_free(key_driver_info.device, key_driver_info.key_gpio);
+    // /*释放GPIO资源*/
+    // devm_gpio_free(key_driver_info.device, key_driver_info.key_gpio);
 
-    /*释放中断资源*/
-    if (key_driver_info.key_irq_num > 0)
-    {
-        devm_free_irq(key_driver_info.device, key_driver_info.key_irq_num, &key_driver_info);
-        key_driver_info.key_irq_num = -1;
-    }
+    // /*释放中断资源*/
+    // if (key_driver_info.key_irq_num > 0)
+    // {
+    //     devm_free_irq(key_driver_info.device, key_driver_info.key_irq_num, &key_driver_info);
+    //     key_driver_info.key_irq_num = -1;
+    // }
 }
 
 /**
