@@ -1,20 +1,28 @@
-#kill application
-pkill -9 node
-pkill -9 main_process
+#!bin/sh
+
+#stop all device
 pkill -9 logger_tool
+pkill -9 local_device
+pkill -9 main_process
 pkill -9 mosquitto
+
+if [ ! -d /tmp/app ]; then
+    mkdir -p /tmp/app
+fi
 
 #start application
 mosquitto -c /etc/mosquitto/mosquitto.conf &
 
-sleep 10
+sleep 1
 
 #start all device
 /home/sys/executable/logger_tool -f /home/sys/configs/config.json &
+sleep 2
+/home/sys/executable/local_device -f /home/sys/configs/config.json &
+sleep 2
 /home/sys/executable/main_process -f /home/sys/configs/config.json &
-
-sleep 5
+sleep 2
 
 #run server.js
 cd /home/sys/server
-/home/sys/support/node/bin/node server.js &
+/usr/bin/node/bin/node server.js &

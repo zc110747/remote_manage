@@ -11,7 +11,7 @@
 //      提供非精确的延时处理，精度位10
 //
 // Author:
-//     	@听心跳的声音
+//      @听心跳的声音
 //
 //  Assumptions:
 //
@@ -94,6 +94,8 @@ bool time_manage::init(uint32_t timeInterval)
     peroid_ = timeInterval;
     
     timer_.start(timeInterval, std::bind(&time_manage::run, this));
+
+    PRINT_NOW("%s:time_manage init success!\n", PRINT_NOW_HEAD_STR);
     return true;
 }
 

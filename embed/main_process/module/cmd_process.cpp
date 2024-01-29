@@ -3,10 +3,10 @@
 //  All Rights Reserved
 //
 //  Name:
-//      cmd_process.cpp
+//      device_manage.cpp
 //
 //  Purpose:
-//      用于支持命令行处理的接口, 包含字符串处理和事件触发
+//      command process for local device.
 //
 // Author:
 //     @听心跳的声音
@@ -17,58 +17,66 @@
 //      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
 #include "cmd_process.hpp"
-#include "center_manage.hpp"
 #include "common_unit.hpp"
 
-/*
-!readdev    [index] #index=[0~3 led,beep,ap,icm]
-!setdev     [index],[data] #index=[0~1 led,beep]  
-!getNet     [index] #index=[0~2 udp,tcp,logger] 
-!testDev    [index] #index=[0~3 led,beep,ap,icm]      
-!getSerial  
-!? or !help
-*/
 const static std::map<std::string, cmd_format_t> CmdMapM = {
-    {"!getos",      CmdGetOS},
-    {"!readdev",    CmdReadDev},
-    {"!setdev",     CmdSetDev},
-    {"!setlevel",   cmdSetLevel},
-    {"!connect",    CmdConnect},
-    {"!?",          CmdGetHelp},
-    {"!help",       CmdGetHelp},
+    {"getos",       cmdGetOS},
+    {"setlevel",    cmdSetLevel},
+    {"?",           CmdGetHelp},
+    {"help",        CmdGetHelp},
 };
 
 const static std::map<cmd_format_t, std::string> CmdHelpMapM = {
-    {CmdGetOS,   "!getos"},
-    {CmdReadDev, "!readdev"},
-    {CmdSetDev,  "!setdev [index],[action]"},
-    {cmdSetLevel, "!setlevel [lev 0-5]",},
-    {CmdGetHelp, "!? ## !help"},
+    {cmdGetOS,      "!mainprocess getos"},
+    {cmdSetLevel,   "!mainprocess setlevel [lev 0-5]",},
+    {CmdGetHelp,    "!mainprocess ? or !mainprocess help"},
 };
 
-bool cmd_process::parse_data(char *ptr, int size)
+cmd_process* cmd_process::instance_pointer_ = nullptr;
+cmd_process* cmd_process::get_instance()
 {
-    if (ptr[0] != '!')
+    if (instance_pointer_ == nullptr)
     {
-        PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "error command:%s", ptr);
-        return false;
+        instance_pointer_ = new(std::nothrow) cmd_process();
+        if (instance_pointer_ == nullptr)
+        {
+            PRINT_NOW("%s:device_manage new failed\r\n", PRINT_NOW_HEAD_STR);
+        }
     }
+    return instance_pointer_;
+}
 
-    ptr[size] = '\0';
+bool cmd_process::init()
+{
+    logger_main_process_tx_fifo_ = std::make_unique<fifo_manage>(LOGGER_MP_TX_FIFO, 
+                                                    S_FIFO_WORK_MODE, 
+                                                    FIFO_MODE_R);
+    if (logger_main_process_tx_fifo_ == nullptr)
+        return false;
+    if (!logger_main_process_tx_fifo_->create())
+        return false;
 
+    cmd_process_thread_ = std::thread(std::bind(&cmd_process::run, this));
+    cmd_process_thread_.detach();
+
+    return true;
+}
+
+bool cmd_process::parse_data()
+{
     //replace first ' ' by '\0'
-    char *pStart = ptr;
+    char *pStart = rx_buffer_;
     while ((*pStart != ' ') && (*pStart != '\0'))
         pStart++;
     pStart[0] = '\0';
-    
+
     //将数据lower,解决数据不符合问题
-    auto strVal = std::string(ptr);
+    auto strVal = std::string(rx_buffer_);
     std::string strDst;
     strDst.resize(strVal.size());
     std::transform(strVal.begin(), strVal.end(), strDst.begin(), ::tolower);
 
-    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "rx command:%s", ptr);
+    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "rx command:%s", strDst.c_str());
     if (CmdMapM.count(strDst) == 0)
     {
         return false;
@@ -76,7 +84,15 @@ bool cmd_process::parse_data(char *ptr, int size)
 
     cmd_format_ = CmdMapM.find(strDst)->second;
     cmd_data_pointer_ = pStart+1;
+
     return true;
+}
+
+void cmd_process::show_os()
+{
+    auto pSysConfig = system_config::get_instance();
+    PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "FW_Version:%s", pSysConfig->get_version().c_str());
+    PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "Logger Level:%d ", (int)log_manage::get_instance()->get_level());
 }
 
 bool cmd_process::process_data()
@@ -84,55 +100,10 @@ bool cmd_process::process_data()
     bool ret = true;
     switch (cmd_format_)
     {
-        case CmdReadDev:
-            { 
-                auto info = device_manage::get_instance()->get_device_info();
-                
-                PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "LedStatus:%d!", info.led_io_);
-                PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "beepStatus:%d!", info.beep_io_);
-                PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "ApInfo, ir:%d, als:%d, ps:%d!",
-                        info.ap_info_.ir,
-                        info.ap_info_.als,
-                        info.ap_info_.ps);
-                PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "ICMInfo, gx,gy,gz:%.2f,%.2f,%.2f;ax,ay,az:%.2f,%.2f,%.2f;temp:%.2f!",
-                        info.icm_info_.gyro_x_act,
-                        info.icm_info_.gyro_y_act,
-                        info.icm_info_.gyro_z_act,
-                        info.icm_info_.accel_x_act,
-                        info.icm_info_.accel_y_act,
-                        info.icm_info_.accel_z_act,
-                        info.icm_info_.temp_act);
-            }  
-            break;
-        case CmdGetOS:
-            {
-                auto pSysConfig = system_config::get_instance();
-                auto pVersion = pSysConfig->get_version().c_str();
-                PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "FW_Version:%d, %d, %d, %d", pVersion[0], pVersion[1], pVersion[2], pVersion[3]);
-                PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "Logger Level:%d ", (int)log_manage::get_instance()->get_level());
-            }
-            break;
-        case CmdSetDev:
-            {
-                uint32_t device = 0, action = 0;
-                sscanf(cmd_data_pointer_, "%d,%d", &device, &action);
-                PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "SetDev:%d, %d!", device, action);
-                center_manage::get_instance()->send_hardware_config_message(device, action);
-            }
+        case cmdGetOS:
+            show_os();
             break;
         case cmdSetLevel:
-            { 
-                uint8_t level = cmd_data_pointer_[0] - '0';
-                if (level > 5)
-                    level = 5;
-                log_manage::get_instance()->set_level((LOG_LEVEL)level);
-                PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "Set Logger Level:%d!", level);
-            }
-            break;
-        case CmdConnect:
-            {
-                PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "Connect with Remote Success!");
-            }
             break;
         case CmdGetHelp:
             {
@@ -143,14 +114,40 @@ bool cmd_process::process_data()
                 }
             }
             break;
-        default:
-            ret = false;
-            break;
     }
 
-    if (!ret)
-    {
-        PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "Invalid Formate:%d, data:%s", cmd_format_, cmd_data_pointer_);
-    }
     return ret;
+}
+
+void cmd_process::run()
+{
+    int len;
+
+    while (1)
+    {
+        len = logger_main_process_tx_fifo_->read(rx_buffer_, DEVICE_RX_BUFFER_SIZE);
+        if (len > 0)
+        {
+            rx_buffer_[len] = '\0';
+            rx_size_ = len;
+
+            if (parse_data())
+            {
+                process_data();
+            }
+            else
+            {
+                PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "cmd_process parse fail, buffer:%s!", rx_buffer_);
+            }
+        }
+        else if (len == 0)
+        {
+            PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "%s read empty fifo data:%d\n", __func__, len);
+        }
+        else
+        {
+            PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "%s read failed:%d\n", __func__, len);
+            break;
+        }
+    }
 }

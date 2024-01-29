@@ -12,17 +12,24 @@
 //      3.提供接口，允许上位机写入配置信息，并保存到config.json文件中, 并支持一键复位
 //
 // Author:
-//     	@听心跳的声音
+//      @听心跳的声音
 //
 //  Assumptions:
 //
 //  Revision History:
 //      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
+#include <arpa/inet.h>
+#include <ifaddrs.h>
+#include <netdb.h>
+#include <netinet/in.h>  
 #include <fstream>
 #include <iostream>
 #include <memory>
+
+#include "common.hpp"
 #include "jsonconfig.hpp"
+#include "logger_manage.hpp"
 
 system_config* system_config::instance_pointer_ = nullptr;
 system_config* system_config::get_instance()
@@ -36,6 +43,46 @@ system_config* system_config::get_instance()
         }
     }
     return instance_pointer_;
+}
+
+bool system_config::check_configfile(const std::string &ipaddr)
+{
+    struct ifaddrs *ifaddr, *ifa;
+    char host[NI_MAXHOST];  
+    bool is_check = false;
+
+    if (getifaddrs(&ifaddr) == -1) {  
+        perror("getifaddrs");  
+        exit(EXIT_FAILURE);
+        return false;
+    }  
+  
+    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {  
+        if (ifa->ifa_addr == NULL) 
+        {  
+            continue;  
+        }  
+        int family = ifa->ifa_addr->sa_family;  
+        if (family == AF_INET) 
+        { // IPv4 or IPv6  
+            if (getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST) == 0) 
+            {  
+                PRINT_NOW("%s:%s IpAddress:%s, %s\n", PRINT_NOW_HEAD_STR, ifa->ifa_name, host, ipaddr.c_str());
+                if (ipaddr == std::string(host))
+                {
+                    is_check = true;
+                    break;
+                }
+            }  
+        }  
+    }  
+    freeifaddrs(ifaddr);
+
+    if(parameter_.main_process.mqtt_device.id.empty())
+    {
+        is_check = false;
+    }
+    return is_check;
 }
 
 [[nodiscard]]
@@ -113,7 +160,7 @@ bool system_config::init(const char* path)
     
     ifs.close();
 
-    return true;
+    return check_configfile(parameter_.ipaddress);
 }
 
 void system_config::default_init() noexcept

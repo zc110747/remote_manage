@@ -65,12 +65,12 @@ char *log_manage::get_memory_buffer_pointer(uint16_t size)
 
     pCurrentMemBuffer = memory_start_pointer_;
     memory_start_pointer_ = pCurrentMemBuffer+size;
-	if (memory_start_pointer_ >  memory_end_pointer_)
-	{
-		pCurrentMemBuffer = memoryBuffer;
-		memory_start_pointer_ = pCurrentMemBuffer + size;
-	}
-	return(pCurrentMemBuffer);
+    if (memory_start_pointer_ >  memory_end_pointer_)
+    {
+        pCurrentMemBuffer = memoryBuffer;
+        memory_start_pointer_ = pCurrentMemBuffer + size;
+    }
+    return(pCurrentMemBuffer);
 }
 
 std::string log_manage::convert_timer(uint32_t timer)
@@ -107,7 +107,7 @@ int log_manage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...)
     len = snprintf(pbuf, bufferlen, "[%s][%s][%d]:", convert_timer(time).c_str(), TOOLS_NAME, level);
     if ((len<=0) || (len>=bufferlen))
     {
-        PRINT_NOW("%s not support buffer-0!\n", __func__);
+        PRINT_NOW("%s: %s not support buffer-0!\n", PRINT_NOW_HEAD_STR, __func__);
         mutex_.unlock();
         return 0;
     }
@@ -116,14 +116,14 @@ int log_manage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...)
     tx_len += len;
 
     //step2: add logger info
-    va_list	valist;
+    va_list valist;
     va_start(valist, fmt);
-	len = vsnprintf(pbuf, bufferlen, fmt, valist);
-	va_end(valist);
+    len = vsnprintf(pbuf, bufferlen, fmt, valist);
+    va_end(valist);
 
     if ((len<=0) || (len>=bufferlen))
     {
-        PRINT_NOW("%s not support buffer-1!\n", __func__);
+        PRINT_NOW("%s: %s not support buffer-1!\n", PRINT_NOW_HEAD_STR, __func__);
         mutex_.unlock();
         return 0;
     }
@@ -135,9 +135,9 @@ int log_manage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...)
     //step3: add logger tail \r\n
     if (bufferlen < 3)
     {
-        PRINT_NOW("%s not support buffer-2!\n", __func__);
+        PRINT_NOW("%s: %s not support buffer-2!\n", PRINT_NOW_HEAD_STR, __func__);
         return 0;
-    } 
+    }
     pbuf[0] = '\r';
     pbuf[1] = '\n';
     tx_len += 2;
@@ -149,14 +149,13 @@ int log_manage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...)
         fflush(stdout);
     }
     else
-    {      
+    {
         len = logger_fifo_->write(logger_tx_buffer, tx_len);
         if (len<=0)
         {
-            PRINT_NOW("%s not support buffer-3!\n", __func__);
+            PRINT_NOW("%s:%s not support buffer-3!\n", PRINT_NOW_HEAD_STR, __func__);
         }
     }
-    
+
     return  tx_len;
 }
-

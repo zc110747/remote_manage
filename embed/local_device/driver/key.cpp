@@ -14,7 +14,7 @@
 //  Assumptions:
 //
 //  Revision History:
-//      12/24/2022   Create New Version	
+//      12/24/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
 
 #include <map>
@@ -53,9 +53,9 @@ bool key_device::init(const std::string &DevicePath, int flags)
             signal(SIGIO, sigio_signal_func);
             is_first_run = false;
         }
-        fcntl(device_fd_, F_SETOWN, getpid());		/* 设置当前进程接收SIGIO信号 	*/
-        flags = fcntl(device_fd_, F_GETFL);			/* 获取当前的进程状态 			*/
-        fcntl(device_fd_, F_SETFL, flags | FASYNC);	/* 设置进程启用异步通知功能 	*/	
+        fcntl(device_fd_, F_SETOWN, getpid());      /* 设置当前进程接收SIGIO信号 */
+        flags = fcntl(device_fd_, F_GETFL);         /* 获取当前的进程状态 */
+        fcntl(device_fd_, F_SETFL, flags | FASYNC); /* 设置进程启用异步通知功能 */
     }
     return true;
 }

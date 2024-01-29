@@ -12,7 +12,7 @@
 //      3.提供接口，允许上位机写入配置信息，并保存到config.json文件中, 并支持一键复位
 //
 // Author:
-//     	@听心跳的声音
+//      @听心跳的声音
 //
 //  Assumptions:
 //
@@ -190,6 +190,12 @@ public:
     
     //node info
     const int get_node_web_port()               const    {return parameter_.node_sever.web_port;}
+
+private:
+    /// \brief check_configfile
+    /// - This method is used to check ipaddress wheather in list.
+    bool check_configfile(const std::string& ipaddr); 
+
 private:
     /// \brief instance_pointer_
     /// - object used to implement the singleton pattern.

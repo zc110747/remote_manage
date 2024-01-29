@@ -14,7 +14,7 @@
 //  Assumptions:
 //
 //  Revision History:
-//      12/24/2022   Create New Version	
+//      12/24/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
@@ -23,7 +23,7 @@ _Pragma("once")
 class key_device:public device_base
 {  
 public:
-	/// \brief constructor
+    /// \brief constructor
     using device_base::device_base;
 
     /// \brief init

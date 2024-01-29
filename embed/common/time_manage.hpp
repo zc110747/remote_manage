@@ -9,7 +9,7 @@
 //      时间管理模块, 支持注册周期性触发的事件
 //
 // Author:
-//     	@听心跳的声音
+//      @听心跳的声音
 //
 //  Assumptions:
 //
@@ -73,7 +73,10 @@ private:
             auto stauts = cond.wait_for(lock, std::chrono::milliseconds(millisecond_));
             if (stauts == std::cv_status::timeout)
             {
-                timeout_handler_();
+                if (timeout_handler_)
+                {
+                    timeout_handler_();
+                }
             }
             else
             {

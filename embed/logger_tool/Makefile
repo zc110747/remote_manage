@@ -13,15 +13,15 @@ BUILD=e
 CCFLAGS := -O3 -std=c++17 -fno-strict-aliasing -lrt 
 
 cpp_objects = main.o \
-			  log_server.o \
-			  log_process.o
-				
+              log_server.o \
+              log_process.o
+                
 
-INCLUDES = 	-I include/ \
-			-I module/
-				
-INCLUDES +=	-I $(ENV_PATH_ROOT)/thirdparts/asio/include/ \
-			-I $(ENV_PATH_ROOT)/thirdparts/jsoncpp/include/
+INCLUDES =  -I include/ \
+            -I module/
+                
+INCLUDES += -I $(ENV_PATH_ROOT)/thirdparts/asio/include/ \
+            -I $(ENV_PATH_ROOT)/thirdparts/jsoncpp/include/
 
 ifeq ($(FIRMWARE_CURRENT_PLATFORMS),ARM)
 library = $(ENV_PATH_ROOT)/buildout/arm/libjsoncpp.a

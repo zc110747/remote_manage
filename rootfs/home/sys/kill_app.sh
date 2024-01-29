@@ -1,8 +1,7 @@
+#!bin/sh
 
-#关闭node
-pkill -9 node
-
-#关闭系统执行命令
-pkill -9 lower_device
-pkill -9 main_process
+#stop all device
 pkill -9 logger_tool
+pkill -9 local_device
+pkill -9 main_process
+pkill -9 mosquitto

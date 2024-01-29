@@ -9,7 +9,7 @@
 //      asio客户端模块
 //
 // Author:
-//     	@听心跳的声音
+//         @听心跳的声音
 //
 //  Assumptions:
 //
@@ -19,13 +19,13 @@
 #include "asio.hpp"
 #include "common_unit.hpp"
 
-#define CLIENT_RX_MAX_BUFFER_SIZE		1024
-#define CLIENT_TX_MAX_BUFFER_SIZE		1024
+#define CLIENT_RX_MAX_BUFFER_SIZE        1024
+#define CLIENT_TX_MAX_BUFFER_SIZE        1024
 
 class asio_client
 {
 public:
-	/// \brief asio_client
+    /// \brief asio_client
     explicit asio_client()
     :io_context_(2), socket_(io_context_)
     {
@@ -39,10 +39,10 @@ public:
 public:
     /// \brief send_msg
     /// - this method is used to send data with protocol to remote.
-	/// \param buffer - the buffer of data area to remote.
-	/// \param size - size of data area to remote.
-	/// \return data already send to remote.
-	int send_msg(char *buffer, uint16_t size);
+    /// \param buffer - the buffer of data area to remote.
+    /// \param size - size of data area to remote.
+    /// \return data already send to remote.
+    int send_msg(char *buffer, uint16_t size);
 
     /// \brief init
     /// - This method is used to init the object.
@@ -63,12 +63,12 @@ private:
     /// - rx thread to process logger interface received.
     void asio_client_tx_run();
 
-	/// \brief write_data
+    /// \brief write_data
     /// - this method is used to write data to uart interface.
-	/// \param pbuffer - the buffer of data write to uart interface.
-	/// \param size - size of data write to uart interface.
-	/// \return data already send to uart interface.
-	int write_data(char *pbuffer, uint16_t size);
+    /// \param pbuffer - the buffer of data write to uart interface.
+    /// \param size - size of data write to uart interface.
+    /// \return data already send to uart interface.
+    int write_data(char *pbuffer, uint16_t size);
 
 private:
     /// \brief instance_pointer_
@@ -92,18 +92,18 @@ private:
     std::unique_ptr<fifo_manage> client_tx_fifo_{nullptr};
 
     /// \brief rx_buffer_
-    /// - rx buffer for receive. 	
+    /// - rx buffer for receive.     
     char rx_buffer_[CLIENT_RX_MAX_BUFFER_SIZE];
 
     /// \brief tx_buffer_
-    /// - tx buffer for receive. 	
+    /// - tx buffer for receive.     
     char tx_buffer_[CLIENT_TX_MAX_BUFFER_SIZE];
 
     /// \brief io_context_
-	/// - manage the context of the server.
+    /// - manage the context of the server.
     asio::io_context io_context_;
 
-	/// \brief acceptor_
-	/// - manage the tcp information.
+    /// \brief acceptor_
+    /// - manage the tcp information.
     asio::ip::tcp::socket socket_;
 };

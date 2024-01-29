@@ -21,12 +21,43 @@
 #include "log_process.hpp"
 #include "log_server.hpp"
 
-#define RX_MAX_BUFFER_SIZE 1024
+#define FMT_HEADER_ONLY
+#include "fmt/core.h"
+
+typedef enum
+{
+    CMD_NULL = 0,
+    CMD_GUI_DEV,
+    CMD_LOCAL_DEV,
+    CMD_LOWER_DEV,
+    CMD_MAIN_DEV,
+    CMD_HELP,
+}CMD_DEVICE;
+
+#define RX_MAX_BUFFER_SIZE  512
 static char rx_buffer[RX_MAX_BUFFER_SIZE];
+static const std::map<std::string, CMD_DEVICE> command_map = {
+    {"!gui ",   CMD_GUI_DEV},
+    {"!local_dev ",  CMD_LOCAL_DEV},
+    {"!lower_dev ",  CMD_LOWER_DEV},
+    {"!main_process ",    CMD_MAIN_DEV},
+    {"!?",      CMD_HELP},
+    {"!help",      CMD_HELP},
+};
+
+static const std::map<CMD_DEVICE, std::string> command_help_map = {
+    {CMD_GUI_DEV, "!gui [command]:gui cmd"},
+    {CMD_LOCAL_DEV, "!local_dev [command]: local device cmd"},
+    {CMD_LOWER_DEV, "!lower_dev [command]: lower device cmd"},
+    {CMD_MAIN_DEV, "!main_process [command]: main process cmd"},
+    {CMD_HELP, "!? or !help"},
+};
 
 void log_process::logger_rx_run()
 {
     int len;
+
+    PRINT_NOW("%s:logger rx run start!\n", PRINT_NOW_HEAD_STR);
 
     while (1)
     {
@@ -37,11 +68,11 @@ void log_process::logger_rx_run()
         }
         else if (len == 0)
         {
-            PRINT_NOW("%s read empty fifo data:%d\n", __func__, len);
+            PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "%s read empty fifo data:%d\n", __func__, len);
         }
         else
         {
-            PRINT_NOW("%s read failed:%d\n", __func__, len);
+            PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "%s read failed:%d\n", __func__, len);
             break;
         }
     }
@@ -64,12 +95,48 @@ log_process* log_process::get_instance()
 bool log_process::init()
 {
     //init and Create logger fifo, must before thread run.
-    logger_rx_fifo_ = std::make_unique<fifo_manage>(LOGGER_RX_FIFO, 
-                                                    S_FIFO_WORK_MODE, 
+    logger_rx_fifo_ = std::make_unique<fifo_manage>(LOGGER_RX_FIFO,
+                                                    S_FIFO_WORK_MODE,
                                                     FIFO_MODE_R_CREATE);
     if (logger_rx_fifo_ == nullptr)
         return false;
     if (!logger_rx_fifo_->create())
+        return false;
+
+    //gui tx fifo
+    logger_gui_tx_fifo_ = std::make_unique<fifo_manage>(LOGGER_GUI_TX_FIFO,
+                                                    S_FIFO_WORK_MODE,
+                                                    FIFO_MODE_W_CREATE);
+    if (logger_gui_tx_fifo_ == nullptr)
+        return false;
+    if (!logger_gui_tx_fifo_->create())
+        return false;
+
+    //local device tx fifo
+    logger_locd_tx_fifo_ = std::make_unique<fifo_manage>(LOGGER_LOC_DEV_TX_FIFO,
+                                                    S_FIFO_WORK_MODE,
+                                                    FIFO_MODE_W_CREATE);
+    if (logger_locd_tx_fifo_ == nullptr)
+        return false;
+    if (!logger_locd_tx_fifo_->create())
+        return false;
+
+    //lower device tx fifo
+    logger_low_dev_tx_fifo_ = std::make_unique<fifo_manage>(LOGGER_LOW_DEV_TX_FIFO,
+                                                    S_FIFO_WORK_MODE,
+                                                    FIFO_MODE_W_CREATE);
+    if (logger_low_dev_tx_fifo_ == nullptr)
+        return false;
+    if (!logger_low_dev_tx_fifo_->create())
+        return false;
+
+    //main process tx_fifo
+    logger_mp_tx_fifo_ = std::make_unique<fifo_manage>(LOGGER_MP_TX_FIFO,
+                                                    S_FIFO_WORK_MODE,
+                                                    FIFO_MODE_W_CREATE);
+    if (logger_mp_tx_fifo_ == nullptr)
+        return false;
+    if (!logger_mp_tx_fifo_->create())
         return false;
 
     logger_rx_thread_ = std::thread(std::bind(&log_process::logger_rx_run, this));
@@ -78,7 +145,68 @@ bool log_process::init()
     return true;
 }
 
+void log_process::show_help()
+{
+    std::string out_str = "\n";
+
+    for (const auto [x, y]:command_help_map)
+    {
+        out_str += fmt::format("{0}\n", y);
+    }
+    out_str.pop_back();
+    PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "%s", out_str.c_str());
+}
+
 void log_process::release()
 {
     logger_rx_fifo_->release();
+}
+
+int log_process::send_buffer(char *ptr, int length)
+{
+    CMD_DEVICE cmd = CMD_NULL;
+    int len = 0;
+
+    for (const auto& command:command_map)
+    {
+        if (strncmp (command.first.c_str(), ptr, command.first.length()) == 0)
+        {
+            cmd = command.second;
+            len = command.first.length();
+            break;
+        }
+    }
+
+    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "logger command information:%s!", ptr);
+
+    if (length >= len)
+    {
+        switch (cmd)
+        {
+            case CMD_GUI_DEV:
+                logger_gui_tx_fifo_->write(ptr+len, length-len);
+                break;
+            case CMD_LOCAL_DEV:
+                logger_locd_tx_fifo_->write(ptr+len, length-len);
+                break;
+            case CMD_LOWER_DEV:
+                logger_low_dev_tx_fifo_->write(ptr+len, length-len);
+                break;
+            case CMD_MAIN_DEV:
+                logger_mp_tx_fifo_->write(ptr+len, length-len);
+                break;
+            case CMD_HELP:
+                show_help();
+                break;
+            default:
+                PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "no equal command:%s", ptr);
+                break;
+        }
+    }
+    else
+    {
+        PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "logger command failed:%d, len:%d, %d\n", cmd, length, len);
+    }
+
+    return length;
 }

@@ -12,35 +12,30 @@ echo "Load the Env Data..."
 #-------------------------------------------------------------------------------
 export CPU_CORE=2
 
-export PROGRAM_PATH=/home/program
-export PROGRAM_SUPPORT=$PROGRAM_PATH/support
-export PROGRAM_BUILD=$PROGRAM_PATH/build
-export PROGRAM_APPLICATION=$PROGRAM_PATH/application
-export PROGRAM_DOWNLOAD=$PROGRAM_PATH/download
+export PROGRAM_SDK_PATH=${ENV_PATH_ROOT}/../sdk
+export PROGRAM_SUPPORT=$PROGRAM_SDK_PATH/support
+export PROGRAM_BUILD=$PROGRAM_SDK_PATH/build
+export PROGRAM_APPLICATION=$PROGRAM_SDK_PATH/application
+export PROGRAM_DOWNLOAD=$PROGRAM_SDK_PATH/download
+export PROGRAM_IMG=$PROGRAM_SDK_PATH/img
 
 #GCC compile path info
 #support old gcc to build kernel(version low, update linux kernel next)
-export OLD_GCC_PATH=$PROGRAM_SUPPORT/old_compiler/bin/
+#arm-linux-gnueabihf-
+export OLD_GCC_PATH=$PROGRAM_SUPPORT/arm/old_compiler/bin
 export KERNEL_CC=$OLD_GCC_PATH/arm-linux-gnueabihf-
-export NEW_GCC_PATH=$PROGRAM_SUPPORT/compiler/bin/
+
+#arm-none-linux-gnueabihf-
+export NEW_GCC_PATH=$PROGRAM_SUPPORT/arm/compiler/bin
 export NEW_KERNEL_CC=$NEW_GCC_PATH/arm-none-linux-gnueabihf-
-export GCC_LIB=$PROGRAM_SUPPORT/compiler/arm-none-linux-gnueabihf
-export AARCH_GCC_PATH=${PROGRAM_SUPPORT}/aarch64_compiler/bin/
+export GCC_LIB=$PROGRAM_SUPPORT/arm/compiler/arm-none-linux-gnueabihf
+
+#aarch64-none-linux-gnueabihf-
+export AARCH_GCC_PATH=${PROGRAM_SUPPORT}/aarch64/bin
 
 #Add directory to PATH
+export PATH="usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
 export PATH=$PATH:${NEW_GCC_PATH}:${OLD_GCC_PATH}:${AARCH_GCC_PATH}
-
-#uboot infos
-export ENV_BOOT_DIR=$PROGRAM_SUPPORT/uboot
-export ENV_KERNAL_UBOOT="u-boot-imx6ull-14x14-ddr512-emmc.imx"
-
-#kernel info
-export ENV_KERNEL_DIR=$PROGRAM_SUPPORT/kernel
-export ENV_KERNEL_ZIMAGE=$ENV_KERNEL_DIR/arch/arm/boot/zImage
-export ENV_KERNEL_DTB=$ENV_KERNEL_DIR/arch/arm/boot/dts/imx6ull-14x14-emmc-4.3-800x480-c.dtb
-
-#rootfs info
-export ENV_ROOTFS_DIR=$PROGRAM_SUPPORT/rootfs
 
 #build output info
 export DST_PATH="/home/freedom/Desktop/Firmware"
@@ -49,10 +44,6 @@ export ENV_CONFIG_FILE="$ENV_PATH_ENVIRONMENT/EnvConfig.mk"
 #-------------------------------------------------------------------------------
 # This section defines the default internal config
 #-------------------------------------------------------------------------------
-export EMBED_DEVICE_IPADDRESS=""
-export FIRMWARE_CURRENT_PLATFORMS=""
-export FMWARE_VESRION=""
-
 #-------------------------------------------------------------------------------
 # ProcessConfig.
 #-------------------------------------------------------------------------------
@@ -60,8 +51,9 @@ declare -a array
 while read line; do
     array+=("$line")
 done < $ENV_CONFIG_FILE
-FIRMWARE_CURRENT_PLATFORMS="${array[0]}"
-FMWARE_VESRION="${array[1]}"
+export FIRMWARE_CURRENT_PLATFORMS="${array[0]}"
+export FMWARE_VESRION="${array[1]}"
+export ROOTFS_RUN="${array[2]}"
 
 #-------------------------------------------------------------------------------
 # This section defined the word color.
@@ -94,27 +86,63 @@ declare -a supportedPlatforms=($FIRMWARE_SUPPORT_PLATFORMS)
 # Only Change if need.
 #-------------------------------------------------------------------------------
 if [[ "${supportedPlatforms[0]}" == "${FIRMWARE_CURRENT_PLATFORMS}" ]]; then
-    #Embed-Linux
+
+    #uboot infos
+    export ENV_ARCH=arm
+
+    export ENV_BOOT_DIR=$PROGRAM_SUPPORT/arm/uboot
+    export ENV_KERNAL_UBOOT="u-boot-imx6ull-14x14-ddr512-emmc.imx"
+
+    #kernel info
+    export ENV_KERNEL_DIR=$PROGRAM_SUPPORT/arm/kernel
+    export ENV_KERNEL_ZIMAGE=$ENV_KERNEL_DIR/arch/arm/boot/zImage
+    export ENV_KERNEL_DTB=$ENV_KERNEL_DIR/arch/arm/boot/dts/imx6ull-14x14-emmc-4.3-800x480-c.dtb
+
+    #rootfs info
+    export ENV_ROOTFS_DIR=$PROGRAM_SUPPORT/arm/rootfs
+
+    #global install
+    export GLOBAL_INTALL=${PROGRAM_SDK_PATH}/install/arm
+
+    #global build
+    export NFS_PATH=$PROGRAM_BUILD/nfs_root/arm
+    export TFTP_PATH=$PROGRAM_BUILD/tftp_root/arm
+
     export APP_C_COMPILE=arm-none-linux-gnueabihf-gcc
     export APP_CC_COMPILE=arm-none-linux-gnueabihf-g++
     export APP_AR_COMPILE=arm-none-linux-gnueabihf-ar
     export APPLICATION_BUILDOUT=$ENV_PATH_ROOT/buildout/arm
-    export GLOBAL_INTALL=${PROGRAM_PATH}/install/arm
-    export NFS_PATH=$PROGRAM_BUILD/nfs_root/arm
-    export TFTP_PATH=$PROGRAM_BUILD/tftp_root/arm
 elif [[ "${supportedPlatforms[1]}" == "${FIRMWARE_CURRENT_PLATFORMS}" ]]; then
+    
+    export ENV_ARCH=aarch64
+
+    #uboot infos
+    export ENV_BOOT_DIR=$PROGRAM_SUPPORT/aarch64/uboot
+    export ENV_KERNAL_UBOOT="u-boot-imx6ull-14x14-ddr512-emmc.imx"
+
+    #kernel info
+    export ENV_KERNEL_DIR=$PROGRAM_SUPPORT/aarch64/kernel
+    export ENV_KERNEL_ZIMAGE=$ENV_KERNEL_DIR/arch/arm/boot/zImage
+    export ENV_KERNEL_DTB=$ENV_KERNEL_DIR/arch/arm/boot/dts/imx6ull-14x14-emmc-4.3-800x480-c.dtb
+
+    #rootfs info
+    export ENV_ROOTFS_DIR=$PROGRAM_SUPPORT/aarch64/rootfs
+
+    #global install
+    export GLOBAL_INTALL=${PROGRAM_SDK_PATH}/install/aarch64
+
+    #global build
+    export NFS_PATH=$PROGRAM_BUILD/nfs_root/aarch64
+    export TFTP_PATH=$PROGRAM_BUILD/tftp_root/aarch64
+
     export APP_C_COMPILE=aarch64-none-linux-gnu-gcc
     export APP_CC_COMPILE=aarch64-none-linux-gnu-g++
     export APP_AR_COMPILE=aarch64-none-linux-gnu-ar
     export APPLICATION_BUILDOUT=$ENV_PATH_ROOT/buildout/aarch64
-    export GLOBAL_INTALL=${PROGRAM_PATH}/install/aarch64
-    export NFS_PATH=$PROGRAM_BUILD/nfs_root/aarch64
-    export TFTP_PATH=$PROGRAM_BUILD/tftp_root/aarch64
+
 else
     echo "${redText}error platform $FIRMWARE_CURRENT_PLATFORMS not exist in list of support${defText}"
 fi
-
-export NFS_RUN_PATH="$NFS_PATH/run/"
 
 #-------------------------------------------------------------------------------
 # This section defines the path for the program
@@ -129,9 +157,8 @@ export APP_ROOTFS_LIB=${APP_ROOTFS}/lib
 export APPLICATION_SYS=${APP_ROOTFS}/home/sys
 export APPLICATION_THIRDPARTS=${ENV_PATH_ROOT}/thirdparts
 export APPLICATION_EMBED=${ENV_PATH_ROOT}/embed
-export APP_MAIN_PORCESS=${APPLICATION_EMBED}/main_process
-export APP_BUILD_DRIVER=${APP_ROOTFS}/home/sys/modules
 
+export APP_BUILD_DRIVER=${NFS_PATH}/home/sys/modules
 export ENV_BUILD=$PROGRAM_APPLICATION/build
 export ENV_BUILD_FIRMWARE=$ENV_BUILD/firmware
 export ENV_BUILD_BIN=$ENV_BUILD_FIRMWARE/bin
@@ -142,4 +169,5 @@ export ENV_BUILD_BIN=$ENV_BUILD_FIRMWARE/bin
 echo "Update Environment Data Success!"
 echo "Can use command '${greenText}SysHelpCommand${defText}' for more helps."
 echo "Current Platform is ${greenText}$FIRMWARE_CURRENT_PLATFORMS${defText}."
+echo "Current ROOTFS is ${greenText}$ROOTFS_RUN${defText}."
 echo "Current Firmware Version is ${greenText}$FMWARE_VESRION${defText}."

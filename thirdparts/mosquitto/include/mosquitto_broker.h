@@ -29,9 +29,9 @@ extern "C" {
 #endif
 
 #if defined(WIN32) && defined(mosquitto_EXPORTS)
-#	define mosq_EXPORT  __declspec(dllexport)
+#    define mosq_EXPORT  __declspec(dllexport)
 #else
-#	define mosq_EXPORT
+#    define mosq_EXPORT
 #endif
 
 #include <stdbool.h>
@@ -43,9 +43,9 @@ struct mosquitto;
 typedef struct mqtt5__property mosquitto_property;
 
 enum mosquitto_protocol {
-	mp_mqtt,
-	mp_mqttsn,
-	mp_websockets
+    mp_mqtt,
+    mp_mqttsn,
+    mp_websockets
 };
 
 /* =========================================================================
@@ -56,119 +56,119 @@ enum mosquitto_protocol {
 
 /* Callback events */
 enum mosquitto_plugin_event {
-	MOSQ_EVT_RELOAD = 1,
-	MOSQ_EVT_ACL_CHECK = 2,
-	MOSQ_EVT_BASIC_AUTH = 3,
-	MOSQ_EVT_EXT_AUTH_START = 4,
-	MOSQ_EVT_EXT_AUTH_CONTINUE = 5,
-	MOSQ_EVT_CONTROL = 6,
-	MOSQ_EVT_MESSAGE = 7,
-	MOSQ_EVT_PSK_KEY = 8,
-	MOSQ_EVT_TICK = 9,
-	MOSQ_EVT_DISCONNECT = 10,
+    MOSQ_EVT_RELOAD = 1,
+    MOSQ_EVT_ACL_CHECK = 2,
+    MOSQ_EVT_BASIC_AUTH = 3,
+    MOSQ_EVT_EXT_AUTH_START = 4,
+    MOSQ_EVT_EXT_AUTH_CONTINUE = 5,
+    MOSQ_EVT_CONTROL = 6,
+    MOSQ_EVT_MESSAGE = 7,
+    MOSQ_EVT_PSK_KEY = 8,
+    MOSQ_EVT_TICK = 9,
+    MOSQ_EVT_DISCONNECT = 10,
 };
 
 /* Data for the MOSQ_EVT_RELOAD event */
 struct mosquitto_evt_reload {
-	void *future;
-	struct mosquitto_opt *options;
-	int option_count;
-	void *future2[4];
+    void *future;
+    struct mosquitto_opt *options;
+    int option_count;
+    void *future2[4];
 };
 
 /* Data for the MOSQ_EVT_ACL_CHECK event */
 struct mosquitto_evt_acl_check {
-	void *future;
-	struct mosquitto *client;
-	const char *topic;
-	const void *payload;
-	mosquitto_property *properties;
-	int access;
-	uint32_t payloadlen;
-	uint8_t qos;
-	bool retain;
-	void *future2[4];
+    void *future;
+    struct mosquitto *client;
+    const char *topic;
+    const void *payload;
+    mosquitto_property *properties;
+    int access;
+    uint32_t payloadlen;
+    uint8_t qos;
+    bool retain;
+    void *future2[4];
 };
 
 /* Data for the MOSQ_EVT_BASIC_AUTH event */
 struct mosquitto_evt_basic_auth {
-	void *future;
-	struct mosquitto *client;
-	char *username;
-	char *password;
-	void *future2[4];
+    void *future;
+    struct mosquitto *client;
+    char *username;
+    char *password;
+    void *future2[4];
 };
 
 /* Data for the MOSQ_EVT_PSK_KEY event */
 struct mosquitto_evt_psk_key {
-	void *future;
-	struct mosquitto *client;
-	const char *hint;
-	const char *identity;
-	char *key;
-	int max_key_len;
-	void *future2[4];
+    void *future;
+    struct mosquitto *client;
+    const char *hint;
+    const char *identity;
+    char *key;
+    int max_key_len;
+    void *future2[4];
 };
 
 /* Data for the MOSQ_EVT_EXTENDED_AUTH event */
 struct mosquitto_evt_extended_auth {
-	void *future;
-	struct mosquitto *client;
-	const void *data_in;
-	void *data_out;
-	uint16_t data_in_len;
-	uint16_t data_out_len;
-	const char *auth_method;
-	void *future2[3];
+    void *future;
+    struct mosquitto *client;
+    const void *data_in;
+    void *data_out;
+    uint16_t data_in_len;
+    uint16_t data_out_len;
+    const char *auth_method;
+    void *future2[3];
 };
 
 /* Data for the MOSQ_EVT_CONTROL event */
 struct mosquitto_evt_control {
-	void *future;
-	struct mosquitto *client;
-	const char *topic;
-	const void *payload;
-	const mosquitto_property *properties;
-	char *reason_string;
-	uint32_t payloadlen;
-	uint8_t qos;
-	uint8_t reason_code;
-	bool retain;
-	void *future2[4];
+    void *future;
+    struct mosquitto *client;
+    const char *topic;
+    const void *payload;
+    const mosquitto_property *properties;
+    char *reason_string;
+    uint32_t payloadlen;
+    uint8_t qos;
+    uint8_t reason_code;
+    bool retain;
+    void *future2[4];
 };
 
 /* Data for the MOSQ_EVT_MESSAGE event */
 struct mosquitto_evt_message {
-	void *future;
-	struct mosquitto *client;
-	char *topic;
-	void *payload;
-	mosquitto_property *properties;
-	char *reason_string;
-	uint32_t payloadlen;
-	uint8_t qos;
-	uint8_t reason_code;
-	bool retain;
-	void *future2[4];
+    void *future;
+    struct mosquitto *client;
+    char *topic;
+    void *payload;
+    mosquitto_property *properties;
+    char *reason_string;
+    uint32_t payloadlen;
+    uint8_t qos;
+    uint8_t reason_code;
+    bool retain;
+    void *future2[4];
 };
 
 
 /* Data for the MOSQ_EVT_TICK event */
 struct mosquitto_evt_tick {
-	void *future;
-	long now_ns;
-	long next_ns;
-	time_t now_s;
-	time_t next_s;
-	void *future2[4];
+    void *future;
+    long now_ns;
+    long next_ns;
+    time_t now_s;
+    time_t next_s;
+    void *future2[4];
 };
 
 /* Data for the MOSQ_EVT_DISCONNECT event */
 struct mosquitto_evt_disconnect {
-	void *future;
-	struct mosquitto *client;
-	int reason;
-	void *future2[4];
+    void *future;
+    struct mosquitto *client;
+    int reason;
+    void *future2[4];
 };
 
 
@@ -199,18 +199,18 @@ typedef struct mosquitto_plugin_id_t mosquitto_plugin_id_t;
  *  event_data - event specific data
  *
  * Returns:
- *	MOSQ_ERR_SUCCESS - on success
- *	MOSQ_ERR_INVAL - if cb_func is NULL
- *	MOSQ_ERR_NOMEM - on out of memory
- *	MOSQ_ERR_ALREADY_EXISTS - if cb_func has already been registered for this event
- *	MOSQ_ERR_NOT_SUPPORTED - if the event is not supported
+ *    MOSQ_ERR_SUCCESS - on success
+ *    MOSQ_ERR_INVAL - if cb_func is NULL
+ *    MOSQ_ERR_NOMEM - on out of memory
+ *    MOSQ_ERR_ALREADY_EXISTS - if cb_func has already been registered for this event
+ *    MOSQ_ERR_NOT_SUPPORTED - if the event is not supported
  */
 mosq_EXPORT int mosquitto_callback_register(
-		mosquitto_plugin_id_t *identifier,
-		int event,
-		MOSQ_FUNC_generic_callback cb_func,
-		const void *event_data,
-		void *userdata);
+        mosquitto_plugin_id_t *identifier,
+        int event,
+        MOSQ_FUNC_generic_callback cb_func,
+        const void *event_data,
+        void *userdata);
 
 /*
  * Function: mosquitto_callback_unregister
@@ -234,16 +234,16 @@ mosq_EXPORT int mosquitto_callback_register(
  *  event_data - event specific data
  *
  * Returns:
- *	MOSQ_ERR_SUCCESS - on success
- *	MOSQ_ERR_INVAL - if cb_func is NULL
- *	MOSQ_ERR_NOT_FOUND - if cb_func was not registered for this event
- *	MOSQ_ERR_NOT_SUPPORTED - if the event is not supported
+ *    MOSQ_ERR_SUCCESS - on success
+ *    MOSQ_ERR_INVAL - if cb_func is NULL
+ *    MOSQ_ERR_NOT_FOUND - if cb_func was not registered for this event
+ *    MOSQ_ERR_NOT_SUPPORTED - if the event is not supported
  */
 mosq_EXPORT int mosquitto_callback_unregister(
-		mosquitto_plugin_id_t *identifier,
-		int event,
-		MOSQ_FUNC_generic_callback cb_func,
-		const void *event_data);
+        mosquitto_plugin_id_t *identifier,
+        int event,
+        MOSQ_FUNC_generic_callback cb_func,
+        const void *event_data);
 
 
 /* =========================================================================
@@ -295,7 +295,7 @@ mosq_EXPORT char *mosquitto_strdup(const char *s);
  * Write a log message using the broker configured logging.
  *
  * Parameters:
- * 	level -    Log message priority. Can currently be one of:
+ *     level -    Log message priority. Can currently be one of:
  *
  *             * MOSQ_LOG_INFO
  *             * MOSQ_LOG_NOTICE
@@ -307,7 +307,7 @@ mosq_EXPORT char *mosquitto_strdup(const char *s);
  *
  *             These values are defined in mosquitto.h.
  *
- *	fmt, ... - printf style format and arguments.
+ *    fmt, ... - printf style format and arguments.
  */
 mosq_EXPORT void mosquitto_log_printf(int level, const char *fmt, ...);
 
@@ -507,13 +507,13 @@ mosq_EXPORT int mosquitto_kick_client_by_username(const char *username, bool wit
  *   MOSQ_ERR_NOMEM - on out of memory
  */
 mosq_EXPORT int mosquitto_broker_publish(
-		const char *clientid,
-		const char *topic,
-		int payloadlen,
-		void *payload,
-		int qos,
-		bool retain,
-		mosquitto_property *properties);
+        const char *clientid,
+        const char *topic,
+        int payloadlen,
+        void *payload,
+        int qos,
+        bool retain,
+        mosquitto_property *properties);
 
 
 /* Function: mosquitto_broker_publish_copy
@@ -531,7 +531,7 @@ mosq_EXPORT int mosquitto_broker_publish(
  *  topic -      message topic
  *  payloadlen - payload length in bytes. Can be 0 for an empty payload.
  *  payload -    payload bytes. If payloadlen > 0 this must not be NULL.
- *	             Memory remains the property of the calling function.
+ *                 Memory remains the property of the calling function.
  *  qos -        message QoS to use.
  *  retain -     should retain be set on the message. This does not apply if
  *               clientid is non-NULL.
@@ -546,13 +546,13 @@ mosq_EXPORT int mosquitto_broker_publish(
  *   MOSQ_ERR_NOMEM - on out of memory
  */
 mosq_EXPORT int mosquitto_broker_publish_copy(
-		const char *clientid,
-		const char *topic,
-		int payloadlen,
-		const void *payload,
-		int qos,
-		bool retain,
-		mosquitto_property *properties);
+        const char *clientid,
+        const char *topic,
+        int payloadlen,
+        const void *payload,
+        int qos,
+        bool retain,
+        mosquitto_property *properties);
 
 #ifdef __cplusplus
 }

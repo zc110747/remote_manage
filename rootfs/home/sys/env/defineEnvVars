@@ -1,0 +1,39 @@
+################################################################################
+# This file is used to define global vars, if want to create the build system, 
+# also need update the file.
+#
+################################################################################
+
+echo "Load the Env Data..."
+
+#-------------------------------------------------------------------------------
+# This section defined the global variable.
+#-------------------------------------------------------------------------------
+export ENV_PATH_CONFIGS=$ENV_PATH_ROOT/configs
+export ENV_PATH_EXE=$ENV_PATH_ROOT/executable
+export ENV_PATH_MODULES=$ENV_PATH_ROOT/modules
+export ENV_PATH_SERVER=$ENV_PATH_ROOT/server
+
+#-------------------------------------------------------------------------------
+# This section defined the word color.
+#-------------------------------------------------------------------------------
+readonly defText="$(tput sgr0)"
+readonly redText="$(tput setaf 1)"
+readonly greenText="$(tput setaf 2)"
+readonly yellowText="$(tput setaf 3)"
+readonly limityellowText="$(tput setaf 190)"
+readonly powerblueText="$(tput setaf 153)"
+readonly blueText="$(tput setaf 4)"
+readonly magentaText="$(tput setaf 5)"
+readonly cyanText="$(tput setaf 6)"
+readonly whiteText="$(tput setaf 7)"
+readonly brightText="$(tput bold)"
+readonly blinkText="$(tput blink)"
+readonly reverseText="$(tput smso)"
+readonly underlineText="$(tput smul)"
+
+#-------------------------------------------------------------------------------
+# Env Vars define finish shows
+#-------------------------------------------------------------------------------
+echo "Update Environment Data Success!"
+echo "Can use command '${greenText}SysHelpCommand${defText}' for more helps."

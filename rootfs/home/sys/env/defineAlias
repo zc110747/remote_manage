@@ -1,0 +1,49 @@
+
+#-------------------------------------------------------------------------------
+# alias global command.
+#-------------------------------------------------------------------------------
+# export ENV_PATH_CONFIGS=$ENV_PATH_ROOT/configs
+# export ENV_PATH_EXE=$ENV_PATH_ROOT/executable
+# export ENV_PATH_MODULES=$ENV_PATH_ROOT/modules
+# export ENV_PATH_SERVER=$ENV_PATH_ROOT/server
+alias cdc="cd $ENV_PATH_CONFIGS"
+alias cde="cd $ENV_PATH_EXE"
+alias cdm="cd $ENV_PATH_MODULES"
+alias cds="cd $ENV_PATH_SERVER"
+
+function SysRunStart()
+{
+    SysRunStop
+
+    if [ ! -d /tmp/app ]; then
+        mkdir -p /tmp/app
+    fi
+
+    #start application
+    mosquitto -c /etc/mosquitto/mosquitto.conf &
+
+    sleep 1
+
+    #start all device
+    /home/sys/executable/logger_tool -f /home/sys/configs/config.json &
+    sleep 2
+    /home/sys/executable/local_device -f /home/sys/configs/config.json &
+    sleep 2
+    /home/sys/executable/main_process -f /home/sys/configs/config.json &
+    sleep 2
+
+    #run server.js
+    # cd /home/sys/server
+    # /usr/bin/node/bin/node server.js &
+}
+alias SysRunStart="SysRunStart"
+
+function SysRunStop()
+{
+    #stop all device
+    pkill -9 main_process
+    pkill -9 local_device
+    pkill -9 logger_tool
+    pkill -9 mosquitto   
+}
+alias SysRunStop="SysRunStop"

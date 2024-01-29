@@ -8,21 +8,20 @@
 - AARCH64平台: 全志H616, WalnutPi.
 
 - 项目地址: <https://github.com/zc110747/remote_manage.git>
-- 配合的文档地址: <https://github.com/zc110747/build_embed_linux_system.git>
+- 配合学习的文档: <https://github.com/zc110747/build_embed_linux_system.git>
 
 产品的目录如下所示：
 
 - build             Makefile编译脚本。
 - buildout          嵌入式端编译文件输出目录。
-- doc               设计文档资料
+- desktop           桌面端访问应用
+- doc               系统文档资料
 - embed             嵌入式Linux应用
 - env               用于构建环境的脚本
 - mod               嵌入式Linux驱动和设备树
-- remote            PC端应用
-- rootfs            支持文件系统运行的其它文件，在执行构建时拷贝到目的文件系统中
+- platform          平台化文件，安装官方平台后导入
+- rootfs            对于busybox支持的启动文件(buildroot和debain不需要)
 - thirdparts        支持应用编译的第三方库。
-
-[目前版本发布信息点此跳转](./buildout/README.md)
 
 ## 项目框架
 
@@ -39,13 +38,26 @@ git clone https://github.com/zc110747/remote_manage.git
 #enter the directory
 cd remote_mange/
 
-#set executable command for sh
-sudo chmod 777 *.sh
-
 #prepare for the environment
-#此命令会安装必要的库，并基于/home/program构建一套包含编译工具，命令行等的方案
+#此命令会安装必要的库，并在项目sdk/目录下构建系统开发环境
+sudo chmod 777 *.sh
 ./preBuildEnvironment.sh all
 ```
+
+关于sdk目录内容的说明如下所示。
+
+- build/ 系统平台编译后文件。
+  - build/nfs_root/     挂载文件系统的目录，nfs访问也基于此目录
+  - build/tftp_root/    编译后的uboot，zImage和设备树文件目录
+- download/ 下载的包保存的目录
+  - download/tmp/       用于解压包的缓存目录
+- img/  rootfs生成的硬盘格式文件保存目录(如果不存在，当第一次启动命令行会自动生成)
+- install/ 第三方库交叉编译默认安装目录，在创建文件系统时会导入
+  - install/aarch64/    arm64格式库安装目录
+  - install/arm/        arm格式库安装目录
+- support/ 包含系统运行需要的compiler, u-boot, kernel, busybox/buildroot文件系统构建工具。
+  - support/aarch64/    arm64应用运行支持环境
+  - support/arm/        arm应用运行支持环境
 
 重新开启命令行，如果加载如下所示，表示已经成功安装，项目需要在普通用户模式下执行，root权限无法加载。
 
@@ -55,11 +67,12 @@ Loading CDE Plugin...
 -------------------------------------------------------------------------
 Load Plugin Success!
 Update the Plugin by filepath /home/[root]/.bashrc.
-Root Path:/usr/application/remote_manage
+Root Path:/usr/application/coding_git/remote_manage
 Load the Env Data...
 Update Environment Data Success!
 Can use command 'SysHelpCommand' for more helps.
 Current Platform is ARM.
+Current ROOTFS is debain.
 Current Firmware Version is 1.0.0.8.
 Update the Alias Command...
 Update the Alias Command Success!
@@ -69,11 +82,14 @@ Update the Alias Command Success!
 如果出现了上述打印信息，表示编译环境加载完成，此时执行如下命令安装系统运行需要的库。
 
 ```shell
+#根据系统配置挂载文件系统
+SysMoutRoots
+
 #安装Debian系统和编译需要的第三方库
 SysPreThirdParts
 ```
 
-上述命令会从对应软件官网下载指定的文件，国内可能访问较慢，可以将文件复制到"/home/program/download"中直接解压编译安装，对应文件包含如下:
+上述命令会从对应软件官网下载指定的文件，国内可能访问较慢，可以将文件复制到"[$(pwd)]/../sdk/download"中直接解压编译安装，对应文件包含如下:
 
 - openssl <https://www.openssl.org/source/openssl-3.1.4.tar.gz>
 - zlib <http://www.zlib.net/zlib-1.3.tar.gz>
@@ -120,12 +136,31 @@ SysHelpCommand
     Show the help command.
 ```
 
-1. 上述命令支持需要在指定的目录里存在对应的文件，执行失败则可能需要安装，执行命令"./preBuildEnvironment.sh all"。
-2. 嵌入式linux平台需要支持node服务器，可参考server/README.md构建，另外需要支持环回接口即127.0.0.1本地连接, 需要rcS文件添加如下端口。
+## 编译环境
+
+对于编译环境，主要包含虚拟机环境，Linux系统，软件源，交叉编译工具这些基础设施。
+
+对于虚拟机环境使用过VMware, VirtualBox和WSL，其中VMware和Virtualbox使用体验都差不多，需要依赖跨系统复制，ssh或samba来回进行切换，不过在Linux平台使用vscode开发已经大大加快了开发效率。WSL则直接可以访问Windows平台程序，不过wsl1因为是模拟Linux接口，所以有很多Linux组件不支持，所以一定不要使用wsl1做交叉编译的环境，对于wsl2,也要确定是在Hyper-V环境下运行，可以综合两部分的优点。
+
+Linux则建议使用满足条件下的最新LTS版本(本项目基于**Ubuntu 22.04.3 LTS**环境开发调试)，包含脚本加载，库编译，代码和驱动编译都进行了验证。旧版本Linux可能因为库或者软件版本问题，导致编译链接时失败。另外不要手动去替换libc/licxx这类，因为有可能导致系统命令链接失败，这种情况基本只能重装，虽然现在基本都一键式傻瓜安装，不过时间还是要花费的。如果硬盘足够大，建议第一次完整构建好环境后，将虚拟机系统进行备份，这样即使操作失误导致系统损坏，删除损坏的系统，重新恢复下原虚拟机系统即可。
+
+对于Linux，你使用的所有工具都在apt-get覆盖的程序库内，将会很简单。不过当你自己编译某个工具，就比较复杂了, 这里以编译mosquitto举个例子，首先需要openssl和Cjson的支持，而编译openssl需要perl新版本的支持，也就是需要4个软件的安装才能完成最后的编译，还需要将动态库放置在指定位置系统才能正常工作。不同的Linux版本，编译器以及库安装情况，导致编译时面对的错误都会不一致。这是Linux系统的不统一导致的，目前没有好的办法，使用相同的系统，通过脚本进行统一构建，并保持更新，只能算相对较统一的方法。
+
+交叉编译工具主要用于编译uboot，kernal，文件系统，应用和库，uboot和kernal如果使用较早版本则有限制，使用新的编译器会包含删除的功能，导致无法编译通过，用老的编译工具即可，文件系统和应用，库需要用一个编译器版本，它们的执行依赖文件系统中的lib库，版本不匹配可能会导致接口缺少而无法正常工作。本项目开发使用的环境如下：
 
 ```shell
-ifconfig lo up
-ifconfig lo netmask 255.255.255.0
+虚拟机 - VMvare/WSL2
+Linux系统 - Ubuntu 22.04 LTS
+软件源 - 清华镜像源(https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/)
+
+#ARM
+交叉编译工具 - gcc-arm-11.2-2022.02-x86_64-arm-none-linux-gnueabihf
+u-boot: uboot-imx-lf_v2022.04(https://codeload.github.com/nxp-imx/uboot-imx/zip/refs/heads/lf_v2022.04)
+kernel: linux-imx-lf-6.1.y(https://codeload.github.com/nxp-imx/linux-imx/zip/refs/heads/lf-6.1.y)
+rootfs: buildroot-2023.02.9(https://buildroot.org/downloads/buildroot-2023.02.9.tar.gz), debain11(http://mirrors.tuna.tsinghua.edu.cn/debian/dists/bookworm)
+
+#AARCH64
+交叉编译(kernal/uboot/rootfs/application/lib) - gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf 
 ```
 
 ## 设计文档
@@ -157,32 +192,3 @@ PC应用端设计
 - windows平台主要提供对于开发板的远程管理，基于QT设计，用于本地的软件访问和管理.
 - web平台基于vue开发，主要用于本地的web访问和管理.
 - 其它设备平台基于STM32单片机设计.
-
-## 编译环境
-
-对于编译环境，主要包含虚拟机环境，Linux系统，软件源，交叉编译工具这些基础设施。
-
-对于虚拟机环境使用过VMware, VirtualBox和WSL，其中VMware和Virtualbox使用体验都差不多，需要依赖跨系统复制，ssh或samba来回进行切换，不过在Linux平台使用vscode开发已经大大加快了开发效率。WSL则直接可以访问Windows平台程序，不过wsl1因为是模拟Linux接口，所以有很多Linux组件不支持，所以一定不要使用wsl1做交叉编译的环境，对于wsl2,也要确定是在Hyper-V环境下运行，可以综合两部分的优点。
-
-Linux则建议使用满足条件下的最新LTS版本(本项目基于**Ubuntu 22.04.3 LTS**环境开发调试)，包含脚本加载，库编译，代码和驱动编译都进行了验证。旧版本Linux可能因为库或者软件版本问题，导致编译链接时失败。另外不要手动去替换libc/licxx这类，因为有可能导致系统命令链接失败，这种情况基本只能重装，虽然现在基本都一键式傻瓜安装，不过时间还是要花费的。如果硬盘足够大，建议第一次完整构建好环境后，将虚拟机系统进行备份，这样即使操作失误导致系统损坏，删除损坏的系统，重新恢复下原虚拟机系统即可。
-
-对于Linux，你使用的所有工具都在apt-get覆盖的程序库内，将会很简单。不过当你自己编译某个工具，就比较复杂了, 这里以编译mosquitto举个例子，首先需要openssl和Cjson的支持，而编译openssl需要perl新版本的支持，也就是需要4个软件的安装才能完成最后的编译，还需要将动态库放置在指定位置系统才能正常工作。不同的Linux版本，编译器以及库安装情况，导致编译时面对的错误都会不一致。这是Linux系统的不统一导致的，目前没有好的办法，使用相同的系统，通过脚本进行统一构建，并保持更新，只能算相对较统一的方法。
-
-Linux系统使用国内镜像源。
-
-- 地址: <https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/>
-
-交叉编译工具主要用于编译uboot，kernal，文件系统，应用和库，uboot和kernal如果使用较早版本则有限制，使用新的编译器会包含删除的功能，导致无法编译通过，用老的编译工具即可，文件系统和应用，库需要用一个编译器版本，它们的执行依赖文件系统中的lib库，版本不匹配可能会导致接口缺少而无法正常工作。本项目开发使用的环境如下：
-
-```shell
-虚拟机 - VMvare/WSL2
-Linux系统 - Ubuntu 22.04 LTS
-软件源 - 清华源
-
-#ARM
-交叉编译(kernal) - gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf 
-交叉编译(uboot/rootfs/application/lib) - gcc-arm-11.2-2022.02-x86_64-arm-none-linux-gnueabihf
-
-#AARCH64
-交叉编译(kernal/uboot/rootfs/application/lib) - gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf 
-```

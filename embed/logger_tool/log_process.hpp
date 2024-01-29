@@ -44,10 +44,19 @@ public:
     /// \return Wheather release is success or failed.
     void release();
 
+    /// \brief send_buffer
+    /// - This method is used update buffer to device.
+    /// \return Wheather send is success or failed.
+    int send_buffer(char *ptr, int length);
+
 private:
     /// \brief logger_rx_run
     /// - rx thread to process logger fifo rx.
     void logger_rx_run();
+
+    /// \brief show_help
+    /// - show help information.
+    void show_help();
 
 private:
     /// \brief instance_pointer_
@@ -55,10 +64,26 @@ private:
     static log_process *instance_pointer_;
 
     /// \brief logger_rx_thread_
-    /// - logger rx thread object. 
+    /// - logger rx thread object.
     std::thread logger_rx_thread_;
 
-    /// \brief logger_internal_tx_fifo_
-    /// - fifo used for logger manage.
+    /// \brief logger_rx_fifo_
+    /// - fifo used for logger rx and write to remote.
     std::unique_ptr<fifo_manage> logger_rx_fifo_{nullptr};
+
+    /// \brief logger_gui_tx_fifo_
+    /// - fifo used for logger server rx and write to gui.
+    std::unique_ptr<fifo_manage> logger_gui_tx_fifo_{nullptr};
+
+    /// \brief logger_loc_dev_tx_fifo_
+    /// - fifo used for logger server rx and write to local device.
+    std::unique_ptr<fifo_manage> logger_locd_tx_fifo_{nullptr};
+
+    /// \brief logger_low_dev_tx_fifo_
+    /// - fifo used for logger server rx and write to lower device.
+    std::unique_ptr<fifo_manage> logger_low_dev_tx_fifo_{nullptr};
+
+    /// \brief logger_mp_tx_fifo_
+    /// - fifo used for logger server rx and write to lower device.
+    std::unique_ptr<fifo_manage> logger_mp_tx_fifo_{nullptr};
 };

@@ -23,13 +23,22 @@ thirdparts/mosquitto/c*
 thirdparts/mosquitto/o*
 thirdparts/mosquitto/z*
 
-rootfs/home/sys/
 rootfs/home/sys/server/*
+rootfs/home/sys/webpage/*
+rootfs/home/sys/configs/*
+!rootfs/etc/*
 
-buildout/
+buildout/aarch64/
+buildout/arm/
 
 mod/rs232/*
 embed/lower_device/lower_device
+embed/main_process/main_process
+embed/local_device/local_device
 embed/logger_tool/logger_tool
 embed/node_server/node_modules
 embed/node_server/*.json
+embed/test/device_info
+
+sdk/*
+!sdk/*.md

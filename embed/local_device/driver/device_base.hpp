@@ -23,6 +23,7 @@
 
 #include "jsonconfig.hpp"
 #include "common_unit.hpp"
+#include "device_common.hpp"
 
 class device_base
 {
