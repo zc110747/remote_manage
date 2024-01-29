@@ -40,8 +40,6 @@
 #include <asm/uaccess.h>
 #include <asm/io.h>
 
-
-
 #define _DBEUG  1
 #if _DBEUG == 1
 #define DRIVE_DEBUG printk
@@ -83,7 +81,7 @@ struct key_info key_driver_info;
 #define key_OFF                         0
 #define key_ON                          1
 
-#define TREE_NODE_NAME                  "/usr_gpios/key"
+#define TREE_NODE_NAME                  "/usr_key"
 #define TREE_GPIO_NAME                  "key-gpio"
 
 /*内部接口*/
@@ -448,7 +446,7 @@ static int key_remove(struct platform_device *dev)
 
 /* 匹配列表 */
 static const struct of_device_id key_of_match[] = {
-	{ .compatible = "usr-gpios" },
+	{ .compatible = "rmk,usr-key" },
 	{ /* Sentinel */ }
 };
 

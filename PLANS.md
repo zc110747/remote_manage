@@ -1,21 +1,19 @@
 
 # 开发计划
 
-## FM Version 1.0.0.9 - next
+## FM Version 1.0.0.9
 
 [paltform]
 
-1. 平台结构更新，将支持平台创建于项目中sdk/目录，统一管理。 -- 完成
+1. 平台结构更新，将支持平台创建于项目中sdk/目录，统一管理
 2. imx6ull u-boot(lf_v2022.04)和kernel(lf-6.1.y)基于nxp-imx主干移植构建。
-3. 文件系统支持buildroot构建方式。 -- 完成
+3. 文件系统支持buildroot构建方式。
 4. 增加新的目录platform, 用于快速构建平台调试。
 
 [embed]
 
-1. 增加测试代码，用于系统稳定性测试
-2. "node_server":增加mqtt与主进程交互模式，支持mqtt和socket两种交互模式
-3. "logger_tool":扩展支持 !`module` `command` `info`的命令格式，进行输入操作，其它模块同步更新 -- 完成
-4. "main_process":扩展增加mqtt的支持，与node_server配合
+1. "logger_tool":扩展支持 !`module` `command` `info`的命令格式，进行输入操作，其它模块同步更新
+2. "main_process":扩展增加mqtt的支持
 
 [mod]
 

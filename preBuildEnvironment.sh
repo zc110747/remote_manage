@@ -12,7 +12,7 @@
 ################################################################################
 
 #备用下载文件目录
-DOWNLOAD_PATH=/home/program/download
+DOWNLOAD_PATH=/usr/download
 AARCH_GCC_TOOLCHAIN=gcc-arm-11.2-2022.02-x86_64-aarch64-none-linux-gnu
 GCC_TOOLCHAIN=gcc-arm-11.2-2022.02-x86_64-arm-none-linux-gnueabihf
 OLD_GCC_TOOLCHAIN=gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf
@@ -20,9 +20,10 @@ UBOOT_FILE=uboot-imx-lf_v2022.04
 KERNEL_FILE=linux-imx-lf-6.1.y
 ROOTFS_FILE=busybox-1.36.1
 
-#全局的环境目录创建
-LOCAL_PATH=$(pwd)
+#全局的环境目录创建, 放置在项目文件夹同级
+LOCAL_PATH=$(pwd)/..
 GLOBAL_PROGRAM_PATH=${LOCAL_PATH}/sdk
+RUN_PATH=$(pwd)
 
 #保存下载的文件
 GLOBAL_PROGRAM_DOWNLOAD=${GLOBAL_PROGRAM_PATH}/download
@@ -56,7 +57,6 @@ if [ ! -d "$GLOBAL_PROGRAM_BUILD" ]; then
 
     #存放编译支持的目录，如编译工具，脚本，文件系统
     mkdir -p ${GLOBAL_PROGRAM_SUPPORT}/arm/compiler/
-    mkdir -p ${GLOBAL_PROGRAM_SUPPORT}/arm/old_compiler/
     mkdir -p ${GLOBAL_PROGRAM_SUPPORT}/arm/uboot/
     mkdir -p ${GLOBAL_PROGRAM_SUPPORT}/arm/kernel/
     mkdir -p ${GLOBAL_PROGRAM_SUPPORT}/arm/rootfs/ 
@@ -154,34 +154,6 @@ function support_new_compiler()
 }
 support_new_compiler
 
-#下载arm-linux-gnueabihf-交叉编译器到old_compiler目录
-function support_old_compiler()
-{
-    LOCAL_OLD_GCC_TOOLCHAIN=${DOWNLOAD_PATH}/${OLD_GCC_TOOLCHAIN}.tar.xz
-    OLD_GCC_SOURCE_ADDR=https://mirrors.tuna.tsinghua.edu.cn/armbian-releases/_toolchain/${OLD_GCC_TOOLCHAIN}.tar.xz
-
-    if [ ! -d ${GLOBAL_PROGRAM_SUPPORT}/arm/old_compiler/bin ]; then
-        cd ${GLOBAL_PROGRAM_DOWNLOAD}/tmp/
-
-        #compiler download exist, tar and add.
-        if [ -f ${LOCAL_OLD_GCC_TOOLCHAIN} ]; then
-            echo "copy gcc from local address:${LOCAL_OLD_GCC_TOOLCHAIN}"
-            cp ${LOCAL_OLD_GCC_TOOLCHAIN} ./
-        else
-            echo "wget from address:$OLD_GCC_SOURCE_ADDR"
-            wget ${OLD_GCC_SOURCE_ADDR}
-        fi
-
-        tar -xvf ${OLD_GCC_TOOLCHAIN}.tar.xz
-        cp -rf ${OLD_GCC_TOOLCHAIN}/* ${GLOBAL_PROGRAM_SUPPORT}/arm/old_compiler/
-        rm -rf ${OLD_GCC_TOOLCHAIN}/
-        mv ${OLD_GCC_TOOLCHAIN}.tar.xz ../
-    else
-        echo "Old Compiler ${greenText}$OLD_GCC_TOOLCHAIN${defText} Check Ok!"
-    fi
-}
-support_old_compiler
-
 #进行uboot环境的构建
 function uboot_check()
 {
@@ -258,19 +230,19 @@ rootfs_check
 function copy_bashrc()
 {
     cd
-    BASHRC_TEMPLATE=$LOCAL_PATH/env/.bashrc_template
-    BASHRC_TMP=$LOCAL_PATH/env/.bashrc_tmp
-    BASHRC=$LOCAL_PATH/env/.bashrc 
+    BASHRC_TEMPLATE=$RUN_PATH/env/.bashrc_template
+    BASHRC_TMP=$RUN_PATH/env/.bashrc_tmp
+    BASHRC=$RUN_PATH/env/.bashrc 
 
     if [ -f $BASHRC ]; then
         rm -rf $BASHRC
     fi
 
-    if [ -f ".bashrc" ] && [ -f $LOCAL_PATH/env/.bashrc_template ]; then
+    if [ -f ".bashrc" ] && [ -f $RUN_PATH/env/.bashrc_template ]; then
         echo "copy user bashrc to the linux system."
-        echo $LOCAL_PATH
+        echo $RUN_PATH
         
-        echo "export ENV_PATH_ROOT=$LOCAL_PATH">>$BASHRC_TMP
+        echo "export ENV_PATH_ROOT=$RUN_PATH">>$BASHRC_TMP
         cat $BASHRC_TMP $BASHRC_TEMPLATE>>$BASHRC
         
         rm -f $BASHRC_TMP
@@ -278,8 +250,8 @@ function copy_bashrc()
         mv $BASHRC .bashrc
         
     else
-        echo "bashrc not exist, just $LOCAL_PATH/env/.bashrc in environment to Directory $(pwd)"
+        echo "bashrc not exist, just $RUN_PATH/env/.bashrc in environment to Directory $(pwd)"
     fi
-    cd $LOCAL_PATH
+    cd $RUN_PATH
 }
 copy_bashrc

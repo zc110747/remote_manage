@@ -12,7 +12,7 @@ echo "Load the Env Data..."
 #-------------------------------------------------------------------------------
 export CPU_CORE=2
 
-export PROGRAM_SDK_PATH=${ENV_PATH_ROOT}/sdk
+export PROGRAM_SDK_PATH=${ENV_PATH_ROOT}/../sdk
 export PROGRAM_SUPPORT=$PROGRAM_SDK_PATH/support
 export PROGRAM_BUILD=$PROGRAM_SDK_PATH/build
 export PROGRAM_APPLICATION=$PROGRAM_SDK_PATH/application
@@ -162,28 +162,6 @@ export APP_BUILD_DRIVER=${NFS_PATH}/home/sys/modules
 export ENV_BUILD=$PROGRAM_APPLICATION/build
 export ENV_BUILD_FIRMWARE=$ENV_BUILD/firmware
 export ENV_BUILD_BIN=$ENV_BUILD_FIRMWARE/bin
-
-rootfs_ver=${ENV_ARCH}-debain.img
-rootfs_size=1024
-case "$ROOTFS_RUN" in
-    "busybox")
-        rootfs_ver=${ENV_ARCH}-busybox.img
-    ;;
-    "buildroot")
-        rootfs_ver=${ENV_ARCH}-buildroot.img
-    ;;
-    "debain")
-        rootfs_ver=${ENV_ARCH}-debain.img
-        rootfs_size=4096
-    ;;
-esac
-export ROOTFS_VER=$rootfs_ver
-
-if [ ! -f ${PROGRAM_IMG}/${ROOTFS_VER} ]; then
-    cd ${PROGRAM_IMG}
-    dd if=/dev/zero of=${ROOTFS_VER} bs=1M count=$rootfs_size
-    mkfs.ext4 ${ROOTFS_VER}
-fi
 
 #-------------------------------------------------------------------------------
 # Env Vars define finish shows

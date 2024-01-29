@@ -328,7 +328,6 @@ static void ap3216_remove(struct i2c_client *client)
     class_destroy(ap_info.dev.class);
 }
 
-/* 传统匹配方式ID列表 -- name不重要，但必须存在 */
 static const struct i2c_device_id ap3216_id[] = {
     {"ap3216", 0},
     {}
@@ -336,7 +335,7 @@ static const struct i2c_device_id ap3216_id[] = {
 
 /* 设备树匹配列表 */
 static const struct of_device_id ap3216_of_match[] = {
-    { .compatible = "usr,ap3216" },
+    { .compatible = "rmk,ap3216" },
     { /* Sentinel */ }
 };
 
@@ -346,7 +345,7 @@ static struct i2c_driver ap3216_driver = {
     .remove = ap3216_remove,
     .driver = {
         .owner = THIS_MODULE,
-        .name = AP3216_NAME,
+        .name = "ap3216",
         .of_match_table = ap3216_of_match, 
     },
     .id_table = ap3216_id,

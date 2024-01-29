@@ -60,99 +60,82 @@ struct icm20608_info
 
 static struct icm20608_info icm_info;
 
-/**
- * 连续读取icm20608设备寄存器的值
- * 
- * @param dev ICM20608设备信息
- * @param reg 待读取设备寄存器的首地址
- * @param buf 读取数据缓冲区首地址
- * @param len 待读取数据长度
- *
- * @return 读取寄存的操作结果
- */
 static int icm20608_read_regs(struct icm20608_dev *dev, u8 reg, void *buf, int len)
 {
-    int ret;
-    unsigned char txdata[64];
-    struct spi_message m;
-    struct spi_transfer *t;
-    struct spi_device *spi = (struct spi_device *)dev->private_data;
+	int ret = -1;
+	unsigned char txdata[2];
+	unsigned char *rxdata;
+	struct spi_message m;
+	struct spi_transfer *t;
+	struct spi_device *spi = (struct spi_device *)dev->private_data;
+    
+	t = kzalloc(sizeof(struct spi_transfer), GFP_KERNEL);	/* 申请内存 */
+	if(!t) {
+		return -ENOMEM;
+	}
 
-    gpio_set_value(dev->cs_gpio, 0);
-    t = kzalloc(sizeof(struct spi_transfer), GFP_KERNEL);
+	rxdata = kzalloc(sizeof(char) * len, GFP_KERNEL);	/* 申请内存 */
+	if(!rxdata) {
+		goto out1;
+	}
 
-    /* 第1次，发送要读取的寄存地址 */
-    txdata[0] = reg | 0x80;
-    t->tx_buf = txdata;
-    t->len = 1;
-    spi_message_init(&m);
-    spi_message_add_tail(t, &m);
-    ret = spi_sync(spi, &m);
+	txdata[0] = reg | 0x80;				
+	t->tx_buf = txdata;			
+    t->rx_buf = rxdata;			
+	t->len = len+1;				
+	spi_message_init(&m);		
+	spi_message_add_tail(t, &m);
+	ret = spi_sync(spi, &m);	
+	if(ret) {
+		goto out2;
+	}
+	
+    memcpy(buf , rxdata+1, len);  /* 只需要读取的数据 */
 
-    /* 第2次，读取数据 */
-    txdata[0] = 0xff;
-    t->rx_buf = buf;
-    t->len = len;
-    spi_message_init(&m);
-    spi_message_add_tail(t, &m);
-    ret = spi_sync(spi, &m);
-
-    kfree(t);
-    gpio_set_value(dev->cs_gpio, 1);
-
-    return ret;
+out2:
+	kfree(rxdata);					/* 释放内存 */
+out1:	
+	kfree(t);						/* 释放内存 */
+	
+	return ret;
 }
 
-/**
- * 连续向icm20608设备寄存器写入数据
- * 
- * @param dev ICM20608设备信息
- * @param reg 待写入设备寄存器的首地址
- * @param buf 待写入数据缓冲区首地址
- * @param len 待写入数据长度
- *
- * @return 写入寄存的操作结果
- */
 static s32 icm20608_write_regs(struct icm20608_dev *dev, u8 reg, u8 *buf, u8 len)
 {
-    int ret;
-
-    unsigned char txdata[64];
-    struct spi_message m;
-    struct spi_transfer *t;
-    struct spi_device *spi = (struct spi_device *)dev->private_data;
-
-    t = kzalloc(sizeof(struct spi_transfer), GFP_KERNEL);
-    gpio_set_value(dev->cs_gpio, 0);
-
-    /* 第1次，发送要读取的寄存地址 */
-    txdata[0] = reg & ~0x80;
-    t->tx_buf = txdata;
-    t->len = 1;
-    spi_message_init(&m);
-    spi_message_add_tail(t, &m);
-    ret = spi_sync(spi, &m);
-
-    /* 第2次，发送要写入的数据 */
-    t->tx_buf = buf;
-    t->len = len;
-    spi_message_init(&m);
-    spi_message_add_tail(t, &m);
-    ret = spi_sync(spi, &m);
-
-    kfree(t);
-    gpio_set_value(dev->cs_gpio, 1);
-    return ret;
+	int ret = -1;
+	unsigned char *txdata;
+	struct spi_message m;
+	struct spi_transfer *t;
+	struct spi_device *spi = (struct spi_device *)dev->private_data;
+	
+	t = kzalloc(sizeof(struct spi_transfer), GFP_KERNEL);	/* 申请内存 */
+	if(!t) {
+		return -ENOMEM;
+	}
+	
+	txdata = kzalloc(sizeof(char)+len, GFP_KERNEL);
+	if(!txdata) {
+		goto out1;
+	}
+	
+	*txdata = reg & ~0x80;
+    memcpy(txdata+1, buf, len);
+	t->tx_buf = txdata;		
+	t->len = len+1;			
+	spi_message_init(&m);		
+	spi_message_add_tail(t, &m);
+	ret = spi_sync(spi, &m);	
+    if(ret) {
+        goto out2;
+    }
+	
+out2:
+	kfree(txdata);		
+out1:1
+	kfree(t);
+	return ret;
 }
 
-/**
- * 读取icm20608指定寄存器地址的值
- * 
- * @param dev ICM20608设备信息
- * @param reg 待读取设备寄存器的地址
- *
- * @return 读取到的寄存值
- */
 static unsigned char icm20608_read_onereg(struct icm20608_dev *dev, u8 reg)
 {
     u8 data = 0;
@@ -160,29 +143,12 @@ static unsigned char icm20608_read_onereg(struct icm20608_dev *dev, u8 reg)
     return data;
 }
 
-/**
- * 向icm20608指定寄存器地址写入值
- * 
- * @param dev ICM20608设备信息
- * @param reg 写入设备寄存器的地址
- * @param value 写入设备寄存的值
- *
- * @return NULL
- */
 static void icm20608_write_onereg(struct icm20608_dev *dev, u8 reg, u8 value)
 {
     u8 buf = value;
     icm20608_write_regs(dev, reg, &buf, 1);
 }
 
-/**
- * 读取ICM20608的数据，读取原始数据，包括三轴陀螺仪、
- * 三轴加速度计和内部温度。
- * 
- * @param p_info ICM20608设备信息
- *
- * @return NULL
- */
 void icm20608_readdata(struct icm20608_info *p_info)
 {
     unsigned char data[14];
@@ -197,30 +163,12 @@ void icm20608_readdata(struct icm20608_info *p_info)
     p_info->gyro_z_adc  = (signed short)((data[12] << 8) | data[13]);
 }
 
-/**
-* 打开设备
-* 
-* @param inode 驱动内的节点信息
-* @param filp  要打开的设备文件(文件描述符) 
-*
-* @return 设备打开处理结果，0表示正常
-*/
 static int icm20608_open(struct inode *inode, struct file *filp)
 {
     filp->private_data = &icm_info; /* 设置私有数据 */
     return 0;
 }
 
-/**
- * 从设备中读取数据
- * 
- * @param filp 要打开的设备文件(文件描述符)
- * @param buf  返回给用户空间的数据缓冲区
- * @param cnt  要读取的数据长度
- * @param off  相对于文件首地址的偏移 
- *
- * @return 读取到数据的长度，负值表示读取失败
- */
 static ssize_t icm20608_read(struct file *filp, char __user *buf, size_t cnt, loff_t *off)
 {
     signed int data[7];
@@ -244,20 +192,11 @@ static ssize_t icm20608_read(struct file *filp, char __user *buf, size_t cnt, lo
     return cnt;
 }
 
-/**
- * icm设备关闭时执行函数
- * 
- * @param inode 驱动内的节点信息
- * @param filp 要打开的设备文件(文件描述符)
- *
- * @return 设备关闭处理结果，0表示正常
- */
 static int icm20608_release(struct inode *inode, struct file *filp)
 {
     return 0;
 }
 
-/* icm20608操作函数 */
 static const struct file_operations icm20608_ops = {
     .owner = THIS_MODULE,
     .open = icm20608_open,
@@ -265,45 +204,14 @@ static const struct file_operations icm20608_ops = {
     .release = icm20608_release,
 };
 
-/**
- * icm设备硬件初始化相关函数
- * 
- * @param spi spi硬件结构体指针
- *
- * @return 设备硬件初始化结果
- */
 static int icm_hardware_init(struct spi_device *spi)
 {
     unsigned char value = 0;
 
-    /* 获取设备树中cs片选信号 */
-    icm_info.dev.nd = of_find_node_by_path("/soc/aips-bus@02000000/spba-bus@02000000/ecspi@02010000");
-    if (icm_info.dev.nd== NULL)
-    {
-        printk("ecspi3 node not find!\r\n");
-        return -EINVAL;
-    }
-
-    /* 2、 获取设备树中的gpio属性，得到BEEP所使用的BEEP编号 */
-    icm_info.dev.cs_gpio = of_get_named_gpio(icm_info.dev.nd, "cs-gpio", 0);
-    if (icm_info.dev.cs_gpio < 0)
-    {
-        printk("can't get cs-gpio");
-        return -EINVAL;
-    }
-
-    /* 3、设置GPIO1_IO20为输出，并且输出高电平 */
-    if (gpio_direction_output(icm_info.dev.cs_gpio, 1) < 0)
-    {
-        printk("can't set gpio!\r\n");
-    }
-
-    /*初始化spi_device */
-    spi->mode = SPI_MODE_0;/*MODE0，CPOL=0，CPHA=0*/
+    spi->mode = SPI_MODE_0;
     spi_setup(spi);
-    icm_info.dev.private_data = spi; /* 设置私有数据 */
+    icm_info.dev.private_data = spi;
 
-    /*设置spi内部寄存器*/
     icm20608_write_onereg(&icm_info.dev, ICM20_PWR_MGMT_1, 0x80);
     mdelay(50);
     icm20608_write_onereg(&icm_info.dev, ICM20_PWR_MGMT_1, 0x01);
@@ -324,13 +232,6 @@ static int icm_hardware_init(struct spi_device *spi)
     return 0;
 }
 
-/**
- * spi驱动的probe函数，当驱动与设备匹配以后此函数就会执行
- * 
- * @param spi spi硬件结构体指针
- *
- * @return 设备probe处理结果
- */
 static int icm20608_probe(struct spi_device *spi)
 {
     int ret = 0;
@@ -376,13 +277,6 @@ static int icm20608_probe(struct spi_device *spi)
     return 0;
 }
 
-/**
- * spi驱动移除函数
- * 
- * @param spi spi设备
- *
- * @return 设备移除处理结果
- */
 static void icm20608_remove(struct spi_device *spi)
 {
     /* 删除设备 */
@@ -394,49 +288,32 @@ static void icm20608_remove(struct spi_device *spi)
     class_destroy(icm_info.dev.class);
 }
 
-/* 传统匹配方式ID列表 */
 static const struct spi_device_id icm20608_id[] = {
-    {"alientek,icm20608", 0},
+    {"icm20608", 0},
     {}
 };
 
-/* 设备树匹配列表 */
 static const struct of_device_id icm20608_of_match[] = {
-    { .compatible = "alientek,icm20608" },
+    { .compatible = "rmk,icm20608" },
     { /* Sentinel */ }
 };
 
-/* SPI驱动结构体 */
 static struct spi_driver icm20608_driver = {
     .probe = icm20608_probe,
     .remove = icm20608_remove,
     .driver = {
         .owner = THIS_MODULE,
-        .name = SPI_ICM_NAME,
+        .name = "icm20608",
         .of_match_table = icm20608_of_match, 
     },
     .id_table = icm20608_id,
 };
 
-/**
- * 驱动加载时执行的初始化函数
- * 
- * @param NULL
- *
- * @return 驱动加载执行结果
- */
 static int __init icm20608_module_init(void)
 {
     return spi_register_driver(&icm20608_driver);
 }
 
-/**
- * 驱动释放时执行的退出函数
- * 
- * @param NULL
- *
- * @return 驱动退出执行结果
- */
 static void __exit icm20608_module_exit(void)
 {
     return spi_unregister_driver(&icm20608_driver);

@@ -1,7 +1,7 @@
 {
 	"local_ipaddress":"127.0.0.1",
 	"ipaddress":"192.168.3.99",
-	"version" : "1.0.1.0",
+	"version" : "1.0.0.9",
 	"local_device" : {
 		"ap_i2c" : {
 			"dev" : "/dev/ap3216"

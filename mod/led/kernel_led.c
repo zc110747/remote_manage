@@ -313,7 +313,7 @@ static int led_remove(struct platform_device *dev)
 
 /* 查询设备树的匹配函数 */
 static const struct of_device_id led_of_match[] = {
-    { .compatible = "usr-led" },
+    { .compatible = "rmk,usr-led" },
     { /* Sentinel */ }
 };
 

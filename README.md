@@ -20,8 +20,7 @@
 - env               用于构建环境的脚本
 - mod               嵌入式Linux驱动和设备树
 - platform          平台化文件，安装官方平台后导入
-- rootfs            自定义文件系统扩展文件
-- sdk               第三方文件，系统运行的支持平台
+- rootfs            对于busybox支持的启动文件(buildroot和debain不需要)
 - thirdparts        支持应用编译的第三方库。
 
 ## 项目框架
@@ -39,28 +38,26 @@ git clone https://github.com/zc110747/remote_manage.git
 #enter the directory
 cd remote_mange/
 
-#set executable command for sh
-sudo chmod 777 *.sh
-
 #prepare for the environment
 #此命令会安装必要的库，并在项目sdk/目录下构建系统开发环境
+sudo chmod 777 *.sh
 ./preBuildEnvironment.sh all
 ```
 
 关于sdk目录内容的说明如下所示。
 
 - build/ 系统平台编译后文件。
-  - build/nfs_root/ 挂载文件系统的目录，nfs访问也基于此目录
-  - build/tftp_root/ 编译后的uboot，zImage和设备树文件目录
+  - build/nfs_root/     挂载文件系统的目录，nfs访问也基于此目录
+  - build/tftp_root/    编译后的uboot，zImage和设备树文件目录
 - download/ 下载的包保存的目录
-  - download/tmp/ 用于解压包的缓存目录
+  - download/tmp/       用于解压包的缓存目录
 - img/  rootfs生成的硬盘格式文件保存目录(如果不存在，当第一次启动命令行会自动生成)
 - install/ 第三方库交叉编译默认安装目录，在创建文件系统时会导入
-  - install/aarch64/ arm64格式库安装目录
-  - install/arm/    arm格式库安装目录
+  - install/aarch64/    arm64格式库安装目录
+  - install/arm/        arm格式库安装目录
 - support/ 包含系统运行需要的compiler, u-boot, kernel, busybox/buildroot文件系统构建工具。
-  - support/aarch64/ arm64应用运行支持环境
-  - support/arm/    arm应用运行支持环境
+  - support/aarch64/    arm64应用运行支持环境
+  - support/arm/        arm应用运行支持环境
 
 重新开启命令行，如果加载如下所示，表示已经成功安装，项目需要在普通用户模式下执行，root权限无法加载。
 
@@ -92,7 +89,7 @@ SysMoutRoots
 SysPreThirdParts
 ```
 
-上述命令会从对应软件官网下载指定的文件，国内可能访问较慢，可以将文件复制到"[$(pwd)]/sdk/download"中直接解压编译安装，对应文件包含如下:
+上述命令会从对应软件官网下载指定的文件，国内可能访问较慢，可以将文件复制到"[$(pwd)]/../sdk/download"中直接解压编译安装，对应文件包含如下:
 
 - openssl <https://www.openssl.org/source/openssl-3.1.4.tar.gz>
 - zlib <http://www.zlib.net/zlib-1.3.tar.gz>
@@ -139,6 +136,33 @@ SysHelpCommand
     Show the help command.
 ```
 
+## 编译环境
+
+对于编译环境，主要包含虚拟机环境，Linux系统，软件源，交叉编译工具这些基础设施。
+
+对于虚拟机环境使用过VMware, VirtualBox和WSL，其中VMware和Virtualbox使用体验都差不多，需要依赖跨系统复制，ssh或samba来回进行切换，不过在Linux平台使用vscode开发已经大大加快了开发效率。WSL则直接可以访问Windows平台程序，不过wsl1因为是模拟Linux接口，所以有很多Linux组件不支持，所以一定不要使用wsl1做交叉编译的环境，对于wsl2,也要确定是在Hyper-V环境下运行，可以综合两部分的优点。
+
+Linux则建议使用满足条件下的最新LTS版本(本项目基于**Ubuntu 22.04.3 LTS**环境开发调试)，包含脚本加载，库编译，代码和驱动编译都进行了验证。旧版本Linux可能因为库或者软件版本问题，导致编译链接时失败。另外不要手动去替换libc/licxx这类，因为有可能导致系统命令链接失败，这种情况基本只能重装，虽然现在基本都一键式傻瓜安装，不过时间还是要花费的。如果硬盘足够大，建议第一次完整构建好环境后，将虚拟机系统进行备份，这样即使操作失误导致系统损坏，删除损坏的系统，重新恢复下原虚拟机系统即可。
+
+对于Linux，你使用的所有工具都在apt-get覆盖的程序库内，将会很简单。不过当你自己编译某个工具，就比较复杂了, 这里以编译mosquitto举个例子，首先需要openssl和Cjson的支持，而编译openssl需要perl新版本的支持，也就是需要4个软件的安装才能完成最后的编译，还需要将动态库放置在指定位置系统才能正常工作。不同的Linux版本，编译器以及库安装情况，导致编译时面对的错误都会不一致。这是Linux系统的不统一导致的，目前没有好的办法，使用相同的系统，通过脚本进行统一构建，并保持更新，只能算相对较统一的方法。
+
+交叉编译工具主要用于编译uboot，kernal，文件系统，应用和库，uboot和kernal如果使用较早版本则有限制，使用新的编译器会包含删除的功能，导致无法编译通过，用老的编译工具即可，文件系统和应用，库需要用一个编译器版本，它们的执行依赖文件系统中的lib库，版本不匹配可能会导致接口缺少而无法正常工作。本项目开发使用的环境如下：
+
+```shell
+虚拟机 - VMvare/WSL2
+Linux系统 - Ubuntu 22.04 LTS
+软件源 - 清华镜像源(https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/)
+
+#ARM
+交叉编译工具 - gcc-arm-11.2-2022.02-x86_64-arm-none-linux-gnueabihf
+u-boot: uboot-imx-lf_v2022.04(https://codeload.github.com/nxp-imx/uboot-imx/zip/refs/heads/lf_v2022.04)
+kernel: linux-imx-lf-6.1.y(https://codeload.github.com/nxp-imx/linux-imx/zip/refs/heads/lf-6.1.y)
+rootfs: buildroot-2023.02.9(https://buildroot.org/downloads/buildroot-2023.02.9.tar.gz), debain11(http://mirrors.tuna.tsinghua.edu.cn/debian/dists/bookworm)
+
+#AARCH64
+交叉编译(kernal/uboot/rootfs/application/lib) - gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf 
+```
+
 ## 设计文档
 
 参考文档(见document目录下说明), 初步设计包含如下。
@@ -168,34 +192,3 @@ PC应用端设计
 - windows平台主要提供对于开发板的远程管理，基于QT设计，用于本地的软件访问和管理.
 - web平台基于vue开发，主要用于本地的web访问和管理.
 - 其它设备平台基于STM32单片机设计.
-
-## 编译环境
-
-对于编译环境，主要包含虚拟机环境，Linux系统，软件源，交叉编译工具这些基础设施。
-
-对于虚拟机环境使用过VMware, VirtualBox和WSL，其中VMware和Virtualbox使用体验都差不多，需要依赖跨系统复制，ssh或samba来回进行切换，不过在Linux平台使用vscode开发已经大大加快了开发效率。WSL则直接可以访问Windows平台程序，不过wsl1因为是模拟Linux接口，所以有很多Linux组件不支持，所以一定不要使用wsl1做交叉编译的环境，对于wsl2,也要确定是在Hyper-V环境下运行，可以综合两部分的优点。
-
-Linux则建议使用满足条件下的最新LTS版本(本项目基于**Ubuntu 22.04.3 LTS**环境开发调试)，包含脚本加载，库编译，代码和驱动编译都进行了验证。旧版本Linux可能因为库或者软件版本问题，导致编译链接时失败。另外不要手动去替换libc/licxx这类，因为有可能导致系统命令链接失败，这种情况基本只能重装，虽然现在基本都一键式傻瓜安装，不过时间还是要花费的。如果硬盘足够大，建议第一次完整构建好环境后，将虚拟机系统进行备份，这样即使操作失误导致系统损坏，删除损坏的系统，重新恢复下原虚拟机系统即可。
-
-对于Linux，你使用的所有工具都在apt-get覆盖的程序库内，将会很简单。不过当你自己编译某个工具，就比较复杂了, 这里以编译mosquitto举个例子，首先需要openssl和Cjson的支持，而编译openssl需要perl新版本的支持，也就是需要4个软件的安装才能完成最后的编译，还需要将动态库放置在指定位置系统才能正常工作。不同的Linux版本，编译器以及库安装情况，导致编译时面对的错误都会不一致。这是Linux系统的不统一导致的，目前没有好的办法，使用相同的系统，通过脚本进行统一构建，并保持更新，只能算相对较统一的方法。
-
-Linux系统使用国内镜像源。
-
-- 地址: <https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/>
-
-交叉编译工具主要用于编译uboot，kernal，文件系统，应用和库，uboot和kernal如果使用较早版本则有限制，使用新的编译器会包含删除的功能，导致无法编译通过，用老的编译工具即可，文件系统和应用，库需要用一个编译器版本，它们的执行依赖文件系统中的lib库，版本不匹配可能会导致接口缺少而无法正常工作。本项目开发使用的环境如下：
-
-```shell
-虚拟机 - VMvare/WSL2
-Linux系统 - Ubuntu 22.04 LTS
-软件源 - 清华源
-
-#ARM
-交叉编译(uboot/kernel/rootfs/application/lib) - gcc-arm-11.2-2022.02-x86_64-arm-none-linux-gnueabihf
-u-boot: nxp-imx/uboot-imx/lf_v2022.04(https://codeload.github.com/nxp-imx/uboot-imx/zip/refs/heads/lf_v2022.04)
-kernel: nxp-imx/linux-imx/lf-6.1.y(https://codeload.github.com/nxp-imx/linux-imx/zip/refs/heads/lf-6.1.y)
-rootfs: buildroot(https://buildroot.org/downloads/buildroot-2023.02.9.tar.gz)
-
-#AARCH64
-交叉编译(kernal/uboot/rootfs/application/lib) - gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf 
-```

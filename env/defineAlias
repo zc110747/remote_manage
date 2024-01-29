@@ -134,8 +134,35 @@ alias SysPreThirdParts='SysPreThirdParts'
 #SysMountRootfs
 #function: mount rootfs
 #############################################################
+function SysCreateRootfsImg()
+{
+	rootfs_ver=${ENV_ARCH}-debain.img
+	rootfs_size=1024
+	case "$ROOTFS_RUN" in
+		"busybox")
+			rootfs_ver=${ENV_ARCH}-busybox.img
+		;;
+		"buildroot")
+			rootfs_ver=${ENV_ARCH}-buildroot.img
+		;;
+		"debain")
+			rootfs_ver=${ENV_ARCH}-debain.img
+			rootfs_size=4096
+		;;
+	esac
+	export ROOTFS_VER=$rootfs_ver
+
+	if [ ! -f ${PROGRAM_IMG}/${ROOTFS_VER} ]; then
+		cd ${PROGRAM_IMG}
+		dd if=/dev/zero of=${ROOTFS_VER} bs=1M count=$rootfs_size
+		mkfs.ext4 ${ROOTFS_VER}
+	fi
+}
+
 function SysMountRootfs()
 {
+	SysCreateRootfsImg
+	
 	cda 
 
 	umount_chroot
@@ -285,7 +312,7 @@ function SysBuildKernel
 		cd $ENV_KERNEL_DIR
 
 		echo "compiler:$NEW_KERNEL_CC"
-		make ARCH=arm CROSS_COMPILE=$NEW_KERNEL_CC imx_v7_defconfig
+		make imx_rmk_v7_defconfig ARCH=arm CROSS_COMPILE=$NEW_KERNEL_CC
 		make V=1 ARCH=arm CROSS_COMPILE=$NEW_KERNEL_CC all -j4
 
 		if [ -f $ENV_KERNEL_ZIMAGE ]; then
@@ -333,10 +360,9 @@ function SysBuildUboot
 
 	if [ -d $ENV_BOOT_DIR ]; then
 		cd $ENV_BOOT_DIR
-
 		echo "compiler:$NEW_KERNEL_CC"
-		make ARCH=arm CROSS_COMPILE=$NEW_KERNEL_CC mx6ull_14x14_evk_emmc_defconfig
-		make V=1 ARCH=arm CROSS_COMPILE=$NEW_KERNEL_CC all -j4
+		make mx6ull_14x14_rmk_emmc_defconfig
+		make V=1 ARCH=arm CROSS_COMPILE=$NEW_KERNEL_CC all -j6
 
 		if [ -f u-boot-dtb.imx ]; then
 			uboot_file="u-boot-dtb.imx"

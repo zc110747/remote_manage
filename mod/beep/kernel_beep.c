@@ -314,7 +314,7 @@ static int beep_remove(struct platform_device *dev)
 
 /* 查询设备树的匹配函数 */
 static const struct of_device_id beep_of_match[] = {
-    { .compatible = "usr-beep" },
+    { .compatible = "rmk,usr-beep" },
     { /* Sentinel */ }
 };
 MODULE_DEVICE_TABLE(of, beep_of_match);
