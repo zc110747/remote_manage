@@ -56,6 +56,8 @@ static const std::map<CMD_DEVICE, std::string> command_help_map = {
 void log_process::logger_rx_run()
 {
     int len;
+    CMD_LOG_INFO log_info;
+    int size = sizeof(CMD_LOG_INFO);
 
     PRINT_NOW("%s:logger rx run start!\n", PRINT_NOW_HEAD_STR);
 
@@ -64,7 +66,20 @@ void log_process::logger_rx_run()
         len = logger_rx_fifo_->read(rx_buffer, RX_MAX_BUFFER_SIZE);
         if (len > 0)
         {
-            log_server::get_instance()->send_buffer(rx_buffer, len);
+            memcpy((char *)&log_info, rx_buffer, size);
+            len = len - size;
+
+            if(log_info.action == LOG_PRINT)
+            {
+                if(len > 0)
+                {
+                    log_server::get_instance()->send_buffer(&rx_buffer[size], len);
+                }
+            }
+            else if(log_info.action == LOG_UPDATE)
+            {
+
+            }
         }
         else if (len == 0)
         {
@@ -97,7 +112,7 @@ bool log_process::init()
     //init and Create logger fifo, must before thread run.
     logger_rx_fifo_ = std::make_unique<fifo_manage>(LOGGER_RX_FIFO,
                                                     S_FIFO_WORK_MODE,
-                                                    FIFO_MODE_R_CREATE);
+                                                    FIFO_MODE_WR_CREATE);
     if (logger_rx_fifo_ == nullptr)
         return false;
     if (!logger_rx_fifo_->create())

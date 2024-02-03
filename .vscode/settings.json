@@ -95,7 +95,13 @@
         "stdint.h": "c",
         "netdb.h": "c",
         "fs.h": "c",
-        "wait.h": "c"
+        "wait.h": "c",
+        "kernel_touch.h": "c",
+        "unistd.h": "c",
+        "string.h": "c",
+        "i2c.h": "c",
+        "module.h": "c",
+        "input.h": "c"
     },
     "files.exclude": {
         "**/.git": true,

@@ -10,8 +10,6 @@
 #ifndef _KERNAL_I2C_AP_H
 #define _KERNAL_I2C_AP_H
 
-#define AP3216C_ADDR    	0X1E	/* AP3216C器件地址  */
-
 /* AP3316C寄存器 */
 #define AP3216C_SYSTEMCONG	0x00	/* 配置寄存器       */
 #define AP3216C_INTSTATUS	0X01	/* 中断状态寄存器   */

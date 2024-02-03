@@ -31,7 +31,6 @@ rootfs/home/sys/configs/*
 buildout/aarch64/
 buildout/arm/
 
-mod/rs232/*
 embed/lower_device/lower_device
 embed/main_process/main_process
 embed/local_device/local_device

@@ -46,15 +46,6 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 
-		reg_can_3v3: regulator@0 {
-			compatible = "regulator-fixed";
-			reg = <0>;
-			regulator-name = "can-3v3";
-			regulator-min-microvolt = <3300000>;
-			regulator-max-microvolt = <3300000>;
-			/*gpios = <&gpio_spi 3 GPIO_ACTIVE_LOW>;*/
-		};
-
 		reg_wifi_vmmc: regulator@1 {
 			compatible = "regulator-fixed";
 			regulator-name = "WIFI_3V3";
@@ -63,79 +54,44 @@
 			gpio = <&gpio1 1 GPIO_ACTIVE_HIGH>;
 			enable-active-high;
 		};
-		reg_vref_3v3: regulator@2 {
-			compatible = "regulator-fixed";
-			regulator-name = "vref-3v3";
-			regulator-min-microvolt = <3300000>;
-			regulator-max-microvolt = <3300000>;
-		};
 	};
 
-	ir-receiver {
-			compatible = "gpio-ir-receiver";
-			gpios = <&gpio4 21 1>;
-			linux,rc-map-name = "rc-100ask-nec";
-			status = "okay";
-	};
-	
-	leds {
-		compatible = "gpio-leds";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_led>;
-
-		led0: cpu {
-			label = "cpu";
-			gpios = <&gpio1 4 GPIO_ACTIVE_LOW>;
-			default-state = "on";
-			linux,default-trigger = "cpu0";
-            status="disabled";
-		};
+	usr_led {
+		compatible = "rmk,usr-led";
+		pinctrl-0 = <&pinctrl_gpio_led>;
+		led-gpio = <&gpio1 3 GPIO_ACTIVE_LOW>;
+		status = "okay";
 	};
 
-	gpio-keys@0 {
-			compatible = "gpio-keys";
-			pinctrl-names = "default";
-			pinctrl-0 = <&pinctrl_gpio_keys>;
-			status = "okay";
-
-			Key0{
-				label = "Key 0";
-				gpios = <&gpio5 1 GPIO_ACTIVE_HIGH>;
-				linux,code = <KEY_1>;
-			};
+	usr_beep {
+		compatible = "rmk,usr-beep";
+		pinctrl-0 = <&pinctrl_gpio_beep>;
+		beep-gpio = <&gpio5 1 GPIO_ACTIVE_LOW>;
+		status = "okay";
 	};
 
-        gpio-keys@1 {
-                        compatible = "gpio-keys";
-                        pinctrl-names = "default";
-                        pinctrl-0 = <&pinctrl_gpio_key1>;
-                        status = "okay";
-
-                        Key0{
-                                label = "Key 1";
-                                gpios = <&gpio1 18 GPIO_ACTIVE_HIGH>;
-                                linux,code = <KEY_2>;
-                        };
-        };
-
-
+	usr_key {
+		compatible = "rmk,usr-key";
+		#address-cells = <1>;
+		#size-cells = <1>; 
+		pinctrl-0 = <&pinctrl_gpio_key>;
+		key-gpio = <&gpio1 18 GPIO_ACTIVE_LOW>;
+		interrupt-parent = <&gpio1>;
+		interrupts = <18 IRQ_TYPE_EDGE_FALLING>;
+		status = "okay";
+	};
 };
 
 &cpu0 {
 	arm-supply = <&reg_arm>;
 	soc-supply = <&reg_soc>;
 	clock-frequency = <800000000>;
-	/*dc-supply = <&reg_gpio_dvfs>;*/
 };
 
 &clks {
 	assigned-clocks = <&clks IMX6UL_CLK_PLL4_AUDIO_DIV>;
 	assigned-clock-rates = <786432000>;
 };
-
-// &qemu_net {
-// 	status = "okay";
-// };
 
 &fec1 {
 	pinctrl-names = "default";
@@ -182,17 +138,53 @@
 	pinctrl-0 = <&pinctrl_i2c1>;
 	status = "okay";
 
+	ap3216@1e {
+		compatible = "rmk,ap3216";
+		reg = <0x1e>;
+	};
+};
+
+&i2c2 {
+	clock-frequency = <100000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_i2c2>;
+	status = "okay";
+
+	gt9147: gt9147@14 {
+		compatible = "rmk,gt9147";
+		reg = <0x14>;
+		pinctrl-0 = <&pinctrl_tsc 
+					&pinctrl_tsc_reset>;
+		interrupt-parent = <&gpio1>;
+		interrupts = <9 IRQ_TYPE_EDGE_FALLING>;
+		reset-gpios = <&gpio5 9 GPIO_ACTIVE_LOW>;
+		interrupt-gpios = <&gpio1 9 GPIO_ACTIVE_LOW>;
+		status = "okay";
+	};
 };
 
 &iomuxc {
 	pinctrl-names = "default";
-	pinctrl-0 = <&extend_board>;
+
 	imx6ul-evk {
-                pinctrl_gpio_key1: pinctrl_gpio_key1{
-                    fsl,pins = <
-                        MX6UL_PAD_UART1_CTS_B__GPIO1_IO18          0x000010B0
-                    >;
-                };
+		pinctrl_gpio_led: gpio-leds {
+			fsl,pins = <
+				MX6UL_PAD_GPIO1_IO03__GPIO1_IO03	0x17059
+			>;
+		};
+
+		pinctrl_gpio_key: gpio-key {
+			fsl,pins = <
+				MX6UL_PAD_UART1_CTS_B__GPIO1_IO18	0x80000000
+			>;
+		};
+
+		pinctrl_pwm3: pwm3grp {
+			fsl,pins = <
+				MX6UL_PAD_GPIO1_IO04__PWM3_OUT			0x110b0
+			>;		
+		};
+
 		pinctrl_remote_control: remote_control {
 			fsl,pins = <
 				MX6UL_PAD_UART2_TX_DATA__UART2_DCE_TX	0x000010B1 /* remote control        add by pengjie 20190703*/
@@ -231,6 +223,13 @@
 			fsl,pins = <
 				MX6UL_PAD_UART4_TX_DATA__I2C1_SCL 0x4001b8b0
 				MX6UL_PAD_UART4_RX_DATA__I2C1_SDA 0x4001b8b0
+			>;
+		};
+
+		pinctrl_i2c2: i2c2grp {
+			fsl,pins = <
+				MX6UL_PAD_UART5_TX_DATA__I2C2_SCL 0x4001b8b0
+				MX6UL_PAD_UART5_RX_DATA__I2C2_SDA 0x4001b8b0
 			>;
 		};
 
@@ -354,13 +353,6 @@
 				MX6UL_PAD_NAND_DATA07__USDHC2_DATA7 0x170f9
 			>;
 		};
-
-		pinctrl_adc1: adc1grp{
-			fsl,pins = <
-                MX6UL_PAD_GPIO1_IO02__GPIO1_IO02          0x000010B1
-                MX6UL_PAD_GPIO1_IO03__GPIO1_IO03          0x000010B1
-			>;
-		};
 		
 		pinctrl_ecspi3: ecspi3grp {
 			fsl,pins = <
@@ -371,83 +363,37 @@
 				MX6UL_PAD_UART2_TX_DATA__GPIO1_IO20        0x000010B0 /*gpio cs1*/
 
 			>;
-		};	
+		};
 
-			
-		pinctrl_led: ledgrp {
+		pinctrl_tsc: tscgrp {
 			fsl,pins = <
-				MX6UL_PAD_GPIO1_IO04__GPIO1_IO04            0x000010B0
-			>;
-		};	
-
-        extend_board: 100ask_extend_board {              
-            fsl,pins = <
-				/*GPIO*/    
-				MX6UL_PAD_CSI_DATA02__GPIO4_IO23           0x000010B0		
-				MX6UL_PAD_CSI_DATA04__GPIO4_IO25           0x000010B0
-				MX6UL_PAD_CSI_DATA05__GPIO4_IO26           0x000010B0	
-				MX6UL_PAD_CSI_DATA06__GPIO4_IO27           0x000010B0	
-				MX6UL_PAD_CSI_DATA07__GPIO4_IO28           0x000010B0                 
- 
-				/*SPI*/
-				//MX6UL_PAD_UART2_RX_DATA__ECSPI3_SCLK       0x000010B1
-                //MX6UL_PAD_UART2_CTS_B__ECSPI3_MOSI         0x000010B1
-                //MX6UL_PAD_UART2_RTS_B__ECSPI3_MISO         0x000010B1
-                //MX6UL_PAD_UART1_CTS_B__GPIO1_IO18          0x000010B0 /*gpio cs0*/
-				//MX6UL_PAD_UART2_TX_DATA__GPIO1_IO20        0x000010B0 /*gpio cs1*/
-
-				/*I2C*/
-				//MX6UL_PAD_UART4_TX_DATA__I2C1_SCL          0x4001b8b0
-				//MX6UL_PAD_UART4_RX_DATA__I2C1_SDA          0x4001b8b0
-				
-				/*ADC*/
-				//MX6UL_PAD_GPIO1_IO02__GPIO1_IO02           0x000010B1
-                //MX6UL_PAD_GPIO1_IO03__GPIO1_IO03           0x000010B1 	
-
-				/*UART*/
-                //MX6UL_PAD_UART3_RX_DATA__UART3_DCE_RX      0x000010B0
-                //MX6UL_PAD_UART3_TX_DATA__UART3_DCE_TX      0x000010B0
-
-                //MX6UL_PAD_UART5_RX_DATA__UART5_DCE_RX      0x000010B0
-                //MX6UL_PAD_UART5_TX_DATA__UART5_DCE_TX      0x000010B0				
-            >;
-        };		
-			
+				MX6UL_PAD_GPIO1_IO09__GPIO1_IO09 		0xF080
+			>;	
+		};			
 	};
 };
 
 &iomuxc_snvs {
 	pinctrl-names = "default_snvs";
         imx6ul-evk {
-			pinctrl_gpio_keys: keysgrp{
-				fsl,pins = <     
-					MX6UL_PAD_SNVS_TAMPER1__GPIO5_IO01       0x000110A1
+			pinctrl_tsc_reset: tsc_reset {
+				fsl,pins = <
+					MX6ULL_PAD_SNVS_TAMPER9__GPIO5_IO09		0x10b0
+				>;		
+			};
+
+			pinctrl_gpio_beep: beep {
+				fsl,pins = <
+					MX6ULL_PAD_SNVS_TAMPER1__GPIO5_IO01	0x400010B0
 				>;
 			};
 		};
 };
 
-&ecspi3 {
-   fsl,spi-num-chipselects = <2>;
-   cs-gpios = <&gpio1 20 0>, <&gpio1 18 0>;
-   pinctrl-names = "default";
-   pinctrl-0 = <&pinctrl_ecspi3>;
-   /* status = "okay"; */
-   status = "disabled";
-
-   /*
-   spidev0: spi@0 {
-      compatible = "rohm,dh2228fv";
-      reg = <0>;
-      spi-max-frequency = <5000000>;
-   };
-   
-	spidev1: spi@1 {
-      compatible = "rohm,dh2228fv";
-      reg = <1>;
-      spi-max-frequency = <5000000>;
-   };
-   */
+&pwm3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm3>;
+	status = "okay";
 };
 
 &uart1 {
@@ -507,14 +453,6 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usdhc2>;
 	non-removable;
-	status = "okay";
-};
-
-&adc1 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_adc1>;
-	vref-supply = <&reg_vref_3v3>;
-	num-channels = <4>; 			
 	status = "okay";
 };
 

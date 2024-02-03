@@ -131,7 +131,7 @@ static s32 icm20608_write_regs(struct icm20608_dev *dev, u8 reg, u8 *buf, u8 len
 	
 out2:
 	kfree(txdata);		
-out1:1
+out1:
 	kfree(t);
 	return ret;
 }
@@ -218,7 +218,7 @@ static int icm_hardware_init(struct spi_device *spi)
     mdelay(50);
 
     value = icm20608_read_onereg(&icm_info.dev, ICM20_WHO_AM_I);
-    printk("ICM20608 ID = %#X\r\n", value);
+    printk(KERN_INFO"ICM20608 ID = %#X\r\n", value);
 
     icm20608_write_onereg(&icm_info.dev, ICM20_SMPLRT_DIV, 0x00);   /* 输出速率是内部采样率 */
     icm20608_write_onereg(&icm_info.dev, ICM20_GYRO_CONFIG, 0x18);  /* 陀螺仪±2000dps量程 */
@@ -235,13 +235,6 @@ static int icm_hardware_init(struct spi_device *spi)
 static int icm20608_probe(struct spi_device *spi)
 {
     int ret = 0;
-
-    ret = icm_hardware_init(spi);
-    if (ret != 0)
-    {
-        printk("icm hardware init failed!\r\n");
-        return -EINVAL;
-    }
 
     /* 1、构建设备号 */
     if (icm_info.dev.major)
@@ -273,6 +266,13 @@ static int icm20608_probe(struct spi_device *spi)
         return PTR_ERR(icm_info.dev.device);
     }
 
+    ret = icm_hardware_init(spi);
+    if (ret != 0)
+    {
+        printk("icm hardware init failed!\r\n");
+        return -EINVAL;
+    }
+    
     printk(KERN_INFO"SPI Driver Init Ok!\r\n");
     return 0;
 }

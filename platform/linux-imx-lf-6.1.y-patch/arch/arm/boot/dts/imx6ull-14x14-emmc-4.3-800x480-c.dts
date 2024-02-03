@@ -1,7 +1,23 @@
+/*
+ * Copyright 2019 NXP
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ */
 
-#include "imx6ull-14x14-rmk-emmc.dts"
+/dts-v1/;
+
+#include "imx6ull.dtsi"
+#include "imx6ul-14x14-rmk.dtsi"
+
+/delete-node/ &sim2;
 
 / {
+	model = "Freescale i.MX6 ULL 14x14 EVK Board";
+	compatible = "fsl,imx6ull-14x14-evk", "fsl,imx6ull";
+
 	usr_led {
 		compatible = "rmk,usr-led";
 		pinctrl-0 = <&pinctrl_gpio_led>;
@@ -23,9 +39,23 @@
 		pinctrl-0 = <&pinctrl_gpio_key>;
 		key-gpio = <&gpio1 18 GPIO_ACTIVE_LOW>;
 		interrupt-parent = <&gpio1>;
-		interrupts = <18 IRQ_TYPE_EDGE_BOTH>;
+		interrupts = <18 IRQ_TYPE_EDGE_FALLING>;
 		status = "okay";
 	};
+};
+
+&clks {
+	assigned-clocks = <&clks IMX6UL_CLK_PLL3_PFD2>,
+			  <&clks IMX6UL_CLK_PLL4_AUDIO_DIV>;
+	assigned-clock-rates = <320000000>, <786432000>;
+};
+
+&csi {
+	status = "okay";
+};
+
+&ov5640 {
+	status = "okay";
 };
 
 &iomuxc {
@@ -35,14 +65,7 @@
         >;
     };
 
-	/*beep pinctrl used add by zc*/
-	pinctrl_gpio_beep: beep {
-		fsl,pins = <
-			MX6ULL_PAD_SNVS_TAMPER1__GPIO5_IO01	0x400010B0
-		>;
-	};
-
-	pinctrl_gpio_key: gpio-keys {
+	pinctrl_gpio_key: gpio-key {
 		fsl,pins = <
 			MX6UL_PAD_UART1_CTS_B__GPIO1_IO18	0x80000000
 		>;
@@ -55,7 +78,50 @@
 			MX6UL_PAD_UART2_CTS_B__ECSPI3_MOSI        0x100b1 
 			MX6UL_PAD_UART2_RX_DATA__ECSPI3_SCLK      0x100b1
         >;
-	};  
+	};
+
+	pinctrl_tsc: tscgrp {
+	    fsl,pins = <
+			MX6UL_PAD_GPIO1_IO09__GPIO1_IO09 		0xF080
+        >;	
+	};
+
+	pinctrl_pwm3: pwm3grp {
+		fsl,pins = <
+			MX6UL_PAD_GPIO1_IO04__PWM3_OUT			0x110b0
+        >;		
+	};
+};
+
+&iomuxc_snvs {
+	pinctrl_tsc_reset: tsc_reset {
+		fsl,pins = <
+			MX6ULL_PAD_SNVS_TAMPER9__GPIO5_IO09		0x49
+		>;		
+	};
+
+	pinctrl_gpio_beep: beep {
+		fsl,pins = <
+			MX6ULL_PAD_SNVS_TAMPER1__GPIO5_IO01		0x400010B0
+		>;
+	};
+};
+
+&pwm3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm3>;
+	status = "okay";
+};
+
+&usdhc2 {
+	pinctrl-names = "default", "state_100mhz", "state_200mhz";
+	pinctrl-0 = <&pinctrl_usdhc2_8bit>;
+	pinctrl-1 = <&pinctrl_usdhc2_8bit_100mhz>;
+	pinctrl-2 = <&pinctrl_usdhc2_8bit_200mhz>;
+	bus-width = <8>;
+	non-removable;
+	no-1-8-v;
+	status = "okay";
 };
 
 &i2c1 {
@@ -67,6 +133,26 @@
 	ap3216@1e {
 		compatible = "rmk,ap3216";
 		reg = <0x1e>;
+	};
+};
+
+&i2c2 {
+	clock-frequency = <100000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_i2c2>;
+	status = "okay";
+
+	gt7149: gt7149@14 {
+		compatible = "rmk,gt7149";
+		reg = <0x14>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_tsc 
+					&pinctrl_tsc_reset>;
+		interrupt-parent = <&gpio1>;
+		interrupts = <9 IRQ_TYPE_EDGE_FALLING>;
+		reset-gpios = <&gpio5 9 GPIO_ACTIVE_LOW>;
+		interrupt-gpios = <&gpio1 9 GPIO_ACTIVE_LOW>;
+		status = "okay";
 	};
 };
 

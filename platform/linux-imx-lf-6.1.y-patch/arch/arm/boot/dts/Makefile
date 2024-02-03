@@ -745,6 +745,7 @@ dtb-$(CONFIG_SOC_IMX6SX) += \
 	imx6sx-udoo-neo-full.dtb
 dtb-$(CONFIG_SOC_IMX6UL) += \
 	imx6ull-14x14-emmc-4.3-800x480-c.dtb \
+	imx6ull-14x14-nand-4.3-800x480-c.dtb \
 	imx6ull-qemu.dtb \
 	imx6ul-14x14-evk.dtb \
 	imx6ul-14x14-evk-csi.dtb \

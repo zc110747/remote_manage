@@ -308,21 +308,32 @@ function SysBuildKernel
 		return 0
 	fi
 
-	if [ -d $ENV_KERNEL_DIR ]; then
-		cd $ENV_KERNEL_DIR
-
-		echo "compiler:$NEW_KERNEL_CC"
-		make imx_rmk_v7_defconfig ARCH=arm CROSS_COMPILE=$NEW_KERNEL_CC
-		make V=1 ARCH=arm CROSS_COMPILE=$NEW_KERNEL_CC all -j4
-
-		if [ -f $ENV_KERNEL_ZIMAGE ]; then
-			cp -avf $ENV_KERNEL_ZIMAGE $TFTP_PATH/
-			cp -avf $ENV_KERNEL_DTB $TFTP_PATH/
+	if [ x$1 != x ]; then
+		if [ $1 == "dtbs" ]; then
+			cd ${PLATFORM_LINUX_PATH}
+			./kernel_upgrade.sh
+			cd ${ENV_KERNEL_DIR}
+			make dtbs
 		else
-			echo "${redText}Linux Kernel build failed, please check!${defText}"
+			echo "extra build command:${redText}SysBuildKernel dtbs${defText}"
 		fi
 	else
-		echo "Kernal Directory:$ENV_KERNEL_DIR not exist!"
+		if [ -d ${ENV_KERNEL_DIR} ]; then
+			cd ${ENV_KERNEL_DIR}
+
+			echo "compiler:$NEW_KERNEL_CC"
+			make imx_rmk_v7_defconfig ARCH=arm CROSS_COMPILE=$NEW_KERNEL_CC
+			make V=1 ARCH=arm CROSS_COMPILE=$NEW_KERNEL_CC all -j4
+
+			if [ -f $ENV_KERNEL_ZIMAGE ]; then
+				cp -avf $ENV_KERNEL_ZIMAGE $TFTP_PATH/
+				cp -avf $ENV_KERNEL_DTB $TFTP_PATH/
+			else
+				echo "${redText}Linux Kernel build failed, please check!${defText}"
+			fi
+		else
+			echo "Kernal Directory:$ENV_KERNEL_DIR not exist!"
+		fi
 	fi
 }
 alias SysBuildKernel='SysBuildKernel'

@@ -90,7 +90,7 @@ int mqtt_device::publish_msg(const std::string &str)
     if (is_connet_ && str.length() > 0)
     {
         ret = publish(NULL, info_.pub_topic.c_str(), str.length(), str.c_str(), info_.qos);
-        PRINT_LOG(LOG_DEBUG, xGetCurrentTimes(), "publisher, topic:%s, ret:%d!", info_.pub_topic.c_str(), ret);
+        PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "publisher, topic:%s, ret:%d!", info_.pub_topic.c_str(), ret);
     }
     
     return ret;

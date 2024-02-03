@@ -28,11 +28,9 @@
 #include <linux/i2c.h>
 #include "kernel_i2c_ap.h"
 
-//全局的指令定义
 #define AP3216_NAME            "ap3216"
 #define I2C_AP_CNT              1
 
-//ap3216设备信息
 struct ap3216_dev
 {
     dev_t devid;            /* 设备号  */
@@ -53,19 +51,8 @@ struct ap3216_info
     unsigned short als;
     unsigned short ps;
 };
-
 static struct ap3216_info ap_info;
 
-/**
- * 连续读取ap3216设备寄存器的值
- * 
- * @param dev ap3216设备信息
- * @param reg 待读取设备寄存器的首地址
- * @param buf 读取数据缓冲区首地址
- * @param len 待读取数据长度
- *
- * @return 读取寄存的操作结果
- */
 static int ap3216_read_regs(struct ap3216_dev *dev, u8 reg, void *buf, int len)
 {
     int ret;
@@ -97,15 +84,6 @@ static int ap3216_read_regs(struct ap3216_dev *dev, u8 reg, void *buf, int len)
     return ret;
 }
 
-
-/**
- * 读取icm20608指定寄存器地址的值
- * 
- * @param dev ICM20608设备信息
- * @param reg 待读取设备寄存器的地址
- *
- * @return 读取到的寄存值
- */
 static unsigned char ap3216_read_reg(struct ap3216_dev *dev, u8 reg)
 {
     u8 data = 0;
@@ -114,13 +92,6 @@ static unsigned char ap3216_read_reg(struct ap3216_dev *dev, u8 reg)
     return data;
 }
 
-/**
- * 读取AP3216的设备数据
- * 
- * @param p_info AP3216的设备信息
- *
- * @return NULL
- */
 void ap3216_readdata(struct ap3216_info *p_info)
 {
     unsigned char i =0;
@@ -153,16 +124,6 @@ void ap3216_readdata(struct ap3216_info *p_info)
     }
 }
 
-/**
- *向ap3216设备连续写入数据
- * 
- * @param dev ap3216的设备信息
- * @param reg 待写入设备寄存器的首地址
- * @param buf 待写入数据缓冲区首地址
- * @param len 待写入数据长度
- *
- * @return 写入寄存的操作结果
- */
 static s32 ap3216_write_regs(struct ap3216_dev *dev, u8 reg, u8 *buf, u8 len)
 {
     u8 b[256];
@@ -181,15 +142,6 @@ static s32 ap3216_write_regs(struct ap3216_dev *dev, u8 reg, u8 *buf, u8 len)
     return i2c_transfer(client->adapter, &msg, 1);
 }
 
-/**
- * 向ap3216指定寄存器地址写入值
- * 
- * @param dev ap3216的设备信息
- * @param reg 写入设备寄存器的地址
- * @param data 写入设备寄存的值
- *
- * @return NULL
- */
 static void ap3216_write_onereg(struct ap3216_dev *dev, u8 reg, u8 data)
 {
     u8 buf = 0;
@@ -197,35 +149,13 @@ static void ap3216_write_onereg(struct ap3216_dev *dev, u8 reg, u8 data)
     ap3216_write_regs(dev, reg, &buf, 1);
 }
 
-/**
-* 打开设备
-* 
-* @param inode 驱动内的节点信息
-* @param filp  要打开的设备文件(文件描述符) 
-*
-* @return 设备打开处理结果，0表示正常
-*/
+
 static int ap3216_open(struct inode *inode, struct file *filp)
 {
     filp->private_data = &ap_info;
-
-    /* 初始化AP3216C */
-    ap3216_write_onereg(&ap_info.dev, AP3216C_SYSTEMCONG, 0x04);/* 复位AP3216C */
-    mdelay(50);
-    ap3216_write_onereg(&ap_info.dev, AP3216C_SYSTEMCONG, 0X03);/* 开启ALS、PS+IR */
     return 0;
 }
 
-/**
- * 从ap3216设备中读取数据
- * 
- * @param filp 要打开的设备文件(文件描述符)
- * @param buf  返回给用户空间的数据缓冲区
- * @param cnt  要读取的数据长度
- * @param off  相对于文件首地址的偏移
- *
- * @return 读取到数据的长度，负值表示读取失败
- */
 static ssize_t ap3216_read(struct file *filp, char __user *buf, size_t cnt, loff_t *off)
 {
     short data[3];
@@ -242,20 +172,11 @@ static ssize_t ap3216_read(struct file *filp, char __user *buf, size_t cnt, loff
     return cnt;
 }
 
-/**
- * ap设备关闭时执行函数
- * 
- * @param inode 驱动内的节点信息
- * @param filp 要打开的设备文件(文件描述符)
- *
- * @return 设备关闭处理结果，0表示正常
- */
 static int ap3216_release(struct inode *inode, struct file *filp)
 {
     return 0;
 }
 
-/* ap3216操作函数 */
 static const struct file_operations ap3216_ops = {
     .owner = THIS_MODULE,
     .open = ap3216_open,
@@ -263,17 +184,8 @@ static const struct file_operations ap3216_ops = {
     .release = ap3216_release,
 };
 
-/**
- * i2c驱动的probe函数，执行设备的模块加载
- * 
- * @param client设备端接口函数
- * @param id  设备端id信息
- *
- * @return 设备probe处理结果
- */
 static int ap3216_probe(struct i2c_client *client, const struct i2c_device_id *id)
 {
-    /* 1、构建设备号 */
     if (ap_info.dev.major)
     {
         ap_info.dev.devid = MKDEV(ap_info.dev.major, 0);
@@ -285,45 +197,35 @@ static int ap3216_probe(struct i2c_client *client, const struct i2c_device_id *i
         ap_info.dev.major = MAJOR(ap_info.dev.devid);
     }
 
-    /* 2、注册设备 */
     cdev_init(&ap_info.dev.cdev, &ap3216_ops);
     cdev_add(&ap_info.dev.cdev, ap_info.dev.devid, I2C_AP_CNT);
 
-    /* 3、创建类 */
     ap_info.dev.class = class_create(THIS_MODULE, AP3216_NAME);
     if (IS_ERR(ap_info.dev.class))
     {
         return PTR_ERR(ap_info.dev.class);
     }
 
-    /* 4、创建设备 */
     ap_info.dev.device = device_create(ap_info.dev.class, NULL, ap_info.dev.devid, NULL, AP3216_NAME);
     if (IS_ERR(ap_info.dev.device))
     {
         return PTR_ERR(ap_info.dev.device);
     }
 
-    //获取client的信息
     ap_info.dev.private_data = client;
+    ap3216_write_onereg(&ap_info.dev, AP3216C_SYSTEMCONG, 0x04);/* 复位AP3216C */
+    mdelay(50);
+    ap3216_write_onereg(&ap_info.dev, AP3216C_SYSTEMCONG, 0X03);/* 开启ALS、PS+IR */
 
     printk(KERN_INFO"I2c-Ap3216 Driver Init Ok!\r\n");
     return 0;
 }
 
-/**
- * iic驱动移除函数
- * 
- * @param spi spi设备   
- *
- * @return 设备移除处理结果
- */
 static void ap3216_remove(struct i2c_client *client)
 {
-    /* 删除设备 */
     cdev_del(&ap_info.dev.cdev);
     unregister_chrdev_region(ap_info.dev.devid, I2C_AP_CNT);
 
-    /* 注销掉类和设备 */
     device_destroy(ap_info.dev.class, ap_info.dev.devid);
     class_destroy(ap_info.dev.class);
 }
@@ -333,13 +235,11 @@ static const struct i2c_device_id ap3216_id[] = {
     {}
 };
 
-/* 设备树匹配列表 */
 static const struct of_device_id ap3216_of_match[] = {
     { .compatible = "rmk,ap3216" },
     { /* Sentinel */ }
 };
 
-/* I2C驱动结构体 */
 static struct i2c_driver ap3216_driver = {
     .probe = ap3216_probe,
     .remove = ap3216_remove,
@@ -351,25 +251,11 @@ static struct i2c_driver ap3216_driver = {
     .id_table = ap3216_id,
 };
 
-/**
- * 驱动加载时执行的初始化函数
- * 
- * @param NULL    
- *
- * @return 驱动加载执行结果
- */
 static int __init ap3216_module_init(void)
 {
     return i2c_add_driver(&ap3216_driver);
 }
 
-/**
- * 驱动释放时执行的退出函数
- * 
- * @param NULL    
- *
- * @return 驱动退出执行结果
- */
 static void __exit ap3216_module_exit(void)
 {
     return i2c_del_driver(&ap3216_driver);
@@ -377,7 +263,7 @@ static void __exit ap3216_module_exit(void)
 
 module_init(ap3216_module_init);
 module_exit(ap3216_module_exit);
-MODULE_AUTHOR("zc");                        //模块作者
-MODULE_LICENSE("GPL v2");                   //模块许可协议
-MODULE_DESCRIPTION("ap3216 driver");        //模块许描述
-MODULE_ALIAS("i2c_ap3216_driver");          //模块别名
+MODULE_AUTHOR("zc");                      
+MODULE_LICENSE("GPL v2");                  
+MODULE_DESCRIPTION("ap3216 driver");      
+MODULE_ALIAS("i2c_ap3216_driver");

@@ -112,6 +112,8 @@ if [[ "${supportedPlatforms[0]}" == "${FIRMWARE_CURRENT_PLATFORMS}" ]]; then
     export APP_CC_COMPILE=arm-none-linux-gnueabihf-g++
     export APP_AR_COMPILE=arm-none-linux-gnueabihf-ar
     export APPLICATION_BUILDOUT=$ENV_PATH_ROOT/buildout/arm
+    export PLATFORM_LINUX_PATH=${ENV_PATH_ROOT}/platform/linux-imx-lf-6.1.y-patch
+    export PLATFORM_UBOOT_PATH=${ENV_PATH_ROOT}/platform/uboot-imx-lf_v2022.04-patch
 elif [[ "${supportedPlatforms[1]}" == "${FIRMWARE_CURRENT_PLATFORMS}" ]]; then
     
     export ENV_ARCH=aarch64

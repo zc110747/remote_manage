@@ -1,6 +1,19 @@
 
 # 开发计划
 
+## FM Version 1.0.0.10 - next
+
+[embed]
+
+1. "node_server": 界面基于vue重构，后台界面设计，增加mqtt的支持
+2. "logger_tool": 增加日志管理功能，支持权限修改。
+3. "local_device": 增加RTC驱动支持
+
+[desktop]
+
+1. "logger_tool": 基于mqtt更新功能和界面
+2. "manage_tool"：功能更新,适配功能调试
+
 ## FM Version 1.0.0.9
 
 [paltform]
@@ -13,7 +26,7 @@
 [embed]
 
 1. "logger_tool":扩展支持 !`module` `command` `info`的命令格式，进行输入操作，其它模块同步更新
-2. "main_process":扩展增加mqtt的支持
+2. "main_process":扩展增加mqtt的支持。
 
 [mod]
 

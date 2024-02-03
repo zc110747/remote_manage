@@ -93,17 +93,26 @@ static char logger_tx_buffer[LOGGER_MAX_BUFFER_SIZE];
 int log_manage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...)
 {
     int len;
-    char *pbuf;
+    char *pbuf = logger_tx_buffer;
     int tx_len = 0;
     int bufferlen = LOGGER_MAX_BUFFER_SIZE;
+    CMD_LOG_INFO log_info;
 
     if (level < log_level_)
         return 0;
 
     mutex_.lock();
 
-    //step1: add logger info header
-    pbuf = logger_tx_buffer;
+    //add logger cmd info
+    log_info.action = LOG_PRINT;
+    log_info.level = level;
+    len = sizeof(CMD_LOG_INFO);
+    memcpy(pbuf, (char *)&log_info, len);
+    pbuf = &pbuf[len];
+    bufferlen -= len;
+    tx_len += len;
+    
+    //add logger header
     len = snprintf(pbuf, bufferlen, "[%s][%s][%d]:", convert_timer(time).c_str(), TOOLS_NAME, level);
     if ((len<=0) || (len>=bufferlen))
     {
@@ -115,7 +124,7 @@ int log_manage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...)
     bufferlen -= len;
     tx_len += len;
 
-    //step2: add logger info
+    //add logger info
     va_list valist;
     va_start(valist, fmt);
     len = vsnprintf(pbuf, bufferlen, fmt, valist);
@@ -132,7 +141,7 @@ int log_manage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...)
     tx_len += len;
     mutex_.unlock();
 
-    //step3: add logger tail \r\n
+    //add logger tail \r\n
     if (bufferlen < 3)
     {
         PRINT_NOW("%s: %s not support buffer-2!\n", PRINT_NOW_HEAD_STR, __func__);
@@ -142,7 +151,7 @@ int log_manage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...)
     pbuf[1] = '\n';
     tx_len += 2;
 
-    //step4:send the logger info.
+    //send the logger info.
     if (!logger_fifo_->is_write_valid())
     {
         len = write(STDOUT_FILENO, logger_tx_buffer, tx_len);

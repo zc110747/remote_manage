@@ -26,29 +26,21 @@
 #include <linux/semaphore.h>
 #include <linux/platform_device.h>
 
-typedef struct 
+struct beep_data
 {
-    dev_t dev_id;           /*总设备号*/
-    int major;              /*主设备号*/
-    int minor;              /*从设备号*/
-    struct cdev cdev;       /*设备接口*/
-    struct class *class;/*设备类指针*/
-    struct device *device;/*设备指针*/
-}device_info;
+    /* device info */
+    dev_t dev_id; 
+    int major;          
+    int minor;            
+    struct cdev cdev;      
+    struct class *class;
+    struct device *device;
+    struct platform_device *pdev;
 
-typedef struct 
-{
-    struct device_node *nd; /*设备节点*/
-    int gpio;          /*beep使用的GPIO编号*/
-    int status;    
-}hardware_info;
-
-typedef struct 
-{
-    hardware_info   hw;
-    device_info     dev;
-}beep_driver;
-static beep_driver driver;
+    /* gpio info */
+    int gpio;               
+    int status;   
+};
 
 #define BEEP_OFF                            0
 #define BEEP_ON                             1
@@ -58,29 +50,29 @@ static beep_driver driver;
 #define DEFAULT_MINOR                       0          /*默认从设备号*/
 #define DEVICE_NAME                         "beep"     /* 设备名, 应用将以/dev/beep访问 */
 
-static void beep_hardware_set(u8 status)
+static void beep_hardware_set(struct beep_data *chip, u8 status)
 {
     switch (status)
     {
         case BEEP_OFF:
-            printk(KERN_INFO"beep off\r\n");
-            gpio_set_value(driver.hw.gpio, 1);
-            driver.hw.status = 0;
+            gpio_set_value(chip->gpio, 1);
+            chip->status = 0;
             break;
         case BEEP_ON:
-            printk(KERN_INFO"beep on\r\n");
-            gpio_set_value(driver.hw.gpio, 0);
-            driver.hw.status = 1;
+            gpio_set_value(chip->gpio, 0);
+            chip->status = 1;
             break;
         default:
-            printk(KERN_INFO"Invalid Beep Set");
             break;
     }
 }
 
 int beep_open(struct inode *inode, struct file *filp)
 {
-    filp->private_data = &driver.dev;
+    struct beep_data *chip;
+
+    chip = container_of(inode->i_cdev, struct beep_data, cdev);
+    filp->private_data = chip;
     return 0;
 }
 
@@ -93,12 +85,14 @@ ssize_t beep_read(struct file *filp, char __user *buf, size_t count, loff_t *f_p
 {
     int result;
     u8 databuf[2];
+    struct beep_data *chip = (struct beep_data *)filp->private_data;
+    struct platform_device *pdev = chip->pdev;
 
-    databuf[0] = driver.hw.status;
+    databuf[0] = chip->status;
     result = copy_to_user(buf, databuf, 1);
     if (result < 0)
     {
-        printk(KERN_INFO"kernel read failed!\r\n");
+        dev_err(&pdev->dev, "read failed!\n");
         return -EFAULT;
     }
     return 1;
@@ -108,31 +102,33 @@ ssize_t beep_write(struct file *filp, const char __user *buf, size_t count,  lof
 {
     int result;
     u8 databuf[2];
+    struct beep_data *chip = (struct beep_data *)filp->private_data;
+    struct platform_device *pdev = chip->pdev;
 
     result = copy_from_user(databuf, buf, count);
     if (result < 0)
     {
-        printk(KERN_INFO"kernel write failed!\r\n");
+        dev_err(&pdev->dev, "write failed!\n");
         return -EFAULT;
     }
 
     /*利用数据操作BEEP*/
-    beep_hardware_set(databuf[0]);
+    beep_hardware_set(chip, databuf[0]);
     return 0;
 }
 
 long beep_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 {
+    struct beep_data *chip = (struct beep_data *)filp->private_data;
     switch (cmd)
     {
         case 0:
-            beep_hardware_set(0);
+            beep_hardware_set(chip, 0);
             break;
         case 1:
-            beep_hardware_set(1);
+            beep_hardware_set(chip, 1);
             break;
         default:
-            printk(KERN_INFO"Invalid Cmd!\r\n");
             return -ENOTTY;
     }
 
@@ -148,207 +144,152 @@ static struct file_operations beep_fops = {
     .release = beep_release,
 };
 
-static int beep_device_create(void)
+static int beep_device_create(struct beep_data *chip)
 {
     int result;
+    int major = DEFAULT_MAJOR;
+    int minor = DEFAULT_MINOR;
+    struct platform_device *pdev = chip->pdev;
 
-    driver.dev.major = DEFAULT_MAJOR;
-    driver.dev.minor = DEFAULT_MINOR;
-
-    /*1.申请字符设备号*/
-    if (driver.dev.major)
-    {
-        driver.dev.dev_id = MKDEV(driver.dev.major, driver.dev.minor);
-        result = register_chrdev_region(driver.dev.dev_id, 1, DEVICE_NAME);
+    if (major){
+        chip->dev_id= MKDEV(major, minor);
+        result = register_chrdev_region(chip->dev_id, 1, DEVICE_NAME);
     }
-    else
-    {
-        result = alloc_chrdev_region(&driver.dev.dev_id, 0, 1, DEVICE_NAME);
-        driver.dev.major = MAJOR(driver.dev.dev_id);
-        driver.dev.minor = MINOR(driver.dev.dev_id);
+    else{
+        result = alloc_chrdev_region(&chip->dev_id, 0, 1, DEVICE_NAME);
+        major = MAJOR(chip->dev_id);
+        minor = MINOR(chip->dev_id);
     }
-
-    if (result < 0)
-    {
-        printk(KERN_INFO"dev alloc or set failed\r\n");
+    if (result < 0){
+        dev_err(&pdev->dev, "dev alloc id failed\n");
         goto exit;
     }
-    else
-    {
-        printk(KERN_INFO"dev alloc or set ok, major:%d, minor:%d\r\n", driver.dev.major,  driver.dev.minor);
-    }
-    
-    /*2.添加设备到相应总线上*/
-    cdev_init(&driver.dev.cdev, &beep_fops);
-    driver.dev.cdev.owner = THIS_MODULE;
-    result = cdev_add(&driver.dev.cdev, driver.dev.dev_id, 1);
-    if (result != 0)
-    {
-        printk(KERN_INFO"cdev add failed\r\n");
+
+    cdev_init(&chip->cdev, &beep_fops);
+    chip->cdev.owner = THIS_MODULE;
+    result = cdev_add(&chip->cdev, chip->dev_id, 1);
+    if (result != 0){
+        dev_err(&pdev->dev, "cdev add failed\n");
         goto exit_cdev_add;
     }
-    else
-    {
-    printk(KERN_INFO"device add Success!\r\n");
-    }
 
-    /* 4、创建类 */
-    driver.dev.class = class_create(THIS_MODULE, DEVICE_NAME);
-    if (IS_ERR(driver.dev.class))
-    {
-        printk(KERN_INFO"class create failed!\r\n");
-        result = PTR_ERR(driver.dev.class);
+    chip->class = class_create(THIS_MODULE, DEVICE_NAME);
+    if (IS_ERR(chip->class)){
+        dev_err(&pdev->dev, "class create failed!\r\n");
+        result = PTR_ERR(chip->class);
         goto exit_class_create;
     }
-    else
-    {
-        printk(KERN_INFO"class create successed!\r\n");
-    }
 
-    /* 5、创建设备 */
-    driver.dev.device = device_create(driver.dev.class, NULL, driver.dev.dev_id, NULL, DEVICE_NAME);
-    if (IS_ERR(driver.dev.device))
-    {
-        printk(KERN_INFO"device create failed!\r\n");
-        result = PTR_ERR(driver.dev.device);
+    chip->device = device_create(chip->class, NULL, chip->dev_id, NULL, DEVICE_NAME);
+    if (IS_ERR(chip->device)){
+        dev_err(&pdev->dev, "device create failed!\r\n");
+        result = PTR_ERR(chip->device);
         goto exit_device_create;
     }
-    else
-    {
-        printk(KERN_INFO"device create successed!\r\n");
-    }
+
+    dev_info(&pdev->dev, "dev create ok, major:%d, minor:%d\r\n", major, minor);
     return 0;
 
-    exit_device_create:
-        class_destroy(driver.dev.class);
-    exit_class_create:
-        cdev_del(&driver.dev.cdev);
-    exit_cdev_add:
-        unregister_chrdev_region(driver.dev.dev_id, 1);
-    exit:
+exit_device_create:
+    class_destroy(chip->class);
+exit_class_create:
+    cdev_del(&chip->cdev);
+exit_cdev_add:
+    unregister_chrdev_region(chip->dev_id, 1);
+exit:
     return result;
 }
 
-static int beep_hardware_init(struct platform_device *pdev)
+static int beep_hardware_init(struct beep_data *chip)
 {
-    int result;
+    struct platform_device *pdev = chip->pdev;
+    struct device_node *beep_nd = pdev->dev.of_node;
+    int ret = 0;
 
-    /*1.获取设备节点*/
-    driver.hw.nd = of_find_node_by_path("/usr_beep");
-    if (driver.hw.nd == NULL)
-    {
-        printk(KERN_INFO"beep node no find\n");
+    /* find the beep-gpio pin */
+    chip->gpio = of_get_named_gpio(beep_nd, "beep-gpio", 0);
+    if (chip->gpio < 0){
+        dev_err(&pdev->dev, "beep-gpio, malloc error!\n");
+        return -EINVAL;
+    }
+    dev_info(&pdev->dev, "find node:%s, io:%d", beep_nd->name, chip->gpio);
+
+    ret = devm_gpio_request(&pdev->dev, chip->gpio, "beep");
+    if(ret < 0){
+        dev_err(&pdev->dev, "beep request failed!\n");
         return -EINVAL;
     }
 
-    /*2.获取设备树中的gpio属性编号*/
-    driver.hw.gpio = of_get_named_gpio(driver.hw.nd, "beep-gpio", 0);
-    if (driver.hw.gpio < 0)
-    {
-        printk(KERN_INFO"beep-gpio no find\n");
-        return -EINVAL;
-    }
+    gpio_direction_output(chip->gpio, 1);
+    beep_hardware_set(chip, BEEP_OFF);
 
-    /*3.设置beep对应GPIO输出*/
-    result = gpio_direction_output(driver.hw.gpio, 1);
-    if (result<0)
-    {
-        printk(KERN_INFO"beep gpio config error\n");
-        return -EINVAL;
-    }
-
-    /*配置beep的默认状态*/
-    beep_hardware_set(BEEP_OFF);
     return 0;
 }
 
-static int beep_probe(struct platform_device *dev)
+static int beep_probe(struct platform_device *pdev)
 {
     int result;
+    struct beep_data *chip = NULL;
 
-    printk(KERN_INFO"device and driver match, do probe!\r\n");
+    chip = devm_kzalloc(&pdev->dev, sizeof(struct beep_data), GFP_KERNEL);
+    if(!chip){
+        dev_err(&pdev->dev, "malloc error\n");
+        return -ENOMEM;
+    }
+    chip->pdev = pdev;
+    platform_set_drvdata(pdev, chip);
 
-    memset((char *)&driver, 0, sizeof(beep_driver));
-
-    //硬件初始化
-    result = beep_hardware_init(dev);
+    result = beep_device_create(chip);
     if (result != 0)
     {
-        printk(KERN_INFO"beep hardware init failed, error:%d!\r\n", result);
+        dev_err(&pdev->dev, "device create failed!\n");
         return result;
     }
 
-    //设备创建!result
-    result = beep_device_create();
+    result = beep_hardware_init(chip);
     if (result != 0)
     {
-        printk(KERN_INFO"beep device create failed, error:%d!\r\n", result);
+        dev_err(&pdev->dev, "hardware init failed!\n");
         return result;
     }
+    dev_info(&pdev->dev, "driver probe all success!\n");
     return 0;
 }
 
-static void beep_device_destory(void)
+static int beep_remove(struct platform_device *pdev)
 {
-    device_destroy(driver.dev.class, driver.dev.dev_id);
-    class_destroy(driver.dev.class);
+    struct beep_data *chip = platform_get_drvdata(pdev);
 
-    cdev_del(&driver.dev.cdev);
-    unregister_chrdev_region(driver.dev.dev_id, 1);   
-}
+    device_destroy(chip->class, chip->dev_id);
+    class_destroy(chip->class);
 
-static void beep_hardware_release(void)
-{
-    //devm_gpio_free(driver.dev.device, driver.hw.gpio);
-}
+    cdev_del(&chip->cdev);
+    unregister_chrdev_region(chip->dev_id, 1);
 
-static int beep_remove(struct platform_device *dev)
-{
-    /*移除硬件驱动*/
-    beep_hardware_release();
-    
-    /*注销设备*/
-    beep_device_destory();
+    dev_info(&pdev->dev, "beep release!\n");
     return 0;
 }
 
 /* 查询设备树的匹配函数 */
-static const struct of_device_id beep_of_match[] = {
-    { .compatible = "rmk,usr-beep" },
+static const struct of_device_id of_match_beep[] = {
+    { .compatible = "rmk,usr-beep"},
     { /* Sentinel */ }
 };
-MODULE_DEVICE_TABLE(of, beep_of_match);
-
-static const struct platform_device_id beep_id_table[] = {
-    { .name = "beep" },
-    { /* sentinel */ },
-};
-MODULE_DEVICE_TABLE(platform, beep_id_table);
+MODULE_DEVICE_TABLE(of, of_match_beep);
 
 static struct platform_driver platform_driver = {
     .driver = {
-        .name = "beep",
-        .of_match_table = beep_of_match,
+        .name = "kernel-beep",
+        .of_match_table = of_match_beep,
     },
     .probe = beep_probe,
     .remove = beep_remove,
-    .id_table = beep_id_table,
 };
 
 static int __init beep_module_init(void)
 {
-    int status;
-
-    status = platform_driver_register(&platform_driver);
-    if (status != 0)
-    {
-        printk(KERN_INFO"mdoule init failed:%d\r\n", status);
-    }
-    else
-    {
-        printk(KERN_INFO"mdoule init ok:%d\r\n", status);
-    }
-    return status;
+    platform_driver_register(&platform_driver);
+    return 0;
 }
 
 static void __exit beep_module_exit(void)
@@ -361,4 +302,4 @@ module_exit(beep_module_exit);
 MODULE_AUTHOR("wzdxf");                         //模块作者
 MODULE_LICENSE("GPL v2");                       //模块许可协议
 MODULE_DESCRIPTION("platform driver for beep"); //模块许描述
-MODULE_ALIAS("beep_driver");                    //模块别名
+MODULE_ALIAS("beep_data");                    //模块别名
