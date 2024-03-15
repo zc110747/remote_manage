@@ -129,6 +129,7 @@ export APPLICATION_ROOTFS="${ENV_PATH_ROOT}"/rootfs
 export APPLICATION_THIRDPARTS=${ENV_PATH_ROOT}/thirdparts
 export APPLICATION_EMBED="${ENV_PATH_ROOT}"/embed
 export APPLICATION_EMBED_MODUILES="${BUILD_NFS_PATH}"/home/sys/modules
+export APPLICATION_PLATFORM="${ENV_PATH_ROOT}"/platform
 
 #-------------------------------------------------------------------------------
 # Env Vars define finish shows

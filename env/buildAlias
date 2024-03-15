@@ -12,7 +12,17 @@ function build_uboot
 	echo "uboot compiler:${NEW_KERNEL_CC}"
 	
 	if [ "${FIRMWARE_CURRENT_PLATFORMS}" == "ARM" ]; then
+		
+		cd "${APPLICATION_PLATFORM}"/ || return
+		mkimage -C none -A arm -T script -d boot.script boot.scr
+		mv boot.scr "${BUILD_TFTP_PATH}"/
+
 		if [ -d "${SUPPORT_ENV_BOOT_DIR}" ]; then
+
+			cd "${PLATFORM_UBOOT_PATH}"/ || return
+			sudo chmod 777 uboot_upgrade.sh
+			./uboot_upgrade.sh
+
 			cd "${SUPPORT_ENV_BOOT_DIR}" || return
 			make mx6ull_14x14_rmk_emmc_defconfig
 			make V=1 ARCH=arm CROSS_COMPILE="${NEW_KERNEL_CC}" all -j6
@@ -42,9 +52,9 @@ function build_kernel
 	else
 		echo "kernel compiler:$NEW_KERNEL_CC"
 
-		cd "${PLATFORM_LINUX_PATH}"/ || return
-		sudo chmod 777 kernel_upgrade.sh
-		./kernel_upgrade.sh
+			cd "${PLATFORM_LINUX_PATH}"/ || return
+			sudo chmod 777 kernel_upgrade.sh
+			./kernel_upgrade.sh
 
 		if [ x"$1" != x ]; then
 			if [ "$1" == "dtbs" ]; then

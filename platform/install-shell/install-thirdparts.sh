@@ -161,7 +161,7 @@ function process_cJSON()
             make clean
         fi
 
-        make CC="${cross_compiler}-gcc -std=c89" -j${CPU_NUM}
+        make CC="${cross_compiler}-gcc -std=c89"
 
         cp -rv *.so* ${PROGRAM_INSTALL}/lib/
         mkdir -p ${PROGRAM_INSTALL}/include/cjson/

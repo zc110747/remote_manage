@@ -1,15 +1,10 @@
-
-setenv eth1addr="00:01:02:03:04:05"
-setenv eth2addr="00:01:02:03:04:06"
-setenv serverip="192.168.3.29"
-setenv ipaddr="192.168.3.99"
-setenv netmask="255.255.255.0"
-setenv gateway="192.168.3.1" 
-setenv nfspath="/home/freedom/Desktop/sdk/arm/build/nfs_root/"
-setenv bootargs="console=ttymxc0,115200 root=/dev/nfs " \
-    "nfsroot=192.168.3.29:${nfspath},proto=tcp rw ip=192.168.3.99:192.168.3.29:192.168.3.1:255.255.255.0::eth0:off" \
-setenv fdt_file="imx6ull-14x14-emmc-4.3-800x480-c.dtb"
-setenv netboot_cmd="tftp 80800000 zImage; tftp 83000000 ${fdt_file}; bootz 80800000 - 83000000;"
-setenv mmcboot_cmd="mmc dev ${mmcdev}; run loadimage; run mmcboot"
-
-run mmcboot_cmd
+echo "boot.src init!"
+setenv serverip "192.168.3.29" 
+setenv ipaddr "192.168.3.99" 
+setenv netmask "255.255.255.0" 
+setenv gateway "192.168.3.1"
+setenv nfspath "/home/freedom/Desktop/sdk/arm/build/nfs_root"
+setenv bootargs "console=ttymxc0,115200 root=/dev/nfs nfsroot=${serverip}:${nfspath},proto=tcp rw ip=${ipaddr}:${serverip}:${gateway}:${netmask}::eth0:off earlyprintk"
+setenv netboot_cmd "tftp 80800000 zImage; tftp 83000000 ${fdt_file}; bootz 80800000 - 83000000;"
+echo "boot.src init fininshed!"
+run netboot_cmd
