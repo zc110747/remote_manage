@@ -21,7 +21,7 @@
 #ifndef __device_base_HPP
 #define __device_base_HPP
 
-#include "jsonconfig.hpp"
+#include "json_config.hpp"
 #include "common_unit.hpp"
 #include "device_common.hpp"
 
@@ -30,9 +30,6 @@ class device_base
 public:
     /// \brief constructor
     device_base();
-
-    /// - copy constructor.
-    device_base(const std::string &DevicePath);
 
     /// -- destructor
     ~device_base();

@@ -3,7 +3,7 @@
 //  All Rights Reserved
 //
 //  Name:
-//      system_config.hpp
+//      json_config.hpp
 //
 //  Purpose:
 //      系统信息配置组件，主要实现如下功能
@@ -48,6 +48,7 @@ _Pragma("once")
 #define DEFAULT_LOGGER_PORT         8003
 #define DEFAULT_GUI_DEVICE_PORT     8004
 #define DEFAULT_NODE_WEB_PORT       8100
+#define DEFAULT_LOGGER_LEVEL        2
 
 
 using JString = Json::String;
@@ -117,6 +118,16 @@ typedef struct
 
 typedef struct 
 {
+    int gui_manage_level;
+    int local_device_level;
+    int logger_device_level;
+    int lower_device_level;
+    int main_process_level;
+    int node_server_level;
+}LoggerPrivilege;
+
+typedef struct 
+{
     JString local_ipaddress;
     
     JString ipaddress;
@@ -130,6 +141,8 @@ typedef struct
     NodeServerConfig node_sever;
 
     LowerDeviceConfig lower_device;
+
+    LoggerPrivilege logger_privilege;
 }SystemParamter;
 
 class system_config
@@ -190,6 +203,8 @@ public:
     
     //node info
     const int get_node_web_port()               const    {return parameter_.node_sever.web_port;}
+
+    const LoggerPrivilege& get_logger_privilege() const  {return parameter_.logger_privilege;}
 
 private:
     /// \brief check_configfile

@@ -28,27 +28,13 @@
 #include <linux/spi/spi.h>
 #include "kernel_spi_icm.h"
 
-//全局的指令定义
-#define SPI_ICM_NAME            "icm20608"
-#define SPI_ICM_CNT             1
+#define DEVICE_NAME            "icm20608"
+#define DEVICE_CNT              1
+#define DEFAULT_MAJOR           0         
+#define DEFAULT_MINOR           0  
 
-//icm20608设备信息
-struct icm20608_dev 
+struct spi_read_data
 {
-    dev_t devid;                /* 设备号 */
-    struct cdev cdev;           /* cdev */
-    struct class *class;        /* 类 */
-    struct device *device;      /* 设备 */
-    struct device_node*nd;    /* 设备节点 */
-    int major;                  /* 主设备号 */
-    void *private_data;         /* 私有数据 */
-    int cs_gpio;                /* 片选所使用的GPIO编号 */
-};
-
-//icm20608应用信息
-struct icm20608_info
-{
-    struct icm20608_dev dev;
     signed int gyro_x_adc;      /* 陀螺仪X轴原始值 */
     signed int gyro_y_adc;      /* 陀螺仪Y轴原始值 */
     signed int gyro_z_adc;      /* 陀螺仪Z轴原始值 */
@@ -58,114 +44,128 @@ struct icm20608_info
     signed int temp_adc;        /* 温度原始值 */
 };
 
-static struct icm20608_info icm_info;
-
-static int icm20608_read_regs(struct icm20608_dev *dev, u8 reg, void *buf, int len)
+struct spi_icm_data
 {
-	int ret = -1;
-	unsigned char txdata[2];
-	unsigned char *rxdata;
-	struct spi_message m;
-	struct spi_transfer *t;
-	struct spi_device *spi = (struct spi_device *)dev->private_data;
-    
-	t = kzalloc(sizeof(struct spi_transfer), GFP_KERNEL);	/* 申请内存 */
-	if(!t) {
-		return -ENOMEM;
-	}
+    /* dev info */
+    dev_t dev_id;              
+    struct cdev cdev;           
+    struct class *class;      
+    struct device *device;                
+    void *private_data;         
 
-	rxdata = kzalloc(sizeof(char) * len, GFP_KERNEL);	/* 申请内存 */
-	if(!rxdata) {
-		goto out1;
-	}
+    /* read data info */
+    struct spi_read_data data;
+};
 
-	txdata[0] = reg | 0x80;				
-	t->tx_buf = txdata;			
-    t->rx_buf = rxdata;			
-	t->len = len+1;				
-	spi_message_init(&m);		
-	spi_message_add_tail(t, &m);
-	ret = spi_sync(spi, &m);	
-	if(ret) {
-		goto out2;
-	}
-	
-    memcpy(buf , rxdata+1, len);  /* 只需要读取的数据 */
-
-out2:
-	kfree(rxdata);					/* 释放内存 */
-out1:	
-	kfree(t);						/* 释放内存 */
-	
-	return ret;
-}
-
-static s32 icm20608_write_regs(struct icm20608_dev *dev, u8 reg, u8 *buf, u8 len)
+static int icm20608_read_regs(struct spi_icm_data *chip, u8 reg, void *buf, int len)
 {
-	int ret = -1;
-	unsigned char *txdata;
-	struct spi_message m;
-	struct spi_transfer *t;
-	struct spi_device *spi = (struct spi_device *)dev->private_data;
-	
-	t = kzalloc(sizeof(struct spi_transfer), GFP_KERNEL);	/* 申请内存 */
-	if(!t) {
-		return -ENOMEM;
-	}
-	
-	txdata = kzalloc(sizeof(char)+len, GFP_KERNEL);
-	if(!txdata) {
-		goto out1;
-	}
-	
-	*txdata = reg & ~0x80;
-    memcpy(txdata+1, buf, len);
-	t->tx_buf = txdata;		
-	t->len = len+1;			
-	spi_message_init(&m);		
-	spi_message_add_tail(t, &m);
-	ret = spi_sync(spi, &m);	
+    int ret = -1;
+    unsigned char txdata[2];
+    unsigned char *rxdata;
+    struct spi_message m;
+    struct spi_transfer *t;
+    struct spi_device *spi = (struct spi_device *)chip->private_data;
+
+    t = kzalloc(sizeof(struct spi_transfer), GFP_KERNEL);
+    if(!t) {
+        return -ENOMEM;
+    }
+
+    rxdata = kzalloc(sizeof(char) * len, GFP_KERNEL);
+    if(!rxdata) {
+        goto out1;
+    }
+
+    txdata[0] = reg | 0x80;    
+    t->tx_buf = txdata; 
+    t->rx_buf = rxdata;
+    t->len = len+1;    
+    spi_message_init(&m);
+    spi_message_add_tail(t, &m);
+    ret = spi_sync(spi, &m);
     if(ret) {
         goto out2;
     }
-	
+
+    memcpy(buf , rxdata+1, len);  
+
 out2:
-	kfree(txdata);		
-out1:
-	kfree(t);
-	return ret;
+    kfree(rxdata);                    /* 释放内存 */
+out1:    
+    kfree(t);                        /* 释放内存 */
+
+    return ret;
 }
 
-static unsigned char icm20608_read_onereg(struct icm20608_dev *dev, u8 reg)
+static s32 icm20608_write_regs(struct spi_icm_data *chip, u8 reg, u8 *buf, u8 len)
+{
+    int ret = -1;
+    unsigned char *txdata;
+    struct spi_message m;
+    struct spi_transfer *t;
+    struct spi_device *spi = (struct spi_device *)chip->private_data;
+
+    t = kzalloc(sizeof(struct spi_transfer), GFP_KERNEL);    /* 申请内存 */
+    if(!t) {
+        return -ENOMEM;
+    }
+
+    txdata = kzalloc(sizeof(char)+len, GFP_KERNEL);
+    if(!txdata) {
+        goto out1;
+    }
+    
+    *txdata = reg & ~0x80;
+    memcpy(txdata+1, buf, len);
+    t->tx_buf = txdata;
+    t->len = len+1;
+    spi_message_init(&m);
+    spi_message_add_tail(t, &m);
+    ret = spi_sync(spi, &m);
+    if(ret) {
+        goto out2;
+    }
+
+out2:
+    kfree(txdata);
+out1:
+    kfree(t);
+    return ret;
+}
+
+static unsigned char icm20608_read_onereg(struct spi_icm_data *chip, u8 reg)
 {
     u8 data = 0;
-    icm20608_read_regs(dev, reg, &data, 1);
+    icm20608_read_regs(chip, reg, &data, 1);
     return data;
 }
 
-static void icm20608_write_onereg(struct icm20608_dev *dev, u8 reg, u8 value)
+static void icm20608_write_onereg(struct spi_icm_data *chip, u8 reg, u8 value)
 {
     u8 buf = value;
-    icm20608_write_regs(dev, reg, &buf, 1);
+    icm20608_write_regs(chip, reg, &buf, 1);
 }
 
-void icm20608_readdata(struct icm20608_info *p_info)
+void icm20608_readdata(struct spi_icm_data *chip)
 {
     unsigned char data[14];
-    icm20608_read_regs(&p_info->dev, ICM20_ACCEL_XOUT_H, data, 14);
+    icm20608_read_regs(chip, ICM20_ACCEL_XOUT_H, data, 14);
 
-    p_info->accel_x_adc = (signed short)((data[0] << 8) | data[1]);
-    p_info->accel_y_adc = (signed short)((data[2] << 8) | data[3]);
-    p_info->accel_z_adc = (signed short)((data[4] << 8) | data[5]);
-    p_info->temp_adc    = (signed short)((data[6] << 8) | data[7]);
-    p_info->gyro_x_adc  = (signed short)((data[8] << 8) | data[9]);
-    p_info->gyro_y_adc  = (signed short)((data[10] << 8) | data[11]);
-    p_info->gyro_z_adc  = (signed short)((data[12] << 8) | data[13]);
+    chip->data.accel_x_adc = (signed short)((data[0] << 8) | data[1]);
+    chip->data.accel_y_adc = (signed short)((data[2] << 8) | data[3]);
+    chip->data.accel_z_adc = (signed short)((data[4] << 8) | data[5]);
+    chip->data.temp_adc    = (signed short)((data[6] << 8) | data[7]);
+    chip->data.gyro_x_adc  = (signed short)((data[8] << 8) | data[9]);
+    chip->data.gyro_y_adc  = (signed short)((data[10] << 8) | data[11]);
+    chip->data.gyro_z_adc  = (signed short)((data[12] << 8) | data[13]);
 }
 
 static int icm20608_open(struct inode *inode, struct file *filp)
 {
-    filp->private_data = &icm_info; /* 设置私有数据 */
+    struct spi_icm_data *chip;
+
+    chip = container_of(inode->i_cdev, struct spi_icm_data, cdev);
+    filp->private_data = chip;
     return 0;
 }
 
@@ -173,16 +173,16 @@ static ssize_t icm20608_read(struct file *filp, char __user *buf, size_t cnt, lo
 {
     signed int data[7];
     int err;
-    struct icm20608_info *p_info = (struct icm20608_info *)filp->private_data;
+    struct spi_icm_data *chip = (struct spi_icm_data *)filp->private_data;
 
-    icm20608_readdata(p_info);
-    data[0] = p_info->gyro_x_adc;
-    data[1] = p_info->gyro_y_adc;
-    data[2] = p_info->gyro_z_adc;
-    data[3] = p_info->accel_x_adc;
-    data[4] = p_info->accel_y_adc;
-    data[5] = p_info->accel_z_adc;
-    data[6] = p_info->temp_adc;
+    icm20608_readdata(chip);
+    data[0] = chip->data.gyro_x_adc;
+    data[1] = chip->data.gyro_y_adc;
+    data[2] = chip->data.gyro_z_adc;
+    data[3] = chip->data.accel_x_adc;
+    data[4] = chip->data.accel_y_adc;
+    data[5] = chip->data.accel_z_adc;
+    data[6] = chip->data.temp_adc;
     err = copy_to_user(buf, data, sizeof(data));
 
     if (err != 0)
@@ -197,101 +197,134 @@ static int icm20608_release(struct inode *inode, struct file *filp)
     return 0;
 }
 
-static const struct file_operations icm20608_ops = {
+static const struct file_operations spi_icm_ops = {
     .owner = THIS_MODULE,
     .open = icm20608_open,
     .read = icm20608_read,
     .release = icm20608_release,
 };
 
-static int icm_hardware_init(struct spi_device *spi)
+static int spi_hardware_init(struct spi_icm_data *chip)
 {
     unsigned char value = 0;
+    struct spi_device *spi = (struct spi_device *)chip->private_data;
 
     spi->mode = SPI_MODE_0;
     spi_setup(spi);
-    icm_info.dev.private_data = spi;
 
-    icm20608_write_onereg(&icm_info.dev, ICM20_PWR_MGMT_1, 0x80);
+    icm20608_write_onereg(chip, ICM20_PWR_MGMT_1, 0x80);
     mdelay(50);
-    icm20608_write_onereg(&icm_info.dev, ICM20_PWR_MGMT_1, 0x01);
+    icm20608_write_onereg(chip, ICM20_PWR_MGMT_1, 0x01);
     mdelay(50);
 
-    value = icm20608_read_onereg(&icm_info.dev, ICM20_WHO_AM_I);
-    printk(KERN_INFO"ICM20608 ID = %#X\r\n", value);
+    value = icm20608_read_onereg(chip, ICM20_WHO_AM_I);
+    dev_info(&spi->dev, "ICM20608 ID = %#X\r\n", value);
 
-    icm20608_write_onereg(&icm_info.dev, ICM20_SMPLRT_DIV, 0x00);   /* 输出速率是内部采样率 */
-    icm20608_write_onereg(&icm_info.dev, ICM20_GYRO_CONFIG, 0x18);  /* 陀螺仪±2000dps量程 */
-    icm20608_write_onereg(&icm_info.dev, ICM20_ACCEL_CONFIG, 0x18); /* 加速度计±16G量程 */
-    icm20608_write_onereg(&icm_info.dev, ICM20_CONFIG, 0x04);       /* 陀螺仪低通滤波BW=20Hz */
-    icm20608_write_onereg(&icm_info.dev, ICM20_ACCEL_CONFIG2, 0x04);/* 加速度计低通滤波BW=21.2Hz */
-    icm20608_write_onereg(&icm_info.dev, ICM20_PWR_MGMT_2, 0x00);   /* 打开加速度计和陀螺仪所有轴 */
-    icm20608_write_onereg(&icm_info.dev, ICM20_LP_MODE_CFG, 0x00);  /* 关闭低功耗 */
-    icm20608_write_onereg(&icm_info.dev, ICM20_FIFO_EN, 0x00);      /* 关闭FIFO*/
+    icm20608_write_onereg(chip, ICM20_SMPLRT_DIV, 0x00);   /* 输出速率是内部采样率 */
+    icm20608_write_onereg(chip, ICM20_GYRO_CONFIG, 0x18);  /* 陀螺仪±2000dps量程 */
+    icm20608_write_onereg(chip, ICM20_ACCEL_CONFIG, 0x18); /* 加速度计±16G量程 */
+    icm20608_write_onereg(chip, ICM20_CONFIG, 0x04);       /* 陀螺仪低通滤波BW=20Hz */
+    icm20608_write_onereg(chip, ICM20_ACCEL_CONFIG2, 0x04);/* 加速度计低通滤波BW=21.2Hz */
+    icm20608_write_onereg(chip, ICM20_PWR_MGMT_2, 0x00);   /* 打开加速度计和陀螺仪所有轴 */
+    icm20608_write_onereg(chip, ICM20_LP_MODE_CFG, 0x00);  /* 关闭低功耗 */
+    icm20608_write_onereg(chip, ICM20_FIFO_EN, 0x00);      /* 关闭FIFO*/
 
     return 0;
 }
 
+static int spi_device_create(struct spi_icm_data *chip)
+{
+    int result;
+    int major = DEFAULT_MAJOR;
+    int minor = DEFAULT_MINOR;
+    struct spi_device *spi = (struct spi_device *)chip->private_data;
+
+    if (major) {
+        chip->dev_id= MKDEV(major, minor);
+        result = register_chrdev_region(chip->dev_id, 1, DEVICE_NAME);
+    } else {
+        result = alloc_chrdev_region(&chip->dev_id, 0, 1, DEVICE_NAME);
+        major = MAJOR(chip->dev_id);
+        minor = MINOR(chip->dev_id);
+    }
+    if (result < 0){
+        dev_err(&spi->dev, "dev alloc id failed\n");
+        goto exit;
+    }
+
+    cdev_init(&chip->cdev, &spi_icm_ops);
+    chip->cdev.owner = THIS_MODULE;
+    result = cdev_add(&chip->cdev, chip->dev_id, 1);
+    if (result != 0){
+        dev_err(&spi->dev, "cdev add failed\n");
+        goto exit_cdev_add;
+    }
+
+    chip->class = class_create(THIS_MODULE, DEVICE_NAME);
+    if (IS_ERR(chip->class)){
+        dev_err(&spi->dev, "class create failed!\r\n");
+        result = PTR_ERR(chip->class);
+        goto exit_class_create;
+    }
+
+    chip->device = device_create(chip->class, NULL, chip->dev_id, NULL, DEVICE_NAME);
+    if (IS_ERR(chip->device)){
+        dev_err(&spi->dev, "device create failed!\r\n");
+        result = PTR_ERR(chip->device);
+        goto exit_device_create;
+    }
+
+    dev_info(&spi->dev, "dev create ok, major:%d, minor:%d\r\n", major, minor);
+
+exit_device_create:
+    class_destroy(chip->class);
+exit_class_create:
+    cdev_del(&chip->cdev);
+exit_cdev_add:
+    unregister_chrdev_region(chip->dev_id, 1);
+exit:
+    return result;
+}
+
 static int icm20608_probe(struct spi_device *spi)
 {
-    int ret = 0;
+    int result;
+    struct spi_icm_data *chip = NULL;
 
-    /* 1、构建设备号 */
-    if (icm_info.dev.major)
-    {
-        icm_info.dev.devid = MKDEV(icm_info.dev.major, 0);
-        register_chrdev_region(icm_info.dev.devid, SPI_ICM_CNT, SPI_ICM_NAME);
-    } 
-    else
-    {
-        alloc_chrdev_region(&icm_info.dev.devid, 0, SPI_ICM_CNT, SPI_ICM_NAME);
-        icm_info.dev.major = MAJOR(icm_info.dev.devid);
+    chip = devm_kzalloc(&spi->dev, sizeof(struct spi_icm_data), GFP_KERNEL);
+    if (!chip){
+        dev_err(&spi->dev, "malloc error\n");
+        return -ENOMEM;
+    }
+    chip->private_data = (void *)spi;
+    spi_set_drvdata(spi, chip);
+
+    result = spi_device_create(chip);
+    if(result){
+        dev_err(&spi->dev, "device create failed!\n");
+        return result;
     }
 
-    /* 2、注册设备 */
-    cdev_init(&icm_info.dev.cdev, &icm20608_ops);
-    cdev_add(&icm_info.dev.cdev, icm_info.dev.devid, SPI_ICM_CNT);
-
-    /* 3、创建类 */
-    icm_info.dev.class = class_create(THIS_MODULE, SPI_ICM_NAME);
-    if (IS_ERR(icm_info.dev.class))
+    result = spi_hardware_init(chip);
+    if (result != 0)
     {
-        return PTR_ERR(icm_info.dev.class);
-    }
-
-    /* 4、创建设备 */
-    icm_info.dev.device = device_create(icm_info.dev.class, NULL, icm_info.dev.devid, NULL, SPI_ICM_NAME);
-    if (IS_ERR(icm_info.dev.device))
-    {
-        return PTR_ERR(icm_info.dev.device);
-    }
-
-    ret = icm_hardware_init(spi);
-    if (ret != 0)
-    {
-        printk("icm hardware init failed!\r\n");
+        dev_err(&spi->dev, "icm hardware init failed!\r\n");
         return -EINVAL;
     }
-    
-    printk(KERN_INFO"SPI Driver Init Ok!\r\n");
+
+    dev_info(&spi->dev, "spi driver init ok!\r\n");
     return 0;
 }
 
 static void icm20608_remove(struct spi_device *spi)
 {
-    /* 删除设备 */
-    cdev_del(&icm_info.dev.cdev);
-    unregister_chrdev_region(icm_info.dev.devid, SPI_ICM_CNT);
+    struct spi_icm_data *chip = spi_get_drvdata(spi);
 
-    /* 注销掉类和设备 */
-    device_destroy(icm_info.dev.class, icm_info.dev.devid);
-    class_destroy(icm_info.dev.class);
+    device_destroy(chip->class, chip->dev_id);
+    class_destroy(chip->class);
+    cdev_del(&chip->cdev);
+    unregister_chrdev_region(chip->dev_id, DEVICE_CNT);
 }
-
-static const struct spi_device_id icm20608_id[] = {
-    {"icm20608", 0},
-    {}
-};
 
 static const struct of_device_id icm20608_of_match[] = {
     { .compatible = "rmk,icm20608" },
@@ -304,23 +337,22 @@ static struct spi_driver icm20608_driver = {
     .driver = {
         .owner = THIS_MODULE,
         .name = "icm20608",
-        .of_match_table = icm20608_of_match, 
-    },
-    .id_table = icm20608_id,
+        .of_match_table = icm20608_of_match,
+    }
 };
 
-static int __init icm20608_module_init(void)
+static int __init spi_icm_module_init(void)
 {
     return spi_register_driver(&icm20608_driver);
 }
 
-static void __exit icm20608_module_exit(void)
+static void __exit spi_icm_module_exit(void)
 {
     return spi_unregister_driver(&icm20608_driver);
 }
 
-module_init(icm20608_module_init);
-module_exit(icm20608_module_exit);
+module_init(spi_icm_module_init);
+module_exit(spi_icm_module_exit);
 MODULE_AUTHOR("zc");                    //模块作者
 MODULE_LICENSE("GPL v2");               //模块许可协议
 MODULE_DESCRIPTION("icm20608 driver");  //模块许描述

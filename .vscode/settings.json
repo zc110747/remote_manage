@@ -101,7 +101,8 @@
         "string.h": "c",
         "i2c.h": "c",
         "module.h": "c",
-        "input.h": "c"
+        "input.h": "c",
+        "kernel_i2c_ap.h": "c"
     },
     "files.exclude": {
         "**/.git": true,

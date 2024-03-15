@@ -30,11 +30,11 @@ static void sigio_signal_func(int signum)
     unsigned int keyvalue = 0;
 
     err = read(fd, &keyvalue, sizeof(keyvalue));
-    if (err < 0) 
+    if (err < 0)
     {
         /* 读取错误 */
-    } 
-    else 
+    }
+    else
     {
         printf("sigio signal! key value=%d\r\n", keyvalue);
     }

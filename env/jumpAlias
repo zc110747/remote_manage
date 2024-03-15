@@ -1,0 +1,32 @@
+#!/bin/bash
+# shellcheck disable=SC2139
+
+echo "Jump directory command alias update."
+
+#-------------------------------------------------------------------------------
+# This section defines the alias of the command.
+# The command abbreviation for use.
+#-------------------------------------------------------------------------------
+alias ll="ls -alF"
+alias pe="printenv"
+alias se="saveenv"
+
+alias cda="cd ${ENV_PATH_ROOT}"
+alias cdae="cd ${ENV_PATH_ROOT}/embed"
+alias cdab="cd ${ENV_PATH_ROOT}/buildout"
+alias cdam="cd ${ENV_PATH_ROOT}/mod"
+alias cdap="cd ${ENV_PATH_ROOT}/platform"
+alias cdat="cd ${ENV_PATH_ROOT}/thirdparts"
+alias cds="cd ${PROGRAM_SDK_PATH}"
+alias cdp="cd ${PROGRAM_SDK_PLATFORM_PATH}"
+alias cdd="cd ${PROGRAM_DOWNLOAD}"
+alias cdpb="cd ${PROGRAM_BUILD}"
+alias cdn="cd ${BUILD_NFS_PATH}"
+alias cdt="cd ${BUILD_TFTP_PATH}"
+alias cdimg="cd ${PROGRAM_IMG}"
+alias cdpi="cd ${PROGRAM_INSTALL}"
+alias cdu="cd ${SUPPORT_ENV_BOOT_DIR}"
+alias cdk="cd ${SUPPORT_ENV_KERNEL_DIR}"
+alias cdrb="cd ${SUPPORT_FS_BUILDROOT_DIR}"
+alias cdrd="cd ${SUPPORT_FS_DEBAIN_DIR}"
+alias cdru="cd ${SUPPORT_FS_UBUNTU_DIR}"

@@ -15,6 +15,7 @@
 *.so*
 *.ko
 *.tar.gz
+*.scr
 
 thirdparts/asio/
 thirdparts/jsoncpp/

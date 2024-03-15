@@ -21,7 +21,7 @@ _Pragma("once")
 #include "device_base.hpp"
 
 class key_device:public device_base
-{  
+{
 public:
     /// \brief constructor
     using device_base::device_base;

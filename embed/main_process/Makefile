@@ -38,14 +38,14 @@ ifeq (${FIRMWARE_CURRENT_PLATFORMS},AARCH64)
 library = $(ENV_PATH_ROOT)/buildout/aarch64/libjsoncpp.a
 ifeq (${DEFINE_MQTT},1)
 cpp_objects += mqtt/mqtt_process.o
-library += -L ${GLOBAL_INTALL}/lib -lssl -lcrypto -lmosquitto -lmosquittopp
+library += -L ${PROGRAM_INSTALL}/lib -lssl -lcrypto -lmosquitto -lmosquittopp
 endif
 else
 #for arm, add library 
 library = $(ENV_PATH_ROOT)/buildout/arm/libjsoncpp.a
 ifeq (${DEFINE_MQTT},1)
 cpp_objects += mqtt/mqtt_process.o
-library += -L ${NFS_PATH}/usr/lib -lssl -lcrypto -lmosquitto -lmosquittopp
+library += -L ${PROGRAM_INSTALL}/lib -lssl -lcrypto -lmosquitto -lmosquittopp
 endif
 endif
 

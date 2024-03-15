@@ -124,7 +124,7 @@ public:
 
 private:
     /// \brief socket_
-    /// - socket used to manage 
+    /// - socket used to manage
     asio::ip::tcp::socket socket_;
 
     /// \brief data_

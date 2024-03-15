@@ -18,29 +18,40 @@
 	model = "Freescale i.MX6 ULL 14x14 EVK Board";
 	compatible = "fsl,imx6ull-14x14-evk", "fsl,imx6ull";
 
-	usr_led {
-		compatible = "rmk,usr-led";
-		pinctrl-0 = <&pinctrl_gpio_led>;
-		led-gpio = <&gpio1 3 GPIO_ACTIVE_LOW>;
-		status = "okay";
-	};
+	gpiosgrp {
+		compatible = "simple-bus";
 
-	usr_beep {
-		compatible = "rmk,usr-beep";
-		pinctrl-0 = <&pinctrl_gpio_beep>;
-		beep-gpio = <&gpio5 1 GPIO_ACTIVE_LOW>;
-		status = "okay";
-	};
+		usr_led {
+			compatible = "rmk,usr-led";
+			pinctrl-0 = <&pinctrl_gpio_led>;
+			led-gpio = <&gpio1 3 GPIO_ACTIVE_LOW>;
+			status = "okay";
+		};
 
-	usr_key {
-		compatible = "rmk,usr-key";
-		#address-cells = <1>;
-		#size-cells = <1>; 
-		pinctrl-0 = <&pinctrl_gpio_key>;
-		key-gpio = <&gpio1 18 GPIO_ACTIVE_LOW>;
-		interrupt-parent = <&gpio1>;
-		interrupts = <18 IRQ_TYPE_EDGE_FALLING>;
-		status = "okay";
+		usr_beep {
+			compatible = "rmk,usr-beep";
+			pinctrl-0 = <&pinctrl_gpio_beep>;
+			beep-gpio = <&gpio5 1 GPIO_ACTIVE_LOW>;
+			status = "okay";
+		};
+
+		usr_key {
+			compatible = "rmk,usr-key";
+			pinctrl-0 = <&pinctrl_gpio_key>;
+			key-gpio = <&gpio1 18 GPIO_ACTIVE_LOW>;
+			interrupt-parent = <&gpio1>;
+			interrupts = <18 IRQ_TYPE_EDGE_FALLING>;
+			status = "okay";
+		};
+
+		usr_loopled {
+				compatible = "rmk,usr-loopled";
+				pinctrl-0 = <&pinctrl_loopled>;
+				leds-gpio = <&gpio4 21 GPIO_ACTIVE_LOW>,
+							<&gpio4 23 GPIO_ACTIVE_LOW>,
+							<&gpio4 25 GPIO_ACTIVE_LOW>;
+				status = "okay";
+		};
 	};
 };
 
@@ -64,7 +75,13 @@
             MX6UL_PAD_GPIO1_IO03__GPIO1_IO03	0x17059
         >;
     };
-
+	pinctrl_loopled: gpio-loopleds {
+        fsl,pins = <
+            MX6UL_PAD_CSI_DATA00__GPIO4_IO21	0x17059
+			MX6UL_PAD_CSI_DATA02__GPIO4_IO23	0x17059
+			MX6UL_PAD_CSI_DATA04__GPIO4_IO25	0x17059
+        >;
+	};
 	pinctrl_gpio_key: gpio-key {
 		fsl,pins = <
 			MX6UL_PAD_UART1_CTS_B__GPIO1_IO18	0x80000000

@@ -1,5 +1,3 @@
-#!bin/sh
-
 #stop all device
 pkill -9 logger_tool
 pkill -9 local_device
@@ -25,4 +23,4 @@ sleep 2
 
 #run server.js
 cd /home/sys/server
-/usr/bin/node/bin/node server.js &
+/usr/bin/node server.js &

@@ -1,0 +1,273 @@
+#!/bin/bash
+# shellcheck disable=SC2154
+# shellcheck disable=SC2174
+
+# SysBuildUboot
+# - build_uboot
+# build the uboot, must install the platform before.
+function build_uboot
+{
+	uboot_file="u-boot.imx"
+
+	echo "uboot compiler:${NEW_KERNEL_CC}"
+	
+	if [ "${FIRMWARE_CURRENT_PLATFORMS}" == "ARM" ]; then
+		if [ -d "${SUPPORT_ENV_BOOT_DIR}" ]; then
+			cd "${SUPPORT_ENV_BOOT_DIR}" || return
+			make mx6ull_14x14_rmk_emmc_defconfig
+			make V=1 ARCH=arm CROSS_COMPILE="${NEW_KERNEL_CC}" all -j6
+
+			if [ -f "u-boot-dtb.imx" ]; then
+				uboot_file="u-boot-dtb.imx"
+			fi
+
+			cp -avf "${uboot_file}" "${BUILD_TFTP_PATH}"/
+		else
+			echo "uboot directory:${SUPPORT_ENV_BOOT_DIR} not exist!"
+		fi
+	else
+		echo "AARCH64 u-boot support feature!"
+	fi
+}
+alias SysBuildUboot='build_uboot'
+
+# SysBuildKernel
+# - build_kernel
+# build the kernel, must install the platform before.
+function build_kernel
+{
+	#check wheather build driver
+	if [ "${FIRMWARE_CURRENT_PLATFORMS}" == "AARCH64" ]; then
+		echo "for AARCH64 only support application, kernel command invalid!".
+	else
+		echo "kernel compiler:$NEW_KERNEL_CC"
+
+		cd "${PLATFORM_LINUX_PATH}"/ || return
+		sudo chmod 777 kernel_upgrade.sh
+		./kernel_upgrade.sh
+
+		if [ x"$1" != x ]; then
+			if [ "$1" == "dtbs" ]; then
+				cd "${SUPPORT_ENV_KERNEL_DIR}"/ || return 
+				make dtbs
+			else
+				echo "extra build command:${redText}SysBuildKernel dtbs${defText}"
+			fi
+		else
+			if [ -d "${SUPPORT_ENV_KERNEL_DIR}" ]; then
+				cd "${SUPPORT_ENV_KERNEL_DIR}"/ || return
+				make imx_rmk_v7_defconfig ARCH=arm CROSS_COMPILE="${NEW_KERNEL_CC}"
+				make V=1 ARCH=arm CROSS_COMPILE="${NEW_KERNEL_CC}" all -j4
+
+				if [ -f "${ENV_KERNEL_ZIMAGE}" ]; then
+					cp -avf "${ENV_KERNEL_ZIMAGE}" "${BUILD_TFTP_PATH}"/
+					cp -avf "${ENV_KERNEL_DTB}" "${BUILD_TFTP_PATH}"/
+				else
+					echo "${redText}Linux Kernel build failed, please check!${defText}"
+				fi
+			else
+				echo "Kernal Directory:${SUPPORT_ENV_KERNEL_DIR} not exist!"
+			fi
+		fi
+	fi
+}
+alias SysBuildKernel='build_kernel'
+
+# SysBuildRootfs
+# - build_rootfs
+# build the kernel, must install the platform before.
+function install_library()
+{
+    sudo cp -Rv "${PROGRAM_INSTALL}"/usr/local/lib/* "${PROGRAM_INSTALL}"/lib/
+
+    sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/usr/lib/
+    sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/usr/include/
+    sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/usr/local/
+    sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/usr/libexec/
+
+    sudo cp -Rv "${PROGRAM_INSTALL}"/usr/libexec/* "${BUILD_NFS_PATH}"/usr/libexec/
+    sudo cp -Rv "${PROGRAM_INSTALL}"/lib/* "${BUILD_NFS_PATH}"/usr/lib/
+    sudo cp -Rv "${PROGRAM_INSTALL}"/usr/local/lib/* "${BUILD_NFS_PATH}"/usr/lib/
+    sudo cp -Rv "${PROGRAM_INSTALL}"/usr/local/include/* "${BUILD_NFS_PATH}"/usr/include/
+    sudo cp -Rv "${PROGRAM_INSTALL}"/include/* "${BUILD_NFS_PATH}"/usr/include/
+    sudo cp -Rv "${PROGRAM_INSTALL}"/usr/local/* "${BUILD_NFS_PATH}"/usr/local/
+    sudo cp -Rv "${PROGRAM_INSTALL}"/etc/* "${BUILD_NFS_PATH}"/etc/
+
+    if [ ! -f "${BUILD_NFS_PATH}"/usr/bin/node ]; then
+        sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/usr/bin/node
+        sudo cp -Rv "${PROGRAM_INSTALL}"/usr/bin/node/*  "${BUILD_NFS_PATH}"/usr/bin/node/
+    else
+        echo "node alread install, not install!"
+    fi
+}
+
+function build_rootfs
+{
+    echo "build or create rootfs:$ROOTFS_RUN"
+	
+	#copy rootfs to the next directory
+	sudo chmod -Rv 755 "${ENV_PATH_ROOT}"/rootfs/
+
+	#install buildroot
+    if [ "${ROOTFS_RUN}" == "buildroot" ]; then
+
+		cdrb || return
+
+		make -j"${CPU_CORE}"
+
+		cp -f output/images/rootfs.ext2 "${PROGRAM_SDK_PATH}"/img/arm-buildroot.img
+
+	#install debain
+	elif [ "${ROOTFS_RUN}" == "debain" ]; then
+
+		sudo mount -o loop "${PROGRAM_IMG}"/arm-debain.img  "${SUPPORT_FS_DEBAIN_DIR}"/
+
+		if [ ! -f "${SUPPORT_FS_DEBAIN_DIR}"/bin/bash ]; then
+			cd "${ENV_PATH_ROOT}"/platform/install-shell || return
+
+			sudo chmod 777 install-debain.sh
+
+			./install-debain.sh
+		else
+			echo "debain already create, not install!"
+		fi
+		
+		install_library
+
+		sleep 1
+		sudo chmod 777 "${SUPPORT_FS_DEBAIN_DIR}"/home/
+		sudo umount -l "${SUPPORT_FS_DEBAIN_DIR}"/
+		sleep 1
+    else
+        sudo cp -ravf "${ENV_PATH_ROOT}"/rootfs/home/* "${BUILD_NFS_PATH}"/home/
+		sudo cp -ravf "${ENV_PATH_ROOT}"/rootfs/etc/mosquitto/ "${BUILD_NFS_PATH}"/etc/
+        sudo cp -ravf "${ENV_PATH_ROOT}"/rootfs/root/.bashrc "${BUILD_NFS_PATH}"/root/
+    fi
+}
+alias SysBuildRootfs='build_rootfs'
+
+# SysPreThirdParts
+# - pre_build_thirdparts
+# prepare build thirdparts package. 
+function pre_build_thirdparts()
+{
+	echo "***start pull thirdparts libary***"
+
+	cd "${ENV_PATH_ROOT}"/platform/install-shell || return
+
+	#set shell run
+	sudo chmod 777 install-thirdparts.sh
+	
+	./install-thirdparts.sh
+}
+alias SysPreThirdParts='pre_build_thirdparts'	#install thirdpart library for the application
+
+# SysBuildModules
+# - build_driver_modules
+# build all the kernel modules for application. 
+# before build, must build kernel before.
+function build_driver_modules()
+{
+	cd "${ENV_PATH_ROOT}" || return 
+
+	if [ -f "${SUPPORT_ENV_KERNEL_DIR}"/.config ]; then
+		echo "start bulid kernal driver"
+        cd "${APPLICATION_MOD}"/ || return
+		make
+	else
+		echo "without compiled linux kernal, not build kernal module"
+	fi
+}
+alias SysBuildModules='build_driver_modules'
+
+# SysBuildModules
+# - build_application
+# build the remote manage application.
+# before build, must prepare the thirdparts library and rootfs.
+function build_application()
+{
+	#check wheather library support
+	if [ ! -f "${PROGRAM_INSTALL}"/lib/libssl.a ] || [ ! -d "${APPLICATION_THIRDPARTS}"/asio ]; then
+		echo "support library for application not exist, run command"
+		echo "  ${redText}SysPreThirdParts${defText}"
+		echo "  ${redText}SysBuildRootfs${defText}"
+		echo "install."
+		return 0
+	fi
+
+	#check wheather build driver
+	if [ "${FIRMWARE_CURRENT_PLATFORMS}" == "ARM" ]; then
+		build_driver_module
+	else
+		echo "driver only support for i.mx6ull, not build!".
+	fi
+	echo "kernal dir:${SUPPORT_ENV_KERNEL_DIR}"
+	echo "firmware path:${ENV_PATH_ROOT}"
+
+	#copy config file
+	cd "${ENV_PATH_ROOT}" || return 
+    mkdir -m 755 -p "${BUILD_NFS_PATH}"/home/sys/configs/
+	cp config.template.json "${BUILD_NFS_PATH}"/home/sys/configs/config.json
+    exit_if_last_error
+
+	#build executable
+	cd "${APPLICATION_EMBED}"/ || return
+	make -j"${CPU_CORE}"
+	exit_if_last_error
+		
+	#package node sever
+	cd "${APPLICATION_EMBED}"/ || return
+    mkdir -m 755 -p "${BUILD_NFS_PATH}"/home/sys/server/
+	cp -rv node_server/* "${BUILD_NFS_PATH}"/home/sys/server/
+
+	cda
+}
+alias SysBuildApplication='build_application'
+
+# SysTarFirmware
+# - tar_firmware
+# tar the firmware and move to path convert.
+function tar_firmware
+{
+	cd "${ENV_PATH_ROOT}"/../ || return
+
+	tar --exclude='remote_manage/.git' --exclude='remote_manage/rootfs' --exclude='remote_manage/thirdparts' -vcjf remote_manage.tar.bz2 remote_manage/
+
+	exit_if_last_error
+
+	echo "move to ${DST_PATH}"
+	mv remote_manage.tar.bz2 "${DST_PATH}"/
+}	
+alias SysTarFirmware='tar_firmware'
+
+function package_firmware
+{
+	#copy tftp directory
+	if [ -d "${BUILD_TFTP_PATH}" ]; then
+		if [ ! -d "${DST_PATH}" ]; then
+			mkdir -m 755 -p "${DST_PATH}" 
+		fi
+
+		cd "${BUILD_TFTP_PATH}"/ || return
+		cp -rvf -- * "${DST_PATH}"/
+		
+		cd "${DST_PATH}"/ || return
+		mv u-boot-dtb.imx "${ENV_KERNAL_UBOOT}"
+	fi
+
+	#package the rootfs
+	mount_rootfs
+
+	# if [ -d "${BUILD_NFS_PATH}"/bin ]; then
+	# 	cd "${BUILD_NFS_PATH}"/ || return
+	# 	rm -rf rootfs.tar.bz2 
+	# 	sudo tar -vcjf rootfs.tar.bz2 -- *
+	# 	sudo chmod 777 rootfs.tar.bz2
+	# 	mv rootfs.tar.bz2 "${DST_PATH}"/
+	# fi
+
+	echo "PackFirmware Success, you can find firmware in directory:${DST_PATH}"
+}
+alias SysPackageFirmware='package_firmware'
+
+echo "build firmware command alias update."

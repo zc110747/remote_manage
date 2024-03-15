@@ -60,5 +60,13 @@
 			"parity" 	:"n",
 			"dev" 		:"/dev/ttyS3"
 		}
+	},
+	"logger_privilege": {
+		"gui_manage_level":2,
+		"local_device_level":2,
+		"logger_device_level":2,
+		"lower_device_level":2,
+		"main_process_level":2,
+		"node_server_level":2
 	}
 }

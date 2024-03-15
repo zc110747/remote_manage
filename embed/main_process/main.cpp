@@ -127,6 +127,7 @@ static bool system_init(int is_default, const char* path)
         ret = system_config::get_instance()->init(path);
         if (!ret)
         {
+            PRINT_NOW("%s:system_config init failed!\n", PRINT_NOW_HEAD_STR);
             return false;
         }
     }
@@ -136,7 +137,9 @@ static bool system_init(int is_default, const char* path)
         PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "System Config use default!");
     }
     //std::cout<<*(system_config::get_instance())<<std::endl;
-
+    LOG_LEVEL level = (LOG_LEVEL)system_config::get_instance()->get_logger_privilege().main_process_level;
+    log_manage::get_instance()->set_level(level);
+    
     ret &= log_manage::get_instance()->init();
     ret &= time_manage::get_instance()->init();
 

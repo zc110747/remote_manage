@@ -1,0 +1,82 @@
+#!/bin/bash
+# shellcheck disable=SC2154
+
+# SysSetPlatform
+# - set_platform
+# set the run platform. now supoort ARM and AARCH64.
+# example：SysSetPlatform ARM
+function save_global_config
+{
+	truncate -s 0 "${ENV_CONFIG_FILE}"
+	echo "${FIRMWARE_CURRENT_PLATFORMS}">"${ENV_CONFIG_FILE}"
+	echo "${FMWARE_VESRION}">>"${ENV_CONFIG_FILE}"
+	echo "${ROOTFS_RUN}">>"${ENV_CONFIG_FILE}"
+	exec bash
+}
+
+# SysSetPlatform
+# - set_platform
+# set the run platform. now supoort ARM and AARCH64.
+# example：SysSetPlatform ARM
+function set_platform
+{
+    current_platform="ARM"
+    if [ x"$1" != x ]; then
+        case "$1" in
+            "ARM")
+                current_platform="ARM"
+            ;;
+            "AARCH64")
+                current_platform="AARCH64"
+            ;;
+        esac
+
+        export FIRMWARE_CURRENT_PLATFORMS=$current_platform       
+        save_global_config
+    else
+        echo "set platform must with parameter ${greenText}'ARM AARCH64'${defText}'"
+    fi
+}
+alias SysSetPlatform='set_platform'
+
+# SysSetRootfs
+# - set_rootfs
+# set the run rootfs platform, can be debain, buildroot, ubuntu.
+# example：SysSetRootfs debain
+function set_rootfs
+{
+    if [ x"$1" != x ]; then  
+        current_rootfs="debain"
+        case "$1" in
+			"buildroot")
+                current_rootfs="buildroot"
+            ;;
+            "debain")
+                current_rootfs="debain"
+            ;;
+            "ubuntu")
+                current_rootfs="ubuntu"
+            ;;
+        esac
+
+        export ROOTFS_RUN=$current_rootfs       
+        save_global_config
+    else
+        echo "set rootfs must with parameter ${greenText}'buildroot debain ubuntu'${defText}'"
+    fi
+}
+alias SysSetRootfs='set_rootfs'
+
+function set_firmware_ver
+{
+	if [ $# -eq 1 ]; then
+		export FMWARE_VESRION=$1
+		echo "Set Firmware Version is $1"
+		save_global_config
+	else
+		echo "firmware version must with parameter, example:${greenText}'SysSetFirmwareVer 1.0.0.1'${defText}"
+	fi
+}
+alias SysSetFirmwareVer='set_firmware_ver'
+
+echo "Config global parameter cmd alias finished."

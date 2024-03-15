@@ -3,7 +3,7 @@
 //  All Rights Reserved
 //
 //  Name:
-//      system_config.cpp
+//      json_config.cpp
 //
 //  Purpose:
 //      系统信息配置组件，主要实现如下功能
@@ -28,7 +28,7 @@
 #include <memory>
 
 #include "common.hpp"
-#include "jsonconfig.hpp"
+#include "json_config.hpp"
 #include "logger_manage.hpp"
 
 system_config* system_config::instance_pointer_ = nullptr;
@@ -67,7 +67,7 @@ bool system_config::check_configfile(const std::string &ipaddr)
         { // IPv4 or IPv6  
             if (getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST) == 0) 
             {  
-                PRINT_NOW("%s:%s IpAddress:%s, %s\n", PRINT_NOW_HEAD_STR, ifa->ifa_name, host, ipaddr.c_str());
+                PRINT_NOW("%s:%s IpAddress Diff %s, %s\n", PRINT_NOW_HEAD_STR, ifa->ifa_name, host, ipaddr.c_str());
                 if (ipaddr == std::string(host))
                 {
                     is_check = true;
@@ -149,7 +149,13 @@ bool system_config::init(const char* path)
         parameter_.lower_device.serial.parity       = root["lower_device"]["serial"]["parity"].asString();
         parameter_.lower_device.serial.dev          = root["lower_device"]["serial"]["dev"].asString();
         parameter_.lower_device.serial.net_port     = root["lower_device"]["serial"]["net_port"].asInt();
-        //save_config_file();
+
+        parameter_.logger_privilege.gui_manage_level = root["logger_privilege"]["gui_manage_level"].asInt();
+        parameter_.logger_privilege.local_device_level = root["logger_privilege"]["local_device_level"].asInt();
+        parameter_.logger_privilege.logger_device_level = root["logger_privilege"]["logger_device_level"].asInt();
+        parameter_.logger_privilege.lower_device_level = root["logger_privilege"]["lower_device_level"].asInt();
+        parameter_.logger_privilege.main_process_level = root["logger_privilege"]["main_process_level"].asInt();
+        parameter_.logger_privilege.node_server_level = root["logger_privilege"]["node_server_level"].asInt();
     }
     catch(const std::exception& e)
     {
@@ -197,6 +203,13 @@ void system_config::default_init() noexcept
     parameter_.lower_device.serial.stopBits = DEFAULT_SERIAL_STOPBITS;
     parameter_.lower_device.serial.parity   = DEFAULT_SERIAL_PARITY;
     parameter_.lower_device.serial.dev      = DEFAULT_SERIAL_DEV;
+
+    parameter_.logger_privilege.gui_manage_level = DEFAULT_LOGGER_LEVEL;
+    parameter_.logger_privilege.local_device_level = DEFAULT_LOGGER_LEVEL;
+    parameter_.logger_privilege.logger_device_level = DEFAULT_LOGGER_LEVEL;
+    parameter_.logger_privilege.lower_device_level = DEFAULT_LOGGER_LEVEL;
+    parameter_.logger_privilege.main_process_level = DEFAULT_LOGGER_LEVEL;
+    parameter_.logger_privilege.node_server_level = DEFAULT_LOGGER_LEVEL;
 }
 
 void system_config::save_config_file()
@@ -237,6 +250,13 @@ void system_config::save_config_file()
     root["lower_device"]["serial"]["stopBits"]  = parameter_.lower_device.serial.stopBits;
     root["lower_device"]["serial"]["parity"]    = parameter_.lower_device.serial.parity;
     root["lower_device"]["serial"]["dev"]       = parameter_.lower_device.serial.dev;
+
+    root["logger_privilege"]["gui_manage_level"] = parameter_.logger_privilege.gui_manage_level;
+    root["logger_privilege"]["local_device_level"] = parameter_.logger_privilege.local_device_level;
+    root["logger_privilege"]["logger_device_level"] = parameter_.logger_privilege.logger_device_level;
+    root["logger_privilege"]["lower_device_level"] = parameter_.logger_privilege.lower_device_level;
+    root["logger_privilege"]["main_process_level"] = parameter_.logger_privilege.main_process_level;
+    root["logger_privilege"]["node_server_level"] = parameter_.logger_privilege.node_server_level;
 
     Json::StreamWriterBuilder swb;
     std::shared_ptr<Json::StreamWriter> sw(swb.newStreamWriter());
@@ -294,5 +314,12 @@ std::ostream& operator<<(std::ostream& os, const system_config& config)
     os<<"------------------node server info ------------------------------\n";
     os<<"node port:"<<config.get_node_port()<<"\n";
 
+    os<<"------------------ privilege ------------------------------\n";
+    os<<"gui_manage_level:"<<config.get_logger_privilege().gui_manage_level<<"\n";
+    os<<"local_dev_level:"<<config.get_logger_privilege().local_device_level<<"\n";
+    os<<"logger_dev_level:"<<config.get_logger_privilege().logger_device_level<<"\n";
+    os<<"lower_dev_level:"<<config.get_logger_privilege().lower_device_level<<"\n";
+    os<<"main_process_level:"<<config.get_logger_privilege().main_process_level<<"\n";
+    os<<"node_server_level:"<<config.get_logger_privilege().node_server_level<<"\n";
     return os;
 }

@@ -35,12 +35,12 @@ public:
 
     /// - destructor, delete not allow for singleton pattern.
     virtual ~cmd_process() = delete;
-    
+
     /// \brief get_instance
     /// - This method is used to get the pattern of the class.
     /// \return the singleton pattern point of the object.
     static cmd_process* get_instance();
-    
+
     /// \brief init
     /// - This method is used to init the object.
     /// \return Wheather initialization is success or failed.
@@ -85,9 +85,9 @@ private:
     /// \brief cmd_data_pointer_
     /// - memory point the start to data area for received.
     char *cmd_data_pointer_;
-    
+
     /// \brief cmd_process_thread_
-    /// - cmd process thread object. 
+    /// - cmd process thread object.
     std::thread cmd_process_thread_;
 
     /// \brief logger_main_process_tx_fifo_

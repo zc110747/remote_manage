@@ -65,20 +65,20 @@ int main(int argc, char *argv[])
 
     /*开启串口模块*/
     fd = open(RS232_DRIVER_NAME, O_RDWR|O_NOCTTY|O_NDELAY);
-    if(fd < 0)
+    if (fd < 0)
     {
         printf("%s Device Open Failed\n");
         return -1;
     }
     else
     {
-        if(set_opt(fd, &opt) != 0)
+        if (set_opt(fd, &opt) != 0)
         {
             do
             {
                 /*从串口缓冲区中读出数据，并写入到发送缓冲区*/
                 nLen = read(fd, nCacheBuffer, UART_BUFFER_SIZE);
-                if(nLen > 0)
+                if (nLen > 0)
                 {
                     write(fd, nCacheBuffer, nLen);
                 }
@@ -102,8 +102,8 @@ static int set_opt(int nFd,  struct serial_opt *opt_info)
     struct termios newtio;
     struct termios oldtio;
 
-    if(tcgetattr(nFd, &oldtio)  !=  0) 
-    { 
+    if (tcgetattr(nFd, &oldtio)  !=  0)
+    {
         printf("Get Serial Attribute Failed\n");
         return -1;
     }
@@ -111,7 +111,7 @@ static int set_opt(int nFd,  struct serial_opt *opt_info)
     newtio.c_cflag |= (CLOCAL|CREAD);
     newtio.c_cflag &= ~CSIZE;
 
-    switch(opt_info->databits)
+    switch (opt_info->databits)
     {
         case 7:
             newtio.c_cflag |= CS7;
@@ -121,9 +121,9 @@ static int set_opt(int nFd,  struct serial_opt *opt_info)
         break;
         default:
         break;
-    }   
+    }
 
-    switch(opt_info->parity[0])
+    switch (opt_info->parity[0])
     {
         case 'O':
         case 'o':
@@ -131,19 +131,19 @@ static int set_opt(int nFd,  struct serial_opt *opt_info)
             newtio.c_cflag |= PARODD;
             newtio.c_iflag |= (INPCK | ISTRIP);
         break;
-        case 'E': 
+        case 'E':
         case 'e':
             newtio.c_iflag |= (INPCK | ISTRIP);
             newtio.c_cflag |= PARENB;
             newtio.c_cflag &= ~PARODD;
         break;
-        case 'N': 
-        case 'n': 
+        case 'N':
+        case 'n':
             newtio.c_cflag &= ~PARENB;
         break;
     }
 
-    switch(opt_info->baud)
+    switch (opt_info->baud)
     {
         case 2400:
             cfsetispeed(&newtio, B2400);
@@ -176,7 +176,7 @@ static int set_opt(int nFd,  struct serial_opt *opt_info)
     }
 
     /*设置停止位*/
-    if(opt_info->stopbits == 1)
+    if (opt_info->stopbits == 1)
     {
         newtio.c_cflag &=  ~CSTOPB;
     }
@@ -189,7 +189,7 @@ static int set_opt(int nFd,  struct serial_opt *opt_info)
 
     /*将配置信息实际设置到串口中*/
     tcflush(nFd, TCIFLUSH);
-    if((tcsetattr(nFd, TCSANOW, &newtio))!=0)
+    if ((tcsetattr(nFd, TCSANOW, &newtio))!=0)
     {
         printf("Serial Config Error\n");
         return -1;

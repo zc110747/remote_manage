@@ -44,20 +44,25 @@ sudo chmod 777 *.sh
 ./preBuildEnvironment.sh all
 ```
 
-关于sdk目录内容的说明如下所示。
+关于sdk(arm/aarch64)目录内容的说明如下所示。
 
-- build/ 系统平台编译后文件。
-  - build/nfs_root/     挂载文件系统的目录，nfs访问也基于此目录
-  - build/tftp_root/    编译后的uboot，zImage和设备树文件目录
-- download/ 下载的包保存的目录
-  - download/tmp/       用于解压包的缓存目录
-- img/  rootfs生成的硬盘格式文件保存目录(如果不存在，当第一次启动命令行会自动生成)
-- install/ 第三方库交叉编译默认安装目录，在创建文件系统时会导入
-  - install/aarch64/    arm64格式库安装目录
-  - install/arm/        arm格式库安装目录
-- support/ 包含系统运行需要的compiler, u-boot, kernel, busybox/buildroot文件系统构建工具。
-  - support/aarch64/    arm64应用运行支持环境
-  - support/arm/        arm应用运行支持环境
+```shell
+download                    #下载文件的目录
+    - tmp                   #缓存空间
+arm/arch
+    build                       #保存编译好的平台
+        - nfs_root              #nfs加载的目录
+        - tftp_root             #tftp加载的目录
+    img                         #打包文件系统目录
+    install                     #交叉编译安装库目录
+    support                     #系统运行需要的支持环境，编译器，uboot，kernel        
+        - compiler
+        - kernel
+        - uboot
+        - rs_buildroot
+        - rs_debain
+        - rs_ubuntu
+```
 
 重新开启命令行，如果加载如下所示，表示已经成功安装，项目需要在普通用户模式下执行，root权限无法加载。
 

@@ -78,7 +78,7 @@ void log_process::logger_rx_run()
             }
             else if(log_info.action == LOG_UPDATE)
             {
-
+                /* funture */
             }
         }
         else if (len == 0)
