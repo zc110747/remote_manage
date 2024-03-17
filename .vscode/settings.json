@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.cpp": "cpp",
         "types.h": "c",
         "fcntl.h": "c",
         "ioctl.h": "c",
@@ -102,7 +103,8 @@
         "i2c.h": "c",
         "module.h": "c",
         "input.h": "c",
-        "kernel_i2c_ap.h": "c"
+        "kernel_i2c_ap.h": "c",
+        "netfwd": "cpp"
     },
     "files.exclude": {
         "**/.git": true,

@@ -224,6 +224,7 @@ static int i2c_device_create(struct ap3216_data *chip)
     }
 
     dev_info(&client->dev, "dev create ok, major:%d, minor:%d\r\n", major, minor);
+    return 0;
 
 exit_device_create:
     class_destroy(chip->class);

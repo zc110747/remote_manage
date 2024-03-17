@@ -46,11 +46,7 @@
 
 /*设备相关参数*/
 struct key_data
-{
-    dev_t dev_id;              
-    struct cdev cdev;         
-    struct class *class;        
-    struct device *device;       
+{      
     struct platform_device *pdev;
     struct input_dev *input_dev;
 
@@ -80,8 +76,7 @@ static irqreturn_t key_handler(int irq, void *data)
     if(chip->key_protect == 0)
     {
         chip->key_protect = 1;
-        chip->key_timer.expires =jiffies + msecs_to_jiffies(10); 
-        add_timer(&chip->key_timer);
+        mod_timer(&chip->key_timer, jiffies + msecs_to_jiffies(20));
     }
 
     return IRQ_RETVAL(IRQ_HANDLED);
@@ -100,13 +95,14 @@ void key_timer_func(struct timer_list *arg)
     if (value == 0)
     {
         input_report_key(chip->input_dev, chip->key_event, KEY_ON);
-        input_sync(chip->input_dev);
     }
     else
     {
-        input_report_key(chip->input_dev, chip->key_event, KEY_OFF);
-        input_sync(chip->input_dev);            
+        input_report_key(chip->input_dev, chip->key_event, KEY_OFF);          
     }
+    input_sync(chip->input_dev);
+
+    dev_info(&pdev->dev, "key timer interrupt!");
     chip->key_protect = 0;
 }
 
@@ -122,15 +118,15 @@ static int key_hw_init(struct key_data *chip)
         return -EINVAL;
     }
 
-    devm_gpio_request(chip->device, chip->key_gpio, "key0");
+    devm_gpio_request(&pdev->dev, chip->key_gpio, "key0");
     gpio_direction_input(chip->key_gpio);
     
     //cat /proc/interrupts可以查看是否增加中断向量
     chip->irq = irq_of_parse_and_map(nd, 0);
-    ret = devm_request_irq (chip->device,
+    ret = devm_request_irq (&pdev->dev,
                             chip->irq, 
                             key_handler, 
-                            IRQF_TRIGGER_FALLING,       
+                            IRQF_TRIGGER_FALLING | IRQF_TRIGGER_RISING,       
                             "key0", 
                             (void *)chip);
     if (ret<0){
@@ -158,12 +154,10 @@ static int key_device_create(struct key_data *chip)
     }
     input_set_drvdata(chip->input_dev, chip);
 
+    chip->key_event = KEY_0; 
     chip->input_dev->name = pdev->name;
-    __set_bit(EV_REP, chip->input_dev->evbit);
-    __set_bit(EV_KEY, chip->input_dev->evbit);
 
     //将EV_KEY定义成按键的动作
-    chip->key_event = KEY_0; 
     input_set_capability(chip->input_dev, EV_KEY, KEY_0);
     result = input_register_device(chip->input_dev);
     if (result)
@@ -214,10 +208,7 @@ static int key_remove(struct platform_device *pdev)
 
     del_timer_sync(&chip->key_timer);
 
-    device_destroy(chip->class, chip->dev_id);
-    class_destroy(chip->class);
-    cdev_del(&chip->cdev);
-    unregister_chrdev_region(chip->dev_id, DEVICE_KEY_CNT);
+	input_unregister_device(chip->input_dev);
 
     dev_info(&pdev->dev, "key remove ok!\r\n");
     return 0;

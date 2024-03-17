@@ -3,6 +3,11 @@
 
 ## FM Version 1.0.0.10 - next
 
+[mod]
+
+1. 驱动内部接口更新
+2. key基于input子系统实现
+
 [embed]
 
 1. "node_server": 界面基于vue重构，后台界面设计，增加mqtt的支持

@@ -110,6 +110,7 @@ function install_library()
         echo "node alread install, not install!"
     fi
 }
+alias SysInstallLibrary='install_library'
 
 function build_rootfs
 {

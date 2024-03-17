@@ -78,7 +78,7 @@ $(info AR_COMPILE:$(AR_COMPILE))
 %.o : %.cpp
 	$(CC_COMPILE) $(CCFLAGS) -c $< -o $@ $(INCLUDES)
 
-%.o : %.C
+%.o : %.c
 	$(C_COMPILE) $(CFLAGS) -c $< -o $@ $(INCLUDES)
 
 all : $(buildout)

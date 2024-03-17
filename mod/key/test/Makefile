@@ -1,28 +1,16 @@
-#编译工具和编译选项
-CC = arm-linux-gnueabihf-g++
-CFLAGS  := -O3 -std=c++11 -lpthread
+################################################################################
+#
+# Build for module files.
+# Copyright (c) 2020-2023
+# Original Author: 1107473010@qq.com
+#
+################################################################################
+BUILD =e
 
-#头文件路径
-LOWERAPP_INC_ROOT = ../
+c_objects = key_test.o
 
-OBJS = key_test.o 
-APP = key_test
+# This is the file name of the executables and path where 
+# place the executables
+buildout = key_test
 
-LOWERAPP_INC= -I $(LOWERAPP_INC_ROOT)
-INCLUDE_PATH = $(LOWERAPP_INC)
-
-all : $(APP)
-
-#生成.o文件 
-%.o : %.cpp
-	$(CC) $(CFLAGS) -c $< -o $@ $(INCLUDE_PATH)
-
-#生成文件
-$(APP): $(OBJS)
-	$(CC) -o $(APP) $(OBJS) $(LIB) $(CFLAGS)
-	rm -f $(OBJS)
-tags :
-	ctags -R *
-
-clean:
-	rm -f $(OBJS) $(APP) test_dest.xml
+include $(ENV_PATH_ROOT)/build/buildrules.mk

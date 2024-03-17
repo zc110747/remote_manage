@@ -262,19 +262,20 @@ static int spi_device_create(struct spi_icm_data *chip)
 
     chip->class = class_create(THIS_MODULE, DEVICE_NAME);
     if (IS_ERR(chip->class)){
-        dev_err(&spi->dev, "class create failed!\r\n");
+        dev_err(&spi->dev, "class create failed!\n");
         result = PTR_ERR(chip->class);
         goto exit_class_create;
     }
 
     chip->device = device_create(chip->class, NULL, chip->dev_id, NULL, DEVICE_NAME);
     if (IS_ERR(chip->device)){
-        dev_err(&spi->dev, "device create failed!\r\n");
+        dev_err(&spi->dev, "device create failed, major:%d, minor:%d\n", major, minor);
         result = PTR_ERR(chip->device);
         goto exit_device_create;
     }
 
-    dev_info(&spi->dev, "dev create ok, major:%d, minor:%d\r\n", major, minor);
+    dev_info(&spi->dev, "dev create ok, major:%d, minor:%d\n", major, minor);
+    return 0;
 
 exit_device_create:
     class_destroy(chip->class);

@@ -14,7 +14,7 @@
 			"dev" : "/dev/icm20608"
 		},
 		"key" : {
-			"dev" : "/dev/key"
+			"dev" : "/dev/input/event1"
 		},
 		"led" : {
 			"init" : 0,

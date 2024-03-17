@@ -113,7 +113,7 @@ void device_manage::update()
         size = outer_info_.copy_to_buffer(tx_buffer_);
 
         device_info_fifo_point_->write(tx_buffer_, size);
-        PRINT_LOG(LOG_DEBUG, xGetCurrentTimes(), "update to main porcess, size:%d!", size);
+        //PRINT_LOG(LOG_TRACE, xGetCurrentTimes(), "update to main porcess, size:%d!", size);
     }
     // else
     // {
@@ -125,7 +125,7 @@ void device_manage::process_event(Event *pEvent)
 {
     uint16_t id = pEvent->get_id();
 
-    PRINT_LOG(LOG_DEBUG, xGetCurrentTicks(), "Device event:%d!", id);
+    //PRINT_LOG(LOG_DEBUG, xGetCurrentTicks(), "Device event:%d!", id);
     switch (id)
     {
         case DEVICE_LOOP_EVENT:
@@ -185,22 +185,17 @@ void device_manage::run()
     });
 
     //register action for key process
-    driver_manage::get_instance()->get_key_zero()->register_func([this](int fd){
-        unsigned int keyvalue = 0;
+    driver_manage::get_instance()->get_key_zero()->register_func(KEY_NUM, KEY_PREES, [this](uint16_t num, uint16_t value){
         static uint8_t status = 0;
 
-        if (::read(fd, &keyvalue, sizeof(keyvalue)) >= 0)
-        {
-            if (keyvalue == 1)
-            {
-                EventBufMessage ebufMsg(DEVICE_HW_SET_EVENT);
+        PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "key num %d, value:%d", num, value);
+        
+        status = status == 0?1:0;
 
-                ebufMsg.get_data().buffer[0] = DEVICE_LED;
-                ebufMsg.get_data().buffer[1] = (status == 0?1:0);
-
-                send_message(reinterpret_cast<char *>(&ebufMsg), sizeof(ebufMsg));
-            }
-        }
+        EventBufMessage ebufMsg(DEVICE_HW_SET_EVENT);
+        ebufMsg.get_data().buffer[0] = DEVICE_LED;
+        ebufMsg.get_data().buffer[1] = status;
+        send_message(reinterpret_cast<char *>(&ebufMsg), sizeof(ebufMsg));
     });
 
     for (;;)
