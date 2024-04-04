@@ -46,6 +46,8 @@ alias SysBuildUboot='build_uboot'
 # build the kernel, must install the platform before.
 function build_kernel
 {
+	kernel_configs="imx_rmk_v7_defconfig"
+
 	#check wheather build driver
 	if [ "${FIRMWARE_CURRENT_PLATFORMS}" == "AARCH64" ]; then
 		echo "for AARCH64 only support application, kernel command invalid!".
@@ -60,24 +62,28 @@ function build_kernel
 			if [ "$1" == "dtbs" ]; then
 				cd "${SUPPORT_ENV_KERNEL_DIR}"/ || return 
 				make dtbs
+				return
+			elif [ "$1" == "qemu" ]; then
+				kernel_configs="imx_qemu_defconfig"
 			else
 				echo "extra build command:${redText}SysBuildKernel dtbs${defText}"
+				return 
+			fi
+		fi
+		
+		if [ -d "${SUPPORT_ENV_KERNEL_DIR}" ]; then
+			cd "${SUPPORT_ENV_KERNEL_DIR}"/ || return
+			make "${kernel_configs}" ARCH=arm CROSS_COMPILE="${NEW_KERNEL_CC}"
+			make V=1 ARCH=arm CROSS_COMPILE="${NEW_KERNEL_CC}" all -j4
+
+			if [ -f "${ENV_KERNEL_ZIMAGE}" ]; then
+				cp -avf "${ENV_KERNEL_ZIMAGE}" "${BUILD_TFTP_PATH}"/
+				cp -avf "${ENV_KERNEL_DTB}" "${BUILD_TFTP_PATH}"/
+			else
+				echo "${redText}Linux Kernel build failed, please check!${defText}"
 			fi
 		else
-			if [ -d "${SUPPORT_ENV_KERNEL_DIR}" ]; then
-				cd "${SUPPORT_ENV_KERNEL_DIR}"/ || return
-				make imx_rmk_v7_defconfig ARCH=arm CROSS_COMPILE="${NEW_KERNEL_CC}"
-				make V=1 ARCH=arm CROSS_COMPILE="${NEW_KERNEL_CC}" all -j4
-
-				if [ -f "${ENV_KERNEL_ZIMAGE}" ]; then
-					cp -avf "${ENV_KERNEL_ZIMAGE}" "${BUILD_TFTP_PATH}"/
-					cp -avf "${ENV_KERNEL_DTB}" "${BUILD_TFTP_PATH}"/
-				else
-					echo "${redText}Linux Kernel build failed, please check!${defText}"
-				fi
-			else
-				echo "Kernal Directory:${SUPPORT_ENV_KERNEL_DIR} not exist!"
-			fi
+			echo "Kernal Directory:${SUPPORT_ENV_KERNEL_DIR} not exist!"
 		fi
 	fi
 }
@@ -122,11 +128,14 @@ function build_rootfs
 	#install buildroot
     if [ "${ROOTFS_RUN}" == "buildroot" ]; then
 
+		cp "${ENV_PATH_ROOT}"/platform/buildroot-2023.02.9-patch/imx6ullrmk_defconfig ${SUPPORT_FS_BUILDROOT_DIR}/configs/
+		echo "BR2_TOOLCHAIN_EXTERNAL_PATH=${PROGRAM_SUPPORT}/compiler" >> ${SUPPORT_FS_BUILDROOT_DIR}/configs/imx6ullrmk_defconfig
 		cdrb || return
-
+		
+		make imx6ullrmk_defconfig
 		make -j"${CPU_CORE}"
 
-		cp -f output/images/rootfs.ext2 "${PROGRAM_SDK_PATH}"/img/arm-buildroot.img
+		cp -f output/images/rootfs.ext2 "${PROGRAM_SDK_PLATFORM_PATH}"/img/arm-buildroot.img
 
 	#install debain
 	elif [ "${ROOTFS_RUN}" == "debain" ]; then

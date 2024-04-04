@@ -29,7 +29,6 @@ source "${ENV_PATH_ENVIRONMENT}"/jumpAlias
 # chroot manage
 mount_chroot()
 {
-	sudo chmod -Rv 777 "${BUILD_NFS_PATH}"/bin/
     sudo mount -t proc chproc "${BUILD_NFS_PATH}"/proc
     sudo mount -t sysfs chsys "${BUILD_NFS_PATH}"/sys
     sudo mount -t devtmpfs chdev "${BUILD_NFS_PATH}"/dev || sudo mount --bind /dev "${BUILD_NFS_PATH}"/dev
@@ -51,7 +50,7 @@ enter_chroot()
 {
 	cd "${BUILD_NFS_PATH}"/ || return
 
-	SysMountRootfs
+	mount_rootfs
 	
 	#exit the chroot
 	umount_chroot
@@ -73,7 +72,7 @@ exit_chroot()
 {
 	umount_chroot
 
-	SysUmoutRootfs
+	umount_rootfs
 }
 alias SysExitChroot='exit_chroot'
 
@@ -128,7 +127,7 @@ function umount_rootfs()
 	
 	sudo umount -l "${BUILD_NFS_PATH}"/
 }
-alias SysUmoutRootfs='umount_rootfs'
+alias SysUmountRootfs='umount_rootfs'
 
 source "${ENV_PATH_ENVIRONMENT}"/buildAlias
 source "${ENV_PATH_ENVIRONMENT}"/configAlias

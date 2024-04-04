@@ -37,7 +37,8 @@ function set_platform
         echo "set platform must with parameter ${greenText}'ARM AARCH64'${defText}'"
     fi
 }
-alias SysSetPlatform='set_platform'
+alias SysSetPlatformARM='set_platform ARM'
+alias SysSetPlatformARM64='set_platform AARCH64'
 
 # SysSetRootfs
 # - set_rootfs
@@ -65,7 +66,9 @@ function set_rootfs
         echo "set rootfs must with parameter ${greenText}'buildroot debain ubuntu'${defText}'"
     fi
 }
-alias SysSetRootfs='set_rootfs'
+alias SysSetRootfsBuildRoot='set_rootfs buildroot'
+alias SysSetRootfsDebain='set_rootfs debain'
+alias SysSetRootfsUbuntu='set_rootfs ubuntu'
 
 function set_firmware_ver
 {

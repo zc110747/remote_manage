@@ -45,12 +45,33 @@
 		};
 
 		usr_loopled {
-				compatible = "rmk,usr-loopled";
-				pinctrl-0 = <&pinctrl_loopled>;
-				leds-gpio = <&gpio4 21 GPIO_ACTIVE_LOW>,
-							<&gpio4 23 GPIO_ACTIVE_LOW>,
-							<&gpio4 25 GPIO_ACTIVE_LOW>;
-				status = "okay";
+			compatible = "rmk,usr-loopled";
+			pinctrl-0 = <&pinctrl_loopled>;
+			leds-gpio = <&gpio4 21 GPIO_ACTIVE_LOW>,
+						<&gpio4 23 GPIO_ACTIVE_LOW>,
+						<&gpio4 25 GPIO_ACTIVE_LOW>;
+			status = "okay";
+		};
+
+		usr_hx711 {
+			compatible = "rmk,usr-hx711";
+			pinctrl-0 = <&pinctrl_hx711>;
+			hx711-gpios = <&gpio4 22 GPIO_ACTIVE_LOW>,
+						<&gpio4 24 GPIO_ACTIVE_LOW>;
+			status = "okay";
+		};
+	};
+
+	regulators {
+		compatible = "simple-bus";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		regulator_vref_adc: regulator@1 {
+			compatible = "regulator-fixed";
+			regulator-name = "VREF_3V";
+			regulator-min-microvolt = <0>;
+			regulator-max-microvolt = <3300000>;
 		};
 	};
 };
@@ -72,28 +93,37 @@
 &iomuxc {
     pinctrl_gpio_led: gpio-leds {
         fsl,pins = <
-            MX6UL_PAD_GPIO1_IO03__GPIO1_IO03	0x17059
+            MX6UL_PAD_GPIO1_IO03__GPIO1_IO03		0x17059
         >;
     };
+
 	pinctrl_loopled: gpio-loopleds {
         fsl,pins = <
-            MX6UL_PAD_CSI_DATA00__GPIO4_IO21	0x17059
-			MX6UL_PAD_CSI_DATA02__GPIO4_IO23	0x17059
-			MX6UL_PAD_CSI_DATA04__GPIO4_IO25	0x17059
+            MX6UL_PAD_CSI_DATA00__GPIO4_IO21		0x17059
+			MX6UL_PAD_CSI_DATA02__GPIO4_IO23		0x17059
+			MX6UL_PAD_CSI_DATA04__GPIO4_IO25		0x17059
         >;
 	};
+
+	pinctrl_hx711: gpio-hx711 {
+        fsl,pins = <
+            MX6UL_PAD_CSI_DATA01__GPIO4_IO22		0x17059
+			MX6UL_PAD_CSI_DATA03__GPIO4_IO24		0x17059
+        >;
+	};
+
 	pinctrl_gpio_key: gpio-key {
 		fsl,pins = <
-			MX6UL_PAD_UART1_CTS_B__GPIO1_IO18	0x80000000
+			MX6UL_PAD_UART1_CTS_B__GPIO1_IO18		0x40000000
 		>;
 	};
 
 	pinctrl_ecspi3: ecspi3grp {
         fsl,pins = <
-			MX6UL_PAD_UART2_TX_DATA__GPIO1_IO20		  0x100b0
-			MX6UL_PAD_UART2_RTS_B__ECSPI3_MISO        0x100b1  
-			MX6UL_PAD_UART2_CTS_B__ECSPI3_MOSI        0x100b1 
-			MX6UL_PAD_UART2_RX_DATA__ECSPI3_SCLK      0x100b1
+			MX6UL_PAD_UART2_TX_DATA__GPIO1_IO20		0x100b0
+			MX6UL_PAD_UART2_RTS_B__ECSPI3_MISO      0x100b1  
+			MX6UL_PAD_UART2_CTS_B__ECSPI3_MOSI      0x100b1 
+			MX6UL_PAD_UART2_RX_DATA__ECSPI3_SCLK    0x100b1
         >;
 	};
 
@@ -101,6 +131,18 @@
 	    fsl,pins = <
 			MX6UL_PAD_GPIO1_IO09__GPIO1_IO09 		0xF080
         >;	
+	};
+
+	pinctrl_rtc: rtcgrp {
+	    fsl,pins = <
+			MX6UL_PAD_GPIO1_IO02__GPIO1_IO02 		0xF080
+        >;
+	};
+
+	pinctrl_adc1: adc1grp {
+	    fsl,pins = <
+			MX6UL_PAD_GPIO1_IO04__GPIO1_IO04 		0x400000b0
+        >;
 	};
 
 	pinctrl_pwm3: pwm3grp {
@@ -124,10 +166,18 @@
 	};
 };
 
+&adc1 {
+	pinctrl-name = "default";
+	pinctrl-0 = <&pinctrl_adc1>;
+	num-channels = <1>;
+	vref-supply = <&regulator_vref_adc>;
+	status = "okay";
+};
+
 &pwm3 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pwm3>;
-	status = "okay";
+	status = "disabled";
 };
 
 &usdhc2 {
@@ -169,6 +219,23 @@
 		interrupts = <9 IRQ_TYPE_EDGE_FALLING>;
 		reset-gpios = <&gpio5 9 GPIO_ACTIVE_LOW>;
 		interrupt-gpios = <&gpio1 9 GPIO_ACTIVE_LOW>;
+		status = "okay";
+	};
+
+	pcf8563: pcf8563@51 {
+		compatible = "rmk,pcf8563";
+		reg = <0x51>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_rtc>;
+		interrupt-parent = <&gpio1>;
+		interrupts = <2 IRQ_TYPE_LEVEL_LOW>;
+		interrupt-gpios = <&gpio1 2 GPIO_ACTIVE_LOW>;
+		status = "okay";
+	};
+
+	tms1637: pcf8563@20 {
+		compatible = "rmk,tms1637";
+		reg = <0x20>;
 		status = "okay";
 	};
 };

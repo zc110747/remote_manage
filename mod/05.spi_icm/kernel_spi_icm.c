@@ -1,17 +1,46 @@
+////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2024-by Persional Inc.
+//  All Rights Reserved
+//
+//  Name:
+//      kernel_spi_icm.c
+//
+//  Purpose:
+//      spi3 icm20608驱动。
+//
+// Author:
+//     @听心跳的声音
+//
+//  Assumptions:
+//
+//  Revision History:
+//      4/3/2022   Create New Version
+/////////////////////////////////////////////////////////////////////////////
 /*
- * File      : kernal_spi_icm.c
- * This file is spi icm20608 driver
- * COPYRIGHT (C) 2020, zc
- *
- * Change Logs:
- * Date           Author       Notes
- * 2020-4-30      zc           the first version
- */
+设备树说明
+&ecspi3 {
+    fsl,spi-num-chipselects = <1>;
+    cs-gpios = <&gpio1 20 GPIO_ACTIVE_LOW>;
+    pinctrl-names = "default";
+    pinctrl-0 = <&pinctrl_ecspi3>;
+    status = "okay";
 
-/**
- * @addtogroup IMX6ULL
- */
-/*@{*/
+    spidev0:icm20608@0 {
+        compatible = "rmk,icm20608";
+        spi-max-frequency = <8000000>;
+        reg = <0>;
+    };
+};
+
+pinctrl_ecspi3: ecspi3grp {
+    fsl,pins = <
+        MX6UL_PAD_UART2_TX_DATA__GPIO1_IO20		0x100b0
+        MX6UL_PAD_UART2_RTS_B__ECSPI3_MISO      0x100b1  
+        MX6UL_PAD_UART2_CTS_B__ECSPI3_MOSI      0x100b1 
+        MX6UL_PAD_UART2_RX_DATA__ECSPI3_SCLK    0x100b1
+    >;
+};
+*/
 
 #include <linux/types.h>
 #include <linux/kernel.h>
@@ -26,7 +55,74 @@
 #include <linux/semaphore.h>
 #include <linux/platform_device.h>
 #include <linux/spi/spi.h>
-#include "kernel_spi_icm.h"
+
+#define ICM20608G_ID                    0XAF
+#define ICM20608D_ID                    0XAE
+#define ICM20_SELF_TEST_X_GYRO          0x00
+#define ICM20_SELF_TEST_Y_GYRO          0x01
+#define ICM20_SELF_TEST_Z_GYRO          0x02
+#define ICM20_SELF_TEST_X_ACCEL         0x0D
+#define ICM20_SELF_TEST_Y_ACCEL         0x0E
+#define ICM20_SELF_TEST_Z_ACCEL         0x0F
+
+/* 陀螺仪静态偏移 */
+#define    ICM20_XG_OFFS_USRH           0x13
+#define    ICM20_XG_OFFS_USRL           0x14
+#define    ICM20_YG_OFFS_USRH           0x15
+#define    ICM20_YG_OFFS_USRL           0x16
+#define    ICM20_ZG_OFFS_USRH           0x17
+#define    ICM20_ZG_OFFS_USRL           0x18
+
+#define    ICM20_SMPLRT_DIV             0x19
+#define    ICM20_CONFIG                 0x1A
+#define    ICM20_GYRO_CONFIG            0x1B
+#define    ICM20_ACCEL_CONFIG           0x1C
+#define    ICM20_ACCEL_CONFIG2          0x1D
+#define    ICM20_LP_MODE_CFG            0x1E
+#define    ICM20_ACCEL_WOM_THR          0x1F
+#define    ICM20_FIFO_EN                0x23
+#define    ICM20_FSYNC_INT              0x36
+#define    ICM20_INT_PIN_CFG            0x37
+#define    ICM20_INT_ENABLE             0x38
+#define    ICM20_INT_STATUS             0x3A
+
+/* 加速度输出 */
+#define    ICM20_ACCEL_XOUT_H           0x3B
+#define    ICM20_ACCEL_XOUT_L           0x3C
+#define    ICM20_ACCEL_YOUT_H           0x3D
+#define    ICM20_ACCEL_YOUT_L           0x3E
+#define    ICM20_ACCEL_ZOUT_H           0x3F
+#define    ICM20_ACCEL_ZOUT_L           0x40
+
+/* 温度输出 */
+#define    ICM20_TEMP_OUT_H             0x41
+#define    ICM20_TEMP_OUT_L             0x42
+
+/* 陀螺仪输出 */
+#define    ICM20_GYRO_XOUT_H            0x43
+#define    ICM20_GYRO_XOUT_L            0x44
+#define    ICM20_GYRO_YOUT_H            0x45
+#define    ICM20_GYRO_YOUT_L            0x46
+#define    ICM20_GYRO_ZOUT_H            0x47
+#define    ICM20_GYRO_ZOUT_L            0x48
+
+#define    ICM20_SIGNAL_PATH_RESET      0x68
+#define    ICM20_ACCEL_INTEL_CTRL       0x69
+#define    ICM20_USER_CTRL              0x6A
+#define    ICM20_PWR_MGMT_1             0x6B
+#define    ICM20_PWR_MGMT_2             0x6C
+#define    ICM20_FIFO_COUNTH            0x72
+#define    ICM20_FIFO_COUNTL            0x73
+#define    ICM20_FIFO_R_W               0x74
+#define    ICM20_WHO_AM_I               0x75
+
+/* 加速度静态偏移 */
+#define    ICM20_XA_OFFSET_H            0x77
+#define    ICM20_XA_OFFSET_L            0x78
+#define    ICM20_YA_OFFSET_H            0x7A
+#define    ICM20_YA_OFFSET_L            0x7B
+#define    ICM20_ZA_OFFSET_H            0x7D
+#define    ICM20_ZA_OFFSET_L             0x7E
 
 #define DEVICE_NAME            "icm20608"
 #define DEVICE_CNT              1
@@ -57,14 +153,13 @@ struct spi_icm_data
     struct spi_read_data data;
 };
 
-static int icm20608_read_regs(struct spi_icm_data *chip, u8 reg, void *buf, int len)
+static int icm20608_read_block(struct spi_device *spi, u8 reg, void *buf, int len)
 {
     int ret = -1;
     unsigned char txdata[2];
     unsigned char *rxdata;
     struct spi_message m;
     struct spi_transfer *t;
-    struct spi_device *spi = (struct spi_device *)chip->private_data;
 
     t = kzalloc(sizeof(struct spi_transfer), GFP_KERNEL);
     if(!t) {
@@ -97,13 +192,12 @@ out1:
     return ret;
 }
 
-static s32 icm20608_write_regs(struct spi_icm_data *chip, u8 reg, u8 *buf, u8 len)
+static int icm20608_write_block(struct spi_device *spi, u8 reg, u8 *buf, u8 len)
 {
     int ret = -1;
     unsigned char *txdata;
     struct spi_message m;
     struct spi_transfer *t;
-    struct spi_device *spi = (struct spi_device *)chip->private_data;
 
     t = kzalloc(sizeof(struct spi_transfer), GFP_KERNEL);    /* 申请内存 */
     if(!t) {
@@ -133,33 +227,6 @@ out1:
     return ret;
 }
 
-static unsigned char icm20608_read_onereg(struct spi_icm_data *chip, u8 reg)
-{
-    u8 data = 0;
-    icm20608_read_regs(chip, reg, &data, 1);
-    return data;
-}
-
-static void icm20608_write_onereg(struct spi_icm_data *chip, u8 reg, u8 value)
-{
-    u8 buf = value;
-    icm20608_write_regs(chip, reg, &buf, 1);
-}
-
-void icm20608_readdata(struct spi_icm_data *chip)
-{
-    unsigned char data[14];
-    icm20608_read_regs(chip, ICM20_ACCEL_XOUT_H, data, 14);
-
-    chip->data.accel_x_adc = (signed short)((data[0] << 8) | data[1]);
-    chip->data.accel_y_adc = (signed short)((data[2] << 8) | data[3]);
-    chip->data.accel_z_adc = (signed short)((data[4] << 8) | data[5]);
-    chip->data.temp_adc    = (signed short)((data[6] << 8) | data[7]);
-    chip->data.gyro_x_adc  = (signed short)((data[8] << 8) | data[9]);
-    chip->data.gyro_y_adc  = (signed short)((data[10] << 8) | data[11]);
-    chip->data.gyro_z_adc  = (signed short)((data[12] << 8) | data[13]);
-}
-
 static int icm20608_open(struct inode *inode, struct file *filp)
 {
     struct spi_icm_data *chip;
@@ -173,9 +240,20 @@ static ssize_t icm20608_read(struct file *filp, char __user *buf, size_t cnt, lo
 {
     signed int data[7];
     int err;
+    unsigned char readbuf[14];
     struct spi_icm_data *chip = (struct spi_icm_data *)filp->private_data;
+    struct spi_device *spi = (struct spi_device *)chip->private_data;
 
-    icm20608_readdata(chip);
+    icm20608_read_block(spi, ICM20_ACCEL_XOUT_H, readbuf, 14);
+
+    chip->data.accel_x_adc = (signed short)((readbuf[0] << 8) | readbuf[1]);
+    chip->data.accel_y_adc = (signed short)((readbuf[2] << 8) | readbuf[3]);
+    chip->data.accel_z_adc = (signed short)((readbuf[4] << 8) | readbuf[5]);
+    chip->data.temp_adc    = (signed short)((readbuf[6] << 8) | readbuf[7]);
+    chip->data.gyro_x_adc  = (signed short)((readbuf[8] << 8) | readbuf[9]);
+    chip->data.gyro_y_adc  = (signed short)((readbuf[10] << 8) | readbuf[11]);
+    chip->data.gyro_z_adc  = (signed short)((readbuf[12] << 8) | readbuf[13]);
+
     data[0] = chip->data.gyro_x_adc;
     data[1] = chip->data.gyro_y_adc;
     data[2] = chip->data.gyro_z_adc;
@@ -207,27 +285,39 @@ static const struct file_operations spi_icm_ops = {
 static int spi_hardware_init(struct spi_icm_data *chip)
 {
     unsigned char value = 0;
-    struct spi_device *spi = (struct spi_device *)chip->private_data;
+    struct spi_device *spi;
+    u8 buf;
 
+    spi = (struct spi_device *)chip->private_data;
     spi->mode = SPI_MODE_0;
     spi_setup(spi);
 
-    icm20608_write_onereg(chip, ICM20_PWR_MGMT_1, 0x80);
+    buf = 0x80;
+    icm20608_write_block(spi, ICM20_PWR_MGMT_1, &buf, 1);
     mdelay(50);
-    icm20608_write_onereg(chip, ICM20_PWR_MGMT_1, 0x01);
+    buf = 0x01;
+    icm20608_write_block(spi, ICM20_PWR_MGMT_1, &buf, 1);
     mdelay(50);
 
-    value = icm20608_read_onereg(chip, ICM20_WHO_AM_I);
+    icm20608_read_block(spi, ICM20_WHO_AM_I, &value, 1);
     dev_info(&spi->dev, "ICM20608 ID = %#X\r\n", value);
 
-    icm20608_write_onereg(chip, ICM20_SMPLRT_DIV, 0x00);   /* 输出速率是内部采样率 */
-    icm20608_write_onereg(chip, ICM20_GYRO_CONFIG, 0x18);  /* 陀螺仪±2000dps量程 */
-    icm20608_write_onereg(chip, ICM20_ACCEL_CONFIG, 0x18); /* 加速度计±16G量程 */
-    icm20608_write_onereg(chip, ICM20_CONFIG, 0x04);       /* 陀螺仪低通滤波BW=20Hz */
-    icm20608_write_onereg(chip, ICM20_ACCEL_CONFIG2, 0x04);/* 加速度计低通滤波BW=21.2Hz */
-    icm20608_write_onereg(chip, ICM20_PWR_MGMT_2, 0x00);   /* 打开加速度计和陀螺仪所有轴 */
-    icm20608_write_onereg(chip, ICM20_LP_MODE_CFG, 0x00);  /* 关闭低功耗 */
-    icm20608_write_onereg(chip, ICM20_FIFO_EN, 0x00);      /* 关闭FIFO*/
+    buf = 0x00;
+    icm20608_write_block(spi, ICM20_SMPLRT_DIV, &buf, 1);   /* 输出速率是内部采样率 */
+    buf = 0x18;
+    icm20608_write_block(spi, ICM20_GYRO_CONFIG, &buf, 1);  /* 陀螺仪±2000dps量程 */
+    buf = 0x18;
+    icm20608_write_block(spi, ICM20_ACCEL_CONFIG, &buf, 1); /* 加速度计±16G量程 */
+    buf = 0x04;
+    icm20608_write_block(spi, ICM20_CONFIG, &buf, 1);       /* 陀螺仪低通滤波BW=20Hz */
+    buf = 0x04;
+    icm20608_write_block(spi, ICM20_ACCEL_CONFIG2, &buf, 1);/* 加速度计低通滤波BW=21.2Hz */
+    buf = 0x00;
+    icm20608_write_block(spi, ICM20_PWR_MGMT_2, &buf, 1);   /* 打开加速度计和陀螺仪所有轴 */
+    buf = 0x00;
+    icm20608_write_block(spi, ICM20_LP_MODE_CFG, &buf, 10);  /* 关闭低功耗 */
+    buf = 0x00;
+    icm20608_write_block(spi, ICM20_FIFO_EN, &buf, 1);      /* 关闭FIFO*/
 
     return 0;
 }
@@ -313,7 +403,7 @@ static int icm20608_probe(struct spi_device *spi)
         return -EINVAL;
     }
 
-    dev_info(&spi->dev, "spi driver init ok!\r\n");
+    dev_info(&spi->dev, "spi probe success!\r\n");
     return 0;
 }
 
@@ -325,6 +415,8 @@ static void icm20608_remove(struct spi_device *spi)
     class_destroy(chip->class);
     cdev_del(&chip->cdev);
     unregister_chrdev_region(chip->dev_id, DEVICE_CNT);
+
+    dev_info(&spi->dev, "spi remove success!\r\n");
 }
 
 static const struct of_device_id icm20608_of_match[] = {

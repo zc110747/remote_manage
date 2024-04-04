@@ -54,6 +54,13 @@
 			gpio = <&gpio1 1 GPIO_ACTIVE_HIGH>;
 			enable-active-high;
 		};
+
+		regulator_vref_adc: regulator@2 {
+			compatible = "regulator-fixed";
+			regulator-name = "VREF_3V";
+			regulator-min-microvolt = <0>;
+			regulator-max-microvolt = <3300000>;
+		};
 	};
 
 	usr_led {
@@ -78,6 +85,14 @@
 		key-gpio = <&gpio1 18 GPIO_ACTIVE_LOW>;
 		interrupt-parent = <&gpio1>;
 		interrupts = <18 IRQ_TYPE_EDGE_FALLING>;
+		status = "okay";
+	};
+
+	usr_hx711 {
+		compatible = "rmk,usr-hx711";
+		pinctrl-0 = <&pinctrl_hx711>;
+		hx711-gpios = <&gpio4 22 GPIO_ACTIVE_LOW>,
+					<&gpio4 24 GPIO_ACTIVE_LOW>;
 		status = "okay";
 	};
 };
@@ -144,6 +159,10 @@
 	};
 };
 
+&rngb {
+	status = "disabled";	
+};
+
 &i2c2 {
 	clock-frequency = <100000>;
 	pinctrl-names = "default";
@@ -170,6 +189,13 @@
 		pinctrl_gpio_led: gpio-leds {
 			fsl,pins = <
 				MX6UL_PAD_GPIO1_IO03__GPIO1_IO03	0x17059
+			>;
+		};
+
+		pinctrl_hx711: gpio-hx711 {
+			fsl,pins = <
+				MX6UL_PAD_CSI_DATA01__GPIO4_IO22		0x17059
+				MX6UL_PAD_CSI_DATA03__GPIO4_IO24		0x17059
 			>;
 		};
 
@@ -369,7 +395,13 @@
 			fsl,pins = <
 				MX6UL_PAD_GPIO1_IO09__GPIO1_IO09 		0xF080
 			>;	
-		};			
+		};
+
+		pinctrl_adc1: adc1grp {
+			fsl,pins = <
+				MX6UL_PAD_GPIO1_IO04__GPIO1_IO04 		0x400000b0
+			>;
+		};		
 	};
 };
 
@@ -388,6 +420,14 @@
 				>;
 			};
 		};
+};
+
+&adc1 {
+	pinctrl-name = "default";
+	pinctrl-0 = <&pinctrl_adc1>;
+	num-channels = <1>;
+	vref-supply = <&regulator_vref_adc>;
+	status = "okay";
 };
 
 &pwm3 {

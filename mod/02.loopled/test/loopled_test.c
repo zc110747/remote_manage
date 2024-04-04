@@ -30,42 +30,34 @@ int main(int argc, const char *argv[])
     int time_loop = 2;
 
     fd = open(LOOP_LED_DEVICE, O_RDWR | O_NDELAY);
-    if (fd == -1)
-    {
+    if (fd == -1) {
         printf("%s open failed!\n", LOOP_LED_DEVICE);
         return -1;
     }
 
-    if(argc > 1)
-    {
+    if (argc > 1) {
         time_loop = atoi(argv[1]);
     }
 
-    while(1)
-    {
-        for (index=0; index<LOOP_LED_NUM; index++)
-        {
+    while (1) {
+        for (index=0; index<LOOP_LED_NUM; index++){
             val[0] = index;
-            if (index == on_num)
-            {
+            if (index == on_num){
                 val[1] = 1;
             }
-            else
-            {
+            else{
                 val[1] = 0;
             }
             write(fd, val, 2);
         }
 
         on_num++;
-        if (on_num == LOOP_LED_NUM)
-        {
+        if (on_num == LOOP_LED_NUM){
             on_num = 0;
         }
         sleep(time_loop);
     }
 
     close(fd); 
-
     exit(0);  
 }

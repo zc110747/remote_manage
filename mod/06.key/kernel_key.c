@@ -1,17 +1,39 @@
+////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2024-by Persional Inc.
+//  All Rights Reserved
+//
+//  Name:
+//      kernel_key.c
+//          GPIO1_18
+//
+//  Purpose:
+//      按键输入检测驱动。
+//
+// Author:
+//     @听心跳的声音
+//
+//  Assumptions:
+//
+//  Revision History:
+//      4/3/2022   Create New Version
+/////////////////////////////////////////////////////////////////////////////
 /*
- * File      : key.c
- * This file is key input driver
- * COPYRIGHT (C) 2020, zc
- *
- * Change Logs:
- * Date           Author       Notes
- * 2020-7-21      zc           the first version
- */
+设备树说明
+usr_key {
+    compatible = "rmk,usr-key";
+    pinctrl-0 = <&pinctrl_gpio_key>;
+    key-gpio = <&gpio1 18 GPIO_ACTIVE_LOW>;
+    interrupt-parent = <&gpio1>;
+    interrupts = <18 IRQ_TYPE_EDGE_FALLING>;
+    status = "okay";
+};
 
-/**
- * @addtogroup IMX6ULL
- */
-/*@{*/
+pinctrl_gpio_key: gpio-key {
+    fsl,pins = <
+        MX6UL_PAD_UART1_CTS_B__GPIO1_IO18		0x40000000
+    >;
+};
+*/
 
 #include <linux/types.h>
 #include <linux/kernel.h>
@@ -23,26 +45,11 @@
 #include <linux/cdev.h>
 #include <linux/device.h>
 #include <linux/of_gpio.h>
-#include <linux/semaphore.h>
 #include <linux/input.h>
-
-//中断和定时器相关
 #include <linux/timer.h>
 #include <linux/of_irq.h>
-#include <linux/irq.h>
 #include <linux/interrupt.h>
-
-//异步事件相关
-#include <linux/wait.h> 
-#include <linux/poll.h>
-#include <linux/fcntl.h>
-#include <linux/fs.h>
-
-//总线和硬件相关接口
 #include <linux/platform_device.h>
-#include <asm/mach/map.h>
-#include <asm/uaccess.h>
-#include <asm/io.h>
 
 /*设备相关参数*/
 struct key_data
@@ -53,7 +60,7 @@ struct key_data
     int key_gpio;             
     int irq;    
     
-    int key_event; 
+    int key_code; 
     struct timer_list key_timer;
     int key_protect;
 };
@@ -94,11 +101,11 @@ void key_timer_func(struct timer_list *arg)
 
     if (value == 0)
     {
-        input_report_key(chip->input_dev, chip->key_event, KEY_ON);
+        input_report_key(chip->input_dev, chip->key_code, KEY_ON);
     }
     else
     {
-        input_report_key(chip->input_dev, chip->key_event, KEY_OFF);          
+        input_report_key(chip->input_dev, chip->key_code, KEY_OFF);          
     }
     input_sync(chip->input_dev);
 
@@ -154,11 +161,11 @@ static int key_device_create(struct key_data *chip)
     }
     input_set_drvdata(chip->input_dev, chip);
 
-    chip->key_event = KEY_0; 
+    chip->key_code = KEY_0; 
     chip->input_dev->name = pdev->name;
 
     //将EV_KEY定义成按键的动作
-    input_set_capability(chip->input_dev, EV_KEY, KEY_0);
+    input_set_capability(chip->input_dev, EV_KEY, chip->key_code);
     result = input_register_device(chip->input_dev);
     if (result)
     {

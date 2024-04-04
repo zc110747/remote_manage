@@ -5,6 +5,6 @@
 # Original Author: 1107473010@qq.com
 #
 ################################################################################
-obj-m := kernel_beep.o
+obj-m := kernel_miscbeep.o
 
 include $(ENV_PATH_ROOT)/build/buildmod.mk

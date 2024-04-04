@@ -104,7 +104,10 @@
         "module.h": "c",
         "input.h": "c",
         "kernel_i2c_ap.h": "c",
-        "netfwd": "cpp"
+        "netfwd": "cpp",
+        "msg.h": "c",
+        "msgbuf.h": "c",
+        "kernel.h": "c"
     },
     "files.exclude": {
         "**/.git": true,

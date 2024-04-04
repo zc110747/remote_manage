@@ -1,17 +1,38 @@
+////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2024-by Persional Inc.
+//  All Rights Reserved
+//
+//  Name:
+//      kernel_led.c
+//
+//  Purpose:
+//      LED输出控制驱动。
+//      LED硬件接口: 
+//          GPIO1_3
+//      
+// Author:
+//     @听心跳的声音
+//
+//  Assumptions:
+//
+//  Revision History:
+//      12/19/2022   Create New Version
+/////////////////////////////////////////////////////////////////////////////
 /*
- * File      : kernel_led.c
- * This file is the driver for led i/o.
- * COPYRIGHT (C) 2023, zc
- *
- * Change Logs:
- * Date           Author       Notes
- * 2023-11-22     zc           the first version
- */
+设备树
+usr_led {
+    compatible = "rmk,usr-led";
+    pinctrl-0 = <&pinctrl_gpio_led>;
+    led-gpio = <&gpio1 3 GPIO_ACTIVE_LOW>;
+    status = "okay";
+};
 
-/**
- * @addtogroup IMX6ULL
- */
-/*@{*/
+pinctrl_gpio_led: gpio-leds {
+    fsl,pins = <
+        MX6UL_PAD_GPIO1_IO03__GPIO1_IO03        0x17059
+    >;
+};
+*/
 
 #include <linux/types.h>
 #include <linux/kernel.h>
@@ -26,9 +47,7 @@
 #include <linux/semaphore.h>
 #include <linux/platform_device.h>
 
-#define DEVICE_NUM                         3
-
-struct loopled_data
+struct led_data
 {
     /*device info*/
     dev_t dev_id;     
@@ -38,19 +57,19 @@ struct loopled_data
     struct platform_device *pdev;
 
     /* hardware info */
-    int gpio[DEVICE_NUM];
-    int status[DEVICE_NUM];
+    int gpio;
+    int status;
 };
 
 #define LED_OFF                            0
 #define LED_ON                             1
 
 //自定义设备号
-#define DEFAULT_MAJOR                      0 
-#define DEFAULT_MINOR                      0    
-#define DEVICE_NAME                        "loopled"
+#define DEFAULT_MAJOR                       0       /*默认主设备号*/
+#define DEFAULT_MINOR                       0       /*默认从设备号*/
+#define DEVICE_NAME                         "led"   /* 设备名, 应用将以/dev/led访问 */
 
-static void led_hardware_set(struct loopled_data *chip, u8 index, u8 status)
+static void led_hardware_set(struct led_data *chip, u8 status)
 {
     struct platform_device *pdev;
 
@@ -58,24 +77,24 @@ static void led_hardware_set(struct loopled_data *chip, u8 index, u8 status)
 
     switch (status)
     {
-        case LED_ON:
-            dev_info(&pdev->dev, "on\n");
-            gpio_set_value(chip->gpio[index], 1);
-            chip->status[index] = 1;
-            break;
         case LED_OFF:
             dev_info(&pdev->dev, "off\n");
-            gpio_set_value(chip->gpio[index], 0);
-            chip->status[index] = 0;
+            gpio_set_value(chip->gpio, 1);
+            chip->status = 0;
+            break;
+        case LED_ON:
+            dev_info(&pdev->dev, "on\n");
+            gpio_set_value(chip->gpio, 0);
+            chip->status = 1;
             break;
     }
 }
 
 int led_open(struct inode *inode, struct file *filp)
 {
-    static struct loopled_data *chip;
+    static struct led_data *chip;
     
-    chip = container_of(inode->i_cdev, struct loopled_data, cdev);
+    chip = container_of(inode->i_cdev, struct led_data, cdev);
     filp->private_data = chip;
     return 0;
 }
@@ -88,16 +107,13 @@ int led_release(struct inode *inode, struct file *filp)
 ssize_t led_read(struct file *filp, char __user *buf, size_t count, loff_t *f_pos)
 {
     int ret;
-    struct loopled_data *chip;
+    struct led_data *chip;
     struct platform_device *pdev;
 
-    if(count > DEVICE_NUM)
-        return -1;
-
-    chip = (struct loopled_data *)filp->private_data;
+    chip = (struct led_data *)filp->private_data;
     pdev = chip->pdev;
 
-    ret = copy_to_user(buf, chip->status, count);
+    ret = copy_to_user(buf, &chip->status, 1);
     if (ret < 0) {
         dev_err(&pdev->dev, "read failed!\n");
         return -EFAULT;
@@ -108,38 +124,38 @@ ssize_t led_read(struct file *filp, char __user *buf, size_t count, loff_t *f_po
 ssize_t led_write(struct file *filp, const char __user *buf, size_t size,  loff_t *f_pos)
 {
     int ret;
-    u8 data[2];
-    struct loopled_data *chip;
+    u8 data;
+    struct led_data *chip;
     struct platform_device *pdev;
 
-    chip = (struct loopled_data *)filp->private_data;
+    chip = (struct led_data *)filp->private_data;
     pdev = chip->pdev;
 
-    ret = copy_from_user(data, buf, 2);
-    if (ret < 0 || data[0] >= DEVICE_NUM){
+    ret = copy_from_user(&data, buf, 1);
+    if (ret < 0){
         dev_err(&pdev->dev, "write failed!\n");
         return -EFAULT;
     }
 
-    led_hardware_set(chip, data[0], data[1]);
+    led_hardware_set(chip, data);
     return 0;
 }
 
 long led_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 {
     struct platform_device *pdev;
-    struct loopled_data *chip;
+    struct led_data *chip;
     
-    chip = (struct loopled_data *)filp->private_data;
+    chip = (struct led_data *)filp->private_data;
     pdev = chip->pdev;
 
     switch (cmd)
     {
         case 0:
-            led_hardware_set(chip, 0, 0);
+            led_hardware_set(chip, 0);
             break;
         case 1:
-            led_hardware_set(chip, 0, 1);
+            led_hardware_set(chip, 1);
             break;
         default:
             dev_err(&pdev->dev, "invalid command:%d!\n", cmd);
@@ -158,7 +174,7 @@ static struct file_operations led_fops = {
     .release = led_release,
 };
 
-static int led_device_create(struct loopled_data *chip)
+static int led_device_create(struct led_data *chip)
 {
     int ret;
     int major, minor;
@@ -214,38 +230,34 @@ exit:
     return ret;
 }
 
-static int led_hardware_init(struct loopled_data *chip)
+static int led_hardware_init(struct led_data *chip)
 {
-    int ret, index;
+    int ret;
     struct platform_device *pdev = chip->pdev;
     struct device_node *led_nd = pdev->dev.of_node;
 
-    for (index=0; index<DEVICE_NUM; index++)
-    {
-        chip->gpio[index] = of_get_named_gpio(led_nd, "leds-gpio", index);
-        if (chip->gpio[index] < 0) {
-            dev_err(&pdev->dev, "find gpio in dts failed!\n");
-            return -EINVAL;
-        }
-        ret = devm_gpio_request(&pdev->dev, chip->gpio[index], "led");
-        if (ret < 0){
-            dev_err(&pdev->dev, "request gpio failed!\n");
-            return -EINVAL;   
-        }
-
-        gpio_direction_output(chip->gpio[index], 1);
-        led_hardware_set(chip, index, LED_ON);
-
-        dev_info(&pdev->dev, "hardware init finished, %s num %d", led_nd->name, chip->gpio[index]);
+    chip->gpio = of_get_named_gpio(led_nd, "led-gpio", 0);
+    if (chip->gpio < 0){
+        dev_err(&pdev->dev, "find gpio in dts failed!\n");
+        return -EINVAL;
+    }
+    ret = devm_gpio_request(&pdev->dev, chip->gpio, "led");
+    if (ret < 0){
+        dev_err(&pdev->dev, "request gpio failed!\n");
+        return -EINVAL;   
     }
 
+    gpio_direction_output(chip->gpio, 1);
+    led_hardware_set(chip, LED_OFF);
+
+    dev_info(&pdev->dev, "hardware init finished, %s num %d", led_nd->name, chip->gpio);
     return 0;
 }
 
 static int led_probe(struct platform_device *pdev)
 {
     int ret;
-    static struct loopled_data *chip;
+    static struct led_data *chip;
 
     chip = devm_kzalloc(&pdev->dev, sizeof(*chip), GFP_KERNEL);
     if (!chip){
@@ -267,13 +279,13 @@ static int led_probe(struct platform_device *pdev)
         return ret;
     }
 
-    dev_err(&pdev->dev, "driver init success!\n");
+    dev_info(&pdev->dev, "driver init success!\n");
     return 0;
 }
 
 static int led_remove(struct platform_device *pdev)
 {
-    struct loopled_data *chip = platform_get_drvdata(pdev);
+    struct led_data *chip = platform_get_drvdata(pdev);
 
     device_destroy(chip->class, chip->dev_id);
     class_destroy(chip->class);
@@ -281,19 +293,19 @@ static int led_remove(struct platform_device *pdev)
     cdev_del(&chip->cdev);
     unregister_chrdev_region(chip->dev_id, 1);
     
-    dev_err(&pdev->dev, "driver release!\n");
+    dev_info(&pdev->dev, "driver release!\n");
     return 0;
 }
 
 //匹配的是根节点的compatible属性
 static const struct of_device_id led_of_match[] = {
-    { .compatible = "rmk,usr-loopled"},
+    { .compatible = "rmk,usr-led"},
     { /* Sentinel */ }
 };
 
 static struct platform_driver platform_driver = {
     .driver = {
-        .name = "loopled",
+        .name = "led",
         .of_match_table = led_of_match,
     },
     .probe = led_probe,
@@ -313,7 +325,7 @@ static void __exit led_module_exit(void)
 
 module_init(led_module_init);
 module_exit(led_module_exit);
-MODULE_AUTHOR("wzdxf");                         //模块作者
-MODULE_LICENSE("GPL v2");                       //模块许可协议
-MODULE_DESCRIPTION("platform driver for led");  //模块许描述
-MODULE_ALIAS("loopled driver");                  //模块别名
+MODULE_AUTHOR("wzdxf");
+MODULE_LICENSE("GPL v2");
+MODULE_DESCRIPTION("platform driver for led");
+MODULE_ALIAS("led_data");

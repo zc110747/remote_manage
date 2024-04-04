@@ -1,23 +1,21 @@
 
 # 开发计划
 
-## FM Version 1.0.0.10 - next
+## FM Version 1.0.0.10
+
+[paltform]
+
+1. 平台结构更新，优化命令和执行脚本
+2. platform内代码更新，增加qemu支持
 
 [mod]
 
-1. 驱动内部接口更新
-2. key基于input子系统实现
+1. 驱动内接口更新，基于devm管理和container_of实现
+2. 增加基于杂项设备接口实现的beep驱动
 
 [embed]
 
-1. "node_server": 界面基于vue重构，后台界面设计，增加mqtt的支持
-2. "logger_tool": 增加日志管理功能，支持权限修改。
-3. "local_device": 增加RTC驱动支持
-
-[desktop]
-
-1. "logger_tool": 基于mqtt更新功能和界面
-2. "manage_tool"：功能更新,适配功能调试
+1. 配置增加logger权限记录，调试打印增加相应处理
 
 ## FM Version 1.0.0.9
 
