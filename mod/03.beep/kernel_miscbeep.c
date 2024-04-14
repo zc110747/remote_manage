@@ -22,8 +22,9 @@
 设备树说明
 usr_beep {
     compatible = "rmk,usr-beep";
+    pinctrl-names = "default";
     pinctrl-0 = <&pinctrl_gpio_beep>;
-    beep-gpio = <&gpio5 1 GPIO_ACTIVE_LOW>;
+    beep-gpios = <&gpio5 1 GPIO_ACTIVE_LOW>;
     status = "okay";
 };
 
@@ -49,8 +50,8 @@ pinctrl_gpio_beep: beep {
 struct beep_data
 {
     /* gpio info */
-    int gpio;
     int status;
+    struct gpio_desc *desc; 
 
     /*device info*/
     struct platform_device *pdev;
@@ -67,14 +68,18 @@ struct beep_data
 
 static void beep_hardware_set(struct beep_data *chip, u8 status)
 {
+    struct platform_device *pdev = chip->pdev;
+
     switch (status)
     {
         case BEEP_OFF:
-            gpio_set_value(chip->gpio, 1);
+            dev_info(&pdev->dev, "off\n");
+            gpiod_set_value(chip->desc, 0);
             chip->status = 0;
             break;
         case BEEP_ON:
-            gpio_set_value(chip->gpio, 0);
+            dev_info(&pdev->dev, "on\n");
+            gpiod_set_value(chip->desc, 1);
             chip->status = 1;
             break;
         default:
@@ -178,26 +183,16 @@ static int beep_device_create(struct beep_data *chip)
 static int beep_hardware_init(struct beep_data *chip)
 {
     struct platform_device *pdev = chip->pdev;
-    struct device_node *beep_nd = pdev->dev.of_node;
-    int ret = 0;
 
-    /* find the beep-gpio pin */
-    chip->gpio = of_get_named_gpio(beep_nd, "beep-gpio", 0);
-    if (chip->gpio < 0){
-        dev_err(&pdev->dev, "beep-gpio, malloc error!\n");
-        return -EINVAL;
-    }
-    dev_info(&pdev->dev, "find node:%s, io:%d", beep_nd->name, chip->gpio);
-
-    ret = devm_gpio_request(&pdev->dev, chip->gpio, "beep");
-    if(ret < 0){
-        dev_err(&pdev->dev, "beep request failed!\n");
-        return -EINVAL;
+    chip->desc = devm_gpiod_get(&pdev->dev, "beep", GPIOD_OUT_LOW);
+    if(!chip->desc){
+        dev_err(&pdev->dev, "beep request gpios failed!\n");
+        return -EIO;     
     }
 
-    gpio_direction_output(chip->gpio, 1);
-    beep_hardware_set(chip, BEEP_OFF);
+    gpiod_direction_output(chip->desc, BEEP_OFF);
 
+    dev_info(&pdev->dev, "beep hardware init success, is active:%d\n", gpiod_is_active_low(chip->desc));
     return 0;
 }
 

@@ -115,6 +115,11 @@ function install_library()
     else
         echo "node alread install, not install!"
     fi
+
+	sudo mkdir -p "${BUILD_NFS_PATH}"/home/sys/
+	sudo cp -ravf "${ENV_PATH_ROOT}"/rootfs/home/sys/* "${BUILD_NFS_PATH}"/home/sys/
+	sudo cp -ravf "${ENV_PATH_ROOT}"/rootfs/etc/mosquitto/ "${BUILD_NFS_PATH}"/etc/
+	sudo cp -ravf "${ENV_PATH_ROOT}"/rootfs/root/.bashrc "${BUILD_NFS_PATH}"/root/
 }
 alias SysInstallLibrary='install_library'
 

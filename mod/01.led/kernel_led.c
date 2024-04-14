@@ -20,11 +20,26 @@
 /////////////////////////////////////////////////////////////////////////////
 /*
 设备树
-usr_led {
-    compatible = "rmk,usr-led";
-    pinctrl-0 = <&pinctrl_gpio_led>;
-    led-gpio = <&gpio1 3 GPIO_ACTIVE_LOW>;
-    status = "okay";
+gpiosgrp {
+    compatible = "simple-bus";
+    #address-cells = <1>;
+    #size-cells = <1>;
+    ranges;
+
+    usr_led {
+        compatible = "rmk,usr-led";
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_gpio_led>;
+        led-gpios = <&gpio1 3 GPIO_ACTIVE_LOW>;
+        reg = <0x020c406c 0x04>,
+            <0x020e0068 0x04>,
+            <0x020e02f4 0x04>,
+            <0x0209c000 0x04>,
+            <0x0209c004 0x04>;
+        status = "okay";
+    };
+
+    //......
 };
 
 pinctrl_gpio_led: gpio-leds {
@@ -46,6 +61,7 @@ pinctrl_gpio_led: gpio-leds {
 #include <linux/of_gpio.h>
 #include <linux/semaphore.h>
 #include <linux/platform_device.h>
+#include <linux/of_address.h>
 
 struct led_data
 {
@@ -57,7 +73,7 @@ struct led_data
     struct platform_device *pdev;
 
     /* hardware info */
-    int gpio;
+    struct gpio_desc *led_desc;
     int status;
 };
 
@@ -79,12 +95,12 @@ static void led_hardware_set(struct led_data *chip, u8 status)
     {
         case LED_OFF:
             dev_info(&pdev->dev, "off\n");
-            gpio_set_value(chip->gpio, 1);
+            gpiod_set_value(chip->led_desc, 0);
             chip->status = 0;
             break;
         case LED_ON:
             dev_info(&pdev->dev, "on\n");
-            gpio_set_value(chip->gpio, 0);
+            gpiod_set_value(chip->led_desc, 1);
             chip->status = 1;
             break;
     }
@@ -232,25 +248,33 @@ exit:
 
 static int led_hardware_init(struct led_data *chip)
 {
-    int ret;
     struct platform_device *pdev = chip->pdev;
     struct device_node *led_nd = pdev->dev.of_node;
+    void *__iomem io_reg;
 
-    chip->gpio = of_get_named_gpio(led_nd, "led-gpio", 0);
-    if (chip->gpio < 0){
-        dev_err(&pdev->dev, "find gpio in dts failed!\n");
-        return -EINVAL;
-    }
-    ret = devm_gpio_request(&pdev->dev, chip->gpio, "led");
-    if (ret < 0){
-        dev_err(&pdev->dev, "request gpio failed!\n");
-        return -EINVAL;   
+    chip->led_desc = devm_gpiod_get(&pdev->dev, "led", GPIOD_OUT_LOW);
+    if(chip->led_desc == NULL)
+    {
+        dev_info(&pdev->dev, "devm_gpiod_get error!\n");
+        return -EIO;
     }
 
-    gpio_direction_output(chip->gpio, 1);
-    led_hardware_set(chip, LED_OFF);
+    io_reg = of_iomap(led_nd, 2);
+    if(io_reg != NULL)
+    {
+        u32 regval = readl(io_reg);
+        u32 is_active;
+        //gpiod_toggle_active_low(chip->led_desc);
+        is_active = gpiod_is_active_low(chip->led_desc);
+        dev_info(&pdev->dev, "reg value:0x%x, active_low:%d\n", regval, is_active);
+    }
+    else
+    {
+        dev_info(&pdev->dev, "of iomap failed\n");
+    }
 
-    dev_info(&pdev->dev, "hardware init finished, %s num %d", led_nd->name, chip->gpio);
+    gpiod_direction_output(chip->led_desc, LED_OFF);
+    dev_info(&pdev->dev, "hardware init success\n");
     return 0;
 }
 
@@ -259,6 +283,7 @@ static int led_probe(struct platform_device *pdev)
     int ret;
     static struct led_data *chip;
 
+    //1.申请led控制块空间，并赋值
     chip = devm_kzalloc(&pdev->dev, sizeof(*chip), GFP_KERNEL);
     if (!chip){
         dev_err(&pdev->dev, "memory alloc failed!\n");
@@ -267,12 +292,14 @@ static int led_probe(struct platform_device *pdev)
     platform_set_drvdata(pdev, chip);
     chip->pdev = pdev;
 
+    //2.初始化LED硬件设备
     ret = led_hardware_init(chip);
     if (ret){
         dev_err(&pdev->dev, "hardware init faile, error:%d!\n", ret);
         return ret;
     }
 
+    //3.创建内核访问接口
     ret = led_device_create(chip);
     if (ret){
         dev_err(&pdev->dev, "device create faile, error:%d!\n", ret);

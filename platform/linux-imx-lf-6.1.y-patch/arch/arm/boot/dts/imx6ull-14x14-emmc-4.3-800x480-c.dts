@@ -20,44 +20,57 @@
 
 	gpiosgrp {
 		compatible = "simple-bus";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
 
 		usr_led {
 			compatible = "rmk,usr-led";
+			pinctrl-names = "default";
 			pinctrl-0 = <&pinctrl_gpio_led>;
-			led-gpio = <&gpio1 3 GPIO_ACTIVE_LOW>;
+			led-gpios = <&gpio1 3 GPIO_ACTIVE_LOW>;
+			reg = <0x020c406c 0x04>,
+			   <0x020e0068 0x04>,
+			   <0x020e02f4 0x04>,
+			   <0x0209c000 0x04>,
+			   <0x0209c004 0x04>;
 			status = "okay";
 		};
 
 		usr_beep {
 			compatible = "rmk,usr-beep";
+			pinctrl-names = "default";
 			pinctrl-0 = <&pinctrl_gpio_beep>;
-			beep-gpio = <&gpio5 1 GPIO_ACTIVE_LOW>;
+			beep-gpios = <&gpio5 1 GPIO_ACTIVE_LOW>;
 			status = "okay";
 		};
 
 		usr_key {
 			compatible = "rmk,usr-key";
+			pinctrl-names = "default";
 			pinctrl-0 = <&pinctrl_gpio_key>;
-			key-gpio = <&gpio1 18 GPIO_ACTIVE_LOW>;
+			key-gpios = <&gpio1 18 GPIO_ACTIVE_LOW>;
 			interrupt-parent = <&gpio1>;
-			interrupts = <18 IRQ_TYPE_EDGE_FALLING>;
+			interrupts = <18 (IRQ_TYPE_EDGE_FALLING|IRQ_TYPE_EDGE_RISING)>;
 			status = "okay";
 		};
 
 		usr_loopled {
 			compatible = "rmk,usr-loopled";
+			pinctrl-names = "default";
 			pinctrl-0 = <&pinctrl_loopled>;
-			leds-gpio = <&gpio4 21 GPIO_ACTIVE_LOW>,
-						<&gpio4 23 GPIO_ACTIVE_LOW>,
-						<&gpio4 25 GPIO_ACTIVE_LOW>;
+			leds-gpios = <&gpio4 21 GPIO_ACTIVE_HIGH>,
+						<&gpio4 23 GPIO_ACTIVE_HIGH>,
+						<&gpio4 25 GPIO_ACTIVE_HIGH>;
 			status = "okay";
 		};
 
 		usr_hx711 {
 			compatible = "rmk,usr-hx711";
+			pinctrl-names = "default";
 			pinctrl-0 = <&pinctrl_hx711>;
-			hx711-gpios = <&gpio4 22 GPIO_ACTIVE_LOW>,
-						<&gpio4 24 GPIO_ACTIVE_LOW>;
+			hx711-gpios = <&gpio4 22 GPIO_ACTIVE_HIGH>,
+						<&gpio4 24 GPIO_ACTIVE_HIGH>;
 			status = "okay";
 		};
 	};
@@ -70,7 +83,7 @@
 		regulator_vref_adc: regulator@1 {
 			compatible = "regulator-fixed";
 			regulator-name = "VREF_3V";
-			regulator-min-microvolt = <0>;
+			regulator-min-microvolt = <3300000>;
 			regulator-max-microvolt = <3300000>;
 		};
 	};
@@ -118,6 +131,12 @@
 		>;
 	};
 
+	pinctrl_ap3216_tsc: gpio-ap3216 {
+		fsl,pins = <
+			MX6UL_PAD_GPIO1_IO01__GPIO1_IO01		0x40017059
+		>;
+	};
+
 	pinctrl_ecspi3: ecspi3grp {
         fsl,pins = <
 			MX6UL_PAD_UART2_TX_DATA__GPIO1_IO20		0x100b0
@@ -129,7 +148,7 @@
 
 	pinctrl_tsc: tscgrp {
 	    fsl,pins = <
-			MX6UL_PAD_GPIO1_IO09__GPIO1_IO09 		0xF080
+			MX6UL_PAD_GPIO1_IO09__GPIO1_IO09 		0x79
         >;	
 	};
 
@@ -200,6 +219,11 @@
 	ap3216@1e {
 		compatible = "rmk,ap3216";
 		reg = <0x1e>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_ap3216_tsc>;
+		interrupt-parent = <&gpio1>;
+		interrupts = <1 IRQ_TYPE_EDGE_FALLING>;
+		int-gpios = <&gpio1 1 GPIO_ACTIVE_LOW>;
 	};
 };
 
@@ -209,8 +233,8 @@
 	pinctrl-0 = <&pinctrl_i2c2>;
 	status = "okay";
 
-	gt7149: gt7149@14 {
-		compatible = "rmk,gt7149";
+	gt9147: gt9147@14 {
+		compatible = "rmk,gt9147";
 		reg = <0x14>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_tsc 

@@ -1521,8 +1521,8 @@ CONFIG_IIO_CONSUMERS_PER_TRIGGER=2
 #
 # Analog to digital converters
 #
-CONFIG_IMX7D_ADC=y
-CONFIG_VF610_ADC=y
+#CONFIG_IMX7D_ADC=y
+#CONFIG_VF610_ADC=y
 
 #
 # Humidity sensors

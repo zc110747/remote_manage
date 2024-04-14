@@ -58,7 +58,7 @@
 		regulator_vref_adc: regulator@2 {
 			compatible = "regulator-fixed";
 			regulator-name = "VREF_3V";
-			regulator-min-microvolt = <0>;
+			regulator-min-microvolt = <3300000>;
 			regulator-max-microvolt = <3300000>;
 		};
 	};
@@ -66,14 +66,14 @@
 	usr_led {
 		compatible = "rmk,usr-led";
 		pinctrl-0 = <&pinctrl_gpio_led>;
-		led-gpio = <&gpio1 3 GPIO_ACTIVE_LOW>;
+		led-gpios = <&gpio1 3 GPIO_ACTIVE_LOW>;
 		status = "okay";
 	};
 
 	usr_beep {
 		compatible = "rmk,usr-beep";
 		pinctrl-0 = <&pinctrl_gpio_beep>;
-		beep-gpio = <&gpio5 1 GPIO_ACTIVE_LOW>;
+		beep-gpios = <&gpio5 1 GPIO_ACTIVE_LOW>;
 		status = "okay";
 	};
 
@@ -82,9 +82,18 @@
 		#address-cells = <1>;
 		#size-cells = <1>; 
 		pinctrl-0 = <&pinctrl_gpio_key>;
-		key-gpio = <&gpio1 18 GPIO_ACTIVE_LOW>;
+		key-gpios = <&gpio1 18 GPIO_ACTIVE_LOW>;
 		interrupt-parent = <&gpio1>;
 		interrupts = <18 IRQ_TYPE_EDGE_FALLING>;
+		status = "okay";
+	};
+
+	usr_loopled {
+		compatible = "rmk,usr-loopled";
+		pinctrl-0 = <&pinctrl_loopled>;
+		leds-gpios = <&gpio4 21 GPIO_ACTIVE_LOW>,
+					<&gpio4 23 GPIO_ACTIVE_LOW>,
+					<&gpio4 25 GPIO_ACTIVE_LOW>;
 		status = "okay";
 	};
 
@@ -202,6 +211,14 @@
 		pinctrl_gpio_key: gpio-key {
 			fsl,pins = <
 				MX6UL_PAD_UART1_CTS_B__GPIO1_IO18	0x80000000
+			>;
+		};
+
+		pinctrl_loopled: gpio-loopleds {
+			fsl,pins = <
+				MX6UL_PAD_CSI_DATA00__GPIO4_IO21		0x17059
+				MX6UL_PAD_CSI_DATA02__GPIO4_IO23		0x17059
+				MX6UL_PAD_CSI_DATA04__GPIO4_IO25		0x17059
 			>;
 		};
 
@@ -425,7 +442,7 @@
 &adc1 {
 	pinctrl-name = "default";
 	pinctrl-0 = <&pinctrl_adc1>;
-	num-channels = <1>;
+	num-channels = <2>;
 	vref-supply = <&regulator_vref_adc>;
 	status = "okay";
 };

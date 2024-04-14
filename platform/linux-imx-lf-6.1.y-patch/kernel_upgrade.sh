@@ -22,4 +22,4 @@ cp -rv ${SRC_DIR}/firmware/* ${DST_DIR}/firmware/
 if [ ! -d ${DST_DIR}/.vscode ]; then
     mkdir ${DST_DIR}/.vscode
 fi
-cp -rv ${SRC_DIR}/.vscode/* ${DST_DIR}/.vscode/
+cp -rv ${SRC_DIR}/.vscode/settings.json ${DST_DIR}/.vscode/

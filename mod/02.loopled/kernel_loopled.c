@@ -24,12 +24,14 @@
 设备树说明
 usr_loopled {
     compatible = "rmk,usr-loopled";
+    pinctrl-names = "default";
     pinctrl-0 = <&pinctrl_loopled>;
-    leds-gpio = <&gpio4 21 GPIO_ACTIVE_LOW>,
-                <&gpio4 23 GPIO_ACTIVE_LOW>,
-                <&gpio4 25 GPIO_ACTIVE_LOW>;
+    leds-gpios = <&gpio4 21 GPIO_ACTIVE_HIGH>,
+                <&gpio4 23 GPIO_ACTIVE_HIGH>,
+                <&gpio4 25 GPIO_ACTIVE_HIGH>;
     status = "okay";
 };
+
 
 pinctrl_loopled: gpio-loopleds {
     fsl,pins = <
@@ -65,7 +67,7 @@ struct loopled_data
     struct platform_device *pdev;
 
     /* hardware info */
-    int gpio[DEVICE_NUM];
+    struct gpio_desc* desc[DEVICE_NUM];
     int status[DEVICE_NUM];
 };
 
@@ -87,12 +89,12 @@ static void led_hardware_set(struct loopled_data *chip, u8 index, u8 status)
     {
         case LED_ON:
             dev_info(&pdev->dev, "on\n");
-            gpio_set_value(chip->gpio[index], 1);
+            gpiod_set_value(chip->desc[index], 1);
             chip->status[index] = 1;
             break;
         case LED_OFF:
             dev_info(&pdev->dev, "off\n");
-            gpio_set_value(chip->gpio[index], 0);
+            gpiod_set_value(chip->desc[index], 0);
             chip->status[index] = 0;
             break;
     }
@@ -249,27 +251,21 @@ exit:
 
 static int led_hardware_init(struct loopled_data *chip)
 {
-    int ret, index;
+    int index;
     struct platform_device *pdev = chip->pdev;
-    struct device_node *led_nd = pdev->dev.of_node;
 
     for (index=0; index<DEVICE_NUM; index++)
     {
-        chip->gpio[index] = of_get_named_gpio(led_nd, "leds-gpio", index);
-        if (chip->gpio[index] < 0) {
+        chip->desc[index] = devm_gpiod_get_index(&pdev->dev, "leds", index, GPIOD_OUT_HIGH);
+        if (chip->desc[index] == NULL) {
             dev_err(&pdev->dev, "find gpio in dts failed!\n");
             return -EINVAL;
         }
-        ret = devm_gpio_request(&pdev->dev, chip->gpio[index], "led");
-        if (ret < 0){
-            dev_err(&pdev->dev, "request gpio failed!\n");
-            return -EINVAL;   
-        }
 
-        gpio_direction_output(chip->gpio[index], 1);
+        gpiod_direction_output(chip->desc[index], 1);
         led_hardware_set(chip, index, LED_ON);
 
-        dev_info(&pdev->dev, "gpio init, %s num %d", led_nd->name, chip->gpio[index]);
+        dev_info(&pdev->dev, "gpio %d init success\n", index);
     }
 
     return 0;

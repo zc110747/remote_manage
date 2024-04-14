@@ -23,4 +23,4 @@ sleep 2
 
 #run server.js
 cd /home/sys/server
-/usr/bin/node server.js &
+#/usr/bin/node/bin/node server.js &

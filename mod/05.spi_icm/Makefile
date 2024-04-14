@@ -5,6 +5,6 @@
 # Original Author: 1107473010@qq.com
 #
 ################################################################################
-obj-m := kernel_spi_icm.o
+obj-m := kernel_regmap_spi.o
 
 include $(ENV_PATH_ROOT)/build/buildmod.mk

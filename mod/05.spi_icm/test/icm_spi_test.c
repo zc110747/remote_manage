@@ -63,14 +63,14 @@ int main(int argc, char *argv[])
             temp_act = ((float)(temp_adc) - 25 ) / 326.8 + 25;
 
             printf("read size:%d\r\n", ret);
-            printf("\r\n原始值:\r\n");
+            printf("\r\nraw value:\r\n");
             printf("gx = %d, gy = %d, gz = %d\r\n", gyro_x_adc, gyro_y_adc, gyro_z_adc);
             printf("ax = %d, ay = %d, az = %d\r\n", accel_x_adc, accel_y_adc, accel_z_adc);
             printf("temp = %d\r\n", temp_adc);
-            printf("实际值:");
-            printf("act gx = %.2f°/S, act gy = %.2f°/S, act gz = %.2f°/S\r\n", gyro_x_act, gyro_y_act, gyro_z_act);
+            printf("convert value:");
+            printf("act gx = %.2f'/S, act gy = %.2f'/S, act gz = %.2f'/S\r\n", gyro_x_act, gyro_y_act, gyro_z_act);
             printf("act ax = %.2fg, act ay = %.2fg, act az = %.2fg\r\n", accel_x_act, accel_y_act, accel_z_act);
-            printf("act temp = %.2f°C\r\n", temp_act);
+            printf("act temp = %.2f'C\r\n", temp_act);
         }
         sleep(1);
     }

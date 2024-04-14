@@ -33,9 +33,8 @@ struct hx711_data
     /*device info*/
     struct platform_device *pdev;
 
-    /* hardware info */
-    int sck_gpio;
-    int sda_gpio;
+    struct gpio_desc* sck_desc;
+    struct gpio_desc* sda_desc;
     uint32_t adc_value;
 
     uint32_t wait_delay;
@@ -44,9 +43,9 @@ struct hx711_data
 //自定义设备号
 #define DEVICE_NAME                         "hx711"   /* 设备名, 应用将以/dev/hx711访问 */
 
-#define SCK_HIGH(gpio)                      {gpio_set_value(gpio, 1);}
-#define SCK_LOWER(gpio)                     {gpio_set_value(gpio, 0);}
-#define SDA_VALUE(gpio)                     (gpio_get_value(gpio))
+#define SCK_HIGH(desc)                      {gpiod_set_value(desc, 1);}
+#define SCK_LOWER(desc)                     {gpiod_set_value(desc, 0);}
+#define SDA_VALUE(desc)                     (gpiod_get_value(desc))
 
 static void delay_us(int us)
 {
@@ -70,9 +69,9 @@ uint32_t read_hx711_adc(struct hx711_data *chip)
     uint32_t Count;
     unsigned char i;
     
-    SCK_LOWER(chip->sck_gpio);
+    SCK_LOWER(chip->sck_desc);
     Count=0;
-    while(SDA_VALUE(chip->sda_gpio))
+    while(SDA_VALUE(chip->sda_desc))
     {
         usleep_range(100, 200);         //200us
         chip->wait_delay++;
@@ -87,18 +86,18 @@ uint32_t read_hx711_adc(struct hx711_data *chip)
 
     for(i=0; i<24; i++)
     {
-        SCK_HIGH(chip->sck_gpio);
+        SCK_HIGH(chip->sck_desc);
         Count = Count<<1;
-        SCK_LOWER(chip->sck_gpio)
+        SCK_LOWER(chip->sck_desc)
         delay_us(1);
 
-        if(SDA_VALUE(chip->sda_gpio))
+        if(SDA_VALUE(chip->sda_desc))
             Count += 1;
         delay_us(1);
     } 
-    SCK_HIGH(chip->sck_gpio);
+    SCK_HIGH(chip->sck_desc);
     Count=Count^0x800000;      
-    SCK_LOWER(chip->sck_gpio)
+    SCK_LOWER(chip->sck_desc)
     return(Count);
 }
 
@@ -161,36 +160,23 @@ static const struct iio_chan_spec hx711_channels[] = {
 };    
 static int hx711_hardware_init(struct hx711_data *chip)
 {
-    int ret;
     struct platform_device *pdev = chip->pdev;
-    struct device_node *hx711_nd = pdev->dev.of_node;
 
-    chip->sck_gpio = of_get_named_gpio(hx711_nd, "hx711-gpios", 0);
-    if (chip->sck_gpio < 0){
-        dev_err(&pdev->dev, "find sck_gpio in dts failed!\n");
-        return -EINVAL;
-    }
-    ret = devm_gpio_request(&pdev->dev, chip->sck_gpio, "hx711-sck");
-    if (ret < 0){
-        dev_err(&pdev->dev, "request sck_gpio failed!\n");
+    chip->sck_desc = devm_gpiod_get_index(&pdev->dev, "hx711", 0, GPIOD_OUT_LOW);
+    if (chip->sck_desc == NULL){
+        dev_err(&pdev->dev, "request sck_desc failed!\n");
         return -EINVAL;   
     }
-    gpio_direction_output(chip->sck_gpio, 0);
+    gpiod_direction_output(chip->sck_desc, 0);
 
-
-    chip->sda_gpio = of_get_named_gpio(hx711_nd, "hx711-gpios", 1);
-    if (chip->sda_gpio < 0){
-        dev_err(&pdev->dev, "find sda_gpio in dts failed!\n");
-        return -EINVAL;
-    }
-    ret = devm_gpio_request(&pdev->dev, chip->sda_gpio, "hx711-sda");
-    if (ret < 0){
-        dev_err(&pdev->dev, "request sda_gpio failed!\n");
+    chip->sda_desc = devm_gpiod_get_index(&pdev->dev, "hx711", 1, GPIOD_IN);
+    if (chip->sda_desc == NULL){
+        dev_err(&pdev->dev, "request sda_desc failed!\n");
         return -EINVAL;   
     }
-    gpio_direction_input(chip->sda_gpio);
+    gpiod_direction_input(chip->sda_desc);
 
-    dev_info(&pdev->dev, "%s init success, sck_pin:%d, sda_pin:%d ", __func__, chip->sck_gpio, chip->sda_gpio);
+    dev_info(&pdev->dev, "%s init success!\n", __func__);
     return 0;
 }
 
@@ -228,12 +214,15 @@ static int hx711_probe(struct platform_device *pdev)
         return ret;
     }
 
-    dev_info(&pdev->dev, "driver init success!\n");
+    chip->adc_value = read_hx711_adc(chip);
+
+    dev_info(&pdev->dev, "driver %s init success, value:0x%x!\n", __func__, chip->adc_value);
     return 0;
 }
 
 static int hx711_remove(struct platform_device *pdev)
 {
+    dev_info(&pdev->dev, "driver %s init success!\n", __func__);
     return 0;
 }
 

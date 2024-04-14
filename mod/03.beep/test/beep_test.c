@@ -12,6 +12,7 @@
 #include<stdlib.h>
 #include<unistd.h>
 
+#define DEVICE_BEEP     "/dev/miscbeep"
 /**
  * 测试LED工作
  * 
@@ -24,10 +25,10 @@ int main(int argc, const char *argv[])
     unsigned char val = 1;
     int fd;
 
-    fd = open("/dev/beep", O_RDWR | O_NDELAY);
+    fd = open(DEVICE_BEEP, O_RDWR | O_NDELAY);
     if (fd == -1)
     {
-        printf("/dev/beep open error");
+        printf("open %s error\r\n", DEVICE_BEEP);
         return -1;
     }
 

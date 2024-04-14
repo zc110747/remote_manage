@@ -22,7 +22,7 @@
 usr_key {
     compatible = "rmk,usr-key";
     pinctrl-0 = <&pinctrl_gpio_key>;
-    key-gpio = <&gpio1 18 GPIO_ACTIVE_LOW>;
+    key-gpios = <&gpio1 18 GPIO_ACTIVE_LOW>;
     interrupt-parent = <&gpio1>;
     interrupts = <18 IRQ_TYPE_EDGE_FALLING>;
     status = "okay";
@@ -83,7 +83,7 @@ static irqreturn_t key_handler(int irq, void *data)
     if(chip->key_protect == 0)
     {
         chip->key_protect = 1;
-        mod_timer(&chip->key_timer, jiffies + msecs_to_jiffies(20));
+        mod_timer(&chip->key_timer, jiffies + msecs_to_jiffies(100));
     }
 
     return IRQ_RETVAL(IRQ_HANDLED);
@@ -119,9 +119,9 @@ static int key_hw_init(struct key_data *chip)
     struct platform_device *pdev = chip->pdev;  
     struct device_node *nd = pdev->dev.of_node;
 
-    chip->key_gpio = of_get_named_gpio(nd, "key-gpio", 0);
+    chip->key_gpio = of_get_named_gpio(nd, "key-gpios", 0);
     if (chip->key_gpio < 0){
-        dev_err(&pdev->dev, "gpio %s no find\n",  "key-gpio");
+        dev_err(&pdev->dev, "gpio %s no find\n",  "key-gpios");
         return -EINVAL;
     }
 
@@ -136,7 +136,7 @@ static int key_hw_init(struct key_data *chip)
                             IRQF_TRIGGER_FALLING | IRQF_TRIGGER_RISING,       
                             "key0", 
                             (void *)chip);
-    if (ret<0){
+    if (ret < 0){
         dev_err(&pdev->dev, "key interrupt config error:%d\n", ret);
         return -EINVAL;
     }
