@@ -50,6 +50,15 @@ _Pragma("once")
 #include "thread_queue.hpp"
 #include "productConfig.hpp"
 
+typedef union
+{
+    float f_val;
+
+    int i_val;
+
+    uint8_t buffer[4];
+}UNION_FLOAT_INT;
+
 #define DEVICE_RX_BUFFER_SIZE           512
 #define DEVICE_TX_BUFFER_SIZE           512
 
@@ -80,4 +89,18 @@ _Pragma("once")
 #define CREATE_UINT16(a, b)             ((a)<<8 | (b))
 #define CREATE_UINT32(a, b, c, d)       ((a)<<24 | (b)<<16 | (c)<<8 | d)
 #define CREATE_FLOAT(a, b, c, d)        (float)((a)<<24 | (b)<<16 | (c)<<8 | d)
+
+#define DEVICE_LOOP_EVENT               0
+#define DEVICE_HW_SET_EVENT             1
+#define DEVICE_SYNC_EVENT               2
+
+//process hardware chage
+#define DEVICE_LED                      0x00
+#define DEVICE_BEEP                     0x01
+
+#define LOCAL_DEVICE_ID                 0
+
+#define COMMAND_HEATBEATS               0x00
+#define COMMAND_UPDATE_LOCAL            0x01
+#define COMMAND_UPDATE_REMOTE           0x02
 

@@ -18,12 +18,13 @@
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
-#include "led.hpp"
 #include "beep.hpp"
 #include "i2c_ap.hpp"
-#include "spi_icm.hpp"
-#include "rtc.hpp"
+#include "iio_device.hpp"
 #include "key.hpp"
+#include "led.hpp"
+#include "rtc.hpp"
+#include "spi_icm.hpp"
 
 class driver_manage
 {
@@ -58,6 +59,11 @@ public:
     /// \return the beep device point.
     beep_device *get_beep_zero()    {return &beep_zero_;}
     
+    /// \brief get_rtc_dev
+    /// - This method is used to get rtc device point.
+    /// \return the rtc device point.
+    rtc_device *get_rtc_dev()  {return &rtc_dev_;}
+
     /// \brief get_key_zero
     /// - This method is used to get key device point.
     /// \return the key device point.
@@ -72,6 +78,16 @@ public:
     /// - This method is used to get ap3126 device point.
     /// \return the spi icm20608 device point.
     icm_device *get_icm20608_dev()  {return &icm20608_dev_;}
+
+    /// \brief get_hx711_dev
+    /// - This method is used to get hx711 device point.
+    /// \return the spi hx711 device point.
+    iio_device *get_hx711_dev()  {return &hx711_dev_;}
+
+    /// \brief get_vf610_dev
+    /// - This method is used to get vf610 device point.
+    /// \return the spi vf610 device point.
+    iio_device *get_vf610_dev()  {return &vf610_adc_dev_;}
 
 private:
     /// \brief instance_pointer_
@@ -101,5 +117,13 @@ private:
     /// \brief rtc_dev_
     /// - rtc device object.   
     rtc_device rtc_dev_;
+
+    /// \brief hx711_dev_
+    /// - hx711 device object.      
+    iio_device hx711_dev_;
+
+    /// \brief hx711_dev_
+    /// - vf610 device object. 
+    iio_device vf610_adc_dev_;
 };
 

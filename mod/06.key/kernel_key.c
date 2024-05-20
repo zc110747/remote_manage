@@ -62,7 +62,7 @@ struct key_data
     
     int key_code; 
     struct timer_list key_timer;
-    int key_protect;
+    atomic_t protect;
 };
 
 #define DEFAULT_MAJOR                   0         
@@ -80,9 +80,9 @@ static irqreturn_t key_handler(int irq, void *data)
 {
     struct key_data* chip = (struct key_data*)data;
 
-    if(chip->key_protect == 0)
+    if(atomic_read(&chip->protect) == 0)
     {
-        chip->key_protect = 1;
+        atomic_set(&chip->protect, 1);
         mod_timer(&chip->key_timer, jiffies + msecs_to_jiffies(100));
     }
 
@@ -110,7 +110,7 @@ void key_timer_func(struct timer_list *arg)
     input_sync(chip->input_dev);
 
     dev_info(&pdev->dev, "key timer interrupt!");
-    chip->key_protect = 0;
+    atomic_set(&chip->protect, 0);
 }
 
 static int key_hw_init(struct key_data *chip)
@@ -130,9 +130,9 @@ static int key_hw_init(struct key_data *chip)
     
     //cat /proc/interrupts可以查看是否增加中断向量
     chip->irq = irq_of_parse_and_map(nd, 0);
-    ret = devm_request_irq (&pdev->dev,
+    ret = devm_request_threaded_irq(&pdev->dev,
                             chip->irq, 
-                            key_handler, 
+                            NULL, key_handler, 
                             IRQF_TRIGGER_FALLING | IRQF_TRIGGER_RISING,       
                             "key0", 
                             (void *)chip);
@@ -142,7 +142,7 @@ static int key_hw_init(struct key_data *chip)
     }
 
     timer_setup(&chip->key_timer, key_timer_func, 0);
-    chip->key_protect = 0;
+    atomic_set(&chip->protect, 0);
 
     dev_info(&pdev->dev, "key interrupt num:%d\n", chip->irq);
     return 0;

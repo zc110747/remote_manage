@@ -90,7 +90,7 @@ int mqtt_device::publish_msg(const std::string &str)
     if (is_connet_ && str.length() > 0)
     {
         ret = publish(NULL, info_.pub_topic.c_str(), str.length(), str.c_str(), info_.qos);
-        PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "publisher, topic:%s, ret:%d!", info_.pub_topic.c_str(), ret);
+        //PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "publisher, topic:%s, ret:%d!", info_.pub_topic.c_str(), ret);
     }
     
     return ret;
@@ -130,7 +130,7 @@ bool mqtt_manage::init()
         };
 
         mqtt_device_ptr = std::make_unique<mqtt_device>(mqtt_process_info, [](char *ptr, int size){
-            PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "rx_buffer_size:%d.", size);
+            PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "rx_buffer_size:%d, buffer:%s.", size, ptr);
         });
         if (mqtt_device_ptr == nullptr)
         {

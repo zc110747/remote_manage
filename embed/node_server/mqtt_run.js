@@ -6,6 +6,32 @@ const mqtt = require('mqtt')
 const { config_info } = require('./config_json.js')
 
 let subscribe_info = {
+    command: 1,
+    data: {
+      angle: 0,
+      ap: { als: 0, ir: 0, ps: 0 },
+      beep: 0,
+      hx711: 0,
+      icm: {
+        accel_x: 0,
+        accel_y: 0,
+        accel_z: 0,
+        gyro_x: 0,
+        gyro_y: 0,
+        gyro_z: 0,
+        temp_act: 0
+      },
+      led: 0,
+      sysinfo: {
+        cpu_info: '',
+        disk_total: 0,
+        disk_used: 0,
+        kernel_info: '',
+        ram_total: 0,
+        ram_used: 0
+      },
+      vf610_adc: 0
+    }
 };
 
 function init()
@@ -26,8 +52,12 @@ function init()
     
         client.on('message', function (topic, message) {
             const json_obj = JSON.parse(message.toString())
-            subscribe_info = json_obj
-            console.log(subscribe_info)
+
+            for (let key in json_obj){
+                if (subscribe_info.hasOwnProperty(key)){
+                    subscribe_info[key] = json_obj[key]
+                }
+            }
         })
     }
     catch(e)

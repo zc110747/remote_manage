@@ -197,7 +197,7 @@ void gt9147_send_cfg(struct gt9147_data *chip, unsigned char mode)
 	unsigned int i = 0;
 
 	buf[0] = 0;
-	buf[1] = mode;	/* 是否写入到GT9147 FLASH */
+	buf[1] = mode;	/* 是否写入到GT9147 FLASH 0表示不写入 */
 	for(i = 0; i < (sizeof(GT9147_CFG_TBL)); i++) /* 计算校验和 */
         buf[0] += GT9147_CFG_TBL[i];            
     buf[0] = (~buf[0]) + 1;
@@ -275,13 +275,12 @@ static int gt9147_gpio_init(struct gt9147_data *chip)
         dev_err(&client->dev, "reset pin is invalid, pin:%d, %d.\n", chip->reset_pin, chip->irq_pin);
         return -1;
     }
-    gpio_direction_output(chip->reset_pin, 1);
 
     /*irq pin init*/
     if (gpio_is_valid(chip->irq_pin)) {
         ret = devm_gpio_request_one(&client->dev, 
                                     chip->irq_pin, 
-                                    GPIOF_IN,
+                                    GPIOF_OUT_INIT_HIGH,
                                     "gt9147 int");
         if (ret) {
             dev_err(&client->dev, "failed to reqeust int pin.\n");
@@ -297,10 +296,11 @@ static int gt9147_gpio_init(struct gt9147_data *chip)
     msleep(10);
     gpio_set_value(chip->reset_pin, 1);
     msleep(10);
+    gpio_set_value(chip->irq_pin, 0);
+    msleep(50);
 
     /*set irq pin input*/
     gpio_direction_input(chip->irq_pin);
-
     ret = devm_request_threaded_irq(&client->dev,
                                 client->irq,
                                 NULL,

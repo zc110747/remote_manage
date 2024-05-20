@@ -39,11 +39,16 @@ public:
     /// \return Wheather time update is success or failed.
     bool update_rtc_time();
 
-    /// \brief get_current_time
-    /// - This method is used to get current time from start.
+    /// \brief get_run_time
+    /// - This method is used to get run time from start.
     /// \return The time from the start.
-    int get_current_time();
+    int get_run_time();
     
+    /// \brief get_timer_str
+    /// - This method is used to get timer string.
+    /// \return The time string convert.   
+    std::string &get_timer_str();
+
 private:
     /// \brief rtc_time_
     /// - rtc time struct data.
@@ -52,4 +57,8 @@ private:
     /// \brief start_time_
     /// - the time when init, used to calculate seconds.
     uint64_t start_time_{0};
+
+    /// \brief time_str_
+    /// - timer string.
+    std::string time_str_{""};
 };

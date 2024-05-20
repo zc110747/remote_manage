@@ -2,188 +2,147 @@
 # shellcheck disable=SC2154
 # shellcheck disable=SC2174
 
+#************************************************************************
+#				
+#
+#       I.MX6ULL Build Function Region
+#
+#
+#************************************************************************
+function imx_build_uboot()
+{
+    cd "${PLATFORM_UBOOT_PATH}"/ || return
+
+    chmod 777 uboot_upgrade.sh && ./uboot_upgrade.sh
+
+    cdp || return
+
+    ./make.sh uboot $1
+
+    cp -fv ${SUPPORT_ENV_PACKAGE}/u-boot-dtb.imx "${BUILD_TFTP_PATH}"/
+    cp -fv ${SUPPORT_ENV_PACKAGE}/boot.scr "${BUILD_TFTP_PATH}"/
+}
+alias imx_build_uboot="imx_build_uboot"
+
+function imx_build_kernel()
+{
+    cd "${PLATFORM_LINUX_PATH}"/ || return
+
+    chmod 777 kernel_upgrade.sh && ./kernel_upgrade.sh
+
+    cdp || return
+
+    ./make.sh kernel $1
+
+    cp -fv ${SUPPORT_ENV_PACKAGE}/*.dtb "${BUILD_TFTP_PATH}"/
+    cp -fv ${SUPPORT_ENV_PACKAGE}/zImage "${BUILD_TFTP_PATH}"/ 
+}
+alias imx_build_kernel="imx_build_kernel"
+
+function imx_build_rootfs()
+{
+    cd "${PLATFORM_BUILDROOT_PATH}"/ || return
+
+	cp -fv imx6ullrmk_defconfig "${SUPPORT_FS_BUILDROOT_DIR}"/configs/
+
+    cdp || return
+
+    ./make.sh rootfs $1
+}
+alias imx_build_rootfs="imx_build_rootfs"
+
+function imx_qemu_run()
+{
+	cd "${PLATFORM_INSTALL_SHELL}"/ || return
+
+	chmod 777 qemu-nogui.sh && ./qemu-nogui.sh
+}
+alias imx_qemu_run="imx_qemu_run"
+
+#************************************************************************
+#				
+#
+#       ALL Build Function Region
+#
+#
+#************************************************************************
 # SysBuildUboot
-# - build_uboot
-# build the uboot, must install the platform before.
 function build_uboot
 {
-	uboot_file="u-boot.imx"
-
-	echo "uboot compiler:${NEW_KERNEL_CC}"
+	echo "uboot compiler:${NEW_KERNEL_CC} ${config_file}"
 	
 	if [ "${FIRMWARE_CURRENT_PLATFORMS}" == "ARM" ]; then
-		
-		cd "${APPLICATION_PLATFORM}"/ || return
-		mkimage -C none -A arm -T script -d boot.script boot.scr
-		mv boot.scr "${BUILD_TFTP_PATH}"/
-
-		if [ -d "${SUPPORT_ENV_BOOT_DIR}" ]; then
-
-			cd "${PLATFORM_UBOOT_PATH}"/ || return
-			sudo chmod 777 uboot_upgrade.sh
-			./uboot_upgrade.sh
-
-			cd "${SUPPORT_ENV_BOOT_DIR}" || return
-			make mx6ull_14x14_rmk_emmc_defconfig
-			make V=1 ARCH=arm CROSS_COMPILE="${NEW_KERNEL_CC}" all -j6
-
-			if [ -f "u-boot-dtb.imx" ]; then
-				uboot_file="u-boot-dtb.imx"
-			fi
-
-			cp -avf "${uboot_file}" "${BUILD_TFTP_PATH}"/
-		else
-			echo "uboot directory:${SUPPORT_ENV_BOOT_DIR} not exist!"
-		fi
-	else
-		echo "AARCH64 u-boot support feature!"
-	fi
+        imx_build_uboot $1
+    fi	
 }
 alias SysBuildUboot='build_uboot'
 
 # SysBuildKernel
-# - build_kernel
-# build the kernel, must install the platform before.
 function build_kernel
 {
-	kernel_configs="imx_rmk_v7_defconfig"
-
-	#check wheather build driver
-	if [ "${FIRMWARE_CURRENT_PLATFORMS}" == "AARCH64" ]; then
-		echo "for AARCH64 only support application, kernel command invalid!".
-	else
-		echo "kernel compiler:$NEW_KERNEL_CC"
-
-			cd "${PLATFORM_LINUX_PATH}"/ || return
-			sudo chmod 777 kernel_upgrade.sh
-			./kernel_upgrade.sh
-
-		if [ x"$1" != x ]; then
-			if [ "$1" == "dtbs" ]; then
-				cd "${SUPPORT_ENV_KERNEL_DIR}"/ || return 
-				make dtbs
-				return
-			elif [ "$1" == "qemu" ]; then
-				kernel_configs="imx_qemu_defconfig"
-			else
-				echo "extra build command:${redText}SysBuildKernel dtbs${defText}"
-				return 
-			fi
-		fi
-		
-		if [ -d "${SUPPORT_ENV_KERNEL_DIR}" ]; then
-			cd "${SUPPORT_ENV_KERNEL_DIR}"/ || return
-			make "${kernel_configs}" ARCH=arm CROSS_COMPILE="${NEW_KERNEL_CC}"
-			make V=1 ARCH=arm CROSS_COMPILE="${NEW_KERNEL_CC}" all -j4
-
-			if [ -f "${ENV_KERNEL_ZIMAGE}" ]; then
-				cp -avf "${ENV_KERNEL_ZIMAGE}" "${BUILD_TFTP_PATH}"/
-				cp -avf "${ENV_KERNEL_DTB}" "${BUILD_TFTP_PATH}"/
-			else
-				echo "${redText}Linux Kernel build failed, please check!${defText}"
-			fi
-		else
-			echo "Kernal Directory:${SUPPORT_ENV_KERNEL_DIR} not exist!"
-		fi
+	if [ "${FIRMWARE_CURRENT_PLATFORMS}" == "ARM" ]; then
+		imx_build_kernel $1
 	fi
 }
 alias SysBuildKernel='build_kernel'
 
 # SysBuildRootfs
-# - build_rootfs
-# build the kernel, must install the platform before.
-function install_library()
-{
-    sudo cp -Rv "${PROGRAM_INSTALL}"/usr/local/lib/* "${PROGRAM_INSTALL}"/lib/
-
-    sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/usr/lib/
-    sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/usr/include/
-    sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/usr/local/
-    sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/usr/libexec/
-
-    sudo cp -Rv "${PROGRAM_INSTALL}"/usr/libexec/* "${BUILD_NFS_PATH}"/usr/libexec/
-    sudo cp -Rv "${PROGRAM_INSTALL}"/lib/* "${BUILD_NFS_PATH}"/usr/lib/
-    sudo cp -Rv "${PROGRAM_INSTALL}"/usr/local/lib/* "${BUILD_NFS_PATH}"/usr/lib/
-    sudo cp -Rv "${PROGRAM_INSTALL}"/usr/local/include/* "${BUILD_NFS_PATH}"/usr/include/
-    sudo cp -Rv "${PROGRAM_INSTALL}"/include/* "${BUILD_NFS_PATH}"/usr/include/
-    sudo cp -Rv "${PROGRAM_INSTALL}"/usr/local/* "${BUILD_NFS_PATH}"/usr/local/
-    sudo cp -Rv "${PROGRAM_INSTALL}"/etc/* "${BUILD_NFS_PATH}"/etc/
-
-    if [ ! -f "${BUILD_NFS_PATH}"/usr/bin/node ]; then
-        sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/usr/bin/node
-        sudo cp -Rv "${PROGRAM_INSTALL}"/usr/bin/node/*  "${BUILD_NFS_PATH}"/usr/bin/node/
-    else
-        echo "node alread install, not install!"
-    fi
-
-	sudo mkdir -p "${BUILD_NFS_PATH}"/home/sys/
-	sudo cp -ravf "${ENV_PATH_ROOT}"/rootfs/home/sys/* "${BUILD_NFS_PATH}"/home/sys/
-	sudo cp -ravf "${ENV_PATH_ROOT}"/rootfs/etc/mosquitto/ "${BUILD_NFS_PATH}"/etc/
-	sudo cp -ravf "${ENV_PATH_ROOT}"/rootfs/root/.bashrc "${BUILD_NFS_PATH}"/root/
-}
-alias SysInstallLibrary='install_library'
-
 function build_rootfs
 {
-    echo "build or create rootfs:$ROOTFS_RUN"
-	
-	#copy rootfs to the next directory
-	sudo chmod -Rv 755 "${ENV_PATH_ROOT}"/rootfs/
-
-	#install buildroot
-    if [ "${ROOTFS_RUN}" == "buildroot" ]; then
-
-		cp "${ENV_PATH_ROOT}"/platform/buildroot-2023.02.9-patch/imx6ullrmk_defconfig ${SUPPORT_FS_BUILDROOT_DIR}/configs/
-		echo "BR2_TOOLCHAIN_EXTERNAL_PATH=${PROGRAM_SUPPORT}/compiler" >> ${SUPPORT_FS_BUILDROOT_DIR}/configs/imx6ullrmk_defconfig
-		cdrb || return
-		
-		make imx6ullrmk_defconfig
-		make -j"${CPU_CORE}"
-
-		cp -f output/images/rootfs.ext2 "${PROGRAM_SDK_PLATFORM_PATH}"/img/arm-buildroot.img
-
-	#install debain
-	elif [ "${ROOTFS_RUN}" == "debain" ]; then
-
-		sudo mount -o loop "${PROGRAM_IMG}"/arm-debain.img  "${SUPPORT_FS_DEBAIN_DIR}"/
-
-		if [ ! -f "${SUPPORT_FS_DEBAIN_DIR}"/bin/bash ]; then
-			cd "${ENV_PATH_ROOT}"/platform/install-shell || return
-
-			sudo chmod 777 install-debain.sh
-
-			./install-debain.sh
-		else
-			echo "debain already create, not install!"
-		fi
-		
-		install_library
-
-		sleep 1
-		sudo chmod 777 "${SUPPORT_FS_DEBAIN_DIR}"/home/
-		sudo umount -l "${SUPPORT_FS_DEBAIN_DIR}"/
-		sleep 1
-    else
-        sudo cp -ravf "${ENV_PATH_ROOT}"/rootfs/home/* "${BUILD_NFS_PATH}"/home/
-		sudo cp -ravf "${ENV_PATH_ROOT}"/rootfs/etc/mosquitto/ "${BUILD_NFS_PATH}"/etc/
-        sudo cp -ravf "${ENV_PATH_ROOT}"/rootfs/root/.bashrc "${BUILD_NFS_PATH}"/root/
-    fi
+	if [ "${FIRMWARE_CURRENT_PLATFORMS}" == "ARM" ]; then
+		imx_build_rootfs $1
+	fi
 }
 alias SysBuildRootfs='build_rootfs'
 
 # SysPreThirdParts
 # - pre_build_thirdparts
 # prepare build thirdparts package. 
+function install_library()
+{
+    sudo cp -Rv "${SUPPORT_ENV_INSTALL}"/usr/local/lib/* "${SUPPORT_ENV_INSTALL}"/lib/
+
+    sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/bin
+    sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/doc
+    sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/etc
+    sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/examples
+    sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/include
+  	sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/lib
+  	sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/mkspecs		
+  	sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/plugins
+  	sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/share
+  	sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/ssl
+  	sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/usr
+
+	sudo cp -Rv "${SUPPORT_ENV_INSTALL}"/* "${BUILD_NFS_PATH}"/
+
+	sudo mkdir -p "${BUILD_NFS_PATH}"/home/sys/
+	sudo cp -ravf "${ENV_PATH_ROOT}"/rootfs/home/sys/* "${BUILD_NFS_PATH}"/home/sys/
+	sudo cp -ravf "${ENV_PATH_ROOT}"/rootfs/etc/mosquitto/ "${BUILD_NFS_PATH}"/etc/
+	sudo cp -ravf "${ENV_PATH_ROOT}"/rootfs/root/.bashrc "${BUILD_NFS_PATH}"/root/
+	sudo cp "${ENV_PATH_ROOT}"/config.template.json "${BUILD_NFS_PATH}"/home/sys/configs/config.json
+	sudo cp "${ENV_PATH_ROOT}"/rootfs/home/sys/configs/dynamic.json "${BUILD_NFS_PATH}"/home/sys/configs/dynamic.json
+
+	#安装启动脚本
+	sudo cp "${PLATFORM_INSTALL_SHELL}"/kill_br_app.sh "${BUILD_NFS_PATH}"/home/sys/
+	sudo cp "${PLATFORM_INSTALL_SHELL}"/start_br_app.sh "${BUILD_NFS_PATH}"/home/sys/
+}
+alias install_library='install_library'
+
 function pre_build_thirdparts()
 {
 	echo "***start pull thirdparts libary***"
 
-	cd "${ENV_PATH_ROOT}"/platform/install-shell || return
+	cd "${PLATFORM_INSTALL_SHELL}" || return
 
 	#set shell run
-	sudo chmod 777 install-thirdparts.sh
-	
-	./install-thirdparts.sh
+	chmod 777 install-thirdparts.sh && ./install-thirdparts.sh
+
+	SysMountRootfs
+
+	exit_if_last_error
+
+	install_library
 }
 alias SysPreThirdParts='pre_build_thirdparts'	#install thirdpart library for the application
 
@@ -212,7 +171,7 @@ alias SysBuildModules='build_driver_modules'
 function build_application()
 {
 	#check wheather library support
-	if [ ! -f "${PROGRAM_INSTALL}"/lib/libssl.a ] || [ ! -d "${APPLICATION_THIRDPARTS}"/asio ]; then
+	if [ ! -f "${SUPPORT_ENV_INSTALL}"/lib/libssl.a ] || [ ! -d "${APPLICATION_THIRDPARTS}"/asio ]; then
 		echo "support library for application not exist, run command"
 		echo "  ${redText}SysPreThirdParts${defText}"
 		echo "  ${redText}SysBuildRootfs${defText}"
@@ -232,7 +191,8 @@ function build_application()
 	#copy config file
 	cd "${ENV_PATH_ROOT}" || return 
     mkdir -m 755 -p "${BUILD_NFS_PATH}"/home/sys/configs/
-	cp config.template.json "${BUILD_NFS_PATH}"/home/sys/configs/config.json
+	chmod 755 "${BUILD_NFS_PATH}"/home/sys/configs/
+	cp -fv config.template.json "${BUILD_NFS_PATH}"/home/sys/configs/config.json
     exit_if_last_error
 
 	#build executable

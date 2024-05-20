@@ -96,27 +96,20 @@ int log_manage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...)
     char *pbuf = logger_tx_buffer;
     int tx_len = 0;
     int bufferlen = LOGGER_MAX_BUFFER_SIZE;
-    CMD_LOG_INFO log_info;
 
     if (level < log_level_)
+    {
+        //PRINT_NOW("%s: %s not support buffer-0!\n", PRINT_NOW_HEAD_STR, __func__);
         return 0;
+    }
 
     mutex_.lock();
-
-    //add logger cmd info
-    log_info.action = LOG_PRINT;
-    log_info.level = level;
-    len = sizeof(CMD_LOG_INFO);
-    memcpy(pbuf, (char *)&log_info, len);
-    pbuf = &pbuf[len];
-    bufferlen -= len;
-    tx_len += len;
     
     //add logger header
     len = snprintf(pbuf, bufferlen, "[%s][%s][%d]:", convert_timer(time).c_str(), TOOLS_NAME, level);
     if ((len<=0) || (len>=bufferlen))
     {
-        PRINT_NOW("%s: %s not support buffer-0!\n", PRINT_NOW_HEAD_STR, __func__);
+        PRINT_NOW("%s: %s not support buffer-1!\n", PRINT_NOW_HEAD_STR, __func__);
         mutex_.unlock();
         return 0;
     }
@@ -132,7 +125,7 @@ int log_manage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...)
 
     if ((len<=0) || (len>=bufferlen))
     {
-        PRINT_NOW("%s: %s not support buffer-1!\n", PRINT_NOW_HEAD_STR, __func__);
+        PRINT_NOW("%s: %s not support buffer-2!\n", PRINT_NOW_HEAD_STR, __func__);
         mutex_.unlock();
         return 0;
     }
@@ -144,7 +137,7 @@ int log_manage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...)
     //add logger tail \r\n
     if (bufferlen < 3)
     {
-        PRINT_NOW("%s: %s not support buffer-2!\n", PRINT_NOW_HEAD_STR, __func__);
+        PRINT_NOW("%s: %s not support buffer-3!\n", PRINT_NOW_HEAD_STR, __func__);
         return 0;
     }
     pbuf[0] = '\r';
@@ -162,7 +155,7 @@ int log_manage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...)
         len = logger_fifo_->write(logger_tx_buffer, tx_len);
         if (len<=0)
         {
-            PRINT_NOW("%s:%s not support buffer-3!\n", PRINT_NOW_HEAD_STR, __func__);
+            PRINT_NOW("%s:%s not support buffer-4!\n", PRINT_NOW_HEAD_STR, __func__);
         }
     }
 

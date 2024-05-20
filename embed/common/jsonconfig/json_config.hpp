@@ -35,6 +35,11 @@ _Pragma("once")
 #define DEFAULT_RTC_DEV             "/dev/rtc0"
 #define DEFAULT_ICMSPI_DEV          "/dev/icm20608"
 #define DEFAULT_API2C_DEV           "/dev/ap3216"
+#define DEFAULT_VF610_DEV           "/sys/bus/iio/devices/iio:device0/in_voltage4_raw" 
+#define DEFAULT_HX711_DEV           "/sys/bus/iio/devices/iio:device1/in_voltage1_raw"
+
+#define DEFAULT_LOWER_DEVICE_LOGGER_PORT    15201
+#define DEFAULT_LOWER_DEVICE_REMOTE_PORT    15202
 #define DEFAULT_SERIAL_BAUD         115200
 #define DEFAULT_SERIAL_DATABITS     8
 #define DEFAULT_SERIAL_STOPBITS     1
@@ -50,6 +55,8 @@ _Pragma("once")
 #define DEFAULT_NODE_WEB_PORT       8100
 #define DEFAULT_LOGGER_LEVEL        2
 
+#define DEFAULT_LOGGER_PASSWD       "user123"
+#define DEFAULT_ALLOW_NO_PASSWD     false
 
 using JString = Json::String;
 
@@ -66,12 +73,19 @@ typedef struct
 
 typedef struct 
 {
+    JString vf610_adc_dev;
+    JString hx711_dev;
+}IIOSysConfig;
+
+typedef struct 
+{
     DeviceSysConfig ap_i2c;
     DeviceSysConfig icm_spi;
     DeviceSysConfig key;
     DeviceSysConfig rtc;
     IoSysConfig led;
     IoSysConfig beep;
+    IIOSysConfig iio;
 }LocalDeviceConfig;
 
 typedef struct 
@@ -101,7 +115,6 @@ typedef struct
 
 typedef struct 
 {
-    int net_port;
     int baud;
     int dataBits;
     int stopBits;
@@ -113,8 +126,17 @@ typedef struct
 {
     int logger_port;
     
+    int remote_port;
+
     SerialSysConfig serial;
 }LowerDeviceConfig;
+
+#define GUI_LOGGER_DEV          0
+#define LOCAL_LOGGER_DEV        1
+#define LOGGER_LOGGER_DEV       2
+#define LOWER_LOGGER_DEV        3
+#define MAIN_LOGGER_DEV         4
+#define NODE_LOGGGE_DEV         5
 
 typedef struct 
 {
@@ -124,6 +146,8 @@ typedef struct
     int lower_device_level;
     int main_process_level;
     int node_server_level;
+    JString passwd;
+    bool allow_no_passwd;
 }LoggerPrivilege;
 
 typedef struct 
@@ -171,9 +195,17 @@ public:
     /// - This method is used to set all data default.
     void default_init() noexcept;
 
-    /// \brief save_config_file
+    /// \brief save_configfile
     /// - This method is used to save config file.
-    void save_config_file();
+    void save_configfile();
+
+    /// \brief save_dynamicfile
+    /// - This method is used to save dynamic file.
+    void save_dynamicfile();
+
+    /// \brief set_logger_level
+    /// - This method is used to set logger level.
+    bool set_logger_level(int dev, int level);
 
 public:
     /// \brief get*
@@ -189,8 +221,10 @@ public:
     const DeviceSysConfig &get_rtc_config()     const   {return parameter_.local_device.rtc;}
     const DeviceSysConfig &get_icm_config()     const   {return parameter_.local_device.icm_spi;}
     const DeviceSysConfig &get_ap_config()      const   {return parameter_.local_device.ap_i2c;}
+    const IIOSysConfig &get_iio_config()        const   {return parameter_.local_device.iio;}
 
     const int &get_lower_device_logger_port()   const    {return parameter_.lower_device.logger_port;}
+    const int &get_lower_device_remote_port()   const    {return parameter_.lower_device.remote_port;}
     const SerialSysConfig &get_serial_config()  const    {return parameter_.lower_device.serial;}
 
     //main process
@@ -206,10 +240,18 @@ public:
 
     const LoggerPrivilege& get_logger_privilege() const  {return parameter_.logger_privilege;}
 
+    const bool get_allow_no_passwd()            const   { return parameter_.logger_privilege.allow_no_passwd; }
+
 private:
     /// \brief check_configfile
     /// - This method is used to check ipaddress wheather in list.
     bool check_configfile(const std::string& ipaddr); 
+
+    /// \brief dynamic_init
+    /// - This method is used to init dynamic information.
+    /// \param path - path of the file for config.
+    /// \return Wheather initialization is success or failed.
+    bool dynamic_init(const char* path);
 
 private:
     /// \brief instance_pointer_
@@ -223,4 +265,8 @@ private:
     /// \brief file_path_
     /// - object used to store path of config file.
     std::string file_path_;
+
+    /// \brief dynamic_path_
+    /// - object used to store path of config file.
+    std::string dynamic_path_;
 };

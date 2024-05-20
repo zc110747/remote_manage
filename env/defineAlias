@@ -79,25 +79,25 @@ alias SysExitChroot='exit_chroot'
 # mount manage
 function create_roofts_img()
 {
-	rootfs_ver=${ENV_ARCH}-debain.img
+	rootfs_ver=debain.img
 	rootfs_size=1024
 	case "$ROOTFS_RUN" in
 		"buildroot")
-			rootfs_ver=${ENV_ARCH}-buildroot.img
+			rootfs_ver=buildroot.img
 		;;
 		"debain")
-			rootfs_ver=${ENV_ARCH}-debain.img
+			rootfs_ver=debain.img
 			rootfs_size=4096
 		;;
 		"ubuntu")
-			rootfs_ver=${ENV_ARCH}-ubuntu.img
+			rootfs_ver=ubuntu.img
 			rootfs_size=4096
 		;;
 	esac
 	export ROOTFS_VER=$rootfs_ver
 
-	if [ ! -f "${PROGRAM_IMG}/${ROOTFS_VER}" ]; then
-		cd "${PROGRAM_IMG}"/ || return
+	if [ ! -f "${SUPPORT_ENV_PACKAGE}/${ROOTFS_VER}" ]; then
+		cd "${SUPPORT_ENV_PACKAGE}"/ || return
 		dd if=/dev/zero of="${ROOTFS_VER}" bs=1M count="${rootfs_size}"
 		mkfs.ext4 "${ROOTFS_VER}"
 	fi
@@ -115,7 +115,7 @@ function mount_rootfs()
 		sudo umount -l "${BUILD_NFS_PATH}"/
 	fi
 
-	sudo mount -o loop "${PROGRAM_IMG}/${ROOTFS_VER}" "${BUILD_NFS_PATH}"/
+	sudo mount -o loop "${SUPPORT_ENV_PACKAGE}/${ROOTFS_VER}" "${BUILD_NFS_PATH}"/
 
 	cdn
 }
@@ -128,6 +128,14 @@ function umount_rootfs()
 	sudo umount -l "${BUILD_NFS_PATH}"/
 }
 alias SysUmountRootfs='umount_rootfs'
+
+function run_qemu()
+{
+	cd "${PLATFORM_INSTALL_SHELL}"/ || return
+	
+	chmod 777 qemu-nogui.sh && ./qemu-nogui.sh
+}
+alias SysRunQemu='run_qemu'
 
 source "${ENV_PATH_ENVIRONMENT}"/buildAlias
 source "${ENV_PATH_ENVIRONMENT}"/configAlias

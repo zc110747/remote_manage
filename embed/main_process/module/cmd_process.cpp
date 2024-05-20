@@ -18,18 +18,21 @@
 /////////////////////////////////////////////////////////////////////////////
 #include "cmd_process.hpp"
 #include "common_unit.hpp"
+#include "device_process.hpp"
 
 const static std::map<std::string, cmd_format_t> CmdMapM = {
-    {"getos",       cmdGetOS},
-    {"setlevel",    cmdSetLevel},
-    {"?",           CmdGetHelp},
-    {"help",        CmdGetHelp},
+    {"getos",           cmdGetOS},
+    {"setlevel",        cmdSetLevel},
+    {"setdev",          cmdSetDevice},
+    {"?",               cmdGetHelp},
+    {"help",            cmdGetHelp},
 };
 
 const static std::map<cmd_format_t, std::string> CmdHelpMapM = {
-    {cmdGetOS,      "!mainprocess getos"},
-    {cmdSetLevel,   "!mainprocess setlevel [lev 0-5]",},
-    {CmdGetHelp,    "!mainprocess ? or !mainprocess help"},
+    {cmdGetOS,          "!main_proc getos"},
+    {cmdSetLevel,       "!main_proc setlevel [dev],[lev 0-5]"},
+    {cmdSetDevice,      "!main_proc setdevice [0~1],[0~1]"},
+    {cmdGetHelp,        "!main_proc ? or !mainprocess help"},
 };
 
 cmd_process* cmd_process::instance_pointer_ = nullptr;
@@ -75,8 +78,7 @@ bool cmd_process::parse_data()
     std::string strDst;
     strDst.resize(strVal.size());
     std::transform(strVal.begin(), strVal.end(), strDst.begin(), ::tolower);
-
-    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "rx command:%s", strDst.c_str());
+    
     if (CmdMapM.count(strDst) == 0)
     {
         return false;
@@ -95,6 +97,44 @@ void cmd_process::show_os()
     PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "Logger Level:%d ", (int)log_manage::get_instance()->get_level());
 }
 
+void cmd_process::sync_level(int dev, int level)
+{
+    int last_level;
+
+    switch(dev)
+    {
+        case GUI_LOGGER_DEV:
+            break;
+        case LOCAL_LOGGER_DEV:
+            last_level = system_config::get_instance()->get_logger_privilege().local_device_level;
+            if(last_level != level)
+            {   
+                char buf[2];
+
+                buf[0] = 0;
+                buf[1] = level;
+                device_process::get_instance()->sync_info(buf, 2);
+            }
+            break;
+        case LOGGER_LOGGER_DEV:
+            //without interface to process
+            break;
+        case LOWER_LOGGER_DEV:
+            break;
+        case MAIN_LOGGER_DEV:
+            last_level = system_config::get_instance()->get_logger_privilege().main_process_level;
+            if(last_level != level)
+            {
+                log_manage::get_instance()->set_level((LOG_LEVEL)level);
+            }
+            break;
+        case NODE_LOGGGE_DEV:
+            break;
+    }
+
+    system_config::get_instance()->set_logger_level(dev, level);
+}
+
 bool cmd_process::process_data()
 {
     bool ret = true;
@@ -103,9 +143,28 @@ bool cmd_process::process_data()
         case cmdGetOS:
             show_os();
             break;
+            
         case cmdSetLevel:
+            {
+                int dev, level;
+                
+                sscanf(cmd_data_pointer_, "%d,%d", &dev, &level);
+                PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "dev:%d, level:%d", dev, level);
+                sync_level(dev, level);
+            }       
             break;
-        case CmdGetHelp:
+        case cmdSetDevice:
+            {
+                int dev, state;
+                char buf[2];
+
+                sscanf(cmd_data_pointer_, "%d,%d", &dev, &state);
+                PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "dev:%d, state:%d", dev, state);
+
+                device_process::get_instance()->set_device(dev, (char *)&state, 1);
+            }
+            break;
+        case cmdGetHelp:
             {
                 for (auto &[x, y] : CmdHelpMapM)
                 {

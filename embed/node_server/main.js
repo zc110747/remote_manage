@@ -13,7 +13,6 @@ const config_json = require('./config_json.js')
 const mqtt_run = require('./mqtt_run.js');
 const static_engine = require('./static_engine.js');
 const dynamic_engine = require('./dynamic_engine.js');
-const sock_m = require('./socket_manage.js');
 
 //global parameter
 const filepath = "/home/sys/configs/config.json";
@@ -34,11 +33,9 @@ function server_process()
     //访问的界面文件在webpage/目录下
     server.listen(config_json.config_info.web_port, config_json.config_info.ipaddress, function (err) {
         if (err) throw err;
-        console.log(`server start ok, server ip:${config_json.config_info.ipaddress}, port:${config_json.config_info.web_port}`);
+        console.log(`server start ok, server ip: ${config_json.config_info.ipaddress}:${config_json.config_info.web_port}`);
     }); 
 
-    //启动客户端, 建立和服务器通讯(替换为mqtt方式)
-    //sock_m.socket_connect(local_ipaddr, netInfo.socket_port);
     mqtt_run.init();
 }
 

@@ -29,16 +29,14 @@
 !? or !help
 */
 const static std::map<std::string, cmd_format_t> CmdMapM = {
-    {"!getos",      CmdGetOS},
-    {"!setlevel",   cmdSetLevel},
-    {"!?",          CmdGetHelp},
-    {"!help",       CmdGetHelp},
+    {"getos",      CmdGetOS},
+    {"?",          cmdGetHelp},
+    {"help",       cmdGetHelp},
 };
 
 const static std::map<cmd_format_t, std::string> CmdHelpMapM = {
-    {CmdGetOS,   "!getos"},
-    {cmdSetLevel, "!setlevel [lev 0-5]",},
-    {CmdGetHelp, "!? ## !help"},
+    {CmdGetOS,   "!lower_dev getos"},
+    {cmdGetHelp, "!lower_dev ?/help"},
 };
 
 bool cmd_process::parse_data(char *ptr, int size)
@@ -87,16 +85,7 @@ bool cmd_process::process_data()
                 PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "Logger Level:%d ", (int)log_manage::get_instance()->get_level());
             }
             break;
-        case cmdSetLevel:
-            { 
-                uint8_t level = cmd_data_pointer_[0] - '0';
-                if (level > 5)
-                    level = 5;
-                log_manage::get_instance()->set_level((LOG_LEVEL)level);
-                PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "Set Logger Level:%d!", level);
-            }
-            break;
-        case CmdGetHelp:
+        case cmdGetHelp:
             {
                 for (auto &[x, y] : CmdHelpMapM)
                 {

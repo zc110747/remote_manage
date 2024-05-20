@@ -14,6 +14,6 @@
 
 - PROGRAM_DOWNLOAD=/home/program/download
 - APPLICATION_ROOTFS=${ENV_PATH_ROOT}/rootfs
-- PROGRAM_INSTALL=${PROGRAM_PATH}/install/arm
+- SUPPORT_ENV_INSTALL=${PROGRAM_PATH}/install/arm
 
 详细脚本见preThirdParts.sh.

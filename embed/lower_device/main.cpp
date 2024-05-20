@@ -6,7 +6,7 @@
 //      main.cpp
 //
 //  Purpose:
-//     支持将socket数据转换为
+//     串口转换为serial_net,
 //
 // Author:
 //     @听心跳的声音

@@ -3,7 +3,6 @@
 
 *.o
 *.d
-*.cmd
 *.mod.c
 *.mod.o
 *.mod
@@ -26,7 +25,6 @@ thirdparts/mosquitto/z*
 
 rootfs/home/sys/server/*
 rootfs/home/sys/webpage/*
-rootfs/home/sys/configs/*
 !rootfs/etc/*
 
 buildout/aarch64/

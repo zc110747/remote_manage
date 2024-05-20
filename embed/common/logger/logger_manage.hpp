@@ -36,18 +36,6 @@ typedef enum
     LOG_FATAL,
 }LOG_LEVEL;
 
-typedef enum
-{
-    LOG_PRINT = 0,
-    LOG_UPDATE = 1,
-}LOG_ACTION;
-
-typedef struct
-{
-    LOG_ACTION action;
-
-    LOG_LEVEL level;
-}CMD_LOG_INFO;
 
 class log_manage final
 {

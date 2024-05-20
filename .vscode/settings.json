@@ -118,7 +118,6 @@
         "**/Thumbs.db": true,
         "**/*.dtb":true,
         "**/*.tmp":true,
-        "**/*.cmd":true,
         "sdk/support/arm/kernel/arch/arm/boot/dts/[a-h]*":true,
         "sdk/support/arm/kernel/arch/arm/boot/dts/[j-z]*":true,
         "sdk/support/arm/kernel/arch/arm/boot/dts/imx[0-5]*":true,

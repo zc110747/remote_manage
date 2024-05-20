@@ -12,19 +12,32 @@ Vue.createApp({
             isShow:true,
             intervalId:null,
             deviceInfo:{
-                led:"off",
-                beep:"off",
-                ir:"0",
-                als:"0",
-                ps:"0",
-                gypox:"0",
-                gypoy:"0",
-                gypoz:"0",
-                accelx:"0",
-                accely:"0",
-                accelz:"0",
-                temp:"0",
-                angle:"0",
+                command: 1,
+                data: {
+                  angle: 0,
+                  ap: { als: 0, ir: 0, ps: 0 },
+                  beep: 0,
+                  hx711: 0,
+                  icm: {
+                    accel_x: 0,
+                    accel_y: 0,
+                    accel_z: 0,
+                    gyro_x: 0,
+                    gyro_y: 0,
+                    gyro_z: 0,
+                    temp_act: 0
+                  },
+                  led: 0,
+                  sysinfo: {
+                    cpu_info: '',
+                    disk_total: 0,
+                    disk_used: 0,
+                    kernel_info: '',
+                    ram_total: 0,
+                    ram_used: 0
+                  },
+                  vf610_adc: 0
+                }
             }
         }   
     },

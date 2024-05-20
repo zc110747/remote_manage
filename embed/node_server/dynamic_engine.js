@@ -4,8 +4,8 @@
 
 */
 const url = require('url');
-const sock_m = require('./socket_manage');
 const { stat } = require('fs');
+const mqtt_run = require('./mqtt_run')
 
 function device_set_process(query)
 {
@@ -39,11 +39,10 @@ function device_set_process(query)
         return false;
 
     let outStr = `!setdev ${dev_num},${dev_status}\n`;
-    if (sock_m.sock_send(outStr))
-        return true;
 
     return false;
 }
+
 function dynamic_engine_process(request, response)
 {
     let Query = url.parse(request.url);
@@ -61,8 +60,8 @@ function dynamic_engine_process(request, response)
                 response.end("ack " + (is_process_ok?"ok":"false"));
                 break;
             case 'axiosDeviceGet':
-                let devInfo = sock_m.device_info;
-                //console.log(devInfo);
+                let devInfo = mqtt_run.subscribe_info
+                console.log(devInfo)
                 response.end(JSON.stringify(devInfo))
                 break;
             default:

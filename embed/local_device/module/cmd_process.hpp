@@ -23,8 +23,7 @@ typedef enum
 {
     CmdReadDev = 0,
     CmdSetDev,
-    cmdSetLevel,
-    CmdGetHelp,
+    cmdGetHelp,
 }cmd_format_t;
 
 class cmd_process

@@ -21,13 +21,6 @@ _Pragma("once")
 #include "driver.hpp"
 #include "fifo_manage.hpp"
 
-#define DEVICE_LOOP_EVENT               0
-#define DEVICE_HW_SET_EVENT             1
-
-//process hardware chage
-#define DEVICE_LED                      0x00
-#define DEVICE_BEEP                     0x01
-
 class device_manage final
 {
 public:
@@ -73,6 +66,11 @@ private:
     /// - This method is used to process the hardware command.
     /// \param pEvent - the point of the event to process.
     void process_hardware(Event *pEvent);
+
+    /// \brief process_sync
+    /// - This method is used to process the sync command.
+    /// \param pEvent - the point of the event to process.
+    void process_sync(Event *pEvent);
 
 private:
     /// \brief instance_pointer_

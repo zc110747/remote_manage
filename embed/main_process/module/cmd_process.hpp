@@ -21,8 +21,9 @@ _Pragma("once")
 
 typedef enum
 {
-    cmdSetLevel,
-    CmdGetHelp,
+    cmdSetLevel = 0,
+    cmdSetDevice,
+    cmdGetHelp,
     cmdGetOS,
 }cmd_format_t;
 
@@ -64,6 +65,10 @@ private:
     /// \brief show_os
     /// - This method is show current os information.
     void show_os();
+
+    /// \brief sync_level
+    /// - This method is used to sync level.   
+    void sync_level(int dev, int level);
 
 private:
     /// \brief instance_pointer_

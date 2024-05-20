@@ -51,7 +51,7 @@ readonly underlineText="$(tput smul)"
 # Now define an global platforms for all the type support
 # Linux：used for PC software
 # Embed-Linux: used for Embed Software
-export FIRMWARE_SUPPORT_PLATFORMS="ARM AARCH64"
+export FIRMWARE_SUPPORT_PLATFORMS="ARM AtomPi WalnutPi"
 
 # Now define an array that contains the space-separated list defined above.
 declare -a supportedPlatforms=($FIRMWARE_SUPPORT_PLATFORMS)
@@ -63,50 +63,48 @@ declare -a supportedPlatforms=($FIRMWARE_SUPPORT_PLATFORMS)
 if [[ "${supportedPlatforms[0]}" == "${FIRMWARE_CURRENT_PLATFORMS}" ]]; then
     export ENV_ARCH=arm
 elif [[ "${supportedPlatforms[1]}" == "${FIRMWARE_CURRENT_PLATFORMS}" ]]; then
-    export ENV_ARCH=aarch64
+    export ENV_ARCH=atompi
+elif [[ "${supportedPlatforms[2]}" == "${FIRMWARE_CURRENT_PLATFORMS}" ]]; then
+    export ENV_ARCH=walnutpi
 else
     echo "${redText}error platform $FIRMWARE_CURRENT_PLATFORMS not exist in list of support${defText}"
     exit 1
 fi
 
-#定义SDK的工具包结构
-export PROGRAM_SDK_PLATFORM_PATH="${PROGRAM_SDK_PATH}/${ENV_ARCH}"
+#sdk基础目录
+export BUILD_NFS_PATH="${PROGRAM_SDK_PATH}"/nfs
+export BUILD_TFTP_PATH="${PROGRAM_SDK_PATH}"/tftp
+export PROGRAM_SDK_PLATFORM_PATH="${PROGRAM_SDK_PATH}"/"${ENV_ARCH}"
 
-#build目录
-export PROGRAM_BUILD="${PROGRAM_SDK_PLATFORM_PATH}"/build
-export BUILD_NFS_PATH="${PROGRAM_BUILD}"/nfs_root
-export BUILD_TFTP_PATH="${PROGRAM_BUILD}"/tftp_root
+#平台根目录:sdk/arm/
+export SUPPORT_ENV_BOOT_DIR="${PROGRAM_SDK_PLATFORM_PATH}"/u-boot
+export SUPPORT_ENV_KERNEL_DIR="${PROGRAM_SDK_PLATFORM_PATH}"/kernel
+export SUPPORT_ENV_ROOTFS_DIR="${PROGRAM_SDK_PLATFORM_PATH}"/rootfs
+export SUPPORT_ENV_INSTALL="${PROGRAM_SDK_PLATFORM_PATH}"/install
+export SUPPORT_ENV_PACKAGE="${PROGRAM_SDK_PLATFORM_PATH}"/package
 
-#img目录
-export PROGRAM_IMG="${PROGRAM_SDK_PLATFORM_PATH}"/img
+#二级rootfs目录:sdk/arm/rootfs
+export SUPPORT_FS_BUILDROOT_DIR="${SUPPORT_ENV_ROOTFS_DIR}"/buildroot
+export SUPPORT_FS_DEBAIN_DIR="${SUPPORT_ENV_ROOTFS_DIR}"/debain
+export SUPPORT_FS_UBUNTU_DIR="${SUPPORT_ENV_ROOTFS_DIR}"/ubuntu
+export PROGRAM_FS_IMG="${SUPPORT_ENV_ROOTFS_DIR}"/img
 
-#support目录
-export PROGRAM_SUPPORT="${PROGRAM_SDK_PLATFORM_PATH}"/support
-export SUPPORT_GCC_PATH="${PROGRAM_SUPPORT}"/compiler/bin
-export SUPPORT_ENV_KERNEL_DIR="${PROGRAM_SUPPORT}"/kernel
-export SUPPORT_ENV_BOOT_DIR="${PROGRAM_SUPPORT}"/uboot
-export SUPPORT_FS_BUILDROOT_DIR="${PROGRAM_SUPPORT}"/rs_buildroot
-export SUPPORT_FS_DEBAIN_DIR="${PROGRAM_SUPPORT}"/rs_debain
-export SUPPORT_FS_UBUNTU_DIR="${PROGRAM_SUPPORT}"/rs_ubuntu
-
-#install目录
-export PROGRAM_INSTALL="${PROGRAM_SDK_PLATFORM_PATH}"/install
+export SUPPORT_GCC_PATH="${PROGRAM_SDK_PLATFORM_PATH}"/toolchain/bin
 
 export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
 export PATH="${PATH}":"${SUPPORT_GCC_PATH}"
 
 if [[ "${supportedPlatforms[0]}" == "${FIRMWARE_CURRENT_PLATFORMS}" ]]; then
     export ENV_KERNAL_UBOOT=u-boot-imx6ull-14x14-ddr512-emmc.imx
-    export ENV_KERNEL_ZIMAGE="${SUPPORT_ENV_KERNEL_DIR}"/arch/arm/boot/zImage
-    export ENV_KERNEL_DTB="${SUPPORT_ENV_KERNEL_DIR}"/arch/arm/boot/dts/imx6ull-14x14-emmc-4.3-800x480-c.dtb
-    
     export APP_C_COMPILE=arm-none-linux-gnueabihf-gcc
     export APP_CC_COMPILE=arm-none-linux-gnueabihf-g++
     export APP_AR_COMPILE=arm-none-linux-gnueabihf-ar
 
     export APPLICATION_BUILDOUT="${ENV_PATH_ROOT}"/buildout/arm
-    export PLATFORM_LINUX_PATH="${ENV_PATH_ROOT}"/platform/linux-imx-lf-6.1.y-patch
-    export PLATFORM_UBOOT_PATH="${ENV_PATH_ROOT}"/platform/uboot-imx-lf_v2022.04-patch 
+    export PLATFORM_LINUX_PATH="${ENV_PATH_ROOT}"/platform/I.MX6ULL/linux-imx-lf-6.1.y-patch
+    export PLATFORM_UBOOT_PATH="${ENV_PATH_ROOT}"/platform/I.MX6ULL/uboot-imx-lf_v2022.04-patch
+    export PLATFORM_BUILDROOT_PATH="${ENV_PATH_ROOT}"/platform/I.MX6ULL/buildroot-2023.02.9-patch
+    export PLATFORM_INSTALL_SHELL="${ENV_PATH_ROOT}"/platform/I.MX6ULL/platform-shell
 
     export NEW_KERNEL_CC="${SUPPORT_GCC_PATH}"/arm-none-linux-gnueabihf-
     export GCC_LIB=$PROGRAM_SUPPORT/compiler/arm-none-linux-gnueabihf
@@ -114,10 +112,10 @@ else
     export APP_C_COMPILE=aarch64-none-linux-gnu-gcc
     export APP_CC_COMPILE=aarch64-none-linux-gnu-g++
     export APP_AR_COMPILE=aarch64-none-linux-gnu-ar
-    export APPLICATION_BUILDOUT=$ENV_PATH_ROOT/buildout/aarch64
+    export APPLICATION_BUILDOUT="${ENV_PATH_ROOT}"/buildout/aarch64
 
-    export NEW_KERNEL_CC=$SUPPORT_GCC_PATH/aarch64-none-linux-gnu-
-    export GCC_LIB=$PROGRAM_SUPPORT/compiler/arm-none-linux-gnueabihf
+    export NEW_KERNEL_CC="${SUPPORT_GCC_PATH}"/aarch64-none-linux-gnu-
+    export GCC_LIB="${PROGRAM_SUPPORT}"/compiler/arm-none-linux-gnueabihf
 fi
 
 #-------------------------------------------------------------------------------

@@ -30,6 +30,9 @@
 #include "common.hpp"
 #include "json_config.hpp"
 #include "logger_manage.hpp"
+#include "time_manage.hpp"
+
+#define DYNAMIC_CONFIG_PATH "/home/sys/configs/dynamic.json"
 
 system_config* system_config::instance_pointer_ = nullptr;
 system_config* system_config::get_instance()
@@ -85,6 +88,51 @@ bool system_config::check_configfile(const std::string &ipaddr)
     return is_check;
 }
 
+bool system_config::dynamic_init(const char* path)
+{
+    Json::Value root;
+    std::ifstream ifs;
+    
+    dynamic_path_.clear();
+    dynamic_path_.assign(path);
+    
+    ifs.open(path);
+    if(!ifs.is_open())
+    {
+        return false;
+    }
+
+    Json::CharReaderBuilder builder;
+    builder["collectComments"] = true;
+    JSONCPP_STRING errs;
+    if (!parseFromStream(builder, ifs, &root, &errs)) {
+        std::cout << errs << std::endl;
+        return false;
+    }
+
+    try
+    {
+        parameter_.logger_privilege.gui_manage_level = root["logger_privilege"]["gui_manage_level"].asInt();
+        parameter_.logger_privilege.local_device_level = root["logger_privilege"]["local_device_level"].asInt();
+        parameter_.logger_privilege.logger_device_level = root["logger_privilege"]["logger_device_level"].asInt();
+        parameter_.logger_privilege.lower_device_level = root["logger_privilege"]["lower_device_level"].asInt();
+        parameter_.logger_privilege.main_process_level = root["logger_privilege"]["main_process_level"].asInt();
+        parameter_.logger_privilege.node_server_level = root["logger_privilege"]["node_server_level"].asInt();
+
+        parameter_.logger_privilege.allow_no_passwd = root["logger_manage"]["allow_no_passwd"].asBool();
+        parameter_.logger_privilege.passwd = root["logger_manage"]["passwd"].asString();
+    }
+    catch(const std::exception& e)
+    {
+        ifs.close();
+        std::cerr << e.what() << '\n';
+        return false;
+    }
+
+    ifs.close();
+    return true;
+}
+
 [[nodiscard]]
 bool system_config::init(const char* path)
 {
@@ -126,6 +174,8 @@ bool system_config::init(const char* path)
         parameter_.local_device.icm_spi.dev         = root["local_device"]["icm_spi"]["dev"].asString();
         parameter_.local_device.ap_i2c.dev          = root["local_device"]["ap_i2c"]["dev"].asString();
         parameter_.local_device.rtc.dev             = root["local_device"]["rtc"]["dev"].asString();
+        parameter_.local_device.iio.vf610_adc_dev   = root["local_device"]["iio"]["vf610_adc"].asString();
+        parameter_.local_device.iio.hx711_dev   = root["local_device"]["iio"]["hx711_dev"].asString();
 
         //main process
         parameter_.main_process.download_path           = root["main_process"]["download_path"].asString();
@@ -143,19 +193,12 @@ bool system_config::init(const char* path)
         parameter_.node_sever.web_port              = root["node_sever"]["web_port"].asInt();
 
         parameter_.lower_device.logger_port         = root["lower_device"]["logger_port"].asInt();
+        parameter_.lower_device.remote_port         = root["lower_device"]["remote_port"].asInt();
         parameter_.lower_device.serial.baud         = root["lower_device"]["serial"]["baud"].asInt();
         parameter_.lower_device.serial.dataBits     = root["lower_device"]["serial"]["dataBits"].asInt();
         parameter_.lower_device.serial.stopBits     = root["lower_device"]["serial"]["stopBits"].asInt();
         parameter_.lower_device.serial.parity       = root["lower_device"]["serial"]["parity"].asString();
         parameter_.lower_device.serial.dev          = root["lower_device"]["serial"]["dev"].asString();
-        parameter_.lower_device.serial.net_port     = root["lower_device"]["serial"]["net_port"].asInt();
-
-        parameter_.logger_privilege.gui_manage_level = root["logger_privilege"]["gui_manage_level"].asInt();
-        parameter_.logger_privilege.local_device_level = root["logger_privilege"]["local_device_level"].asInt();
-        parameter_.logger_privilege.logger_device_level = root["logger_privilege"]["logger_device_level"].asInt();
-        parameter_.logger_privilege.lower_device_level = root["logger_privilege"]["lower_device_level"].asInt();
-        parameter_.logger_privilege.main_process_level = root["logger_privilege"]["main_process_level"].asInt();
-        parameter_.logger_privilege.node_server_level = root["logger_privilege"]["node_server_level"].asInt();
     }
     catch(const std::exception& e)
     {
@@ -166,6 +209,11 @@ bool system_config::init(const char* path)
     
     ifs.close();
 
+    if(dynamic_init(DYNAMIC_CONFIG_PATH) != true)
+    {
+        return false;
+    }
+    
     return check_configfile(parameter_.ipaddress);
 }
 
@@ -183,6 +231,8 @@ void system_config::default_init() noexcept
     parameter_.local_device.icm_spi.dev     = DEFAULT_ICMSPI_DEV;
     parameter_.local_device.ap_i2c.dev      = DEFAULT_API2C_DEV;
     parameter_.local_device.rtc.dev         = DEFAULT_RTC_DEV;
+    parameter_.local_device.iio.hx711_dev     = DEFAULT_HX711_DEV;
+    parameter_.local_device.iio.vf610_adc_dev = DEFAULT_VF610_DEV;
 
     parameter_.main_process.download_path   = DEFAULT_DOWNLOAD_PATH;
     parameter_.main_process.node_port       = DEFAULT_NODE_PORT;
@@ -198,6 +248,8 @@ void system_config::default_init() noexcept
 
     parameter_.node_sever.web_port          = DEFAULT_NODE_WEB_PORT;
 
+    parameter_.lower_device.logger_port = DEFAULT_LOWER_DEVICE_LOGGER_PORT;
+    parameter_.lower_device.remote_port = DEFAULT_LOWER_DEVICE_REMOTE_PORT;
     parameter_.lower_device.serial.baud     = DEFAULT_SERIAL_BAUD;
     parameter_.lower_device.serial.dataBits = DEFAULT_SERIAL_DATABITS;
     parameter_.lower_device.serial.stopBits = DEFAULT_SERIAL_STOPBITS;
@@ -210,9 +262,37 @@ void system_config::default_init() noexcept
     parameter_.logger_privilege.lower_device_level = DEFAULT_LOGGER_LEVEL;
     parameter_.logger_privilege.main_process_level = DEFAULT_LOGGER_LEVEL;
     parameter_.logger_privilege.node_server_level = DEFAULT_LOGGER_LEVEL;
+    parameter_.logger_privilege.passwd = DEFAULT_LOGGER_PASSWD;
+    parameter_.logger_privilege.allow_no_passwd = DEFAULT_ALLOW_NO_PASSWD;
 }
 
-void system_config::save_config_file()
+void system_config::save_dynamicfile()
+{
+    Json::Value root;
+
+    root["logger_privilege"]["gui_manage_level"] = parameter_.logger_privilege.gui_manage_level;
+    root["logger_privilege"]["local_device_level"] = parameter_.logger_privilege.local_device_level;
+    root["logger_privilege"]["logger_device_level"] = parameter_.logger_privilege.logger_device_level;
+    root["logger_privilege"]["lower_device_level"] = parameter_.logger_privilege.lower_device_level;
+    root["logger_privilege"]["main_process_level"] = parameter_.logger_privilege.main_process_level;
+    root["logger_privilege"]["node_server_level"] = parameter_.logger_privilege.node_server_level;
+    root["logger_manage"]["passwd"] = parameter_.logger_privilege.passwd;
+    root["logger_manage"]["allow_no_passwd"] = parameter_.logger_privilege.allow_no_passwd;
+
+    Json::StreamWriterBuilder swb;
+    std::shared_ptr<Json::StreamWriter> sw(swb.newStreamWriter());
+
+    std::stringstream str;
+    sw->write(root, &str);
+    auto s = str.str();
+    
+    std::ofstream fstr;
+    fstr.open(dynamic_path_.c_str(), std::ios::out);
+    fstr.write(s.c_str(), s.size());
+    fstr.close();   
+}
+
+void system_config::save_configfile()
 {
     Json::Value root;
 
@@ -244,19 +324,13 @@ void system_config::save_config_file()
         
     root["node_sever"]["web_port"]              = parameter_.node_sever.web_port;
 
-    root["lower_device"]["logger_port"]         = parameter_.lower_device.logger_port;   
+    root["lower_device"]["logger_port"]         = parameter_.lower_device.logger_port;
+    root["lower_device"]["remote_port"]         = parameter_.lower_device.remote_port; 
     root["lower_device"]["serial"]["baud"]      = parameter_.lower_device.serial.baud ;
     root["lower_device"]["serial"]["dataBits"]  = parameter_.lower_device.serial.dataBits;
     root["lower_device"]["serial"]["stopBits"]  = parameter_.lower_device.serial.stopBits;
     root["lower_device"]["serial"]["parity"]    = parameter_.lower_device.serial.parity;
     root["lower_device"]["serial"]["dev"]       = parameter_.lower_device.serial.dev;
-
-    root["logger_privilege"]["gui_manage_level"] = parameter_.logger_privilege.gui_manage_level;
-    root["logger_privilege"]["local_device_level"] = parameter_.logger_privilege.local_device_level;
-    root["logger_privilege"]["logger_device_level"] = parameter_.logger_privilege.logger_device_level;
-    root["logger_privilege"]["lower_device_level"] = parameter_.logger_privilege.lower_device_level;
-    root["logger_privilege"]["main_process_level"] = parameter_.logger_privilege.main_process_level;
-    root["logger_privilege"]["node_server_level"] = parameter_.logger_privilege.node_server_level;
 
     Json::StreamWriterBuilder swb;
     std::shared_ptr<Json::StreamWriter> sw(swb.newStreamWriter());
@@ -269,6 +343,70 @@ void system_config::save_config_file()
     fstr.open(file_path_.c_str(), std::ios::out);
     fstr.write(s.c_str(), s.size());
     fstr.close();
+}
+
+bool system_config::set_logger_level(int dev, int level)
+{
+    int ret = -1;
+
+    switch(dev)
+    {
+        case GUI_LOGGER_DEV:
+            ret = 0;
+            if(parameter_.logger_privilege.gui_manage_level != level)
+            {
+                ret = 1;
+                parameter_.logger_privilege.gui_manage_level = level;
+            }
+            break;
+        case LOCAL_LOGGER_DEV:
+            ret = 0;
+            if(parameter_.logger_privilege.local_device_level != level)
+            {
+                ret = 1;
+                parameter_.logger_privilege.local_device_level = level;
+            }
+            break;
+        case LOGGER_LOGGER_DEV:
+            ret = 0;
+            if(parameter_.logger_privilege.logger_device_level != level)
+            {
+                ret = 1;
+                parameter_.logger_privilege.logger_device_level = level;
+            }
+            break;
+        case LOWER_LOGGER_DEV:
+            ret = 0;
+            if(parameter_.logger_privilege.lower_device_level != level)
+            {
+                ret = 1;
+                parameter_.logger_privilege.lower_device_level = level;
+            }
+            break;
+        case MAIN_LOGGER_DEV:
+            ret = 0;
+            if(parameter_.logger_privilege.main_process_level != level)
+            {
+                ret = 1;
+                parameter_.logger_privilege.main_process_level = level;
+            }
+            break;
+        case NODE_LOGGGE_DEV:
+            ret = 0;
+            if(parameter_.logger_privilege.node_server_level != level)
+            {
+                ret = 1;
+                parameter_.logger_privilege.node_server_level = level;
+            }
+            break;
+    }
+
+    PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "set level:%d, %d, ret:%d", dev, level, ret);
+    if(ret == 1)
+    {
+        save_dynamicfile();
+    }
+    return ret;
 }
 
 std::ostream& operator<<(std::ostream& os, const system_config& config)
@@ -288,10 +426,12 @@ std::ostream& operator<<(std::ostream& os, const system_config& config)
     os<<"icm_spi:"<<config.get_icm_config().dev<<"\n";
     os<<"ap_i2c:"<<config.get_ap_config().dev<<"\n";
     os<<"rtc:"<<config.get_rtc_config().dev<<"\n";
+    os<<"hx711:"<<config.get_iio_config().hx711_dev<<"\n";
+    os<<"vf610:"<<config.get_iio_config().vf610_adc_dev<<"\n";
 
     os<<"------------------lower device info ------------------------------\n";
     os<<"logger port:"<<sys_parameter_->lower_device.logger_port<<"\n"; 
-    os<<"net port:"<<sys_parameter_->lower_device.serial.net_port<<"\n"; 
+    os<<"net port:"<<sys_parameter_->lower_device.remote_port<<"\n"; 
     os<<"baud:"<<sys_parameter_->lower_device.serial.baud<<"\n";
     os<<"dataBits:"<<sys_parameter_->lower_device.serial.dataBits<<"\n";
     os<<"stopBits:"<<sys_parameter_->lower_device.serial.stopBits<<"\n";

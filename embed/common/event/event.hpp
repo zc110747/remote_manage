@@ -75,6 +75,10 @@ template<int N>
 struct Buffer
 {
     uint8_t buffer[N];
+
+    int size{N};
+
+    uint8_t *get_buffer() { return buffer; }
 };
 
 using EventU8Message = EventExtend<uint8_t>;

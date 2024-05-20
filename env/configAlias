@@ -21,24 +21,27 @@ function save_global_config
 function set_platform
 {
     current_platform="ARM"
+
     if [ x"$1" != x ]; then
         case "$1" in
             "ARM")
                 current_platform="ARM"
             ;;
-            "AARCH64")
-                current_platform="AARCH64"
+            "AtomPi")
+                current_platform="AtomPi"
+            ;;
+            "WalnutPi")
+                current_platform="WalnutPi"
             ;;
         esac
 
         export FIRMWARE_CURRENT_PLATFORMS=$current_platform       
         save_global_config
-    else
-        echo "set platform must with parameter ${greenText}'ARM AARCH64'${defText}'"
     fi
 }
 alias SysSetPlatformARM='set_platform ARM'
-alias SysSetPlatformARM64='set_platform AARCH64'
+alias SysSetPlatformAtomPi='set_platform AtomPi'
+alias SysSetPlatformWanlutpi='set_platform WalnutPi'
 
 # SysSetRootfs
 # - set_rootfs

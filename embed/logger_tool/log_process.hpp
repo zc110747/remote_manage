@@ -58,6 +58,10 @@ private:
     /// - show help information.
     void show_help();
 
+    /// \brief login
+    /// - login process.
+    bool login(char *ptr, int size);
+
 private:
     /// \brief instance_pointer_
     /// - object used to implement the singleton pattern.
@@ -66,7 +70,7 @@ private:
     /// \brief logger_rx_thread_
     /// - logger rx thread object.
     std::thread logger_rx_thread_;
-
+    
     /// \brief logger_rx_fifo_
     /// - fifo used for logger rx and write to remote.
     std::unique_ptr<fifo_manage> logger_rx_fifo_{nullptr};
@@ -86,4 +90,8 @@ private:
     /// \brief logger_mp_tx_fifo_
     /// - fifo used for logger server rx and write to lower device.
     std::unique_ptr<fifo_manage> logger_mp_tx_fifo_{nullptr};
+
+    /// \brief is_login_
+    /// - for login information.
+    bool is_login_{false};
 };

@@ -1,6 +1,6 @@
 {
 	"local_ipaddress":"127.0.0.1",
-	"ipaddress":"192.168.3.99",
+	"ipaddress":"172.27.83.254",
 	"version" : "1.0.0.9",
 	"local_device" : {
 		"ap_i2c" : {
@@ -22,6 +22,10 @@
 		},
 		"rtc" : {
 			"dev" : "/dev/rtc0"
+		},
+		"iio" : {
+			"vf610_adc" : "/sys/bus/iio/devices/iio:device0/in_voltage4_raw",
+			"hx711_dev": "/sys/bus/iio/devices/iio:device1/in_voltage1_raw"
 		}
 	},
 	"main_process" :{
@@ -52,21 +56,13 @@
 	},
 	"lower_device" :{
 		"logger_port"	:15201,
+		"remote_port"  :15202,
 		"serial" : {
-			"net_port"  :15202,
 			"stopBits" 	:0,
 			"baud" 		:115200,
 			"dataBits" 	:8,
 			"parity" 	:"n",
 			"dev" 		:"/dev/ttyS3"
 		}
-	},
-	"logger_privilege": {
-		"gui_manage_level":2,
-		"local_device_level":2,
-		"logger_device_level":2,
-		"lower_device_level":2,
-		"main_process_level":2,
-		"node_server_level":2
 	}
 }
