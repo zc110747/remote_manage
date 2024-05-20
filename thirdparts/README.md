@@ -13,8 +13,7 @@
 在交叉编译前，系统已经创建以下变量如下。
 
 - PROGRAM_DOWNLOAD=/home/program/download
-- APP_ROOTFS=${ENV_PATH_ROOT}/rootfs
-- APP_ROOTFS_LIB=${APP_ROOTFS}/lib
-- GLOBAL_INTALL=${PROGRAM_PATH}/install/arm
+- APPLICATION_ROOTFS=${ENV_PATH_ROOT}/rootfs
+- SUPPORT_ENV_INSTALL=${PROGRAM_PATH}/install/arm
 
 详细脚本见preThirdParts.sh.

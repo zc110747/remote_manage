@@ -21,8 +21,9 @@ _Pragma("once")
 
 typedef enum
 {
-    cmdSetLevel,
-    CmdGetHelp,
+    cmdSetLevel = 0,
+    cmdSetDevice,
+    cmdGetHelp,
     cmdGetOS,
 }cmd_format_t;
 
@@ -35,12 +36,12 @@ public:
 
     /// - destructor, delete not allow for singleton pattern.
     virtual ~cmd_process() = delete;
-    
+
     /// \brief get_instance
     /// - This method is used to get the pattern of the class.
     /// \return the singleton pattern point of the object.
     static cmd_process* get_instance();
-    
+
     /// \brief init
     /// - This method is used to init the object.
     /// \return Wheather initialization is success or failed.
@@ -65,6 +66,10 @@ private:
     /// - This method is show current os information.
     void show_os();
 
+    /// \brief sync_level
+    /// - This method is used to sync level.   
+    void sync_level(int dev, int level);
+
 private:
     /// \brief instance_pointer_
     /// - object used to implement the singleton pattern.
@@ -85,9 +90,9 @@ private:
     /// \brief cmd_data_pointer_
     /// - memory point the start to data area for received.
     char *cmd_data_pointer_;
-    
+
     /// \brief cmd_process_thread_
-    /// - cmd process thread object. 
+    /// - cmd process thread object.
     std::thread cmd_process_thread_;
 
     /// \brief logger_main_process_tx_fifo_

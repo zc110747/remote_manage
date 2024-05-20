@@ -43,7 +43,9 @@ bool driver_manage::init()
     ret &= ap3216_dev_.init(pConfig->get_ap_config().dev, O_RDONLY | O_NONBLOCK);
     ret &= icm20608_dev_.init(pConfig->get_icm_config().dev, O_RDONLY | O_NONBLOCK);
     ret &= rtc_dev_.init(pConfig->get_rtc_config().dev,  O_RDONLY | O_NONBLOCK);
-    ret &= key_zero_.init(pConfig->get_key_config().dev, O_RDWR | O_NONBLOCK);
+    ret &= key_zero_.init(pConfig->get_key_config().dev, O_RDWR);
+    ret &= hx711_dev_.init(pConfig->get_iio_config().hx711_dev);
+    ret &= vf610_adc_dev_.init(pConfig->get_iio_config().vf610_adc_dev);
 
     if (ret)
     {

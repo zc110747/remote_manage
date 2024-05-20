@@ -1,6 +1,25 @@
 
 # 开发计划
 
+## FM Version 1.0.0.10
+
+[paltform]
+
+1. 平台结构更新，优化命令和执行脚本
+2. platform内代码更新，增加qemu支持
+
+[mod]
+
+1. 驱动内接口更新，基于devm管理和container_of实现
+2. 增加基于杂项设备接口实现的beep驱动
+3. 增加基于I/O模拟的hx117驱动
+4. 增加rtc和adc驱动
+
+[embed]
+
+1. 配置增加logger权限记录，调试打印增加相应处理
+2. 统一权限处理接口，引入到系统中
+
 ## FM Version 1.0.0.9
 
 [paltform]
@@ -13,7 +32,7 @@
 [embed]
 
 1. "logger_tool":扩展支持 !`module` `command` `info`的命令格式，进行输入操作，其它模块同步更新
-2. "main_process":扩展增加mqtt的支持
+2. "main_process":扩展增加mqtt的支持。
 
 [mod]
 

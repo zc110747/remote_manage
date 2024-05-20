@@ -18,7 +18,7 @@
 /////////////////////////////////////////////////////////////////////////////
 #include "logger_manage.hpp"
 #include "time_manage.hpp"
-#include "jsonconfig.hpp"
+#include "json_config.hpp"
 #include "asio_server.hpp"
 
 #define FMT_HEADER_ONLY
@@ -93,34 +93,20 @@ static char logger_tx_buffer[LOGGER_MAX_BUFFER_SIZE];
 int log_manage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...)
 {
     int len;
-    char *pbuf;
+    char *pbuf = logger_tx_buffer;
     int tx_len = 0;
     int bufferlen = LOGGER_MAX_BUFFER_SIZE;
 
     if (level < log_level_)
-        return 0;
-
-    mutex_.lock();
-
-    //step1: add logger info header
-    pbuf = logger_tx_buffer;
-    len = snprintf(pbuf, bufferlen, "[%s][%s][%d]:", convert_timer(time).c_str(), TOOLS_NAME, level);
-    if ((len<=0) || (len>=bufferlen))
     {
-        PRINT_NOW("%s: %s not support buffer-0!\n", PRINT_NOW_HEAD_STR, __func__);
-        mutex_.unlock();
+        //PRINT_NOW("%s: %s not support buffer-0!\n", PRINT_NOW_HEAD_STR, __func__);
         return 0;
     }
-    pbuf = &pbuf[len];
-    bufferlen -= len;
-    tx_len += len;
 
-    //step2: add logger info
-    va_list valist;
-    va_start(valist, fmt);
-    len = vsnprintf(pbuf, bufferlen, fmt, valist);
-    va_end(valist);
-
+    mutex_.lock();
+    
+    //add logger header
+    len = snprintf(pbuf, bufferlen, "[%s][%s][%d]:", convert_timer(time).c_str(), TOOLS_NAME, level);
     if ((len<=0) || (len>=bufferlen))
     {
         PRINT_NOW("%s: %s not support buffer-1!\n", PRINT_NOW_HEAD_STR, __func__);
@@ -130,19 +116,35 @@ int log_manage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...)
     pbuf = &pbuf[len];
     bufferlen -= len;
     tx_len += len;
-    mutex_.unlock();
 
-    //step3: add logger tail \r\n
-    if (bufferlen < 3)
+    //add logger info
+    va_list valist;
+    va_start(valist, fmt);
+    len = vsnprintf(pbuf, bufferlen, fmt, valist);
+    va_end(valist);
+
+    if ((len<=0) || (len>=bufferlen))
     {
         PRINT_NOW("%s: %s not support buffer-2!\n", PRINT_NOW_HEAD_STR, __func__);
+        mutex_.unlock();
+        return 0;
+    }
+    pbuf = &pbuf[len];
+    bufferlen -= len;
+    tx_len += len;
+    mutex_.unlock();
+
+    //add logger tail \r\n
+    if (bufferlen < 3)
+    {
+        PRINT_NOW("%s: %s not support buffer-3!\n", PRINT_NOW_HEAD_STR, __func__);
         return 0;
     }
     pbuf[0] = '\r';
     pbuf[1] = '\n';
     tx_len += 2;
 
-    //step4:send the logger info.
+    //send the logger info.
     if (!logger_fifo_->is_write_valid())
     {
         len = write(STDOUT_FILENO, logger_tx_buffer, tx_len);
@@ -153,7 +155,7 @@ int log_manage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...)
         len = logger_fifo_->write(logger_tx_buffer, tx_len);
         if (len<=0)
         {
-            PRINT_NOW("%s:%s not support buffer-3!\n", PRINT_NOW_HEAD_STR, __func__);
+            PRINT_NOW("%s:%s not support buffer-4!\n", PRINT_NOW_HEAD_STR, __func__);
         }
     }
 

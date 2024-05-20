@@ -45,7 +45,7 @@ void icm_device::calculate_angle(void)
     AngleIndex++;
     if (AngleIndex == ANGLE_LIST_SIZE)
         AngleIndex = 0;
-    
+
     sumx = 0;
     min = 0x3fff;
     max = -0x3fff;
@@ -55,7 +55,7 @@ void icm_device::calculate_angle(void)
         sumx += AngleList[i];
         if (AngleList[i] >= max)
             max = AngleList[i];
-        
+
         if (AngleList[i] <= min)
             min = AngleList[i];
     }

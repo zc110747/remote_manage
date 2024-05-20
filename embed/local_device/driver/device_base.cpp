@@ -28,12 +28,6 @@ device_base::device_base()
     device_fd_ = -1;
 }
 
-device_base::device_base(const string &DevicePath)
-{
-    device_path_ = DevicePath;
-    device_fd_ = -1;
-}
-
 device_base::~device_base()
 {
     device_path_.clear();
@@ -61,7 +55,7 @@ bool device_base::init(const std::string &DevicePath, int flags)
 
 void device_base::close()
 {
-    if (device_fd_ != 1)
+    if (device_fd_ != -1)
     {
         device_fd_ = -1;
         ::close(device_fd_);

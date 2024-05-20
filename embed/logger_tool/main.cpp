@@ -130,6 +130,8 @@ static bool system_init(int is_default, const char* path)
     {
         system_config::get_instance()->default_init();
     }
+    LOG_LEVEL level = (LOG_LEVEL)system_config::get_instance()->get_logger_privilege().logger_device_level;
+    log_manage::get_instance()->set_level(level);
 
     ret &= time_manage::get_instance()->init();
     ret &= log_process::get_instance()->init();

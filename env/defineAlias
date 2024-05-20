@@ -1,79 +1,56 @@
+#!/bin/bash
+# shellcheck disable=SC2154
+
 ################################################################################
 # This file is used to define global command, no need update the file unless 
 # want to extend the global command.
 #
 ################################################################################
 
-echo "Update the Alias Command..."
-
-#-------------------------------------------------------------------------------
-# This section defines the alias of the command.
-# The command abbreviation for use.
-#-------------------------------------------------------------------------------
-alias ll="ls -alF"
-alias pe="printenv"
-alias se="saveenv"
-
-alias cda="cd ${ENV_PATH_ROOT}"
-alias cdb="cd ${ENV_PATH_ROOT/buildout}"
-alias cdd="cd ${PROGRAM_DOWNLOAD}"
-alias cde="cd ${ENV_PATH_ROOT/embed}"
-alias cdk="cd ${ENV_KERNEL_DIR}"
-alias cdn="cd ${NFS_PATH}"
-alias cdt="cd ${TFTP_PATH}"
-alias cdr="cd ${ENV_ROOTFS_DIR}"
-alias cdu="cd ${ENV_BOOT_DIR}"
-alias cdi="cd ${GLOBAL_INTALL}"
-
+echo "Config global alias defined..."
 #-------------------------------------------------------------------------------
 # This section defines the function for program management.
 # The Extend Command for program compiler, package, push.
 #-------------------------------------------------------------------------------
-exit_if_last_error() {
+exit_if_last_error() 
+{
     if [[ $? -ne 0 ]]; then
-		read -p "shell faild, wheather exit?(y/n, default is y)" exit_val
+		read -r -p "shell faild, wheather exit?(y/n, default is y)" exit_val
 
-		if [ -z ${exit_val} ] || [ ${exit_val} == 'y' ]; then
+		if [ -z "${exit_val}" ] || [ "${exit_val}" == 'y' ]; then
         	exit 1
 		fi
     fi
 }
-alias exit_if_last_error='exit_if_last_error'
+alias exit_if_last_error="exit_if_last_error"
 
-############################################################
-# mount_chroot
-# function: mount for chroot.
-#############################################################
+source "${ENV_PATH_ENVIRONMENT}"/jumpAlias
+
+# chroot manage
 mount_chroot()
 {
-	sudo chmod -Rv 777 ${NFS_PATH}/bin/
-    sudo mount -t proc chproc ${NFS_PATH}/proc
-    sudo mount -t sysfs chsys ${NFS_PATH}/sys
-    sudo mount -t devtmpfs chdev ${NFS_PATH}/dev || sudo mount --bind /dev ${NFS_PATH}/dev
-    sudo mount -t devpts chpts ${NFS_PATH}/dev/pts
+    sudo mount -t proc chproc "${BUILD_NFS_PATH}"/proc
+    sudo mount -t sysfs chsys "${BUILD_NFS_PATH}"/sys
+    sudo mount -t devtmpfs chdev "${BUILD_NFS_PATH}"/dev || sudo mount --bind /dev "${BUILD_NFS_PATH}"/dev
+    sudo mount -t devpts chpts "${BUILD_NFS_PATH}"/dev/pts
 }
 
 umount_chroot()
 {
-    while grep -Eq "${NFS_PATH}.*(dev|proc|sys)" /proc/mounts
+    while grep -Eq "${BUILD_NFS_PATH}.*(dev|proc|sys)" /proc/mounts
     do
-        sudo umount -l --recursive ${NFS_PATH}/dev >/dev/null 2>&1
-        sudo umount -l ${NFS_PATH}/proc >/dev/null 2>&1
-        sudo umount -l ${NFS_PATH}/sys >/dev/null 2>&1
+        sudo umount -l --recursive "${BUILD_NFS_PATH}"/dev >/dev/null 2>&1
+        sudo umount -l "${BUILD_NFS_PATH}"/proc >/dev/null 2>&1
+        sudo umount -l "${BUILD_NFS_PATH}"/sys >/dev/null 2>&1
         sleep 5
     done
 }
-alias umount_chroot='umount_chroot'
 
-############################################################
-# enter_chroot
-# function: enter the chroot for arm.
-#############################################################
 enter_chroot()
 {
-	cd ${NFS_PATH}/
+	cd "${BUILD_NFS_PATH}"/ || return
 
-	SysMountRootfs
+	mount_rootfs
 	
 	#exit the chroot
 	umount_chroot
@@ -81,431 +58,87 @@ enter_chroot()
 	#enter chroot
 	mount_chroot
 
-	if [ -f ${NFS_PATH}/bin/bash ]; then
-		LC_ALL=C LANGUAGE=C LANG=C sudo chroot ${NFS_PATH} chown root:root /usr/bin/sudo
-		LC_ALL=C LANGUAGE=C LANG=C sudo chroot ${NFS_PATH} chmod u+s /usr/bin/sudo
-		LC_ALL=C LANGUAGE=C LANG=C sudo chroot ${NFS_PATH}
+	if [ -f "${BUILD_NFS_PATH}"/bin/bash ]; then
+		LC_ALL=C LANGUAGE=C LANG=C sudo chroot "${BUILD_NFS_PATH}" chown root:root /usr/bin/sudo
+		LC_ALL=C LANGUAGE=C LANG=C sudo chroot "${BUILD_NFS_PATH}" chmod u+s /usr/bin/sudo
+		LC_ALL=C LANGUAGE=C LANG=C sudo chroot "${BUILD_NFS_PATH}"
 	else
-		LC_ALL=C LANGUAGE=C LANG=C sudo chroot ${NFS_PATH} /bin/sh
+		LC_ALL=C LANGUAGE=C LANG=C sudo chroot "${BUILD_NFS_PATH}" /bin/sh
 	fi	
 }
-alias enter_chroot='enter_chroot'
+alias SysEnterChroot='enter_chroot'
 
-############################################################
-# SysTarFirmwareSource
-# function: tar the source
-#############################################################
-function SysTarFirmwareSource
+exit_chroot()
 {
-	cd ${ENV_PATH_ROOT}/../
+	umount_chroot
 
-	tar --exclude='remote_manage/.git' --exclude='remote_manage/rootfs' --exclude='remote_manage/thirdparts' -vcjf remote_manage.tar.bz2 remote_manage/
-
-	exit_if_last_error
-
-	echo "move to ${DST_PATH}"
-	mv remote_manage.tar.bz2 ${DST_PATH}/
-}	
-alias SysTarFirmwareSource='SysTarFirmwareSource'
-
-############################################################
-#SysPreThirdParts
-#function: perpare for third parts install
-#############################################################
-function SysPreThirdParts()
-{
-	echo "------start pull thirdparts libary------"
-
-	cd ${ENV_PATH_ROOT}/thirdparts/
-
-	if [ ! -d ${NFS_PATH}/bin ]; then
-		sudo chmod 777 preRootfs.sh
-		./preRootfs.sh
-	fi
-
-	#set shell run
-	sudo chmod 777 preThirdParts.sh
-	
-	./preThirdParts.sh
+	umount_rootfs
 }
-alias SysPreThirdParts='SysPreThirdParts'
+alias SysExitChroot='exit_chroot'
 
-############################################################
-#SysMountRootfs
-#function: mount rootfs
-#############################################################
-function SysCreateRootfsImg()
+# mount manage
+function create_roofts_img()
 {
-	rootfs_ver=${ENV_ARCH}-debain.img
+	rootfs_ver=debain.img
 	rootfs_size=1024
 	case "$ROOTFS_RUN" in
-		"busybox")
-			rootfs_ver=${ENV_ARCH}-busybox.img
-		;;
 		"buildroot")
-			rootfs_ver=${ENV_ARCH}-buildroot.img
+			rootfs_ver=buildroot.img
 		;;
 		"debain")
-			rootfs_ver=${ENV_ARCH}-debain.img
+			rootfs_ver=debain.img
+			rootfs_size=4096
+		;;
+		"ubuntu")
+			rootfs_ver=ubuntu.img
 			rootfs_size=4096
 		;;
 	esac
 	export ROOTFS_VER=$rootfs_ver
 
-	if [ ! -f ${PROGRAM_IMG}/${ROOTFS_VER} ]; then
-		cd ${PROGRAM_IMG}
-		dd if=/dev/zero of=${ROOTFS_VER} bs=1M count=$rootfs_size
-		mkfs.ext4 ${ROOTFS_VER}
+	if [ ! -f "${SUPPORT_ENV_PACKAGE}/${ROOTFS_VER}" ]; then
+		cd "${SUPPORT_ENV_PACKAGE}"/ || return
+		dd if=/dev/zero of="${ROOTFS_VER}" bs=1M count="${rootfs_size}"
+		mkfs.ext4 "${ROOTFS_VER}"
 	fi
 }
 
-function SysMountRootfs()
+function mount_rootfs()
 {
-	SysCreateRootfsImg
-	
-	cda 
-
 	umount_chroot
 
-	mstate=$(mount | grep ${NFS_PATH})
+	create_roofts_img
 
-	if [ -n "$mstate" ]; then
-		sudo umount ${NFS_PATH}/
+	mstate=$(mount | grep "${BUILD_NFS_PATH}")
+
+	if [ -n "${mstate}" ]; then
+		sudo umount -l "${BUILD_NFS_PATH}"/
 	fi
 
-	sudo mount -o loop ${PROGRAM_IMG}/${ROOTFS_VER} ${NFS_PATH}/
+	sudo mount -o loop "${SUPPORT_ENV_PACKAGE}/${ROOTFS_VER}" "${BUILD_NFS_PATH}"/
 
 	cdn
 }
-alias SysMountRootfs='SysMountRootfs'
+alias SysMountRootfs='mount_rootfs'
 
-############################################################
-#SysBuildApplication
-#function: build application and install
-#############################################################
-function build_driver_module()
+function umount_rootfs()
 {
-	cd $ENV_PATH_ROOT
-	if [ -f "$ENV_KERNEL_DIR/.config" ]; then
-		echo "start bulid kernal driver"
-		cd $ENV_PATH_KERNAL_MOD/
-		
-		#执行全部的make_modules
-		make
-	else
-		echo "without compiled linux kernal, not build kernal module"
-	fi
+	cda 
+	
+	sudo umount -l "${BUILD_NFS_PATH}"/
 }
-alias test_build_driver_module='build_driver_module'
+alias SysUmountRootfs='umount_rootfs'
 
-#build Application
-function SysBuildApplication()
+function run_qemu()
 {
-	#check wheather library support
-	if [ ! -f ${GLOBAL_INTALL}/lib/libssl.a ] || [ ! -d ${APPLICATION_THIRDPARTS}/asio ]; then
-		echo "support library for application not exist, run command"
-		echo "  ${redText}SysPreThirdParts${defText}"
-		echo "  ${redText}SysBuildRootfs${defText}"
-		echo "install."
-		return -1
-	fi
-
-	#check wheather build driver
-	if [ "${FIRMWARE_CURRENT_PLATFORMS}" == "ARM" ]; then
-		build_driver_module
-	else
-		echo "driver only support for i.mx6ull, not build!".
-	fi
-	echo "kernal dir:${ENV_KERNEL_DIR}"
-	echo "firmware path:${ENV_PATH_ROOT}"
-
-	#copy config file
-	cd $ENV_PATH_ROOT
-	cp config.template.json ${NFS_PATH}/home/sys/configs/config.json
-
-	#build executable
-	cd ${APPLICATION_EMBED}/
-	make -j${CPU_CORE}
-	exit_if_last_error
-		
-	#package node sever
-	cd ${APPLICATION_EMBED}/
-	cp -rv node_server/* ${NFS_PATH}/home/sys/server/
-
-	cda
+	cd "${PLATFORM_INSTALL_SHELL}"/ || return
+	
+	chmod 777 qemu-nogui.sh && ./qemu-nogui.sh
 }
-alias SysBuildApplication='SysBuildApplication'
+alias SysRunQemu='run_qemu'
 
-############################################################
-#SysSetPlatformARM/SysSetPlatformAARCH64
-#function: update the platform
-#############################################################
-function SysUpdateConfig
-{
-	truncate -s 0 $ENV_CONFIG_FILE
-	echo "$FIRMWARE_CURRENT_PLATFORMS">$ENV_CONFIG_FILE
-	echo "$FMWARE_VESRION">>$ENV_CONFIG_FILE
-	echo "$ROOTFS_RUN">>$ENV_CONFIG_FILE
-	exec bash
-}
-
-function SysSetPlatform
-{
-    if [ x$1 != x ]; then
-        
-        current_platform="ARM"
-        case "$1" in
-            "ARM")
-                current_platform="ARM"
-            ;;
-            "AARCH64")
-                current_platform="AARCH64"
-            ;;
-        esac
-
-        export FIRMWARE_CURRENT_PLATFORMS=$current_platform       
-        SysUpdateConfig
-    else
-        echo "set platform must with parameter ${greenText}'ARM AARCH64'${defText}'"
-    fi
-}
-alias SysSetPlatform='SysSetPlatform'
-
-function SysSetRootfs
-{
-    if [ x$1 != x ]; then
-        
-        current_rootfs="debain"
-        case "$1" in
-            "busybox")
-                current_rootfs="busybox"
-            ;;
-			"buildroot")
-                current_rootfs="buildroot"
-            ;;
-            "debain")
-                current_rootfs="debain"
-            ;;
-        esac
-
-        export ROOTFS_RUN=$current_rootfs       
-        SysUpdateConfig
-    else
-        echo "set rootfs must with parameter ${greenText}'busybox buildroot debain'${defText}'"
-    fi
-}
-alias SysSetRootfs='SysSetRootfs'
-
-############################################################
-#SysBuildKernel/SysCleanKernel
-#function: build and clean the kernel
-#############################################################
-function SysBuildKernel
-{
-	#check wheather build driver
-	if [ "${FIRMWARE_CURRENT_PLATFORMS}" == "AARCH64" ]; then
-		echo "for AARCH64 only support application, kernel command invalid!".
-		return 0
-	fi
-
-	if [ -d $ENV_KERNEL_DIR ]; then
-		cd $ENV_KERNEL_DIR
-
-		echo "compiler:$NEW_KERNEL_CC"
-		make imx_rmk_v7_defconfig ARCH=arm CROSS_COMPILE=$NEW_KERNEL_CC
-		make V=1 ARCH=arm CROSS_COMPILE=$NEW_KERNEL_CC all -j4
-
-		if [ -f $ENV_KERNEL_ZIMAGE ]; then
-			cp -avf $ENV_KERNEL_ZIMAGE $TFTP_PATH/
-			cp -avf $ENV_KERNEL_DTB $TFTP_PATH/
-		else
-			echo "${redText}Linux Kernel build failed, please check!${defText}"
-		fi
-	else
-		echo "Kernal Directory:$ENV_KERNEL_DIR not exist!"
-	fi
-}
-alias SysBuildKernel='SysBuildKernel'
-
-function SysCleanKernel
-{
-	#check wheather build driver
-	if [ "${FIRMWARE_CURRENT_PLATFORMS}" == "AARCH64" ]; then
-		echo "for AARCH64 only support application, kernel command invalid!".
-		return 0
-	fi
-
-	if [ -d $ENV_KERNEL_DIR ]; then
-		cd $ENV_KERNEL_DIR
-		make distclean
-	else
-		echo "Kernal Directory:$ENV_KERNEL_DIR not exist!"
-	fi
-}
-alias SysCleanKernel='SysCleanKernel'
-
-############################################################
-#SysBuildUboot/SysCleanUboot
-#function: build and clean the uboot
-#############################################################
-function SysBuildUboot
-{
-	uboot_file="u-boot.imx"
-
-	#check wheather build driver
-	if [ "${FIRMWARE_CURRENT_PLATFORMS}" == "AARCH64" ]; then
-		echo "for AARCH64 only support application, uboot command invalid!".
-		return 0
-	fi
-
-	if [ -d $ENV_BOOT_DIR ]; then
-		cd $ENV_BOOT_DIR
-		echo "compiler:$NEW_KERNEL_CC"
-		make mx6ull_14x14_rmk_emmc_defconfig
-		make V=1 ARCH=arm CROSS_COMPILE=$NEW_KERNEL_CC all -j6
-
-		if [ -f u-boot-dtb.imx ]; then
-			uboot_file="u-boot-dtb.imx"
-		fi
-
-		cp -avf ${uboot_file} $TFTP_PATH/
-	else
-		echo "uboot directory:$ENV_BOOT_DIR not exist!"
-	fi
-}
-alias SysBuildUboot='SysBuildUboot'
-
-function SysCleanUboot
-{
-	#check wheather build driver
-	if [ "${FIRMWARE_CURRENT_PLATFORMS}" == "AARCH64" ]; then
-		echo "for AARCH64 only support application, uboot command invalid!".
-		return 0
-	fi
-
-	if [ -d $ENV_BOOT_DIR ]; then
-		cd $ENV_BOOT_DIR
-		make distclean
-	else
-		echo "uboot directory:$ENV_BOOT_DIR not exist!"
-	fi
-}
-alias SysCleanUboot='SysCleanUboot'
-
-############################################################
-#SysBuildRootfs/SysCleanRootfs
-#function: build and clean the kernel
-#############################################################
-function SysBuildRootfs
-{
-    echo "build or create rootfs:$ROOTFS_RUN"
-
-    if [ $ROOTFS_RUN == "busybox" ]; then
-
-        cd $ENV_ROOTFS_DIR/
-        make -j4 && make install
-
-		cd ${NFS_PATH}/
-		sudo mkdir -m 755 dev etc lib proc root sys tmp run
-
-        #copy rootfs to the next directory
-        sudo chmod -Rv 755 ${ENV_PATH_ROOT}/rootfs/etc
-        sudo cp -ravf ${ENV_PATH_ROOT}/rootfs/* ${NFS_PATH}/
-        sudo cp -ravf ${ENV_ROOTFS_DIR}/_install/* $NFS_PATH/
-
-        #copy C/C++ library
-        echo "copy c++ library"
-        cd $GCC_LIB/lib
-        sudo cp -ravf *so* $NFS_PATH/lib/
-
-        echo "copy c library"
-        cd $GCC_LIB/libc/lib
-        sudo cp -ravf *so* $NFS_PATH/lib/
-    elif [ $ROOTFS_RUN == "buildroot" ]; then
-        #copy rootfs to the next directory
-        sudo chmod -Rv 755 ${ENV_PATH_ROOT}/rootfs/ 
-    else
-        #copy rootfs to the next directory
-        sudo chmod -Rv 755 ${ENV_PATH_ROOT}/rootfs/
-        sudo cp -ravf ${ENV_PATH_ROOT}/rootfs/home/* ${NFS_PATH}/home/
-		sudo cp -ravf ${ENV_PATH_ROOT}/rootfs/etc/mosquitto/ ${NFS_PATH}/etc/
-        sudo cp -ravf ${ENV_PATH_ROOT}/rootfs/root/.bashrc ${NFS_PATH}/root/
-    fi
-}
-alias SysBuildRootfs='SysBuildRootfs'
-
-function SysCleanRootfs
-{
-	#check wheather build driver
-	if [ "${FIRMWARE_CURRENT_PLATFORMS}" == "AARCH64" ]; then
-		echo "for AARCH64 only support application, rootfs command invalid!".
-		return 0
-	fi
-
-	if [ -d $ENV_ROOTFS_DIR ]; then
-		cd $ENV_ROOTFS_DIR
-		make clean
-	else
-		echo "rootfs directory:$ENV_ROOTFS_DIR not exist!"
-	fi
-}
-alias SysCleanRootfs='SysCleanRootfs'
-
-############################################################
-#SysSetApplicationVer
-#function: set the application version.
-#############################################################
-function SysSetApplicationVer
-{
-	if [ $# -eq 1 ]; then
-		export FMWARE_VESRION=$1
-		echo "Set Firmware Version is $1"
-		SysUpdateConfig
-	else
-		echo "one parameter about firmware version need!"
-	fi
-}
-alias SysSetApplicationVer='SysSetApplicationVer'
-
-############################################################
-#SysPackageFirmware
-#function: package firmware command
-#############################################################
-#打包内核 firmware包，文件系统到$DST_PATH，对于新的工程环境，命令执行流程
-#SysCleanUboot
-#SysBuildUboot
-#SysCleanKernel
-#SysCleanRootfs
-#SysBuildRootfs
-#SysSetApplicationVer [version]
-#SysBuildApplication
-#SysPackageFirmware
-function SysPackageFirmware
-{
-	if [ -d $TFTP_PATH ]; then
-
-		if [ ! -d $DST_PATH ]; then
-			mkdir $DST_PATH 
-		fi
-
-		cd $TFTP_PATH
-		cp -rvf * $DST_PATH/
-		
-		cd $DST_PATH/
-		mv u-boot-dtb.imx $ENV_KERNAL_UBOOT
-	fi
-
-	if [ -d $NFS_PATH ]; then
-		cd $NFS_PATH
-		rm -rf rootfs.tar.bz2 
-		tar -vcjf rootfs.tar.bz2 *
-		mv rootfs.tar.bz2 $DST_PATH/
-	fi
-
-	echo "PackFirmware Success, you can find firmware in directory:"
-	echo "$DST_PATH/"
-}
-alias SysPackageFirmware='SysPackageFirmware'
+source "${ENV_PATH_ENVIRONMENT}"/buildAlias
+source "${ENV_PATH_ENVIRONMENT}"/configAlias
 
 ############################################################
 #SysHelpCommand
@@ -526,21 +159,14 @@ function SysHelpCommand
 	echo "    ${limityellowText}Clean the app firmware for next."
 	echo "${blueText}SysBuildKernel${defText}"
 	echo "    ${limityellowText}Build the linux kernal, copy to tftp directory, if failed, execute SysCleanKernel first."
-	echo "${blueText}SysCleanKernel${defText}"
-	echo "    ${limityellowText}Clean the kernal compiler data for next."
 	echo "${blueText}SysBuildUboot${defText}"
 	echo "    ${limityellowText}Build the uboot, copy to tftp directory, if failed, execute SysCleanUboot first."
-	echo "${blueText}SysCleanUboot${defText}"
-	echo "    ${limityellowText}Clean the uboot compiler data for next."
 	echo "${blueText}SysBuildRootfs${defText}"
 	echo "    ${limityellowText}build the rootfs, copy to nfs directory, if failed, execut SysCleanRootfs first."
-	echo "${blueText}SysCleanRootfs${defText}"
-	echo "    ${limityellowText}Clean the rootfs compiler data for next."
 	echo "${blueText}SysPackageFirmware${defText}"
 	echo "    ${limityellowText}Package the uboot, kernal, rootfs and application, can use tools download."
 	echo "${blueText}SysHelpCommand${defText}"
 	echo "    ${limityellowText}Show the help command.${defText}"
 }
 alias SysHelpCommand='SysHelpCommand'
-
 echo "Update the Alias Command Success!"

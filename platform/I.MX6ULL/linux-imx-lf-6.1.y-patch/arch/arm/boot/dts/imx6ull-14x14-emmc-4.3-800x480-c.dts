@@ -1,0 +1,322 @@
+/*
+ * Copyright 2019 NXP
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ */
+
+/dts-v1/;
+
+#include "imx6ull.dtsi"
+#include "imx6ul-14x14-rmk.dtsi"
+
+/delete-node/ &sim2;
+
+/ {
+	model = "Freescale i.MX6 ULL 14x14 EVK Board";
+	compatible = "fsl,imx6ull-14x14-evk", "fsl,imx6ull";
+
+	gpiosgrp {
+		compatible = "simple-bus";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		usr_led {
+			compatible = "rmk,usr-led";
+			pinctrl-names = "default", "improve";
+			pinctrl-0 = <&pinctrl_gpio_led>;
+			pinctrl-1 =	<&pinctrl_led_improve>;
+			led-gpios = <&gpio1 3 GPIO_ACTIVE_LOW>;
+			reg = <0x020c406c 0x04>,
+			   <0x020e0068 0x04>,
+			   <0x020e02f4 0x04>,
+			   <0x0209c000 0x04>,
+			   <0x0209c004 0x04>;
+			status = "okay";
+		};
+
+		usr_beep {
+			compatible = "rmk,usr-beep";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_gpio_beep>;
+			beep-gpios = <&gpio5 1 GPIO_ACTIVE_LOW>;
+			status = "okay";
+		};
+
+		usr_key {
+			compatible = "rmk,usr-key";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_gpio_key>;
+			key-gpios = <&gpio1 18 GPIO_ACTIVE_LOW>;
+			interrupt-parent = <&gpio1>;
+			interrupts = <18 (IRQ_TYPE_EDGE_FALLING|IRQ_TYPE_EDGE_RISING)>;
+			status = "okay";
+		};
+
+		usr_loopled {
+			compatible = "rmk,usr-loopled";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_loopled>;
+			leds-gpios = <&gpio4 21 GPIO_ACTIVE_HIGH>,
+						<&gpio4 23 GPIO_ACTIVE_HIGH>,
+						<&gpio4 25 GPIO_ACTIVE_HIGH>;
+			status = "okay";
+		};
+
+		usr_hx711 {
+			compatible = "rmk,usr-hx711";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_hx711>;
+			hx711-gpios = <&gpio4 22 GPIO_ACTIVE_HIGH>,
+						<&gpio4 24 GPIO_ACTIVE_HIGH>;
+			status = "okay";
+		};
+	};
+
+	regulators {
+		compatible = "simple-bus";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		regulator_vref_adc: regulator@1 {
+			compatible = "regulator-fixed";
+			regulator-name = "VREF_3V";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+		};
+	};
+};
+
+&clks {
+	assigned-clocks = <&clks IMX6UL_CLK_PLL3_PFD2>,
+			  <&clks IMX6UL_CLK_PLL4_AUDIO_DIV>;
+	assigned-clock-rates = <320000000>, <786432000>;
+};
+
+&csi {
+	status = "okay";
+};
+
+&ov5640 {
+	status = "okay";
+};
+
+&iomuxc {
+    pinctrl_gpio_led: gpio-led {
+        fsl,pins = <
+            MX6UL_PAD_GPIO1_IO03__GPIO1_IO03		0x17059
+        >;
+    };
+
+	pinctrl_led_improve: led-improve {
+	    fsl,pins = <
+            MX6UL_PAD_GPIO1_IO03__GPIO1_IO03		0x40017059
+        >;	
+	};
+
+	pinctrl_loopled: gpio-loopleds {
+        fsl,pins = <
+            MX6UL_PAD_CSI_DATA00__GPIO4_IO21		0x17059
+			MX6UL_PAD_CSI_DATA02__GPIO4_IO23		0x17059
+			MX6UL_PAD_CSI_DATA04__GPIO4_IO25		0x17059
+        >;
+	};
+
+	pinctrl_hx711: gpio-hx711 {
+        fsl,pins = <
+            MX6UL_PAD_CSI_DATA01__GPIO4_IO22		0x17059
+			MX6UL_PAD_CSI_DATA03__GPIO4_IO24		0x17059
+        >;
+	};
+
+	pinctrl_gpio_key: gpio-key {
+		fsl,pins = <
+			MX6UL_PAD_UART1_CTS_B__GPIO1_IO18		0x40000000
+		>;
+	};
+
+	pinctrl_ap3216_tsc: gpio-ap3216 {
+		fsl,pins = <
+			MX6UL_PAD_GPIO1_IO01__GPIO1_IO01		0x40017059
+		>;
+	};
+
+	pinctrl_ecspi3: ecspi3grp {
+        fsl,pins = <
+			MX6UL_PAD_UART2_TX_DATA__GPIO1_IO20		0x100b0
+			MX6UL_PAD_UART2_RTS_B__ECSPI3_MISO      0x100b1  
+			MX6UL_PAD_UART2_CTS_B__ECSPI3_MOSI      0x100b1 
+			MX6UL_PAD_UART2_RX_DATA__ECSPI3_SCLK    0x100b1
+        >;
+	};
+
+	pinctrl_tsc: tscgrp {
+	    fsl,pins = <
+			MX6UL_PAD_GPIO1_IO09__GPIO1_IO09 		0x40017059
+        >;	
+	};
+
+	pinctrl_rtc: rtcgrp {
+	    fsl,pins = <
+			MX6UL_PAD_GPIO1_IO02__GPIO1_IO02 		0xF080
+        >;
+	};
+
+	pinctrl_adc1: adc1grp {
+	    fsl,pins = <
+			MX6UL_PAD_GPIO1_IO04__GPIO1_IO04 		0x400000b0
+        >;
+	};
+
+	pinctrl_pwm7: pwm7grp {
+		fsl,pins = <
+			MX6UL_PAD_CSI_VSYNC__PWM7_OUT			0x110b0
+        >;
+	};
+};
+
+&iomuxc_snvs {
+	pinctrl_tsc_reset: tsc_reset {
+		fsl,pins = <
+			MX6ULL_PAD_SNVS_TAMPER9__GPIO5_IO09		0x49
+		>;		
+	};
+
+	pinctrl_gpio_beep: beep {
+		fsl,pins = <
+			MX6ULL_PAD_SNVS_TAMPER1__GPIO5_IO01		0x400010B0
+		>;
+	};
+};
+
+&adc1 {
+	pinctrl-name = "default";
+	num-channels = <2>;
+	pinctrl-0 = <&pinctrl_adc1>;
+	vref-supply = <&regulator_vref_adc>;
+	status = "okay";
+};
+
+&pwm7 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm7>;
+	status = "okay";
+};
+
+&usdhc2 {
+	pinctrl-names = "default", "state_100mhz", "state_200mhz";
+	pinctrl-0 = <&pinctrl_usdhc2_8bit>;
+	pinctrl-1 = <&pinctrl_usdhc2_8bit_100mhz>;
+	pinctrl-2 = <&pinctrl_usdhc2_8bit_200mhz>;
+	bus-width = <8>;
+	non-removable;
+	no-1-8-v;
+	status = "okay";
+};
+
+&i2c1 {
+	clock-frequency = <100000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_i2c1>;
+	status = "okay";
+	
+	ap3216@1e {
+		compatible = "rmk,ap3216";
+		reg = <0x1e>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_ap3216_tsc>;
+		interrupt-parent = <&gpio1>;
+		interrupts = <1 IRQ_TYPE_EDGE_FALLING>;
+		int-gpios = <&gpio1 1 GPIO_ACTIVE_LOW>;
+	};
+};
+
+&i2c2 {
+	clock-frequency = <100000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_i2c2>;
+	status = "okay";
+
+	gt9147: gt9147@14 {
+		compatible = "rmk,gt9147";
+		reg = <0x14>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_tsc 
+					&pinctrl_tsc_reset>;
+		interrupt-parent = <&gpio1>;
+		interrupts = <9 IRQ_TYPE_EDGE_FALLING>;
+		reset-gpios = <&gpio5 9 GPIO_ACTIVE_LOW>;
+		interrupt-gpios = <&gpio1 9 GPIO_ACTIVE_LOW>;
+		status = "okay";
+	};
+
+	pcf8563: pcf8563@51 {
+		compatible = "rmk,pcf8563";
+		reg = <0x51>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_rtc>;
+		interrupt-parent = <&gpio1>;
+		interrupts = <2 IRQ_TYPE_LEVEL_LOW>;
+		interrupt-gpios = <&gpio1 2 GPIO_ACTIVE_LOW>;
+		status = "okay";
+	};
+
+	tms1637: tms1637@20 {
+		compatible = "rmk,tms1637";
+		reg = <0x20>;
+		status = "okay";
+	};
+};
+
+&ecspi3 {
+	fsl,spi-num-chipselects = <1>;
+	cs-gpios = <&gpio1 20 GPIO_ACTIVE_LOW>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_ecspi3>;
+	status = "okay";
+
+	spidev0:icm20608@0 {
+		compatible = "rmk,icm20608";
+		spi-max-frequency = <8000000>;
+		reg = <0>;
+	};
+};
+
+&lcdif {
+	assigned-clocks = <&clks IMX6UL_CLK_LCDIF_PRE_SEL>;
+	assigned-clock-parents = <&clks IMX6UL_CLK_PLL5_VIDEO_DIV>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lcdif_dat
+		     &pinctrl_lcdif_ctrl>;
+	display = <&display0>;
+	status = "okay";
+
+	display0: display@0 {
+		bits-per-pixel = <16>;
+		bus-width = <24>;
+
+		display-timings {
+			native-mode = <&timing0>;
+            
+			timing0: timing0 {
+                clock-frequency = <33000000>;
+                hactive = <800>;
+                vactive = <480>;
+                hfront-porch = <40>;
+                hback-porch = <88>;
+                hsync-len = <48>;
+                vback-porch = <32>;
+                vfront-porch = <13>;
+                vsync-len = <3>;
+
+                hsync-active = <0>;
+                vsync-active = <0>;
+                de-active = <1>;
+                pixelclk-active = <0>;
+			};
+		};
+	};
+};

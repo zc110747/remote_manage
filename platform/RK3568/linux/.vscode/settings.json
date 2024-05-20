@@ -1,0 +1,35 @@
+{
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
+        "**/.tmp_versions": true,
+        "**/scripts":true,
+        "**/*.cmd":true,
+        "**/*.tmp":true,
+        "**/*.dtb":true,
+
+        "arch/[!a]*":true,
+        "arch/arm/*":true,
+        "arch/arc/*":true,
+        "arch/alpha/*":true,
+        "arch/arm64/boot/dts/[!r]*":true,
+        "arch/arm64/boot/dts/r[!o]*":true,
+        "arch/arm64/boot/dts/rockchip/[!r]*":true,
+        "arch/arm64/boot/dts/rockchip/rk[!3]*":true,
+        "arch/arm64/boot/dts/rockchip/rk3[!5]*":true,
+        "arch/arm64/boot/dts/rockchip/rk35[!6]*":true,
+        "arch/arm64/boot/dts/rockchip/rk356[!8]*":true,
+        "arch/arm64/boot/dts/rockchip/rk3568-[e,n,t,i,l]*":true,
+        "arch/arm64/boot/dts/rockchip/rk3568-a[m,n]*":true,
+    },
+
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/bower_components": true,
+        "**/*.code-search": true,
+    }
+}

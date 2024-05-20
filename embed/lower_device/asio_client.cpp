@@ -80,7 +80,7 @@ void asio_client::asio_client_rx_run()
 {
     asio::ip::tcp::resolver resolver(io_context_);
     const auto& ipaddress = system_config::get_instance()->get_local_ipaddress();
-    const auto& port = system_config::get_instance()->get_serial_config().net_port;
+    const auto& port = system_config::get_instance()->get_lower_device_remote_port();
 
     PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "%s start", __func__);
 

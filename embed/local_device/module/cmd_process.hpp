@@ -23,8 +23,7 @@ typedef enum
 {
     CmdReadDev = 0,
     CmdSetDev,
-    cmdSetLevel,
-    CmdGetHelp,
+    cmdGetHelp,
 }cmd_format_t;
 
 class cmd_process
@@ -36,12 +35,12 @@ public:
 
     /// - destructor, delete not allow for singleton pattern.
     virtual ~cmd_process() = delete;
-    
+
     /// \brief get_instance
     /// - This method is used to get the pattern of the class.
     /// \return the singleton pattern point of the object.
     static cmd_process* get_instance();
-    
+
     /// \brief init
     /// - This method is used to init the object.
     /// \return Wheather initialization is success or failed.
@@ -82,9 +81,9 @@ private:
     /// \brief cmd_data_pointer_
     /// - memory point the start to data area for received.
     char *cmd_data_pointer_;
-    
+
     /// \brief cmd_process_thread_
-    /// - cmd process thread object. 
+    /// - cmd process thread object.
     std::thread cmd_process_thread_;
 
     /// \brief logger_loc_dev_tx_fifo_

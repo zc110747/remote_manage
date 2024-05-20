@@ -21,7 +21,7 @@ _Pragma("once")
 #include <mosquittopp.h>
 #include "common_unit.hpp"
 
-typedef struct 
+typedef struct
 {
     std::string id;
     std::string host;
@@ -55,8 +55,8 @@ public:
     /// \brief on_subscribe
     /// - This method is used do subscribe success.
     /// \param mid --
-    /// \param qos_count -- 
-    /// \param granted_qos -- 
+    /// \param qos_count --
+    /// \param granted_qos --
     void on_subscribe(int mid, int qos_count, const int *granted_qos);
 
     /// \brief publish_msg
@@ -84,15 +84,15 @@ private:
     bool is_connet_{false};
 
     /// \brief thread_
-    /// - mqtt run thread object. 
+    /// - mqtt run thread object.
     std::thread thread_;
 
     /// \brief buffer_
-    /// - buffer store subscription information.     
+    /// - buffer store subscription information.
     char buffer_[512];
 
     /// \brief buffer_
-    /// - buffer store subscription information. 
+    /// - buffer store subscription information.
     std::function<void(char *ptr, int size)> func_handler_;
 };
 
@@ -105,7 +105,7 @@ public:
 
     /// - destructor, delete not allow for singleton pattern.
     virtual ~mqtt_manage() = delete;
-    
+
     /// \brief get_instance
     /// - This method is used to get the pattern of the class.
     /// \return the singleton pattern point of the object.

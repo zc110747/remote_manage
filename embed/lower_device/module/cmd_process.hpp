@@ -23,12 +23,8 @@ _Pragma("once")
 #define COMMAND_MAX_SIZE    4
 typedef enum
 {
-    CmdReadDev = 0,
     CmdGetOS,
-    CmdSetDev,
-    cmdSetLevel,
-    CmdGetHelp,
-    CmdConnect,
+    cmdGetHelp,
 }cmd_format_t;
 
 class cmd_process

@@ -3,7 +3,6 @@
 
 *.o
 *.d
-*.cmd
 *.mod.c
 *.mod.o
 *.mod
@@ -15,6 +14,7 @@
 *.so*
 *.ko
 *.tar.gz
+*.scr
 
 thirdparts/asio/
 thirdparts/jsoncpp/
@@ -25,13 +25,11 @@ thirdparts/mosquitto/z*
 
 rootfs/home/sys/server/*
 rootfs/home/sys/webpage/*
-rootfs/home/sys/configs/*
 !rootfs/etc/*
 
 buildout/aarch64/
 buildout/arm/
 
-mod/rs232/*
 embed/lower_device/lower_device
 embed/main_process/main_process
 embed/local_device/local_device

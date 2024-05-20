@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.cpp": "cpp",
         "types.h": "c",
         "fcntl.h": "c",
         "ioctl.h": "c",
@@ -95,7 +96,18 @@
         "stdint.h": "c",
         "netdb.h": "c",
         "fs.h": "c",
-        "wait.h": "c"
+        "wait.h": "c",
+        "kernel_touch.h": "c",
+        "unistd.h": "c",
+        "string.h": "c",
+        "i2c.h": "c",
+        "module.h": "c",
+        "input.h": "c",
+        "kernel_i2c_ap.h": "c",
+        "netfwd": "cpp",
+        "msg.h": "c",
+        "msgbuf.h": "c",
+        "kernel.h": "c"
     },
     "files.exclude": {
         "**/.git": true,
@@ -106,7 +118,6 @@
         "**/Thumbs.db": true,
         "**/*.dtb":true,
         "**/*.tmp":true,
-        "**/*.cmd":true,
         "sdk/support/arm/kernel/arch/arm/boot/dts/[a-h]*":true,
         "sdk/support/arm/kernel/arch/arm/boot/dts/[j-z]*":true,
         "sdk/support/arm/kernel/arch/arm/boot/dts/imx[0-5]*":true,

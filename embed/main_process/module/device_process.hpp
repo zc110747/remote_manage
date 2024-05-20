@@ -86,6 +86,14 @@ public:
     /// - update device string info.
     void update_info_string();
 
+     /// \brief set_device
+    /// - set device command.   
+    int set_device(int dev, char *buf, int size);
+
+    /// \brief sync_info
+    /// - sync info command. 
+    int sync_info(char *buf, int size);
+    
 private:
     /// \brief run
     /// - This method is used for thread run the device management.

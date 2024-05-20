@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="97HLYAoYRTmnaLsdLiow" name="MainFrameWork">
-        <mxGraphModel dx="36" dy="797" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="270" dy="938" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -62,16 +62,16 @@
                     <mxGeometry x="894" y="1178" width="199" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="88" value="" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;dashPattern=8 8;" parent="1" vertex="1">
-                    <mxGeometry x="905" y="192" width="740" height="500" as="geometry"/>
+                    <mxGeometry x="899" y="201" width="750" height="526" as="geometry"/>
                 </mxCell>
                 <mxCell id="36" value="" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-                    <mxGeometry x="1095" y="242" width="540" height="280" as="geometry"/>
+                    <mxGeometry x="1095" y="242" width="540" height="336" as="geometry"/>
                 </mxCell>
                 <mxCell id="91" value="lower_device" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;" parent="1" vertex="1">
                     <mxGeometry x="1395" y="381" width="233" height="133" as="geometry"/>
                 </mxCell>
-                <mxCell id="77" value="" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;" parent="1" vertex="1">
-                    <mxGeometry x="1355" y="542" width="280" height="110" as="geometry"/>
+                <mxCell id="77" value="lower_manage" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;align=left;verticalAlign=top;fontSize=15;" parent="1" vertex="1">
+                    <mxGeometry x="1355" y="591" width="280" height="110" as="geometry"/>
                 </mxCell>
                 <mxCell id="74" value="" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;" parent="1" vertex="1">
                     <mxGeometry x="915" y="242" width="140" height="280" as="geometry"/>
@@ -79,7 +79,7 @@
                 <mxCell id="3" value="main_process" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;" parent="1" vertex="1">
                     <mxGeometry x="1225" y="252" width="150" height="260" as="geometry"/>
                 </mxCell>
-                <mxCell id="4" value="LocalDevice" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;" parent="1" vertex="1">
+                <mxCell id="4" value="local_device" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;" parent="1" vertex="1">
                     <mxGeometry x="1395" y="294" width="148" height="80" as="geometry"/>
                 </mxCell>
                 <mxCell id="7" value="local_dev&lt;br&gt;fifo &lt;br&gt;manage" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
@@ -89,19 +89,13 @@
                     <mxGeometry x="1411" y="322" width="50" height="40" as="geometry"/>
                 </mxCell>
                 <mxCell id="10" value="PC Manage" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=bottom;" parent="1" vertex="1">
-                    <mxGeometry x="1405" y="572" width="100" height="70" as="geometry"/>
+                    <mxGeometry x="1405" y="621" width="100" height="70" as="geometry"/>
                 </mxCell>
                 <mxCell id="11" value="Serial" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-                    <mxGeometry x="1430" y="572" width="50" height="40" as="geometry"/>
+                    <mxGeometry x="1430" y="621" width="50" height="40" as="geometry"/>
                 </mxCell>
                 <mxCell id="12" value="serial" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="1415" y="467" width="80" height="40" as="geometry"/>
-                </mxCell>
-                <mxCell id="14" value="" style="endArrow=classic;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;startArrow=classic;startFill=1;" parent="1" source="10" target="12" edge="1">
-                    <mxGeometry width="50" height="50" relative="1" as="geometry">
-                        <mxPoint x="1475" y="572" as="sourcePoint"/>
-                        <mxPoint x="1525" y="522" as="targetPoint"/>
-                    </mxGeometry>
                 </mxCell>
                 <mxCell id="16" value="" style="endArrow=classic;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;endFill=1;startArrow=classic;startFill=1;" parent="1" source="9" target="7" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
@@ -109,7 +103,7 @@
                         <mxPoint x="1525" y="492" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="19" value="Mqtt Server (mosquitto)" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                <mxCell id="19" value="mqtt_Server (mosquitto)" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="1105" y="348" width="100" height="79" as="geometry"/>
                 </mxCell>
                 <mxCell id="21" value="Data&lt;br&gt;&amp;nbsp;publisher" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
@@ -124,20 +118,17 @@
                 <mxCell id="24" value="node/asio_server&lt;br&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;" parent="1" vertex="1">
                     <mxGeometry x="1105" y="252" width="100" height="64" as="geometry"/>
                 </mxCell>
-                <mxCell id="30" value="HardWare&lt;br&gt;Driver" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                <mxCell id="30" value="hardware driver" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="1473" y="301" width="57" height="64" as="geometry"/>
                 </mxCell>
                 <mxCell id="32" value="can" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="1535" y="467" width="88" height="40" as="geometry"/>
                 </mxCell>
                 <mxCell id="42" value="LowerDevice" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=bottom;" parent="1" vertex="1">
-                    <mxGeometry x="1535" y="572" width="90" height="70" as="geometry"/>
+                    <mxGeometry x="1535" y="621" width="90" height="70" as="geometry"/>
                 </mxCell>
                 <mxCell id="43" value="CAN" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-                    <mxGeometry x="1555" y="572" width="50" height="40" as="geometry"/>
-                </mxCell>
-                <mxCell id="89" value="" style="edgeStyle=none;html=1;startArrow=classic;startFill=1;" parent="1" source="32" target="43" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
+                    <mxGeometry x="1555" y="621" width="50" height="40" as="geometry"/>
                 </mxCell>
                 <mxCell id="47" value="" style="endArrow=classic;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="21" target="19" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
@@ -169,7 +160,7 @@
                 <mxCell id="69" value="PC Winform" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="945" y="362" width="80" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="70" value="Android/IOS Device" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                <mxCell id="70" value="Android Device" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="945" y="447" width="80" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="71" value="" style="endArrow=classic;startArrow=classic;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="68" target="49" edge="1">
@@ -193,14 +184,11 @@
                 <mxCell id="75" value="Remote&amp;nbsp; Manage" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
                     <mxGeometry x="915" y="242" width="110" height="20" as="geometry"/>
                 </mxCell>
-                <mxCell id="78" value="Lower Manage" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
-                    <mxGeometry x="1355" y="542" width="100" height="30" as="geometry"/>
-                </mxCell>
                 <mxCell id="82" value="Embed Linux&amp;nbsp; Manage System" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;dashed=1;" parent="1" vertex="1">
-                    <mxGeometry x="915" y="192" width="180" height="40" as="geometry"/>
+                    <mxGeometry x="913" y="202" width="180" height="40" as="geometry"/>
                 </mxCell>
                 <mxCell id="87" value="Linux Platform support functional:&lt;br&gt;1. ssh service.&lt;br&gt;2. vnc viewer remote service.&lt;br&gt;3. node run environment.&lt;br&gt;4.support busybox rootfs and debain rootfs." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;dashed=1;" parent="1" vertex="1">
-                    <mxGeometry x="1101" y="555" width="190" height="93" as="geometry"/>
+                    <mxGeometry x="1019" y="603" width="190" height="93" as="geometry"/>
                 </mxCell>
                 <mxCell id="90" value="fifo rx/tx&lt;br&gt;manage" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="1415" y="412" width="80" height="35" as="geometry"/>
@@ -244,29 +232,41 @@
                 <mxCell id="94" style="edgeStyle=none;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;startArrow=classicThin;startFill=1;" parent="1" source="32" target="90" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="112" style="edgeStyle=none;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;startArrow=classic;startFill=1;" edge="1" parent="1" source="110" target="90">
+                <mxCell id="112" style="edgeStyle=none;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;startArrow=classic;startFill=1;" parent="1" source="110" target="90" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="110" value="lower_dev&lt;br&gt;fifo&amp;nbsp;&lt;br&gt;manage" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                <mxCell id="110" value="lower_dev&lt;br&gt;fifo&amp;nbsp;&lt;br&gt;manage" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="1303" y="427" width="59" height="62" as="geometry"/>
                 </mxCell>
-                <mxCell id="113" value="logger" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                <mxCell id="113" value="logger" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="1307" y="287" width="57" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="115" value="logger" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                <mxCell id="115" value="logger" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="1548" y="412" width="57" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="116" value="logger" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                <mxCell id="116" value="logger" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="1156" y="489" width="46" height="20" as="geometry"/>
                 </mxCell>
-                <mxCell id="117" value="logger" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                <mxCell id="117" value="logger" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="1156" y="285" width="46" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="89" value="" style="edgeStyle=none;html=1;startArrow=classic;startFill=1;exitX=0.9;exitY=0.984;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" source="118" target="43" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="14" value="" style="endArrow=classic;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.666;entryY=0.984;entryDx=0;entryDy=0;startArrow=classic;startFill=1;entryPerimeter=0;" parent="1" source="10" target="118" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="1475" y="572" as="sourcePoint"/>
+                        <mxPoint x="1525" y="522" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="118" value="Linux Runtime Structure(Uboot，Kernel，Rootfs, Driver, Thrid Library)" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="1102" y="528" width="530" height="41" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>
     </diagram>
-    <diagram id="GkxDtE88crtYGHlinc6s" name="Logger流程">
-        <mxGraphModel dx="995" dy="797" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <diagram id="GkxDtE88crtYGHlinc6s" name="带权限Logger管理">
+        <mxGraphModel dx="917" dy="797" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -433,7 +433,7 @@
                 <mxCell id="zpnHHBPMRUaiMUG7heuJ-56" value="未连接" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
                     <mxGeometry x="360" y="430" width="20" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="FvqIGmHXlZ88CQS9xZLu-1" value="logger发送流程" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;" vertex="1" parent="1">
+                <mxCell id="FvqIGmHXlZ88CQS9xZLu-1" value="logger发送流程" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;" parent="1" vertex="1">
                     <mxGeometry x="140" y="60" width="130" height="50" as="geometry"/>
                 </mxCell>
             </root>

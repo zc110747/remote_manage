@@ -31,18 +31,20 @@ typedef enum
     CMD_LOCAL_DEV,
     CMD_LOWER_DEV,
     CMD_MAIN_DEV,
+    CMD_PASSWD,
     CMD_HELP,
 }CMD_DEVICE;
 
 #define RX_MAX_BUFFER_SIZE  512
 static char rx_buffer[RX_MAX_BUFFER_SIZE];
 static const std::map<std::string, CMD_DEVICE> command_map = {
-    {"!gui ",   CMD_GUI_DEV},
-    {"!local_dev ",  CMD_LOCAL_DEV},
-    {"!lower_dev ",  CMD_LOWER_DEV},
-    {"!main_process ",    CMD_MAIN_DEV},
-    {"!?",      CMD_HELP},
-    {"!help",      CMD_HELP},
+    {"!gui ",           CMD_GUI_DEV},
+    {"!local_dev ",     CMD_LOCAL_DEV},
+    {"!lower_dev ",     CMD_LOWER_DEV},
+    {"!main_proc ",     CMD_MAIN_DEV},
+    {"!passwd ",         CMD_PASSWD},
+    {"!?",              CMD_HELP},
+    {"!help",           CMD_HELP},
 };
 
 static const std::map<CMD_DEVICE, std::string> command_help_map = {
@@ -56,7 +58,6 @@ static const std::map<CMD_DEVICE, std::string> command_help_map = {
 void log_process::logger_rx_run()
 {
     int len;
-
     PRINT_NOW("%s:logger rx run start!\n", PRINT_NOW_HEAD_STR);
 
     while (1)
@@ -97,7 +98,7 @@ bool log_process::init()
     //init and Create logger fifo, must before thread run.
     logger_rx_fifo_ = std::make_unique<fifo_manage>(LOGGER_RX_FIFO,
                                                     S_FIFO_WORK_MODE,
-                                                    FIFO_MODE_R_CREATE);
+                                                    FIFO_MODE_WR_CREATE);
     if (logger_rx_fifo_ == nullptr)
         return false;
     if (!logger_rx_fifo_->create())
@@ -162,10 +163,35 @@ void log_process::release()
     logger_rx_fifo_->release();
 }
 
+bool log_process::login(char *ptr, int size)
+{
+    bool allow_no_passwd = system_config::get_instance()->get_allow_no_passwd();
+    
+    if (allow_no_passwd == true
+    || is_login_ == true)
+    {
+        return true;
+    }
+
+    if(strncmp("!passwd ", ptr, strlen("!passwd ")) != 0)
+    {
+        return false;
+    }
+    return true;
+}
+
 int log_process::send_buffer(char *ptr, int length)
 {
     CMD_DEVICE cmd = CMD_NULL;
     int len = 0;
+    bool ret;
+
+    ret = login(ptr, length);
+    if (!ret)
+    {
+        PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "not login:%s", ptr);
+        return -1;
+    }
 
     for (const auto& command:command_map)
     {
@@ -177,7 +203,7 @@ int log_process::send_buffer(char *ptr, int length)
         }
     }
 
-    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "logger command information:%s!", ptr);
+    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "logger command information:%s", ptr);
 
     if (length >= len)
     {
@@ -194,6 +220,28 @@ int log_process::send_buffer(char *ptr, int length)
                 break;
             case CMD_MAIN_DEV:
                 logger_mp_tx_fifo_->write(ptr+len, length-len);
+                break;
+            case CMD_PASSWD:
+                {
+                    char *pdata;
+                    int size;
+                    auto passwd = system_config::get_instance()->get_logger_privilege().passwd;
+
+                    pdata = ptr + len;
+                    size = length - len;
+
+                    if(size == passwd.length() 
+                    && (memcmp(pdata, passwd.c_str(), passwd.length()) == 0)
+                    )
+                    {
+                        is_login_ = true;
+                        PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "login in, use !? search support command");
+                    }
+                    else
+                    {
+                        PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "passwd:%s, %s, %d, %d", pdata, passwd.c_str(), size, passwd.length());
+                    }
+                }
                 break;
             case CMD_HELP:
                 show_help();

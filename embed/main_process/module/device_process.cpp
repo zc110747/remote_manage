@@ -113,6 +113,40 @@ int device_process::send_buffer(const char* ptr, int size)
     return device_cmd_fifo_point_->write(ptr, size);
 }
 
+int device_process::set_device(int dev, char *buf, int size)
+{   
+    EventBufMessage EventBuf;
+    auto &data = EventBuf.get_data();
+
+    EventBuf.set_id(DEVICE_HW_SET_EVENT);
+
+    if(size > data.size-1)
+    {
+        return -1;
+    }
+
+    data.buffer[0] = dev;
+    memcpy(&data.buffer[1], buf, size);
+    return send_buffer(reinterpret_cast<char *>(&EventBuf), sizeof(EventBuf));
+}
+
+int device_process::sync_info(char *buf, int size)
+{
+    EventBufMessage EventBuf;
+    auto &data = EventBuf.get_data();
+
+    EventBuf.set_id(DEVICE_SYNC_EVENT);
+
+    if(size > data.size)
+    {
+        return -1;
+    }
+    memcpy(data.buffer, buf, size);
+    
+    PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "sync_info:%d, %d", size, EventBuf.get_data().get_buffer()[0]);
+    return send_buffer(reinterpret_cast<char *>(&EventBuf), sizeof(EventBuf));   
+}
+
 bool device_process::system_info_init()
 {
     bool result;
@@ -225,31 +259,34 @@ bool device_process::get_ram_info()
 void device_process::update_info_string()
 {
     Json::Value root;
+    
+    root["command"] = COMMAND_UPDATE_LOCAL; 
+    root["data"]["led"] = info_.led_io_;
+    root["data"]["beep"] = info_.beep_io_;
 
-    root["led"] = info_.led_io_;
-    root["beep"] = info_.beep_io_;
+    root["data"]["ap"]["ir"] = info_.ap_info_.ir;
+    root["data"]["ap"]["als"] = info_.ap_info_.als;
+    root["data"]["ap"]["ps"] = info_.ap_info_.ps;
 
-    root["ap"]["ir"] = info_.ap_info_.ir;
-    root["ap"]["als"] = info_.ap_info_.als;
-    root["ap"]["ps"] = info_.ap_info_.ps;
+    root["data"]["icm"]["gyro_x"] = info_.icm_info_.gyro_x_act;
+    root["data"]["icm"]["gyro_y"] = info_.icm_info_.gyro_y_act;
+    root["data"]["icm"]["gyro_z"] = info_.icm_info_.gyro_z_act;
+    root["data"]["icm"]["accel_x"] = info_.icm_info_.accel_x_act;
+    root["data"]["icm"]["accel_y"] = info_.icm_info_.accel_y_act;
+    root["data"]["icm"]["accel_z"] = info_.icm_info_.accel_z_act;
+    root["data"]["icm"]["temp_act"] = info_.icm_info_.temp_act;
 
-    root["icm"]["gyro_x"] = info_.icm_info_.gyro_x_act;
-    root["icm"]["gyro_y"] = info_.icm_info_.gyro_y_act;
-    root["icm"]["gyro_z"] = info_.icm_info_.gyro_z_act;
-    root["icm"]["accel_x"] = info_.icm_info_.accel_x_act;
-    root["icm"]["accel_y"] = info_.icm_info_.accel_y_act;
-    root["icm"]["accel_z"] = info_.icm_info_.accel_z_act;
-    root["icm"]["temp_act"] = info_.icm_info_.temp_act;
-
-    root["angle"] = info_.angle_;
+    root["data"]["angle"] = info_.angle_;
+    root["data"]["hx711"] = info_.hx711_;
+    root["data"]["vf610_adc"] = info_.vf610_adc_;
 
     //system information
-    root["sysinfo"]["cpu_info"] = sysinfo_.cpu_info;
-    root["sysinfo"]["kernel_info"] = sysinfo_.kernel_info;
-    root["sysinfo"]["disk_total"] = sysinfo_.disk_total;
-    root["sysinfo"]["disk_used"] = sysinfo_.disk_used;
-    root["sysinfo"]["ram_total"] = sysinfo_.ram_total;
-    root["sysinfo"]["ram_used"] = sysinfo_.ram_used;
+    root["data"]["sysinfo"]["cpu_info"] = sysinfo_.cpu_info;
+    root["data"]["sysinfo"]["kernel_info"] = sysinfo_.kernel_info;
+    root["data"]["sysinfo"]["disk_total"] = sysinfo_.disk_total;
+    root["data"]["sysinfo"]["disk_used"] = sysinfo_.disk_used;
+    root["data"]["sysinfo"]["ram_total"] = sysinfo_.ram_total;
+    root["data"]["sysinfo"]["ram_used"] = sysinfo_.ram_used;
 
     info_str_ = root.toStyledString();
 }

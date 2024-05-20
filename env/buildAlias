@@ -1,0 +1,258 @@
+#!/bin/bash
+# shellcheck disable=SC2154
+# shellcheck disable=SC2174
+
+#************************************************************************
+#				
+#
+#       I.MX6ULL Build Function Region
+#
+#
+#************************************************************************
+function imx_build_uboot()
+{
+    cd "${PLATFORM_UBOOT_PATH}"/ || return
+
+    chmod 777 uboot_upgrade.sh && ./uboot_upgrade.sh
+
+    cdp || return
+
+    ./make.sh uboot $1
+
+    cp -fv ${SUPPORT_ENV_PACKAGE}/u-boot-dtb.imx "${BUILD_TFTP_PATH}"/
+    cp -fv ${SUPPORT_ENV_PACKAGE}/boot.scr "${BUILD_TFTP_PATH}"/
+}
+alias imx_build_uboot="imx_build_uboot"
+
+function imx_build_kernel()
+{
+    cd "${PLATFORM_LINUX_PATH}"/ || return
+
+    chmod 777 kernel_upgrade.sh && ./kernel_upgrade.sh
+
+    cdp || return
+
+    ./make.sh kernel $1
+
+    cp -fv ${SUPPORT_ENV_PACKAGE}/*.dtb "${BUILD_TFTP_PATH}"/
+    cp -fv ${SUPPORT_ENV_PACKAGE}/zImage "${BUILD_TFTP_PATH}"/ 
+}
+alias imx_build_kernel="imx_build_kernel"
+
+function imx_build_rootfs()
+{
+    cd "${PLATFORM_BUILDROOT_PATH}"/ || return
+
+	cp -fv imx6ullrmk_defconfig "${SUPPORT_FS_BUILDROOT_DIR}"/configs/
+
+    cdp || return
+
+    ./make.sh rootfs $1
+}
+alias imx_build_rootfs="imx_build_rootfs"
+
+function imx_qemu_run()
+{
+	cd "${PLATFORM_INSTALL_SHELL}"/ || return
+
+	chmod 777 qemu-nogui.sh && ./qemu-nogui.sh
+}
+alias imx_qemu_run="imx_qemu_run"
+
+#************************************************************************
+#				
+#
+#       ALL Build Function Region
+#
+#
+#************************************************************************
+# SysBuildUboot
+function build_uboot
+{
+	echo "uboot compiler:${NEW_KERNEL_CC} ${config_file}"
+	
+	if [ "${FIRMWARE_CURRENT_PLATFORMS}" == "ARM" ]; then
+        imx_build_uboot $1
+    fi	
+}
+alias SysBuildUboot='build_uboot'
+
+# SysBuildKernel
+function build_kernel
+{
+	if [ "${FIRMWARE_CURRENT_PLATFORMS}" == "ARM" ]; then
+		imx_build_kernel $1
+	fi
+}
+alias SysBuildKernel='build_kernel'
+
+# SysBuildRootfs
+function build_rootfs
+{
+	if [ "${FIRMWARE_CURRENT_PLATFORMS}" == "ARM" ]; then
+		imx_build_rootfs $1
+	fi
+}
+alias SysBuildRootfs='build_rootfs'
+
+# SysPreThirdParts
+# - pre_build_thirdparts
+# prepare build thirdparts package. 
+function install_library()
+{
+    sudo cp -Rv "${SUPPORT_ENV_INSTALL}"/usr/local/lib/* "${SUPPORT_ENV_INSTALL}"/lib/
+
+    sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/bin
+    sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/doc
+    sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/etc
+    sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/examples
+    sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/include
+  	sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/lib
+  	sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/mkspecs		
+  	sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/plugins
+  	sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/share
+  	sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/ssl
+  	sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/usr
+
+	sudo cp -Rv "${SUPPORT_ENV_INSTALL}"/* "${BUILD_NFS_PATH}"/
+
+	sudo mkdir -p "${BUILD_NFS_PATH}"/home/sys/
+	sudo cp -ravf "${ENV_PATH_ROOT}"/rootfs/home/sys/* "${BUILD_NFS_PATH}"/home/sys/
+	sudo cp -ravf "${ENV_PATH_ROOT}"/rootfs/etc/mosquitto/ "${BUILD_NFS_PATH}"/etc/
+	sudo cp -ravf "${ENV_PATH_ROOT}"/rootfs/root/.bashrc "${BUILD_NFS_PATH}"/root/
+	sudo cp "${ENV_PATH_ROOT}"/config.template.json "${BUILD_NFS_PATH}"/home/sys/configs/config.json
+	sudo cp "${ENV_PATH_ROOT}"/rootfs/home/sys/configs/dynamic.json "${BUILD_NFS_PATH}"/home/sys/configs/dynamic.json
+
+	#安装启动脚本
+	sudo cp "${PLATFORM_INSTALL_SHELL}"/kill_br_app.sh "${BUILD_NFS_PATH}"/home/sys/
+	sudo cp "${PLATFORM_INSTALL_SHELL}"/start_br_app.sh "${BUILD_NFS_PATH}"/home/sys/
+}
+alias install_library='install_library'
+
+function pre_build_thirdparts()
+{
+	echo "***start pull thirdparts libary***"
+
+	cd "${PLATFORM_INSTALL_SHELL}" || return
+
+	#set shell run
+	chmod 777 install-thirdparts.sh && ./install-thirdparts.sh
+
+	SysMountRootfs
+
+	exit_if_last_error
+
+	install_library
+}
+alias SysPreThirdParts='pre_build_thirdparts'	#install thirdpart library for the application
+
+# SysBuildModules
+# - build_driver_modules
+# build all the kernel modules for application. 
+# before build, must build kernel before.
+function build_driver_modules()
+{
+	cd "${ENV_PATH_ROOT}" || return 
+
+	if [ -f "${SUPPORT_ENV_KERNEL_DIR}"/.config ]; then
+		echo "start bulid kernal driver"
+        cd "${APPLICATION_MOD}"/ || return
+		make
+	else
+		echo "without compiled linux kernal, not build kernal module"
+	fi
+}
+alias SysBuildModules='build_driver_modules'
+
+# SysBuildModules
+# - build_application
+# build the remote manage application.
+# before build, must prepare the thirdparts library and rootfs.
+function build_application()
+{
+	#check wheather library support
+	if [ ! -f "${SUPPORT_ENV_INSTALL}"/lib/libssl.a ] || [ ! -d "${APPLICATION_THIRDPARTS}"/asio ]; then
+		echo "support library for application not exist, run command"
+		echo "  ${redText}SysPreThirdParts${defText}"
+		echo "  ${redText}SysBuildRootfs${defText}"
+		echo "install."
+		return 0
+	fi
+
+	#check wheather build driver
+	if [ "${FIRMWARE_CURRENT_PLATFORMS}" == "ARM" ]; then
+		build_driver_module
+	else
+		echo "driver only support for i.mx6ull, not build!".
+	fi
+	echo "kernal dir:${SUPPORT_ENV_KERNEL_DIR}"
+	echo "firmware path:${ENV_PATH_ROOT}"
+
+	#copy config file
+	cd "${ENV_PATH_ROOT}" || return 
+    mkdir -m 755 -p "${BUILD_NFS_PATH}"/home/sys/configs/
+	chmod 755 "${BUILD_NFS_PATH}"/home/sys/configs/
+	cp -fv config.template.json "${BUILD_NFS_PATH}"/home/sys/configs/config.json
+    exit_if_last_error
+
+	#build executable
+	cd "${APPLICATION_EMBED}"/ || return
+	make -j"${CPU_CORE}"
+	exit_if_last_error
+		
+	#package node sever
+	cd "${APPLICATION_EMBED}"/ || return
+    mkdir -m 755 -p "${BUILD_NFS_PATH}"/home/sys/server/
+	cp -rv node_server/* "${BUILD_NFS_PATH}"/home/sys/server/
+
+	cda
+}
+alias SysBuildApplication='build_application'
+
+# SysTarFirmware
+# - tar_firmware
+# tar the firmware and move to path convert.
+function tar_firmware
+{
+	cd "${ENV_PATH_ROOT}"/../ || return
+
+	tar --exclude='remote_manage/.git' --exclude='remote_manage/rootfs' --exclude='remote_manage/thirdparts' -vcjf remote_manage.tar.bz2 remote_manage/
+
+	exit_if_last_error
+
+	echo "move to ${DST_PATH}"
+	mv remote_manage.tar.bz2 "${DST_PATH}"/
+}	
+alias SysTarFirmware='tar_firmware'
+
+function package_firmware
+{
+	#copy tftp directory
+	if [ -d "${BUILD_TFTP_PATH}" ]; then
+		if [ ! -d "${DST_PATH}" ]; then
+			mkdir -m 755 -p "${DST_PATH}" 
+		fi
+
+		cd "${BUILD_TFTP_PATH}"/ || return
+		cp -rvf -- * "${DST_PATH}"/
+		
+		cd "${DST_PATH}"/ || return
+		mv u-boot-dtb.imx "${ENV_KERNAL_UBOOT}"
+	fi
+
+	#package the rootfs
+	mount_rootfs
+
+	# if [ -d "${BUILD_NFS_PATH}"/bin ]; then
+	# 	cd "${BUILD_NFS_PATH}"/ || return
+	# 	rm -rf rootfs.tar.bz2 
+	# 	sudo tar -vcjf rootfs.tar.bz2 -- *
+	# 	sudo chmod 777 rootfs.tar.bz2
+	# 	mv rootfs.tar.bz2 "${DST_PATH}"/
+	# fi
+
+	echo "PackFirmware Success, you can find firmware in directory:${DST_PATH}"
+}
+alias SysPackageFirmware='package_firmware'
+
+echo "build firmware command alias update."

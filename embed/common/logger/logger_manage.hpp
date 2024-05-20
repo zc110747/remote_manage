@@ -34,7 +34,8 @@ typedef enum
     LOG_WARN,
     LOG_ERROR,
     LOG_FATAL,
-    }LOG_LEVEL;
+}LOG_LEVEL;
+
 
 class log_manage final
 {

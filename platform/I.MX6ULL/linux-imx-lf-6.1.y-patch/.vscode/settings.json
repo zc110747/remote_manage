@@ -1,0 +1,41 @@
+{
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
+        "**/.tmp_versions": true,
+        "**/scripts":true,
+        "**/*.cmd":true,
+        "**/*.tmp":true,
+        "**/*.dtb":true,
+
+        "arch/arm64":true,
+        "arch/arc":true,
+        "arch/alpha":true,
+        "arch/[b-z]*":true,
+        "arch/arm/configs/[a-h,j-z]*":true,
+        "arch/arm/configs/i[!m]*":true,
+        "arch/arm/boot/dts/[a-h,j-z]*":true,
+        "arch/arm/boot/dts/i[!m]*":true,
+        "arch/arm/boot/dts/imx[!6]*":true,
+        "arch/arm/boot/dts/imx6[!u]*":true,
+        "arch/arm/boot/dts/imx6ul-[a-o,q-z,9]*":true,
+        "arch/arm/boot/dts/imx6ul-ph*":true,
+        "arch/arm/boot/dts/imx6ulz*":true,
+        "arch/arm/boot/dts/imx6ull-[a-o,r-z,9]*":true,
+        "arch/arm/boot/dts/imx6ull-ph*":true,
+        "arch/arm/boot/dts/imx6ul-14x14-evk*":true,
+        "arch/arm/boot/dts/imx6ull-14x14-evk*":true,
+        "arch/arm/mach-[!i]*":true,
+        "arch/arm/mach-i[!m]*":true,
+    },
+
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/bower_components": true,
+        "**/*.code-search": true,
+    }
+}

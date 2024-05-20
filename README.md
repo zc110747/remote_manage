@@ -2,7 +2,34 @@
 
 ## 项目说明
 
-本项目用于实现具有远程访问，权限控制，调试管理，本机硬件读取和设置，下位机管理的嵌入式Linux应用和驱动开发综合产品。内部实现平台构建，项目管理，内核驱动开发，应用开发等部分，项目支持在arm和aarch64平台，并提供相应的构建工具和编译平台，本项目已经验证的芯片平台。
+本项目用于实现具有远程访问，调试权限管理，本机硬件控制，下位机项目管理的嵌入式Linux应用和驱动开发综合产品，主要实现功能如下。
+
+1. 支持Linux平台移植(I.MX6ULL编译支持，正点原子阿尔法Linux开发板) -- platform/
+2. 嵌入式Linux平台驱动代码实现 -- mod/
+3. 嵌入式Linux平台应用层硬件管理 -- embed/local_device
+4. web局域网访问服务器 -- embed/main_process
+5. 带权限logger调试实现 -- embed/logger_tool
+6. 基于mqtt的局域网软件管理 -- embed/main_process
+7. 扩展的下位机应用管理 -- embed/lower_device
+8. 基于QT的本地GUI界面管理 -- embed/gui_manage
+9. 其它功能支持(文档，编译脚本) -- doc/、 env/
+
+完整产品框架如下所示。
+
+![image](doc/image/mainFrame.png)
+
+- 嵌入式Linux端
+  - main_process: 代码目录:embed/main_process，核心进程，其它所有数据都交由main_process处理后，转发到相应进程后显示或者动作
+  - logger_tool: 代码目录:embed/logger_tool，调试进程，主要将其它所有进程的打印信息进行包装后，支持通过本地串口，网口或者按照时间以文件方式保存本地
+  - local_device: 代码目录:embed/local_device，管理平台硬件的进程，包含对led，beep，ap3216，rtc等设备的应用层访问代码
+  - lower_device: 代码目录:embed/lower_device，管理和下位机通讯的进程，主要通过串口(RS485)，can访问其它设备
+  - node_server: 代码目录:embed/node_server, web服务器应用进程，基于node实现的web服务器和客户端，用于本地web访问资源
+  - gui_manage: 代码目录:embed/gui_manage, 基于QT本地管理界面，可通过本地UI查看设备信息和管理开关状态
+  - linux runtime structure: 代码目录: mod/, platform/，构建Linux平台的u-boot, linux, rootfs, 驱动和第三方构建实现
+- 应用桌面端
+  - PC Winform: 代码目录: destop/manage_tool, 管理系统的桌面端应用，C/S架构下的应用客户端
+
+内部实现平台构建，项目管理，内核驱动开发，应用开发等部分，项目支持在arm和aarch64平台，并提供相应的构建工具和编译平台，本项目已经验证的芯片平台。
 
 - ARM平台: NXP I.MX6ull, 正点原子阿尔法开发板.
 - AARCH64平台: 全志H616, WalnutPi.
@@ -23,10 +50,6 @@
 - rootfs            对于busybox支持的启动文件(buildroot和debain不需要)
 - thirdparts        支持应用编译的第三方库。
 
-## 项目框架
-
-![image](doc/image/mainFrame.png)
-
 ## 快速启动项目
 
 下载项目后到本地后，执行预处理脚本构建完整的应用平台。
@@ -44,20 +67,23 @@ sudo chmod 777 *.sh
 ./preBuildEnvironment.sh all
 ```
 
-关于sdk目录内容的说明如下所示。
+关于sdk(arm/aarch64)目录内容的说明如下所示。
 
-- build/ 系统平台编译后文件。
-  - build/nfs_root/     挂载文件系统的目录，nfs访问也基于此目录
-  - build/tftp_root/    编译后的uboot，zImage和设备树文件目录
-- download/ 下载的包保存的目录
-  - download/tmp/       用于解压包的缓存目录
-- img/  rootfs生成的硬盘格式文件保存目录(如果不存在，当第一次启动命令行会自动生成)
-- install/ 第三方库交叉编译默认安装目录，在创建文件系统时会导入
-  - install/aarch64/    arm64格式库安装目录
-  - install/arm/        arm格式库安装目录
-- support/ 包含系统运行需要的compiler, u-boot, kernel, busybox/buildroot文件系统构建工具。
-  - support/aarch64/    arm64应用运行支持环境
-  - support/arm/        arm应用运行支持环境
+```shell
+download                    #下载文件的目录
+    - tmp                   #缓存空间
+nfs                         #用于编译后的文件系统mount目录
+tftp                        #用于编译后的uboot和内核放置目录
+arm/arch
+    img                     #打包文件系统目录
+    install                 #交叉编译安装库目录     
+    toolchain               #编译工具目录
+    uboot                   #uboot目录
+    kernel                  #kernel目录
+    buildroot               #buildroot目录
+    debain                  #debain构建目录
+    ubuntu                  #uboot构建目录
+```
 
 重新开启命令行，如果加载如下所示，表示已经成功安装，项目需要在普通用户模式下执行，root权限无法加载。
 
@@ -87,6 +113,9 @@ SysMoutRoots
 
 #安装Debian系统和编译需要的第三方库
 SysPreThirdParts
+
+#安装第三方库
+SysInstallLibrary
 ```
 
 上述命令会从对应软件官网下载指定的文件，国内可能访问较慢，可以将文件复制到"[$(pwd)]/../sdk/download"中直接解压编译安装，对应文件包含如下:

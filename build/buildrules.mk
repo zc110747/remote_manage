@@ -46,7 +46,7 @@ cpp_objects ?=
 objects+=${c_objects}
 objects+=${cpp_objects}
 
-run_dist ?=$(NFS_PATH)/home/sys/executable
+run_dist ?=$(BUILD_NFS_PATH)/home/sys/executable
 
 ###library for store the buildout
 ifeq ($(FIRMWARE_CURRENT_PLATFORMS),ARM)
@@ -78,7 +78,7 @@ $(info AR_COMPILE:$(AR_COMPILE))
 %.o : %.cpp
 	$(CC_COMPILE) $(CCFLAGS) -c $< -o $@ $(INCLUDES)
 
-%.o : %.C
+%.o : %.c
 	$(C_COMPILE) $(CFLAGS) -c $< -o $@ $(INCLUDES)
 
 all : $(buildout)
@@ -97,7 +97,7 @@ endif
 	cp $(buildout) $(lib_dist)/
 
 	if [ ! -d $(run_dist) ]; then \
-		sudo mkdir -m 777 -p $(run_dist); \
+		mkdir -m 777 -p $(run_dist); \
 	fi
 	
 	mv $(buildout) $(run_dist)/

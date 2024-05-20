@@ -30,16 +30,14 @@
 const static std::map<std::string, cmd_format_t> CmdMapM = {
     {"readdev",    CmdReadDev},
     {"setdev",     CmdSetDev},
-    {"setlevel",   cmdSetLevel},
-    {"?",          CmdGetHelp},
-    {"help",       CmdGetHelp},
+    {"?",          cmdGetHelp},
+    {"help",       cmdGetHelp},
 };
 
 const static std::map<cmd_format_t, std::string> CmdHelpMapM = {
-    {CmdReadDev,    "!localdevice readdev"},
-    {CmdSetDev,     "!localdevice setdev [index],[action]"},
-    {cmdSetLevel,   "!localdevice setlevel [lev 0-5]",},
-    {CmdGetHelp,    "!localdevice ? or !locd help"},
+    {CmdReadDev,    "!local_dev readdev"},
+    {CmdSetDev,     "!local_dev setdev [index],[action]"},
+    {cmdGetHelp,    "!local_dev ? or !locd help"},
 };
 
 cmd_process* cmd_process::instance_pointer_ = nullptr;
@@ -107,9 +105,7 @@ bool cmd_process::process_data()
             break;
         case CmdSetDev:
             break;
-        case cmdSetLevel:
-            break;
-        case CmdGetHelp:
+        case cmdGetHelp:
             {
                 for (auto &[x, y] : CmdHelpMapM)
                 {

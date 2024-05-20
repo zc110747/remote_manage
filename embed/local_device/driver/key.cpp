@@ -16,21 +16,19 @@
 //  Revision History:
 //      12/24/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
-
-#include <map>
+#include <linux/input.h>
 #include "key.hpp"
 #include "logger_manage.hpp"
 #include "common.hpp"
 
-static std::map<int, std::function<void(int)>> FuncList;
-
-static void sigio_signal_func(int signum)
+typedef struct
 {
-    for (auto &&func : FuncList)
-    {
-        func.second(func.first);
-    }
-}
+    uint16_t key_num;
+    uint16_t key_event;
+    std::function<void(uint16_t, uint16_t)> func;
+}KEY_ACTION_STRUCT;
+
+static std::vector<KEY_ACTION_STRUCT> key_action_list;
 
 bool key_device::init(const std::string &DevicePath, int flags)
 {
@@ -45,27 +43,66 @@ bool key_device::init(const std::string &DevicePath, int flags)
     }
     else
     {
-        PRINT_LOG(LOG_INFO, 0, "open %s device success, fd:%d!", device_path_.c_str(), device_fd_);
-
-        if (is_first_run)
-        {
-            PRINT_LOG(LOG_INFO, 0, "sigio register!");
-            signal(SIGIO, sigio_signal_func);
-            is_first_run = false;
-        }
-        fcntl(device_fd_, F_SETOWN, getpid());      /* 设置当前进程接收SIGIO信号 */
-        flags = fcntl(device_fd_, F_GETFL);         /* 获取当前的进程状态 */
-        fcntl(device_fd_, F_SETFL, flags | FASYNC); /* 设置进程启用异步通知功能 */
+        std::thread(std::bind(&key_device::run, this)).detach();
     }
     return true;
 }
 
-bool key_device::register_func(std::function<void(int)> func)
+void key_device::run()
+{
+    int flags;
+    struct input_event event;
+
+    PRINT_LOG(LOG_INFO, 0, "key device run start!");
+
+    while(1)
+    {
+        flags = read(device_fd_, &event, sizeof(event));
+        if (flags > 0) 
+        {
+            switch (event.type) 
+            {
+                case EV_KEY:
+                        for(auto key_action:key_action_list)
+                        {
+                            if(event.code == key_action.key_num
+                            && event.value == key_action.key_event)
+                            {
+                                key_action.func(key_action.key_num, key_action.key_event);
+                                break;
+                            }
+                        }
+                    break;
+                case EV_REL:
+                    break;
+                case EV_ABS:
+                    break;
+                case EV_MSC:
+                    break;
+                case EV_SW:
+                    break;
+            }
+        } 
+        else 
+        {
+            printf("read data failed!\n");
+        }
+    }
+}
+
+bool key_device::register_func(uint16_t key_num, uint16_t key_event, std::function<void(uint16_t, uint16_t)> func)
 {
     if (device_fd_ >= 0)
     {
-        FuncList.insert(std::make_pair(device_fd_, func));
-        PRINT_LOG(LOG_INFO, 0, "key register, totol:%d!", FuncList.size());
+        KEY_ACTION_STRUCT key_action =
+        {
+            .key_num = key_num, 
+            .key_event = key_event, 
+            .func = func
+        };
+
+        key_action_list.push_back(key_action);
+        PRINT_LOG(LOG_INFO, 0, "key register, totol:%d!", key_action_list.size());
         return true;
     }
     return false;

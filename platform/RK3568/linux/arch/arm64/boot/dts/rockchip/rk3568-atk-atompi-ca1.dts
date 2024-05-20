@@ -1,0 +1,99 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright (c) 2020 Rockchip Electronics Co., Ltd.
+ *
+ */
+
+#include "rk3568-atk-atompi-ca1.dtsi"
+
+/ {
+	fiq-debugger {
+		compatible = "rockchip,fiq-debugger";
+		rockchip,serial-id = <2>;
+		rockchip,wake-irq = <0>;
+		/* If enable uart uses irq instead of fiq */
+		rockchip,irq-mode-enable = <1>;
+		rockchip,baudrate = <1500000>;  /* Only 115200 and 1500000 */
+		interrupts = <GIC_SPI 252 IRQ_TYPE_LEVEL_LOW>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&uart2m0_xfer>;
+		status = "okay";
+	};
+
+	debug: debug@fd904000 {
+		compatible = "rockchip,debug";
+		reg = <0x0 0xfd904000 0x0 0x1000>,
+			<0x0 0xfd905000 0x0 0x1000>,
+			<0x0 0xfd906000 0x0 0x1000>,
+			<0x0 0xfd907000 0x0 0x1000>;
+	};
+
+    cspmu: cspmu@fd90c000 {
+		compatible = "rockchip,cspmu";
+		reg = <0x0 0xfd90c000 0x0 0x1000>,
+			<0x0 0xfd90d000 0x0 0x1000>,
+			<0x0 0xfd90e000 0x0 0x1000>,
+			<0x0 0xfd90f000 0x0 0x1000>;
+	};
+
+	adc_keys: adc-keys {
+		compatible = "adc-keys";
+		io-channels = <&saradc 0>;
+		io-channel-names = "buttons";
+		keyup-threshold-microvolt = <1800000>;
+		poll-interval = <100>;
+
+		vol-up-key {
+			label = "volume up";
+			linux,code = <KEY_VOLUMEUP>;
+			press-threshold-microvolt = <17822>;
+		};
+
+		vol-down-key {
+			label = "volume down";
+			linux,code = <KEY_VOLUMEDOWN>;
+			press-threshold-microvolt = <415385>;
+		};
+	};	
+};
+
+&pwm3 {
+	status = "okay";
+
+	compatible = "rockchip,remotectl-pwm";
+	remote_pwm_id = <3>;
+	handle_cpu_id = <1>;
+	remote_support_psci = <0>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pwm3_pins>;
+	wakeup-source;
+
+	ir_key1 {
+		/* 正点原子红外遥控器按键定义: 一共20个按键 */
+		wakeup-source;
+		rockchip,usercode = <0xFF00>;
+		rockchip,key_table =
+			<0xba KEY_POWER>,
+			<0xb9 KEY_UP>,
+			<0xb8 KEY_HOME>,
+			<0xbb KEY_REWIND>,
+			<0xbf KEY_PLAYPAUSE>,
+			<0xbc KEY_FASTFORWARD>,
+			<0xf8 KEY_VOLUMEDOWN>,
+			<0xea KEY_DOWN>,
+			<0xf6 KEY_VOLUMEUP>,
+			<0xe9 KEY_1>,
+			<0xe6 KEY_2>,
+			<0xf2 KEY_3>,
+			<0xf3 KEY_4>,
+			<0xe7 KEY_5>,
+			<0xa1 KEY_6>,
+			<0xf7 KEY_7>,
+			<0xe3 KEY_8>,
+			<0xa5 KEY_9>,
+			<0xbd KEY_0>,
+			<0xb5 KEY_BACKSPACE>;
+	};
+};
+
+

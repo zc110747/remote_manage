@@ -23,7 +23,7 @@ _Pragma("once")
 //common unit for all application
 #include "time_manage.hpp"
 #include "fifo/fifo_manage.hpp"
-#include "jsonconfig/jsonconfig.hpp"
+#include "jsonconfig/json_config.hpp"
 #include "logger/logger_manage.hpp"
 
 uint16_t crc16(uint16_t crc, uint8_t const *buffer, uint16_t len);

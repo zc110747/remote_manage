@@ -20,8 +20,12 @@ _Pragma("once")
 
 #include "device_base.hpp"
 
+#define KEY_NUM     11
+#define KEY_PREES   1
+#define KEY_RELEASE 0
+
 class key_device:public device_base
-{  
+{
 public:
     /// \brief constructor
     using device_base::device_base;
@@ -37,5 +41,11 @@ public:
     /// - This method is used to register function for key callback.
     /// \param func - function register for the key.
     /// \return Wheather register is success or failed.
-    bool register_func(std::function<void(int)> func);
+    bool register_func(uint16_t key_num, uint16_t key_event, std::function<void(uint16_t, uint16_t)> func);
+
+private:
+
+    /// \brief run
+    /// - This method is used for thread run key. 
+    void run();
 };

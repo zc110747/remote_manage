@@ -19,6 +19,9 @@
 #include <sys/ioctl.h>
 #include "rtc.hpp"
 
+#define FMT_HEADER_ONLY
+#include "fmt/core.h"
+
 bool rtc_device::update_rtc_time()
 {
     bool ret = false;
@@ -44,7 +47,13 @@ bool rtc_device::update_rtc_time()
     {
         retval = ioctl(device_fd_, RTC_RD_TIME, &rtc_time_);
         if (retval >= 0)
+        {
+            time_str_ = fmt::format("{0:0>4}:{1:0>2}:{2:0>2} {3:0>2}:{4:0>2}:{5:0>2}", 
+                                    rtc_time_.tm_year, rtc_time_.tm_mon, rtc_time_.tm_mday,
+                                    rtc_time_.tm_hour, rtc_time_.tm_min, rtc_time_.tm_sec);
             ret = true;
+        }
+
     }
 #endif
     return ret;
@@ -52,12 +61,12 @@ bool rtc_device::update_rtc_time()
 
 bool rtc_device::init(const std::string &DevicePath, int flags)
 {
-    start_time_ = get_current_time();
+    start_time_ = get_run_time();
 
     return device_base::init(DevicePath, flags);
 }
 
-int rtc_device::get_current_time()
+int rtc_device::get_run_time()
 {
     uint64_t second = 0;
 
@@ -67,7 +76,10 @@ int rtc_device::get_current_time()
         second += rtc_time_.tm_min*60;
         second += rtc_time_.tm_sec;
     }
-
     return second-start_time_;
 }
 
+std::string &rtc_device::get_timer_str()
+{
+    return time_str_;
+}

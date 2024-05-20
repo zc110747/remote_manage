@@ -6,7 +6,7 @@
 //      main.cpp
 //
 //  Purpose:
-//     支持将socket数据转换为
+//     串口转换为serial_net,
 //
 // Author:
 //     @听心跳的声音
@@ -132,6 +132,8 @@ static bool system_init(int is_default, const char* path)
         PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "System Config use default!");
     }
     std::cout<<*(system_config::get_instance())<<std::endl;
+    LOG_LEVEL level = (LOG_LEVEL)system_config::get_instance()->get_logger_privilege().lower_device_level;
+    log_manage::get_instance()->set_level(level);
 
     ret &= log_manage::get_instance()->init();
     ret &= time_manage::get_instance()->init();
