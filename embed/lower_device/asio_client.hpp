@@ -80,11 +80,11 @@ private:
     std::atomic<bool> is_client_link_{false};
 
     /// \brief client_tx_thread_
-    /// - client tx thread object. 
+    /// - client tx thread object.
     std::thread client_tx_thread_;
 
     /// \brief client_rx_thread_
-    /// - client rx thread object. 
+    /// - client rx thread object.
     std::thread client_rx_thread_;
 
     /// \brief logger_fifo_
@@ -92,11 +92,11 @@ private:
     std::unique_ptr<fifo_manage> client_tx_fifo_{nullptr};
 
     /// \brief rx_buffer_
-    /// - rx buffer for receive.     
+    /// - rx buffer for receive.
     char rx_buffer_[CLIENT_RX_MAX_BUFFER_SIZE];
 
     /// \brief tx_buffer_
-    /// - tx buffer for receive.     
+    /// - tx buffer for receive.
     char tx_buffer_[CLIENT_TX_MAX_BUFFER_SIZE];
 
     /// \brief io_context_

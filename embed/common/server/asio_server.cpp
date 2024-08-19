@@ -184,7 +184,7 @@ void asio_server::init(const std::string& address, const std::string& port, std:
     acceptor_.listen();
     
     do_accept();
-} 
+}
 
 void asio_server::do_accept()
 {

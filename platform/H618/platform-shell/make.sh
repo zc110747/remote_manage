@@ -94,6 +94,7 @@ compile_u_boot()
 
     mkimage -C none -A arm -T script -d boot.cmd boot.scr
     mv boot.scr "${PACKAGE_PATH}"/
+    cp config.txt "${PACKAGE_PATH}/"
 
     make ${UBOOT_CONFIG}
 
@@ -119,11 +120,6 @@ compile_kernel()
     cp "${KERNEL_PATH}/arch/${CHIP_ARCH}/boot/Image" "${PACKAGE_PATH}/"
     make modules_install INSTALL_MOD_PATH="${PACKAGE_PATH}" ARCH=${CHIP_ARCH}
     make dtbs_install INSTALL_DTBS_PATH="${PACKAGE_PATH}" ARCH=${CHIP_ARCH}
-    mkimage -C none -A arm -T script -d ${PATH_PWD}/boot.cmd ${PATH_PWD}/boot.scr
-
-    cp -fv "${PATH_PWD}/boot.cmd" "${PACKAGE_PATH}/"
-    cp -fv "${PATH_PWD}/boot.scr" "${PACKAGE_PATH}/"
-    cp -fv "${PATH_PWD}/config.txt" "${PACKAGE_PATH}/"
 }
 
 compile_debain()

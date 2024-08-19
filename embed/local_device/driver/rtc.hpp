@@ -46,7 +46,7 @@ public:
     
     /// \brief get_timer_str
     /// - This method is used to get timer string.
-    /// \return The time string convert.   
+    /// \return The time string convert.
     std::string &get_timer_str();
 
 private:

@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="97HLYAoYRTmnaLsdLiow" name="MainFrameWork">
-        <mxGraphModel dx="270" dy="938" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="-208" dy="455" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -259,7 +259,7 @@
                         <mxPoint x="1525" y="522" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="118" value="Linux Runtime Structure(Uboot，Kernel，Rootfs, Driver, Thrid Library)" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                <mxCell id="118" value="Linux Runtime Structure(Uboot，Kernel，Rootfs, Driver, Thrid Library)" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="1102" y="528" width="530" height="41" as="geometry"/>
                 </mxCell>
             </root>

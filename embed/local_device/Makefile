@@ -28,11 +28,7 @@ INCLUDES =      -I include/ \
 INCLUDES +=     -I $(ENV_PATH_ROOT)/thirdparts/asio/include/ \
                 -I $(ENV_PATH_ROOT)/thirdparts/jsoncpp/include/
 
-ifeq ($(FIRMWARE_CURRENT_PLATFORMS),ARM)
-library = $(ENV_PATH_ROOT)/buildout/arm/libjsoncpp.a
-else
-library = $(ENV_PATH_ROOT)/buildout/aarch64/libjsoncpp.a
-endif
+library = $(SUPPORT_ENV_INSTALL)/lib/libjsoncpp.a
 
 # This is the file name of the executables and path where 
 # place the executables

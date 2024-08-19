@@ -30,7 +30,7 @@ usr_beep {
 
 pinctrl_gpio_beep: beep {
     fsl,pins = <
-        MX6ULL_PAD_SNVS_TAMPER1__GPIO5_IO01		0x400010B0
+        MX6ULL_PAD_SNVS_TAMPER1__GPIO5_IO01        0x400010B0
     >;
 };
 */
@@ -64,7 +64,7 @@ struct beep_data
 
 //自定义设备号
 #define DEVICE_NAME                         "miscbeep"      /* 设备名, 应用将以/dev/beep访问 */
-#define MISCBEEP_MINOR		                156		        /* 子设备号 */
+#define MISCBEEP_MINOR                        156                /* 子设备号 */
 
 static void beep_hardware_set(struct beep_data *chip, u8 status)
 {
@@ -171,7 +171,7 @@ static int beep_device_create(struct beep_data *chip)
     chip->misc_dev.fops = &(chip->misc_fops);
 
     result = misc_register(&(chip->misc_dev));
-    if(result < 0){
+    if (result < 0){
         dev_info(&pdev->dev, "misc device register failed!\n");
         return -EFAULT;
     }
@@ -184,12 +184,12 @@ static int beep_hardware_init(struct beep_data *chip)
 {
     struct platform_device *pdev = chip->pdev;
 
+    //1.获取beep gpio属性, 设置为输出模式
     chip->desc = devm_gpiod_get(&pdev->dev, "beep", GPIOD_OUT_LOW);
-    if(!chip->desc){
+    if (!chip->desc){
         dev_err(&pdev->dev, "beep request gpios failed!\n");
         return -EIO;     
     }
-
     gpiod_direction_output(chip->desc, BEEP_OFF);
 
     dev_info(&pdev->dev, "beep hardware init success, is active:%d\n", gpiod_is_active_low(chip->desc));
@@ -201,14 +201,24 @@ static int beep_probe(struct platform_device *pdev)
     int result;
     struct beep_data *chip = NULL;
 
+    //1.申请beep控制块
     chip = devm_kzalloc(&pdev->dev, sizeof(struct beep_data), GFP_KERNEL);
-    if(!chip){
+    if (!chip){
         dev_err(&pdev->dev, "malloc error\n");
         return -ENOMEM;
     }
     chip->pdev = pdev;
     platform_set_drvdata(pdev, chip);
 
+    //2.初始化beep硬件设备
+    result = beep_hardware_init(chip);
+    if (result != 0)
+    {
+        dev_err(&pdev->dev, "hardware init failed!\n");
+        return result;
+    }
+
+    //3.创建内核访问接口
     result = beep_device_create(chip);
     if (result != 0)
     {
@@ -216,12 +226,6 @@ static int beep_probe(struct platform_device *pdev)
         return result;
     }
 
-    result = beep_hardware_init(chip);
-    if (result != 0)
-    {
-        dev_err(&pdev->dev, "hardware init failed!\n");
-        return result;
-    }
     dev_info(&pdev->dev, "driver probe all success!\n");
     return 0;
 }

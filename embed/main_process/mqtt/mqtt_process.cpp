@@ -17,6 +17,8 @@
 //      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
 #include "mqtt_process.hpp"
+#include "cmd_process.hpp"
+#include "mqtt_protocol.hpp"
 
 mqtt_device::mqtt_device(const mqtt_info &info, std::function<void(char *ptr, int size)> handler) 
 :mosquittopp(info.id.c_str())
@@ -83,13 +85,13 @@ void mqtt_device::on_subscribe(int mid, int qos_count, const int *granted_qos)
     PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "subscription topic:%s, succeeded!", info_.sub_topic.c_str());
 }
 
-int mqtt_device::publish_msg(const std::string &str)
+int mqtt_device::publish_msg(const std::string &topic, int qos, const char* ptr, int size)
 {
     int ret = 0;
 
-    if (is_connet_ && str.length() > 0)
+    if (is_connet_ && size > 0)
     {
-        ret = publish(NULL, info_.pub_topic.c_str(), str.length(), str.c_str(), info_.qos);
+        ret = publish(NULL, topic.c_str(), size, ptr, qos);
         //PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "publisher, topic:%s, ret:%d!", info_.pub_topic.c_str(), ret);
     }
     
@@ -110,27 +112,41 @@ mqtt_manage* mqtt_manage::get_instance()
     return instance_pointer_;
 }
 
+//"A0 + json data"
+//"0x41 0x31 + Hex data"
 bool mqtt_manage::init()
 {
     bool ret = false;
 
     try
     {
-        const MqttDeivceInfo mqtt_config = system_config::get_instance()->get_mqtt_config();
+        const MqttDeivceInfo mqtt_config = system_config::get_instance()->get_mp_mqtt_config();
 
         //mqtt subscribe init
         mqtt_info mqtt_process_info = {
             id:mqtt_config.id,
-            host:system_config::get_instance()->get_ipaddress(),
-            port:mqtt_config.port,
+            host:system_config::get_instance()->get_mqtthost(),
+            port:system_config::get_instance()->get_mqttport(),
             sub_topic:mqtt_config.sub_topic,
-            pub_topic:mqtt_config.pub_topic,
             keepalive:mqtt_config.keepalive,
             qos:mqtt_config.qos
         };
 
-        mqtt_device_ptr = std::make_unique<mqtt_device>(mqtt_process_info, [](char *ptr, int size){
+        mqtt_device_ptr = std::make_unique<mqtt_device>(mqtt_process_info, [](char *ptr, int size)
+        {
             PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "rx_buffer_size:%d, buffer:%s.", size, ptr);
+
+            if(size > 2)
+            {
+                if (memcmp(ptr, JSON_DATA_HEAD, 2) == 0)
+                {
+                    mqtt_protocol::get_instance()->decode_json_command(ptr+2, size);
+                }
+                else if(memcmp(ptr, HEX_DATA_HEAD, 2) == 0)
+                {
+                    PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "hex data receive!");
+                }
+            }
         });
         if (mqtt_device_ptr == nullptr)
         {
@@ -146,13 +162,26 @@ bool mqtt_manage::init()
     return ret;
 }
 
-int mqtt_manage::mqtt_publish(const std::string &str)
+int mqtt_manage::mqtt_publish(const std::string &topic, int qos, const std::string &str)
 {
     int ret = -1;
 
     if (mqtt_device_ptr != nullptr)
     {
-        ret = mqtt_device_ptr->publish_msg(str);
+        PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "topic:%s, data:%s", topic.c_str(), str.c_str());
+        ret = mqtt_device_ptr->publish_msg(topic, qos, str.c_str(), str.size());
     }
     return ret;
+}
+
+int mqtt_manage::mqtt_publish(const std::string &topic, int qos, char *ptr, uint16_t size)
+{
+    int ret = -1;
+
+    if (mqtt_device_ptr != nullptr)
+    {
+        PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "topic:%s, data:%s", topic.c_str(), ptr);
+        ret = mqtt_device_ptr->publish_msg(topic, qos, ptr, size);
+    }
+    return ret;   
 }

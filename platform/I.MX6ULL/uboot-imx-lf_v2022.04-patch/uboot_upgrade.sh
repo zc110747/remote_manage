@@ -1,15 +1,13 @@
 
 PLATFORM_BOOT=$(pwd)
 
-#SRC_DIR=${SUPPORT_ENV_BOOT_DIR}
-#DST_DIR=${PLATFORM_BOOT}
 SRC_DIR=${PLATFORM_BOOT}
 DST_DIR=${SUPPORT_ENV_BOOT_DIR}
 
 echo "start copy u-boot patch..."
 
 #boot script
-cp -fv ${SRC_DIR}/boot.script ${DST_DIR}/
+cp -fv ${SRC_DIR}/boot.cmd ${DST_DIR}/
 
 #configs
 cp -fv ${SRC_DIR}/configs/* ${DST_DIR}/configs/
@@ -35,10 +33,6 @@ if [ ! -d "${DST_DIR}/.vscode" ]; then
     mkdir -p "${DST_DIR}/.vscode"
 fi
 cp -rv ${SRC_DIR}/.vscode/settings.json ${DST_DIR}/.vscode/
-
-#build
-sudo chmod 777 rmk_build_emmc.sh 
-cp -rv ${SRC_DIR}/rmk_build_emmc.sh ${DST_DIR}/
 
 echo "end copy u-boot patch, success!"
 sleep 1

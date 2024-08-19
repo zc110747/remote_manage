@@ -43,12 +43,12 @@ public:
 
     /// \brief getfd
     /// - get current device fd.
-    /// \return the device fd of current device. 
+    /// \return the device fd of current device.
     int getfd() { return device_fd_; }
 
     /// \brief getDevicePath
     /// - get current device path.
-    /// \return the path of current device. 
+    /// \return the path of current device.
     const std::string &getDevicePath() {return device_path_;}
 
 protected:

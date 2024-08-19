@@ -5,7 +5,7 @@
 # Original Author: 1107473010@qq.com
 #
 ################################################################################
-obj-m := kernel_iio_adc.o
-with_kernel:=y
+obj-m := vf610_adc.o
+FIRMWARE_CLEAN := 1
 
 include $(ENV_PATH_ROOT)/build/buildmod.mk

@@ -35,9 +35,10 @@ static int led_device_create(struct led_data *chip)
     if (major){
         chip->dev_id = MKDEV(major, minor);
         ret = register_chrdev_region(chip->dev_id, 1, DEVICE_NAME);
-    }else {
+    } else {
         ret = alloc_chrdev_region(&chip->dev_id, 0, 1, DEVICE_NAME);
     }
+
     if (ret < 0){
         dev_err(&pdev->dev, "id alloc failed!\n");
         goto exit;

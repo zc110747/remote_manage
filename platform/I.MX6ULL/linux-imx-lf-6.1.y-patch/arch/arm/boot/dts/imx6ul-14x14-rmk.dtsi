@@ -268,28 +268,28 @@
 // 	};
 // };
 
-&i2c1 {
-	clock-frequency = <100000>;
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_i2c1>;
-	status = "okay";
+// &i2c1 {
+// 	clock-frequency = <100000>;
+// 	pinctrl-names = "default";
+// 	pinctrl-0 = <&pinctrl_i2c1>;
+// 	status = "okay";
 
-	// magnetometer@e {
-	// 	compatible = "fsl,mag3110";
-	// 	reg = <0x0e>;
-	// 	vdd-supply = <&reg_peri_3v3>;
-	// 	vddio-supply = <&reg_peri_3v3>;
-	// 	position = <2>;
-	// };
+// 	magnetometer@e {
+// 		compatible = "fsl,mag3110";
+// 		reg = <0x0e>;
+// 		vdd-supply = <&reg_peri_3v3>;
+// 		vddio-supply = <&reg_peri_3v3>;
+// 		position = <2>;
+// 	};
 
-	// fxls8471@1e {
-	// 	compatible = "fsl,fxls8471";
-	// 	reg = <0x1e>;
-	// 	position = <0>;
-	// 	interrupt-parent = <&gpio5>;
-	// 	interrupts = <0 8>;
-	// };
-};
+// 	fxls8471@1e {
+// 		compatible = "fsl,fxls8471";
+// 		reg = <0x1e>;
+// 		position = <0>;
+// 		interrupt-parent = <&gpio5>;
+// 		interrupts = <0 8>;
+// 	};
+// };
 
 &pwm1 {
 	#pwm-cells = <2>;

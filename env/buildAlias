@@ -124,8 +124,8 @@ function install_library()
 	sudo cp "${ENV_PATH_ROOT}"/rootfs/home/sys/configs/dynamic.json "${BUILD_NFS_PATH}"/home/sys/configs/dynamic.json
 
 	#安装启动脚本
-	sudo cp "${PLATFORM_INSTALL_SHELL}"/kill_br_app.sh "${BUILD_NFS_PATH}"/home/sys/
-	sudo cp "${PLATFORM_INSTALL_SHELL}"/start_br_app.sh "${BUILD_NFS_PATH}"/home/sys/
+	sudo cp "${PLATFORM_INSTALL_SHELL}"/kill_all.sh "${BUILD_NFS_PATH}"/home/sys/
+	sudo cp "${PLATFORM_INSTALL_SHELL}"/start_app.sh "${BUILD_NFS_PATH}"/home/sys/
 }
 alias install_library='install_library'
 
@@ -181,7 +181,7 @@ function build_application()
 
 	#check wheather build driver
 	if [ "${FIRMWARE_CURRENT_PLATFORMS}" == "ARM" ]; then
-		build_driver_module
+		build_driver_modules
 	else
 		echo "driver only support for i.mx6ull, not build!".
 	fi
@@ -189,8 +189,14 @@ function build_application()
 	echo "firmware path:${ENV_PATH_ROOT}"
 
 	#copy config file
-	cd "${ENV_PATH_ROOT}" || return 
-    mkdir -m 755 -p "${BUILD_NFS_PATH}"/home/sys/configs/
+	cd "${ENV_PATH_ROOT}" || return
+
+	if [ ! -d "${BUILD_NFS_PATH}"/bin ]; then
+		SysMountRootfs
+	fi
+
+	sudo chmod 777 "${BUILD_NFS_PATH}"
+	mkdir -m 755 -p "${BUILD_NFS_PATH}"/home/sys/configs/
 	chmod 755 "${BUILD_NFS_PATH}"/home/sys/configs/
 	cp -fv config.template.json "${BUILD_NFS_PATH}"/home/sys/configs/config.json
     exit_if_last_error

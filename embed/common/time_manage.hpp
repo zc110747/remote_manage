@@ -91,7 +91,7 @@ private:
     std::condition_variable cond;
 
     /// \brief mutex_
-    /// - mutex_ used for condition. 
+    /// - mutex_ used for condition.
     std::mutex mutex_;
 
     /// \brief millisecond_

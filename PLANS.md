@@ -1,6 +1,29 @@
 
 # 开发计划
 
+## FM Version 1.0.0.12(处理中)
+
+[platform]
+
+[embed]
+
+1. 增加node服务器的功能，支持界面
+2. 增加logger记录功能
+3. 增加mqtt request处理
+
+## FM Version 1.0.0.11
+
+[platform]
+
+1. 增加RockChip和H618平台支持
+2. 支持qemu仿真环境支持
+3. 支持nand环境
+4. 增加升级功能(发送支持16进制和字符串)
+
+[mod]
+
+1. 增加pwm驱动支持
+
 ## FM Version 1.0.0.10
 
 [paltform]

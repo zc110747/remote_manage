@@ -44,8 +44,7 @@ int main(int argc, const char *argv[])
             val[0] = index;
             if (index == on_num){
                 val[1] = 1;
-            }
-            else{
+            } else {
                 val[1] = 0;
             }
             write(fd, val, 2);

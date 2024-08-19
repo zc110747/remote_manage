@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
         fcntl(device_fd, F_SETFL, flags | FASYNC);
 
         rtc_time.tm_min += 1;
-        if(rtc_time.tm_min == 60)
+        if (rtc_time.tm_min == 60)
         {
             rtc_time.tm_min = 0;
             rtc_time.tm_hour += 1;
@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
         printf("retval:%d\n", retval);   
     }
 
-    while(!flag)
+    while (!flag)
     {
         sleep(1);
     }

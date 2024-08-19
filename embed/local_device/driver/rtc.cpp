@@ -53,7 +53,6 @@ bool rtc_device::update_rtc_time()
                                     rtc_time_.tm_hour, rtc_time_.tm_min, rtc_time_.tm_sec);
             ret = true;
         }
-
     }
 #endif
     return ret;

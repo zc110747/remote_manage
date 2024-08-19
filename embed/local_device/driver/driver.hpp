@@ -25,6 +25,7 @@ _Pragma("once")
 #include "led.hpp"
 #include "rtc.hpp"
 #include "spi_icm.hpp"
+#include "pwm_dev.hpp"
 
 class driver_manage
 {
@@ -86,9 +87,13 @@ public:
 
     /// \brief get_vf610_dev
     /// - This method is used to get vf610 device point.
-    /// \return the spi vf610 device point.
+    /// \return the vf610 device point.
     iio_device *get_vf610_dev()  {return &vf610_adc_dev_;}
 
+    /// \brief get_pwm_dev
+    /// - This method is used to get pwm device point.
+    /// \return the pwm device point.
+    pwm_device *get_pwm_dev()  {return &pwm_dev_;}
 private:
     /// \brief instance_pointer_
     /// - object used to implement the singleton pattern.
@@ -115,15 +120,19 @@ private:
     icm_device icm20608_dev_;
 
     /// \brief rtc_dev_
-    /// - rtc device object.   
+    /// - rtc device object.
     rtc_device rtc_dev_;
 
     /// \brief hx711_dev_
-    /// - hx711 device object.      
+    /// - hx711 device object.
     iio_device hx711_dev_;
 
-    /// \brief hx711_dev_
-    /// - vf610 device object. 
+    /// \brief vf610_adc_dev_
+    /// - vf610 device object.
     iio_device vf610_adc_dev_;
+
+    /// \brief pwm_dev_
+    /// - pwm device object.   
+    pwm_device pwm_dev_;
 };
 

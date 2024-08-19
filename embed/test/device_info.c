@@ -29,6 +29,9 @@
 #include <sys/utsname.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <linux/rtc.h>
+#include <time.h>
 
 #define MEM_B       0
 #define MEM_KB      1
@@ -47,6 +50,7 @@ static int memory_manage(void);
 static int ip_list(void);
 static int kernal_info_get(void);
 static int get_cpuinfo(void);
+static int show_time(void);
 
 int main()
 {
@@ -60,6 +64,7 @@ int main()
 
     get_cpuinfo();
 
+    show_time();
     return 0;
 }
 
@@ -92,6 +97,24 @@ char *get_memory_info(uint8_t unit)
             return "TB";
         break;
     }
+}
+
+static int show_time(void)
+{
+    time_t timep;
+    struct tm mytime, *p;
+
+    time(&timep);
+    p = localtime_r(&timep, &mytime); //gmtime_r将秒数转换成UTC时钟的时区值
+
+    if (p != NULL)
+    {
+        printf("%d-%d-%d-%d:%d:%d\n", 
+                mytime.tm_year+1900, mytime.tm_mon+1, mytime.tm_mday, 
+                mytime.tm_hour, mytime.tm_min, mytime.tm_sec);
+    }
+
+    return 0;
 }
 
 static int diskinfo_manage(void)
@@ -195,7 +218,7 @@ static int get_cpuinfo(void)
     {  
         perror("Failed to open /proc/cpuinfo");
         exit(EXIT_FAILURE);
-    }  
+    }
   
     while (fgets(line, MAX_LINE_LENGTH, file))
     {  
@@ -215,7 +238,7 @@ static int get_cpuinfo(void)
                 break;
             }
             token = strtok_r(NULL, ":", &saveptr);
-        } 
+        }
 
         if (is_success == 1)
         {

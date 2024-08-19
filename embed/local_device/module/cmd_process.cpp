@@ -126,8 +126,7 @@ void cmd_process::run()
     while (1)
     {
         len = logger_loc_dev_tx_fifo_->read(rx_buffer_, DEVICE_RX_BUFFER_SIZE);
-        if (len > 0)
-        {
+        if (len > 0) {
             rx_buffer_[len] = '\0';
             rx_size_ = len;
 
@@ -139,13 +138,9 @@ void cmd_process::run()
             {
                 PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "cmd_process parse fail, buffer:%s!", rx_buffer_);
             }
-        }
-        else if (len == 0)
-        {
+        } else if (len == 0) {
             PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "%s read empty fifo data:%d\n", __func__, len);
-        }
-        else
-        {
+        } else {
             PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "%s read failed:%d\n", __func__, len);
             break;
         }

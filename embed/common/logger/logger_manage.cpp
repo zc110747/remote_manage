@@ -99,7 +99,6 @@ int log_manage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...)
 
     if (level < log_level_)
     {
-        //PRINT_NOW("%s: %s not support buffer-0!\n", PRINT_NOW_HEAD_STR, __func__);
         return 0;
     }
 
@@ -125,7 +124,7 @@ int log_manage::print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...)
 
     if ((len<=0) || (len>=bufferlen))
     {
-        PRINT_NOW("%s: %s not support buffer-2!\n", PRINT_NOW_HEAD_STR, __func__);
+        PRINT_NOW("%s: %s not support buffer, len:%d-2!\n", PRINT_NOW_HEAD_STR, __func__, len);
         mutex_.unlock();
         return 0;
     }

@@ -55,8 +55,8 @@
 #define CONFIG_FASTBOOT_USB_DEV 0
 
 #define USER_ENV_SETTINGS \
-	"eth1addr=00:01:02:03:04:05\0" \
-	"eth2addr=00:01:02:03:04:06\0" \
+	"ethaddr=00:01:02:03:04:05\0" \
+	"eth1addr=00:01:02:03:04:06\0" \
 	"nfspath=/home/freedom/Desktop/sdk/arm/build/nfs_root/\0" \
 	"bootargs=console=ttymxc0,115200 root=/dev/nfs " \
 		"nfsroot=192.168.2.29:${nfspath},proto=tcp rw ip=192.168.2.99:192.168.2.29:192.168.2.1:255.255.255.0::eth0:off\0" \

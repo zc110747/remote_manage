@@ -63,16 +63,11 @@ void log_process::logger_rx_run()
     while (1)
     {
         len = logger_rx_fifo_->read(rx_buffer, RX_MAX_BUFFER_SIZE);
-        if (len > 0)
-        {
+        if (len > 0) {
             log_server::get_instance()->send_buffer(rx_buffer, len);
-        }
-        else if (len == 0)
-        {
+        } else if (len == 0) {
             PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "%s read empty fifo data:%d\n", __func__, len);
-        }
-        else
-        {
+        } else {
             PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "%s read failed:%d\n", __func__, len);
             break;
         }
@@ -173,7 +168,7 @@ bool log_process::login(char *ptr, int size)
         return true;
     }
 
-    if(strncmp("!passwd ", ptr, strlen("!passwd ")) != 0)
+    if (strncmp("!passwd ", ptr, strlen("!passwd ")) != 0)
     {
         return false;
     }
@@ -230,7 +225,7 @@ int log_process::send_buffer(char *ptr, int length)
                     pdata = ptr + len;
                     size = length - len;
 
-                    if(size == passwd.length() 
+                    if (size == passwd.length() 
                     && (memcmp(pdata, passwd.c_str(), passwd.length()) == 0)
                     )
                     {

@@ -21,14 +21,14 @@ int file_data_read(char *filename, char *str, size_t size)
     FILE *file;
 
     file = fopen(filename, "r"); /* 只读打开 */
-    if(file == NULL) 
+    if (file == NULL) 
     {
         printf("can't open file %s\r\n", filename);
         return -1;
     }
 
     ret = fread(str, 1, size, file);
-    if(ret <= 0) 
+    if (ret <= 0) 
     {
         printf("file read error!\r\n");
     }
@@ -45,10 +45,10 @@ int main(int argc, const char *argv[])
     int value;
     char str[50];
 
-    while(1)
+    while (1)
     {
         ret = file_data_read(h711_path, str, sizeof(str));
-        if(ret == 0)
+        if (ret == 0)
         {
             value = atoi(str);
             printf("read_gx711:%d, voltage:%3f\n", value, (float)value/4096*3.3);

@@ -23,7 +23,7 @@ _Pragma("once")
 #include "common.hpp"
 #include "fifo_manage.hpp"
 
-#define LOGGER_MAX_BUFFER_SIZE      256
+#define LOGGER_MAX_BUFFER_SIZE      1024
 #define LOGGER_MESSAGE_BUFFER_SIZE  16384
 
 typedef enum

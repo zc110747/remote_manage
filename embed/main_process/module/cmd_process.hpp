@@ -22,7 +22,9 @@ _Pragma("once")
 typedef enum
 {
     cmdSetLevel = 0,
+    cmdGetStatus,
     cmdSetDevice,
+    cmdGetDevice,
     cmdGetHelp,
     cmdGetOS,
 }cmd_format_t;
@@ -47,6 +49,16 @@ public:
     /// \return Wheather initialization is success or failed.
     bool init();
 
+    /// \brief parse_data
+    /// - This method is used to decode command received.
+    /// \return Wheather parse is success or failed.
+    bool mqtt_decode_command(char *ptr, int size);
+
+    /// \brief process_data
+    /// - This method is used to process device.
+    /// \return Wheather process is success or failed.
+    bool process_device(int dev, const std::string& data);
+    
 private:
     /// \brief run
     /// - This method is used for thread run the device management.
@@ -61,13 +73,13 @@ private:
     /// - This method is used to process the data already parse.
     /// \return Wheather process is success or failed.
     bool process_data();
-
+    
     /// \brief show_os
     /// - This method is show current os information.
     void show_os();
 
     /// \brief sync_level
-    /// - This method is used to sync level.   
+    /// - This method is used to sync level.
     void sync_level(int dev, int level);
 
 private:

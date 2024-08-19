@@ -1,0 +1,27 @@
+bootlogo=false
+overlay_prefix=sun50i-h616
+fdtfile=sun50i-h616-walnutpi-1b
+
+##  enable the console with screen
+console_display=enable
+console_uart=uart0
+
+## show the bootinfo to the screen
+display_bootinfo=enable
+
+
+## loglevel
+printk_level=3
+
+## Specify HDMI output resolution (eg. extraargs=video=HDMI-A-1:800x480-24@60)
+#extraargs=video=HDMI-A-1:1024x600-24@60
+
+
+#spi : spidev0_0 spidev1_0 spidev1_1 spidev1_2
+#i2c : i2c1 i2c2 i2c4
+#uart : uart2 uart4
+overlays=spi1 i2c1 i2c2 uart2
+
+
+#------------------------------------------------#
+rootfstype=ext4

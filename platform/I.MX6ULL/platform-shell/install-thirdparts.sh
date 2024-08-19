@@ -187,7 +187,7 @@ function process_mosquitto()
     mkdir -m 777 -p ${SUPPORT_ENV_INSTALL}/usr/local/sbin/
     mkdir -m 777 -p ${SUPPORT_ENV_INSTALL}/usr/local/lib/
 
-    下载和解压mosquitto
+    #下载和解压mosquitto
     mosquitto_ver=mosquitto-2.0.18
     cd ${PROGRAM_DOWNLOAD}/
     if [ ! -f ${mosquitto_ver}.tar.gz ]; then
@@ -247,6 +247,31 @@ function process_jsoncpp()
     make -j${CPU_NUM}
 }
 
+function process_curl()
+{
+    if [ -f ${SUPPORT_ENV_INSTALL}/bin/curl ]; then
+        echo "curl already build, not install!"
+        return 0
+    fi
+
+    cd ${PROGRAM_DOWNLOAD}/
+
+    if [ ! -f "curl_8.8.0.orig.tar.gz" ]; then
+        wget https://mirrors.tuna.tsinghua.edu.cn/debian/pool/main/c/curl/curl_8.8.0.orig.tar.gz
+        sleep 2
+    fi
+
+    tar -xvf curl_8.8.0.orig.tar.gz
+    cd curl-8.8.0/
+    
+    ./configure --with-ssl="${SUPPORT_ENV_INSTALL}" --with-zlib="${SUPPORT_ENV_INSTALL}" --host=arm-none-linux-gnueabihf --target=arm-none-linux-gnueabihf --prefix="${SUPPORT_ENV_INSTALL}" --enable-shared=0
+
+    make -j${CPU_NUM} && make install
+
+    cd ${SUPPORT_ENV_INSTALL}/etc
+    wget https://curl.se/ca/cacert.pem
+}
+
 function install_all()
 {
     process_openssl
@@ -264,5 +289,7 @@ function install_all()
     process_asio
     
     process_jsoncpp
+
+    #process_curl
 }
 install_all

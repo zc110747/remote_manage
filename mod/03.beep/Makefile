@@ -6,5 +6,6 @@
 #
 ################################################################################
 obj-m := kernel_miscbeep.o
+FIRMWARE_CLEAN := 1
 
 include $(ENV_PATH_ROOT)/build/buildmod.mk

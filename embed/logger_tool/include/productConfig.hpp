@@ -20,6 +20,7 @@ _Pragma("once")
 
 #include "global_def.hpp"
 
+#define LOGS_DIR                   "/home/sys/logger/test.txt"
 #define PROCESS_RUN                 PROCESS_LOGGER_TOOL
 #define TOOLS_NAME                  "logger_tool"
 #define PRINT_NOW_HEAD_STR          "[0000 00:00:00][logger_tool][5]"

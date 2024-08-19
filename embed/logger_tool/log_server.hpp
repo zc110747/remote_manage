@@ -20,7 +20,6 @@ _Pragma("once")
 
 #include "common_unit.hpp"
 
-#define LOGGER_MAX_BUFFER_SIZE      256
 #define LOGGER_MESSAGE_BUFFER_SIZE  16384
 
 class log_server final
@@ -53,6 +52,13 @@ private:
     /// - rx thread to process logger interface received.
     void logger_rx_server_run();
 
+    /// \brief logger_file_process
+    /// - used to logger file saved.
+    /// \param pbuffer - point to start of the save buffer.
+    /// \param time - size of the save buffer.
+    /// \return wheater save is ok or not
+    int logger_file_process(char *buffer, uint32_t size);
+
 private:
     /// \brief instance_pointer_
     /// - object used to implement the singleton pattern.
@@ -63,8 +69,12 @@ private:
     std::atomic<bool> thread_work_{false};
 
     /// \brief logger_rx_thread_
-    /// - logger rx thread object. 
+    /// - logger rx thread object.
     std::thread logger_rx_thread_;
+
+    /// \brief outfile
+    /// - file to read.
+    std::ofstream outfile;
 };
 
 

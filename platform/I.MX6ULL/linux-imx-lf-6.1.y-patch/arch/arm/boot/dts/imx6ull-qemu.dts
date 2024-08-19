@@ -46,14 +46,14 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 
-		reg_wifi_vmmc: regulator@1 {
-			compatible = "regulator-fixed";
-			regulator-name = "WIFI_3V3";
-			regulator-min-microvolt = <3300000>;
-			regulator-max-microvolt = <3300000>;
-			gpio = <&gpio1 1 GPIO_ACTIVE_HIGH>;
-			enable-active-high;
-		};
+		// reg_wifi_vmmc: regulator@1 {
+		// 	compatible = "regulator-fixed";
+		// 	regulator-name = "WIFI_3V3";
+		// 	regulator-min-microvolt = <3300000>;
+		// 	regulator-max-microvolt = <3300000>;
+		// 	gpio = <&gpio1 1 GPIO_ACTIVE_HIGH>;
+		// 	enable-active-high;
+		// };
 
 		regulator_vref_adc: regulator@2 {
 			compatible = "regulator-fixed";
@@ -91,13 +91,14 @@
 		pinctrl-0 = <&pinctrl_gpio_key>;
 		key-gpios = <&gpio1 18 GPIO_ACTIVE_LOW>;
 		interrupt-parent = <&gpio1>;
-		interrupts = <18 IRQ_TYPE_EDGE_FALLING>;
+		interrupts = <18 (IRQ_TYPE_EDGE_FALLING|IRQ_TYPE_EDGE_RISING)>;
 		status = "okay";
 	};
 
 	usr_loopled {
 		compatible = "rmk,usr-loopled";
 		pinctrl-0 = <&pinctrl_loopled>;
+	    leds-num = <3>;
 		leds-gpios = <&gpio4 21 GPIO_ACTIVE_LOW>,
 					<&gpio4 23 GPIO_ACTIVE_LOW>,
 					<&gpio4 25 GPIO_ACTIVE_LOW>;
@@ -110,6 +111,21 @@
 		hx711-gpios = <&gpio4 22 GPIO_ACTIVE_LOW>,
 					<&gpio4 24 GPIO_ACTIVE_LOW>;
 		status = "okay";
+	};
+
+	usr_wdt {
+		compatible = "rmk,usr-wdt";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_wdt_pin>;
+		wdt-gpios = <&gpio4 26 GPIO_ACTIVE_HIGH>;
+		status = "okay";
+	};
+
+	fan0: pwm-fan {
+		compatible = "pwm-fan";
+		#cooling-cells = <2>;
+		pwms = <&pwm7 0 10000 0>;
+		cooling-levels = <0 102 170 230>;
 	};
 };
 
@@ -172,6 +188,12 @@
 	ap3216@1e {
 		compatible = "rmk,ap3216";
 		reg = <0x1e>;
+		rmk,sysconf = /bits/ 8 <0x03>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_ap3216_tsc>;
+		interrupt-parent = <&gpio1>;
+		interrupts = <1 IRQ_TYPE_EDGE_FALLING>;
+		int-gpios = <&gpio1 1 GPIO_ACTIVE_LOW>;
 	};
 };
 
@@ -198,6 +220,29 @@
 	};
 };
 
+&ecspi3 {
+	fsl,spi-num-chipselects = <1>;
+	cs-gpios = <&gpio1 20 GPIO_ACTIVE_LOW>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_ecspi3>;
+	status = "okay";
+
+	spidev0:icm20608@0 {
+		compatible = "rmk,icm20608";
+		spi-max-frequency = <8000000>;
+		reg = <0>;
+
+		smplrt_div 		= /bits/ 8 <0x00>;
+		gyro_config 	= /bits/ 8 <0x18>;
+		accel_config 	= /bits/ 8 <0x18>;
+		config			= /bits/ 8 <0x04>;
+		accel_config2 	= /bits/ 8 <0x04>;
+		pwr_mgmt_2 		= /bits/ 8 <0x00>;
+		lp_mode_cfg 	= /bits/ 8 <0x00>;
+		fifo_en			= /bits/ 8 <0x00>;
+	};
+};
+
 &iomuxc {
 	pinctrl-names = "default";
 
@@ -206,6 +251,12 @@
 			fsl,pins = <
 				MX6UL_PAD_GPIO1_IO03__GPIO1_IO03	0x17059
 			>;
+		};
+
+		pinctrl_wdt_pin: gpio-wdt {
+			fsl,pins = <
+				MX6UL_PAD_CSI_DATA05__GPIO4_IO26		0x17059
+			>;	
 		};
 
 		pinctrl_led_improve: led-improve {
@@ -285,6 +336,12 @@
 			fsl,pins = <
 				MX6UL_PAD_UART4_TX_DATA__I2C1_SCL 0x4001b8b0
 				MX6UL_PAD_UART4_RX_DATA__I2C1_SDA 0x4001b8b0
+			>;
+		};
+
+		pinctrl_ap3216_tsc: gpio-ap3216 {
+			fsl,pins = <
+				MX6UL_PAD_GPIO1_IO01__GPIO1_IO01		0x40017059
 			>;
 		};
 
@@ -423,7 +480,6 @@
                 MX6UL_PAD_UART2_RTS_B__ECSPI3_MISO         0x000010B1
                 MX6UL_PAD_UART1_CTS_B__GPIO1_IO18          0x000010B0 /*gpio cs0*/
 				MX6UL_PAD_UART2_TX_DATA__GPIO1_IO20        0x000010B0 /*gpio cs1*/
-
 			>;
 		};
 
@@ -453,7 +509,7 @@
 };
 
 /* 
-adc1 and pwm3 used samed i/o, 
+adc1 and pwm7 used samed i/o, 
 only one can be okey same time. 
 */
 &adc1 {
@@ -461,10 +517,11 @@ only one can be okey same time.
 	pinctrl-0 = <&pinctrl_adc1>;
 	num-channels = <1>;
 	vref-supply = <&regulator_vref_adc>;
-	status = "disabled";
+	status = "okay";
 };
 
 &pwm7 {
+	compatible = "rmk,pwm";
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pwm7>;
 	status = "okay";
@@ -481,12 +538,6 @@ only one can be okey same time.
 	pinctrl-0 = <&pinctrl_uart3>;
 	status = "okay";
 };
-
-// &uart5 {
-// 	pinctrl-names = "default";
-// 	pinctrl-0 = <&pinctrl_uart5>;
-// 	status = "okay";
-// };
 
 &usbotg1 {
 	dr_mode = "otg";
@@ -518,7 +569,7 @@ only one can be okey same time.
 	/*cd-gpios = <&gpio1 1 GPIO_ACTIVE_LOW>;*/
 	keep-power-in-suspend;
 	enable-sdio-wakeup;
-	vmmc-supply = <&reg_wifi_vmmc>;
+	//vmmc-supply = <&reg_wifi_vmmc>;
 	status = "okay";
 };
 

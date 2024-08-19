@@ -7,7 +7,8 @@ cpp_objects +=  ${common_path}/jsonconfig/json_config.o
 cpp_objects +=  ${common_path}/logger/logger_manage.o
 cpp_objects +=  ${common_path}/server/asio_server.o
 cpp_objects +=  ${common_path}/calculate.o 
-cpp_objects +=  ${common_path}/time_manage.o 
+cpp_objects +=  ${common_path}/time_manage.o
+cpp_objects +=  $(common_path)/parameter_parser.o
 
 #include
 INCLUDES += -I ${common_path}/

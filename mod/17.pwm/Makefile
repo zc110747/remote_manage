@@ -5,6 +5,7 @@
 # Original Author: 1107473010@qq.com
 #
 ################################################################################
-obj-m := pwm-imx27.o
+obj-m := kernel_pwm.o
+FIRMWARE_CLEAN := 1
 
 include $(ENV_PATH_ROOT)/build/buildmod.mk

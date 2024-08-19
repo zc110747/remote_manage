@@ -90,10 +90,10 @@ private:
     ENUM_FIFO_MODE fifo_mode_;
 
     /// \brief readfd_
-    /// - the fd of the fifo to read. 
+    /// - the fd of the fifo to read.
     int readfd_{-1};
 
     /// \brief writefd_
-    /// - the fd of the fifo to write. 
+    /// - the fd of the fifo to write.
     int writefd_{-1};
 };

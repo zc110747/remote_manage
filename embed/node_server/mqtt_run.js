@@ -52,7 +52,7 @@ function init()
     
         client.on('message', function (topic, message) {
             const json_obj = JSON.parse(message.toString())
-
+            console.log(json_obj)
             for (let key in json_obj){
                 if (subscribe_info.hasOwnProperty(key)){
                     subscribe_info[key] = json_obj[key]

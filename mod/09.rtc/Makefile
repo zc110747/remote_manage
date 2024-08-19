@@ -6,5 +6,6 @@
 #
 ################################################################################
 obj-m := kernel_rtc_pcf8563.o
+FIRMWARE_CLEAN := 1
 
 include $(ENV_PATH_ROOT)/build/buildmod.mk

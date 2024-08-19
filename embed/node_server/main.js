@@ -41,7 +41,7 @@ function server_process()
 
 function start_server()
 { 
-    if(config_json.load_config_file(filepath))
+    if (config_json.load_config_file(filepath))
     {
         console.log("config load success, server start!")
         server_process();

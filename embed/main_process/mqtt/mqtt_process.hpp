@@ -21,13 +21,15 @@ _Pragma("once")
 #include <mosquittopp.h>
 #include "common_unit.hpp"
 
+#define JSON_DATA_HEAD  "A0"
+#define HEX_DATA_HEAD   "A1"
+
 typedef struct
 {
     std::string id;
     std::string host;
     int port;
     std::string sub_topic;
-    std::string pub_topic;
     int keepalive{60};
     int qos{1};
 }mqtt_info;
@@ -63,12 +65,11 @@ public:
     /// - This method is publish msg str.
     /// \param str -- memssage when receive by subscribe
     /// \return publish msg process.
-    int publish_msg(const std::string &str);
+    int publish_msg(const std::string &topic, int qos, const char* ptr, int size);
 
     /// \brief start
     /// - This method is used to start mqtt process.
     bool start();
-
 private:
     /// \brief mqtt_run
     /// - mqtt loop run thread.
@@ -118,9 +119,18 @@ public:
 
     /// \brief init
     /// - This method is used to publisher string.
+    /// \param topic -- topic used to publisher.
     /// \param str -- memssage publisher the string.
-    /// \return Wheather initialization is success or failed.
-    int mqtt_publish(const std::string &str);
+    /// \return Wheather send is success or failed.
+    int mqtt_publish(const std::string &topic, int qos, const std::string &str);
+
+    /// \brief init
+    /// - This method is used to publisher string.
+    /// \param topic -- topic used to publisher.
+    /// \param ptr -- buffer to publisher.
+    /// \param size -- size to publisher.
+    /// \return Wheather send is success or failed.
+    int mqtt_publish(const std::string &topic, int qos, char *ptr, uint16_t size);
 
 private:
     /// \brief instance_pointer_

@@ -2,37 +2,50 @@
 
 ## 项目说明
 
-本项目用于实现具有远程访问，调试权限管理，本机硬件控制，下位机项目管理的嵌入式Linux应用和驱动开发综合产品，主要实现功能如下。
+本项目用于实现具有远程访问，调试权限管理，本机硬件控制，下位机项目管理的嵌入式Linux应用和驱动开发综合产品。对于一个完整的Linux应用项目，主要包含功能有Linux系统运行平台(U-Boot，Kernel，Rootfs)，用于操作硬件的驱动实现，支持应用功能的第三方软件和库(如mosquitto，cJson，asio，fmt，ssh，qt/lvgl support library等)，以及实现具体功能的应用程序，按照功能模块划分如下所示。
 
-1. 支持Linux平台移植(I.MX6ULL编译支持，正点原子阿尔法Linux开发板) -- platform/
-2. 嵌入式Linux平台驱动代码实现 -- mod/
-3. 嵌入式Linux平台应用层硬件管理 -- embed/local_device
-4. web局域网访问服务器 -- embed/main_process
-5. 带权限logger调试实现 -- embed/logger_tool
-6. 基于mqtt的局域网软件管理 -- embed/main_process
-7. 扩展的下位机应用管理 -- embed/lower_device
-8. 基于QT的本地GUI界面管理 -- embed/gui_manage
-9. 其它功能支持(文档，编译脚本) -- doc/、 env/
+1. 嵌入式系统运行平台构建(platform目录)
+2. 嵌入式系统驱动开发(mod目录)
+3. 第三方库功能支持(thirdparts目录)                 -- 目录: thirdparts/
+4. 应用功能，图形界面管理(embed)
+5. 系统文档(doc)
+6. 构建SDK环境脚本(env)
 
 完整产品框架如下所示。
 
 ![image](doc/image/mainFrame.png)
 
 - 嵌入式Linux端
-  - main_process: 代码目录:embed/main_process，核心进程，其它所有数据都交由main_process处理后，转发到相应进程后显示或者动作
-  - logger_tool: 代码目录:embed/logger_tool，调试进程，主要将其它所有进程的打印信息进行包装后，支持通过本地串口，网口或者按照时间以文件方式保存本地
-  - local_device: 代码目录:embed/local_device，管理平台硬件的进程，包含对led，beep，ap3216，rtc等设备的应用层访问代码
-  - lower_device: 代码目录:embed/lower_device，管理和下位机通讯的进程，主要通过串口(RS485)，can访问其它设备
-  - node_server: 代码目录:embed/node_server, web服务器应用进程，基于node实现的web服务器和客户端，用于本地web访问资源
-  - gui_manage: 代码目录:embed/gui_manage, 基于QT本地管理界面，可通过本地UI查看设备信息和管理开关状态
-  - linux runtime structure: 代码目录: mod/, platform/，构建Linux平台的u-boot, linux, rootfs, 驱动和第三方构建实现
+  - main_process
+    - 代码目录: embed/main_proces
+    - 说明: 核心进程，其它所有数据都交由main_process处理后，转发到相应进程后显示或者动作
+  - logger_tool
+    - 代码目录: embed/logger_tool
+    - 说明：调试进程，主要将其它所有进程的打印信息进行包装后，支持通过本地串口，网口或者按照时间以文件方式保存本地
+  - local_device
+    - 代码目录：embed/local_device
+    - 说明：管理平台硬件的进程，包含对led，beep，ap3216，rtc等设备的应用层访问代码
+  - lower_device代码目录
+    - 代码目录: embed/lower_device
+    - 说明: 管理和下位机通讯的进程，主要通过串口(RS485)，can访问其它设备
+  - node_server
+    - 代码目录:embed/node_server
+    - 说明：web服务器应用进程，基于node实现的web服务器和客户端，用于本地web访问资源
+  - gui_manage
+    - 代码目录:embed/gui_manage
+    - 说明：基于QT本地管理界面，可通过本地UI查看设备信息和管理开关状态
+  - linux runtime structure
+    - 代码目录：mod/, platform/
+    - 说明：构建Linux平台的u-boot, linux, rootfs, 驱动和第三方构建实现
 - 应用桌面端
-  - PC Winform: 代码目录: destop/manage_tool, 管理系统的桌面端应用，C/S架构下的应用客户端
+  - PC Winform
+    - 代码目录: destop/manage_tool
+    - 说明：管理系统的桌面端应用，C/S架构下的应用客户端
 
 内部实现平台构建，项目管理，内核驱动开发，应用开发等部分，项目支持在arm和aarch64平台，并提供相应的构建工具和编译平台，本项目已经验证的芯片平台。
 
-- ARM平台: NXP I.MX6ull, 正点原子阿尔法开发板.
-- AARCH64平台: 全志H616, WalnutPi.
+- ARM平台: NXP I.MX6ull.
+- AARCH64平台: 全志H616.
 
 - 项目地址: <https://github.com/zc110747/remote_manage.git>
 - 配合学习的文档: <https://github.com/zc110747/build_embed_linux_system.git>
@@ -40,14 +53,13 @@
 产品的目录如下所示：
 
 - build             Makefile编译脚本。
-- buildout          嵌入式端编译文件输出目录。
-- desktop           桌面端访问应用
+- desktop           桌面端访问应用(包含桌面软件，网页，安卓端)
 - doc               系统文档资料
 - embed             嵌入式Linux应用
 - env               用于构建环境的脚本
 - mod               嵌入式Linux驱动和设备树
-- platform          平台化文件，安装官方平台后导入
-- rootfs            对于busybox支持的启动文件(buildroot和debain不需要)
+- platform          运行平台文件，包含uboot,kernel,rootfs的构建方法
+- rootfs            添加到文件系统的配置和管理文件
 - thirdparts        支持应用编译的第三方库。
 
 ## 快速启动项目
@@ -67,22 +79,23 @@ sudo chmod 777 *.sh
 ./preBuildEnvironment.sh all
 ```
 
-关于sdk(arm/aarch64)目录内容的说明如下所示。
+关于sdk(arm(imx6ull)/walnutPi)目录内容的说明如下所示。
 
 ```shell
 download                    #下载文件的目录
     - tmp                   #缓存空间
 nfs                         #用于编译后的文件系统mount目录
 tftp                        #用于编译后的uboot和内核放置目录
-arm/arch
-    img                     #打包文件系统目录
-    install                 #交叉编译安装库目录     
-    toolchain               #编译工具目录
-    uboot                   #uboot目录
-    kernel                  #kernel目录
-    buildroot               #buildroot目录
-    debain                  #debain构建目录
-    ubuntu                  #uboot构建目录
+arm
+    - install               #第三方库安装目录
+    - package               #存放编译打包项目的地址
+    - toolchain             #编译工具
+    - uboot                 #uboot目录
+    - kernel                #kernel目录
+    - rootfs                #文件系统目录
+        - buildroot         #buildroot文件系统构建目录
+        - debain            #debain文件系统构建目录
+        - ubuntu            #ubuntu文件系统构建目录
 ```
 
 重新开启命令行，如果加载如下所示，表示已经成功安装，项目需要在普通用户模式下执行，root权限无法加载。
@@ -98,7 +111,7 @@ Load the Env Data...
 Update Environment Data Success!
 Can use command 'SysHelpCommand' for more helps.
 Current Platform is ARM.
-Current ROOTFS is debain.
+Current ROOTFS is buildroot.
 Current Firmware Version is 1.0.0.8.
 Update the Alias Command...
 Update the Alias Command Success!
@@ -108,6 +121,9 @@ Update the Alias Command Success!
 如果出现了上述打印信息，表示编译环境加载完成，此时执行如下命令安装系统运行需要的库。
 
 ```shell
+#默认环境如果时buildroot，需要先编译系统
+SysBuildRootfs
+
 #根据系统配置挂载文件系统
 SysMoutRoots
 
@@ -182,14 +198,14 @@ Linux则建议使用满足条件下的最新LTS版本(本项目基于**Ubuntu 22
 Linux系统 - Ubuntu 22.04 LTS
 软件源 - 清华镜像源(https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/)
 
-#ARM
+#ARM(I.MX6ULL, T113.i)
 交叉编译工具 - gcc-arm-11.2-2022.02-x86_64-arm-none-linux-gnueabihf
 u-boot: uboot-imx-lf_v2022.04(https://codeload.github.com/nxp-imx/uboot-imx/zip/refs/heads/lf_v2022.04)
 kernel: linux-imx-lf-6.1.y(https://codeload.github.com/nxp-imx/linux-imx/zip/refs/heads/lf-6.1.y)
 rootfs: buildroot-2023.02.9(https://buildroot.org/downloads/buildroot-2023.02.9.tar.gz), debain11(http://mirrors.tuna.tsinghua.edu.cn/debian/dists/bookworm)
 
-#AARCH64
-交叉编译(kernal/uboot/rootfs/application/lib) - gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf 
+#AARCH64(RK3568s, H616)
+交叉编译工具 - gcc-arm-11.2-2022.02-x86_64-aarch64-none-linux-gnu
 ```
 
 ## 设计文档

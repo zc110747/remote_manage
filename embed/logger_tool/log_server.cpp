@@ -91,5 +91,32 @@ int log_server::send_buffer(char *pbuffer, uint32_t size)
             //do something
         }
     }
+
+    logger_file_process(pbuffer, size);
+
     return len;
+}
+
+int log_server::logger_file_process(char *buffer, uint32_t size)
+{
+    time_t timep;
+    struct tm mytime, *p;
+    std::string filename(LOGS_DIR);
+
+    time(&timep);
+    p = localtime_r(&timep, &mytime);
+    if(p != NULL)
+    {
+        filename = fmt::format("/home/sys/logger/{0}-{1}-{2}.txt", mytime.tm_year+1900, mytime.tm_mon+1, mytime.tm_mday);
+    }
+
+    if(!outfile.is_open())
+    {
+        outfile.open(filename, std::ios::app);
+    }
+
+    outfile<<std::string(buffer, size);
+    outfile.close();
+
+    return 0;
 }

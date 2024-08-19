@@ -97,6 +97,9 @@ typedef union
 //process hardware chage
 #define DEVICE_LED                      0x00
 #define DEVICE_BEEP                     0x01
+#define DEVICE_PWM                      0x02
+#define DEVICE_RTC                      0x03
+#define DEVICE_RTC_ALARM                0x04
 
 #define LOCAL_DEVICE_ID                 0
 
@@ -104,3 +107,6 @@ typedef union
 #define COMMAND_UPDATE_LOCAL            0x01
 #define COMMAND_UPDATE_REMOTE           0x02
 
+#define MQTT_SOURCE_NODE                0
+#define MQTT_SOURCE_GUI                 1
+#define MQTT_SOURCE_DESKTOP             2

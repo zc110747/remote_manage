@@ -107,7 +107,15 @@
         "netfwd": "cpp",
         "msg.h": "c",
         "msgbuf.h": "c",
-        "kernel.h": "c"
+        "kernel.h": "c",
+        "pwm-imx27.h": "c",
+        "gpio.h": "c",
+        "kernel_pwm.h": "c",
+        "thermal.h": "c",
+        "signal.h": "c",
+        "time.h": "c",
+        "zram_drv.h": "c",
+        "select.h": "c"
     },
     "files.exclude": {
         "**/.git": true,

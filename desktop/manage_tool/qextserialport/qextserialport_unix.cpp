@@ -142,7 +142,7 @@ qint64 QextSerialPortPrivate::bytesAvailable_sys() const
 }
 
 /*!
-    Translates a system-specific error code to a QextSerialPort error code.  Used internally.
+    Translates a system-specific error code to a QextSerialPort error code. Used internally.
 */
 void QextSerialPortPrivate::translateError(ulong error)
 {
@@ -239,8 +239,8 @@ unsigned long QextSerialPortPrivate::lineStatus_sys()
 }
 
 /*!
-    Reads a block of data from the serial port.  This function will read at most maxSize bytes from
-    the serial port and place them in the buffer pointed to by data.  Return value is the number of
+    Reads a block of data from the serial port. This function will read at most maxSize bytes from
+    the serial port and place them in the buffer pointed to by data. Return value is the number of
     bytes actually read, or -1 on error.
 
     \warning before calling this function ensure that serial port associated with this class
@@ -258,8 +258,8 @@ qint64 QextSerialPortPrivate::readData_sys(char *data, qint64 maxSize)
 }
 
 /*!
-    Writes a block of data to the serial port.  This function will write maxSize bytes
-    from the buffer pointed to by data to the serial port.  Return value is the number
+    Writes a block of data to the serial port. This function will write maxSize bytes
+    from the buffer pointed to by data to the serial port. Return value is the number
     of bytes actually written, or -1 on error.
 
     \warning before calling this function ensure that serial port associated with this class

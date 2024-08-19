@@ -21,7 +21,8 @@ cpp_objects =   main.o                  \
                 remote/tcp_thread.o     \
                 remote/protocol.o       \
                 module/cmd_process.o    \
-                module/device_process.o 
+                module/device_process.o \
+                mqtt/mqtt_protocol.o
 
 INCLUDES =  -I remote/                  \
             -I include/                 \
@@ -32,17 +33,16 @@ INCLUDES += -I $(ENV_PATH_ROOT)/thirdparts/asio/include/ \
             -I $(ENV_PATH_ROOT)/thirdparts/jsoncpp/include/ \
             -I $(ENV_PATH_ROOT)/thirdparts/mosquitto/include/ 
 
+library = $(SUPPORT_ENV_INSTALL)/lib/libjsoncpp.a
 ifeq (${FIRMWARE_CURRENT_PLATFORMS},AARCH64)
 
 #for aarch64, add library 
-library = $(ENV_PATH_ROOT)/buildout/aarch64/libjsoncpp.a
 ifeq (${DEFINE_MQTT},1)
 cpp_objects += mqtt/mqtt_process.o
 library += -L ${SUPPORT_ENV_INSTALL}/lib -lssl -lcrypto -lmosquitto -lmosquittopp
 endif
 else
 #for arm, add library 
-library = $(ENV_PATH_ROOT)/buildout/arm/libjsoncpp.a
 ifeq (${DEFINE_MQTT},1)
 cpp_objects += mqtt/mqtt_process.o
 library += -L ${SUPPORT_ENV_INSTALL}/lib -lssl -lcrypto -lmosquitto -lmosquittopp

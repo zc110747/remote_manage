@@ -44,8 +44,7 @@ public:
     bool register_func(uint16_t key_num, uint16_t key_event, std::function<void(uint16_t, uint16_t)> func);
 
 private:
-
     /// \brief run
-    /// - This method is used for thread run key. 
+    /// - This method is used for thread run key.
     void run();
 };

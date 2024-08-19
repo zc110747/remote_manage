@@ -42,12 +42,12 @@ int main(int argc, char **argv)
     data_test();
 
     file = fopen(PATH, "r");
-    if(!file){
+    if (!file){
         return -1;
     }
 
     len = fread(buffer, 1, sizeof(buffer), file);
-    if(len > 0)
+    if (len > 0)
     {
         buffer[len] = '\0';
         printf("read file:%s, size:%d\n", buffer, len);
@@ -77,14 +77,14 @@ void data_test(void)
     v1[2].f_val = 1.8;
     v1[3].f_val = 4.6;
     
-    for(int i=0; i<4; i++)
+    for (int i=0; i<4; i++)
     {
         memcpy(&buf[size], v1[i].buffer, 4);
         size += 4;
     }
 
     size = 0;
-    for(int i=0; i<4; i++)
+    for (int i=0; i<4; i++)
     {
         memcpy(v2[i].buffer, &buf[size], 4);
         size += 4;    

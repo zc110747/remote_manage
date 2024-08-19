@@ -26,6 +26,7 @@ usr_loopled {
     compatible = "rmk,usr-loopled";
     pinctrl-names = "default";
     pinctrl-0 = <&pinctrl_loopled>;
+    leds-num = <3>;
     leds-gpios = <&gpio4 21 GPIO_ACTIVE_HIGH>,
                 <&gpio4 23 GPIO_ACTIVE_HIGH>,
                 <&gpio4 25 GPIO_ACTIVE_HIGH>;
@@ -35,11 +36,13 @@ usr_loopled {
 
 pinctrl_loopled: gpio-loopleds {
     fsl,pins = <
-        MX6UL_PAD_CSI_DATA00__GPIO4_IO21		0x17059
-        MX6UL_PAD_CSI_DATA02__GPIO4_IO23		0x17059
-        MX6UL_PAD_CSI_DATA04__GPIO4_IO25		0x17059
+        MX6UL_PAD_CSI_DATA00__GPIO4_IO21        0x17059
+        MX6UL_PAD_CSI_DATA02__GPIO4_IO23        0x17059
+        MX6UL_PAD_CSI_DATA04__GPIO4_IO25        0x17059
     >;
 };
+
+可通过修改leds-num, leds-gpio和gpio-loople来支持不同数量的led
 */
 
 #include <linux/types.h>
@@ -54,8 +57,9 @@ pinctrl_loopled: gpio-loopleds {
 #include <linux/of_gpio.h>
 #include <linux/semaphore.h>
 #include <linux/platform_device.h>
+#include <linux/of.h>
 
-#define DEVICE_NUM                         3
+#define DEVICE_MAX_NUM                         16
 
 struct loopled_data
 {
@@ -65,10 +69,11 @@ struct loopled_data
     struct class *class;
     struct device *device;
     struct platform_device *pdev;
-
+    
     /* hardware info */
-    struct gpio_desc* desc[DEVICE_NUM];
-    int status[DEVICE_NUM];
+    uint32_t leds_num;
+    struct gpio_desc* desc[DEVICE_MAX_NUM];
+    int status[DEVICE_MAX_NUM];
 };
 
 #define LED_OFF                            0
@@ -120,11 +125,11 @@ ssize_t led_read(struct file *filp, char __user *buf, size_t count, loff_t *f_po
     struct loopled_data *chip;
     struct platform_device *pdev;
 
-    if(count > DEVICE_NUM)
-        return -1;
-
     chip = (struct loopled_data *)filp->private_data;
     pdev = chip->pdev;
+
+    if (count > chip->leds_num)
+        return -1;
 
     ret = copy_to_user(buf, chip->status, count);
     if (ret < 0) {
@@ -145,7 +150,7 @@ ssize_t led_write(struct file *filp, const char __user *buf, size_t size,  loff_
     pdev = chip->pdev;
 
     ret = copy_from_user(data, buf, 2);
-    if (ret < 0 || data[0] >= DEVICE_NUM){
+    if (ret < 0 || data[0] >= chip->leds_num){
         dev_err(&pdev->dev, "write failed:%d!\n", data[0]);
         return -EFAULT;
     }
@@ -169,12 +174,12 @@ long led_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
     pdev = chip->pdev;
 
     pbuf = kmalloc(arglen, GFP_KERNEL);
-    if(!pbuf) {
+    if (!pbuf) {
         dev_err(&pdev->dev, "kmalloc return empty!\n");
         return -ENOMEM;
     }
     err = copy_from_user(pbuf, (char *)arg, arglen);
-    if(err) {
+    if (err) {
         dev_err(&pdev->dev, "kmalloc return empty!\n");
         kfree(pbuf);
         return -EFAULT;  
@@ -203,32 +208,34 @@ static int led_device_create(struct loopled_data *chip)
     minor = DEFAULT_MINOR;
     pdev = chip->pdev;
 
-    if (major){
+    //1.申请设备号
+    if (major) {
         chip->dev_id = MKDEV(major, minor);
         ret = register_chrdev_region(chip->dev_id, 1, DEVICE_NAME);
-    }else {
+    } else {
         ret = alloc_chrdev_region(&chip->dev_id, 0, 1, DEVICE_NAME);
     }
-    if (ret < 0){
+    if (ret < 0) {
         dev_err(&pdev->dev, "id alloc failed!\n");
         goto exit;
     }
     
+    //2.创建字符设备，关联设备号，并添加到内核
     cdev_init(&chip->cdev, &led_fops);
     chip->cdev.owner = THIS_MODULE;
     ret = cdev_add(&chip->cdev, chip->dev_id, 1);
-    if (ret){
+    if (ret) {
         dev_err(&pdev->dev, "cdev add failed:%d!\n", ret);
         goto exit_cdev_add;
     }
 
+    //3.创建设备类和设备文件，关联设备号，用于应用层访问
     chip->class = class_create(THIS_MODULE, DEVICE_NAME);
     if (IS_ERR(chip->class)) {
         dev_err(&pdev->dev, "class create failed!\n");
         ret = PTR_ERR(chip->class);
         goto exit_class_create;
     }
-
     chip->device = device_create(chip->class, NULL, chip->dev_id, NULL, DEVICE_NAME);
     if (IS_ERR(chip->device)) {
         dev_err(&pdev->dev, "device create failed!\r\n");
@@ -253,8 +260,20 @@ static int led_hardware_init(struct loopled_data *chip)
 {
     int index;
     struct platform_device *pdev = chip->pdev;
+    int ret;
 
-    for (index=0; index<DEVICE_NUM; index++)
+    //1.获取"leds-num"属性中LED数目
+    ret = of_property_read_u32(pdev->dev.of_node, "leds-num", &chip->leds_num);
+    if (ret) {
+        dev_err(&pdev->dev, "no read leds-num!\n");
+        return -EINVAL;  
+    }
+    if (chip->leds_num > DEVICE_MAX_NUM) {
+        chip->leds_num = DEVICE_MAX_NUM;
+    }
+    
+    //2.获取"leds-gpio"属性中LED，设置GPIO输出并控制
+    for (index=0; index<chip->leds_num; index++)
     {
         chip->desc[index] = devm_gpiod_get_index(&pdev->dev, "leds", index, GPIOD_OUT_HIGH);
         if (chip->desc[index] == NULL) {
@@ -264,9 +283,10 @@ static int led_hardware_init(struct loopled_data *chip)
 
         gpiod_direction_output(chip->desc[index], 1);
         led_hardware_set(chip, index, LED_ON);
-
-        dev_info(&pdev->dev, "gpio %d init success\n", index);
+        dev_info(&pdev->dev, "gpio %d init success", index);
     }
+
+    dev_info(&pdev->dev, "gpio nums %d init success", chip->leds_num);
 
     return 0;
 }
@@ -275,7 +295,8 @@ static int led_probe(struct platform_device *pdev)
 {
     int ret;
     static struct loopled_data *chip;
-
+    
+    //1.申请loopled控制块
     chip = devm_kzalloc(&pdev->dev, sizeof(*chip), GFP_KERNEL);
     if (!chip){
         dev_err(&pdev->dev, "memory alloc failed!\n");
@@ -284,12 +305,14 @@ static int led_probe(struct platform_device *pdev)
     platform_set_drvdata(pdev, chip);
     chip->pdev = pdev;
 
+    //2.初始化loopled硬件设备
     ret = led_hardware_init(chip);
     if (ret){
         dev_err(&pdev->dev, "hardware init faile, error:%d!\n", ret);
         return ret;
     }
 
+    //3.创建内核访问接口
     ret = led_device_create(chip);
     if (ret){
         dev_err(&pdev->dev, "device create faile, error:%d!\n", ret);

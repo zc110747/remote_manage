@@ -101,3 +101,5 @@ private:
     /// - buffer used to store tx info.
     char tx_buffer_[DEVICE_TX_BUFFER_SIZE];
 };
+
+#define ArraryToUint32(ptr) ((uint32_t)((*ptr)<<24 | (*(ptr+1))<<16 | (*(ptr+2))<<8 | (*(ptr+3))))

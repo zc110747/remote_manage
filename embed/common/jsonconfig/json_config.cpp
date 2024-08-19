@@ -58,13 +58,13 @@ bool system_config::check_configfile(const std::string &ipaddr)
         perror("getifaddrs");  
         exit(EXIT_FAILURE);
         return false;
-    }  
+    }
   
     for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {  
         if (ifa->ifa_addr == NULL) 
         {  
             continue;  
-        }  
+        }
         int family = ifa->ifa_addr->sa_family;  
         if (family == AF_INET) 
         { // IPv4 or IPv6  
@@ -76,12 +76,12 @@ bool system_config::check_configfile(const std::string &ipaddr)
                     is_check = true;
                     break;
                 }
-            }  
-        }  
-    }  
+            }
+        }
+    }
     freeifaddrs(ifaddr);
 
-    if(parameter_.main_process.mqtt_device.id.empty())
+    if (parameter_.main_process.mqtt_device.id.empty())
     {
         is_check = false;
     }
@@ -97,7 +97,7 @@ bool system_config::dynamic_init(const char* path)
     dynamic_path_.assign(path);
     
     ifs.open(path);
-    if(!ifs.is_open())
+    if (!ifs.is_open())
     {
         return false;
     }
@@ -164,6 +164,8 @@ bool system_config::init(const char* path)
     {
         parameter_.local_ipaddress                  = root["local_ipaddress"].asString();
         parameter_.ipaddress                        = root["ipaddress"].asString();
+        parameter_.mqtt_host                        = root["mqtt_host"].asString();
+        parameter_.mqtt_port                        = root["mqtt_port"].asInt();
         parameter_.version                          = root["version"].asString();
         
         parameter_.local_device.led.init            = root["local_device"]["led"]["init"].asInt();
@@ -175,7 +177,11 @@ bool system_config::init(const char* path)
         parameter_.local_device.ap_i2c.dev          = root["local_device"]["ap_i2c"]["dev"].asString();
         parameter_.local_device.rtc.dev             = root["local_device"]["rtc"]["dev"].asString();
         parameter_.local_device.iio.vf610_adc_dev   = root["local_device"]["iio"]["vf610_adc"].asString();
-        parameter_.local_device.iio.hx711_dev   = root["local_device"]["iio"]["hx711_dev"].asString();
+        parameter_.local_device.iio.hx711_dev       = root["local_device"]["iio"]["hx711_dev"].asString();
+        parameter_.local_device.pwm.pwm_chip        = root["local_device"]["pwm"]["dev"].asString();
+        parameter_.local_device.pwm.state           = root["local_device"]["pwm"]["init"]["state"].asInt();
+        parameter_.local_device.pwm.peroid          = root["local_device"]["pwm"]["init"]["peroid"].asUInt();
+        parameter_.local_device.pwm.duty_cycle       = root["local_device"]["pwm"]["init"]["duty"].asUInt();
 
         //main process
         parameter_.main_process.download_path           = root["main_process"]["download_path"].asString();
@@ -184,13 +190,27 @@ bool system_config::init(const char* path)
         parameter_.main_process.logger_port             = root["main_process"]["logger_port"].asInt();
         parameter_.main_process.gui_port                = root["main_process"]["gui_port"].asInt();
         parameter_.main_process.mqtt_device.id            = root["main_process"]["mqtt_device"]["id"].asString();
-        parameter_.main_process.mqtt_device.port          = root["main_process"]["mqtt_device"]["port"].asInt();
         parameter_.main_process.mqtt_device.sub_topic     = root["main_process"]["mqtt_device"]["sub_topic"].asString();
-        parameter_.main_process.mqtt_device.pub_topic     = root["main_process"]["mqtt_device"]["pub_topic"].asString();
         parameter_.main_process.mqtt_device.keepalive     = root["main_process"]["mqtt_device"]["keepalive"].asInt();
         parameter_.main_process.mqtt_device.qos           = root["main_process"]["mqtt_device"]["qos"].asInt();
 
-        parameter_.node_sever.web_port              = root["node_sever"]["web_port"].asInt();
+        //node server
+        parameter_.node_server.web_port              = root["node_server"]["web_port"].asInt();
+        parameter_.node_server.pages                 = root["node_server"]["pages"].asString();
+        parameter_.node_server.mqtt_device.id            = root["node_server"]["mqtt_device"]["id"].asString();
+        parameter_.node_server.mqtt_device.sub_topic     = root["node_server"]["mqtt_device"]["sub_topic"].asString();
+        parameter_.node_server.mqtt_device.keepalive     = root["node_server"]["mqtt_device"]["keepalive"].asInt();
+        parameter_.node_server.mqtt_device.qos           = root["node_server"]["mqtt_device"]["qos"].asInt();
+
+        parameter_.gui_manage.mqtt_device.id            = root["gui_manage"]["mqtt_device"]["id"].asString();
+        parameter_.gui_manage.mqtt_device.sub_topic     = root["gui_manage"]["mqtt_device"]["sub_topic"].asString();
+        parameter_.gui_manage.mqtt_device.keepalive     = root["gui_manage"]["mqtt_device"]["keepalive"].asInt();
+        parameter_.gui_manage.mqtt_device.qos           = root["gui_manage"]["mqtt_device"]["qos"].asInt();
+
+        parameter_.winform.mqtt_device.id            = root["winform"]["mqtt_device"]["id"].asString();
+        parameter_.winform.mqtt_device.sub_topic     = root["winform"]["mqtt_device"]["sub_topic"].asString();
+        parameter_.winform.mqtt_device.keepalive     = root["winform"]["mqtt_device"]["keepalive"].asInt();
+        parameter_.winform.mqtt_device.qos           = root["winform"]["mqtt_device"]["qos"].asInt();
 
         parameter_.lower_device.logger_port         = root["lower_device"]["logger_port"].asInt();
         parameter_.lower_device.remote_port         = root["lower_device"]["remote_port"].asInt();
@@ -209,7 +229,7 @@ bool system_config::init(const char* path)
     
     ifs.close();
 
-    if(dynamic_init(DYNAMIC_CONFIG_PATH) != true)
+    if (dynamic_init(DYNAMIC_CONFIG_PATH) != true)
     {
         return false;
     }
@@ -221,6 +241,8 @@ void system_config::default_init() noexcept
 {
     parameter_.local_ipaddress              = DEFAULT_LOCAL_IPADRESS;
     parameter_.ipaddress                    = DEFAULT_IPADDRESS;
+    parameter_.mqtt_host                    = DEFAULT_IPADDRESS;
+    parameter_.mqtt_port                    = DEFAULT_MQTT_PORT;
     parameter_.version                      = DEFAULT_FW_VERSION;
     
     parameter_.local_device.led.init        = DEFAULT_LED_INIT;
@@ -233,6 +255,10 @@ void system_config::default_init() noexcept
     parameter_.local_device.rtc.dev         = DEFAULT_RTC_DEV;
     parameter_.local_device.iio.hx711_dev     = DEFAULT_HX711_DEV;
     parameter_.local_device.iio.vf610_adc_dev = DEFAULT_VF610_DEV;
+    parameter_.local_device.pwm.pwm_chip        = DEFAULT_PWM_CHIP;
+    parameter_.local_device.pwm.state           = DEFAULT_PWM_STATE;
+    parameter_.local_device.pwm.peroid          = DEFAULT_PWM_PEROID;
+    parameter_.local_device.pwm.duty_cycle       = DEFAULT_PWM_DUTY;
 
     parameter_.main_process.download_path   = DEFAULT_DOWNLOAD_PATH;
     parameter_.main_process.node_port       = DEFAULT_NODE_PORT;
@@ -240,13 +266,26 @@ void system_config::default_init() noexcept
     parameter_.main_process.logger_port     = DEFAULT_LOGGER_PORT;
     parameter_.main_process.gui_port        = DEFAULT_GUI_DEVICE_PORT;
     parameter_.main_process.mqtt_device.id    = "default";
-    parameter_.main_process.mqtt_device.port  = 1883;
     parameter_.main_process.mqtt_device.sub_topic = "/info/null0",
-    parameter_.main_process.mqtt_device.pub_topic = "/info/null1",
     parameter_.main_process.mqtt_device.keepalive = 60;
     parameter_.main_process.mqtt_device.qos   = 0;
 
-    parameter_.node_sever.web_port          = DEFAULT_NODE_WEB_PORT;
+    parameter_.node_server.web_port          = DEFAULT_NODE_WEB_PORT;
+    parameter_.node_server.pages             = DEFAULT_NODE_PAGES;
+    parameter_.node_server.mqtt_device.id    = "default";
+    parameter_.node_server.mqtt_device.sub_topic = "/info/null0";
+    parameter_.node_server.mqtt_device.keepalive = 60;
+    parameter_.node_server.mqtt_device.qos   = 0;
+
+    parameter_.gui_manage.mqtt_device.id      = "default";
+    parameter_.gui_manage.mqtt_device.sub_topic = "/info/null1";
+    parameter_.gui_manage.mqtt_device.keepalive = 60;
+    parameter_.gui_manage.mqtt_device.qos = 0;
+
+    parameter_.winform.mqtt_device.id      = "default";
+    parameter_.winform.mqtt_device.sub_topic = "/info/null2";
+    parameter_.winform.mqtt_device.keepalive = 60;
+    parameter_.winform.mqtt_device.qos = 0;
 
     parameter_.lower_device.logger_port = DEFAULT_LOWER_DEVICE_LOGGER_PORT;
     parameter_.lower_device.remote_port = DEFAULT_LOWER_DEVICE_REMOTE_PORT;
@@ -298,6 +337,8 @@ void system_config::save_configfile()
 
     root["local_ipaddress"]                     = parameter_.local_ipaddress;
     root["ipaddress"]                           = parameter_.ipaddress;
+    root["mqtt_host"]                           = parameter_.mqtt_host;
+    root["mqtt_port"]                           = parameter_.mqtt_port;
     root["version"]                             = parameter_.version ;
 
     root["local_device"]["led"]["init"]         = parameter_.local_device.led.init;
@@ -310,19 +351,37 @@ void system_config::save_configfile()
     root["local_device"]["ap_i2c"]["dev"]       = parameter_.local_device.ap_i2c.dev;
     root["local_device"]["rtc"]["dev"]          = parameter_.local_device.rtc.dev  ;
 
+    root["local_device"]["pwm"]["dev"] = parameter_.local_device.pwm.pwm_chip;
+    root["local_device"]["pwm"]["init"]["state"] = parameter_.local_device.pwm.state;
+    root["local_device"]["pwm"]["init"]["peroid"] = parameter_.local_device.pwm.peroid;
+    root["local_device"]["pwm"]["init"]["duty"] =  parameter_.local_device.pwm.duty_cycle;
+
     root["main_process"]["download_path"]       = parameter_.main_process.download_path;
     root["main_process"]["node_port"]           = parameter_.main_process.node_port;
     root["main_process"]["local_port"]          = parameter_.main_process.local_port;
     root["main_process"]["logger_port"]         = parameter_.main_process.logger_port;
     root["main_process"]["gui_port"]            = parameter_.main_process.gui_port;
     root["main_process"]["mqtt_device"]["id"]     = parameter_.main_process.mqtt_device.id; 
-    root["main_process"]["mqtt_device"]["port"]   = parameter_.main_process.mqtt_device.port;
     root["main_process"]["mqtt_device"]["sub_topic"] = parameter_.main_process.mqtt_device.sub_topic;
-    root["main_process"]["mqtt_device"]["pub_topic"] = parameter_.main_process.mqtt_device.pub_topic;
     root["main_process"]["mqtt_device"]["keepalive"] = parameter_.main_process.mqtt_device.keepalive;
     root["main_process"]["mqtt_device"]["qos"]       = parameter_.main_process.mqtt_device.qos;
         
-    root["node_sever"]["web_port"]              = parameter_.node_sever.web_port;
+    root["node_server"]["web_port"]              = parameter_.node_server.web_port;
+    root["node_server"]["pages"]                 = parameter_.node_server.pages;
+    root["node_server"]["mqtt_device"]["id"]     = parameter_.node_server.mqtt_device.id; 
+    root["node_server"]["mqtt_device"]["sub_topic"] = parameter_.node_server.mqtt_device.sub_topic;
+    root["node_server"]["mqtt_device"]["keepalive"] = parameter_.node_server.mqtt_device.keepalive;
+    root["node_server"]["mqtt_device"]["qos"]       = parameter_.node_server.mqtt_device.qos;
+
+    root["gui_manage"]["mqtt_device"]["id"]     = parameter_.gui_manage.mqtt_device.id; 
+    root["gui_manage"]["mqtt_device"]["sub_topic"] = parameter_.gui_manage.mqtt_device.sub_topic;
+    root["gui_manage"]["mqtt_device"]["keepalive"] = parameter_.gui_manage.mqtt_device.keepalive;
+    root["gui_manage"]["mqtt_device"]["qos"]       = parameter_.gui_manage.mqtt_device.qos;
+
+    root["winform"]["mqtt_device"]["id"]     = parameter_.winform.mqtt_device.id;
+    root["winform"]["mqtt_device"]["sub_topic"] = parameter_.winform.mqtt_device.sub_topic;
+    root["winform"]["mqtt_device"]["keepalive"] = parameter_.winform.mqtt_device.keepalive;
+    root["winform"]["mqtt_device"]["qos"]       = parameter_.winform.mqtt_device.qos;
 
     root["lower_device"]["logger_port"]         = parameter_.lower_device.logger_port;
     root["lower_device"]["remote_port"]         = parameter_.lower_device.remote_port; 
@@ -349,11 +408,11 @@ bool system_config::set_logger_level(int dev, int level)
 {
     int ret = -1;
 
-    switch(dev)
+    switch (dev)
     {
         case GUI_LOGGER_DEV:
             ret = 0;
-            if(parameter_.logger_privilege.gui_manage_level != level)
+            if (parameter_.logger_privilege.gui_manage_level != level)
             {
                 ret = 1;
                 parameter_.logger_privilege.gui_manage_level = level;
@@ -361,7 +420,7 @@ bool system_config::set_logger_level(int dev, int level)
             break;
         case LOCAL_LOGGER_DEV:
             ret = 0;
-            if(parameter_.logger_privilege.local_device_level != level)
+            if (parameter_.logger_privilege.local_device_level != level)
             {
                 ret = 1;
                 parameter_.logger_privilege.local_device_level = level;
@@ -369,7 +428,7 @@ bool system_config::set_logger_level(int dev, int level)
             break;
         case LOGGER_LOGGER_DEV:
             ret = 0;
-            if(parameter_.logger_privilege.logger_device_level != level)
+            if (parameter_.logger_privilege.logger_device_level != level)
             {
                 ret = 1;
                 parameter_.logger_privilege.logger_device_level = level;
@@ -377,7 +436,7 @@ bool system_config::set_logger_level(int dev, int level)
             break;
         case LOWER_LOGGER_DEV:
             ret = 0;
-            if(parameter_.logger_privilege.lower_device_level != level)
+            if (parameter_.logger_privilege.lower_device_level != level)
             {
                 ret = 1;
                 parameter_.logger_privilege.lower_device_level = level;
@@ -385,7 +444,7 @@ bool system_config::set_logger_level(int dev, int level)
             break;
         case MAIN_LOGGER_DEV:
             ret = 0;
-            if(parameter_.logger_privilege.main_process_level != level)
+            if (parameter_.logger_privilege.main_process_level != level)
             {
                 ret = 1;
                 parameter_.logger_privilege.main_process_level = level;
@@ -393,7 +452,7 @@ bool system_config::set_logger_level(int dev, int level)
             break;
         case NODE_LOGGGE_DEV:
             ret = 0;
-            if(parameter_.logger_privilege.node_server_level != level)
+            if (parameter_.logger_privilege.node_server_level != level)
             {
                 ret = 1;
                 parameter_.logger_privilege.node_server_level = level;
@@ -402,7 +461,7 @@ bool system_config::set_logger_level(int dev, int level)
     }
 
     PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "set level:%d, %d, ret:%d", dev, level, ret);
-    if(ret == 1)
+    if (ret == 1)
     {
         save_dynamicfile();
     }
@@ -417,6 +476,8 @@ std::ostream& operator<<(std::ostream& os, const system_config& config)
     os<<"filepath:"<<config.get_config_file_path()<<"\n";
     os<<"local_ipaddress:"<<config.get_local_ipaddress()<<"\n";
     os<<"ipaddress:"<<config.get_ipaddress()<<"\n";
+    os<<"mqtt_host:"<<config.get_mqtthost()<<"\n";
+    os<<"mqtt_port:"<<config.get_mqttport()<<"\n";
     os<<"version:"<<config.get_version()<<"\n";
 
     os<<"------------------local device info ------------------------------\n";
@@ -445,9 +506,7 @@ std::ostream& operator<<(std::ostream& os, const system_config& config)
     os<<"logger port:"<<sys_parameter_->main_process.logger_port<<"\n";
     os<<"gui port:"<<sys_parameter_->main_process.gui_port<<"\n";
     os<<"mqtt id:"<<sys_parameter_->main_process.mqtt_device.id<<"\n";
-    os<<"mqtt port:"<<sys_parameter_->main_process.mqtt_device.port<<"\n";
     os<<"mqtt keepalive:"<<sys_parameter_->main_process.mqtt_device.keepalive<<"\n";
-    os<<"mqtt pub_topic:"<<sys_parameter_->main_process.mqtt_device.pub_topic<<"\n";
     os<<"mqtt sub_topic:"<<sys_parameter_->main_process.mqtt_device.sub_topic<<"\n";
     os<<"mqtt qos:"<<sys_parameter_->main_process.mqtt_device.qos<<"\n"; 
 

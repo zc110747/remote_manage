@@ -90,7 +90,7 @@ bool fifo_manage::create()
     }
 
     return true;
-}                      
+}
 
 void fifo_manage::release()
 {
@@ -105,7 +105,7 @@ void fifo_manage::release()
         close(readfd_);
         readfd_ = -1;
     }
-}               
+}
 
 int fifo_manage::read(char *buf, int bufsize)
 {
@@ -116,7 +116,7 @@ int fifo_manage::read(char *buf, int bufsize)
     }
     
     return readbytes;
-}              
+}
 
 int fifo_manage::write(const char *buf, int bufsize)
 {

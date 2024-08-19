@@ -188,17 +188,20 @@ void device_manage::update()
     memset(inter_info_.rtc_timer.buffer, 0, STRUCT_STRING_MAX_SIZE);
     auto rtc_ptr = driver_manage::get_instance()->get_rtc_dev();
     size = rtc_ptr->update_rtc_time();
-    if(size > 0)
+    if (size > 0)
     {
         auto timer_str = rtc_ptr->get_timer_str();
         inter_info_.rtc_timer.size = timer_str.size();
-        if(timer_str.size() > 0)
+        if (timer_str.size() > 0)
         {
             memcpy(inter_info_.rtc_timer.buffer, timer_str.c_str(), 
                     timer_str.size()<STRUCT_STRING_MAX_SIZE?timer_str.size():STRUCT_STRING_MAX_SIZE);
         }
     }
 
+    auto pwm_ptr = driver_manage::get_instance()->get_pwm_dev();
+    inter_info_.pwm_duty_ = pwm_ptr->get_duty();
+    
     if (inter_info_ != outer_info_)
     {
         uint8_t size;
@@ -222,7 +225,7 @@ void device_manage::process_event(Event *pEvent)
 {
     uint16_t id = pEvent->get_id();
 
-    if(id != DEVICE_LOOP_EVENT)
+    if (id != DEVICE_LOOP_EVENT)
     {
         PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "Device event:%d!", id);
     }
@@ -250,7 +253,7 @@ void device_manage::process_sync(Event *pEvent)
 
     uint8_t sync_internal = data.buffer[0];
 
-    switch(sync_internal)
+    switch (sync_internal)
     {
         case 0:
             uint8_t level = data.buffer[1];
@@ -284,6 +287,18 @@ void device_manage::process_hardware(Event *pEvent)
                 beep_ptr->write_io_status(action);
                 PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "beep process:%d, %d!", device, action);
             }
+            break;
+        case DEVICE_PWM:
+            {
+                int state = data.buffer[1];
+                uint32_t peroid = ArraryToUint32(&data.buffer[2]);
+                uint32_t duty = ArraryToUint32(&data.buffer[6]);
+                auto pwm_ptr = driver_manage::get_instance()->get_pwm_dev();
+                pwm_ptr->pwm_setup(state, peroid, duty);
+                PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "pwm run:%d, %d, %d!", state, peroid, duty);
+            }
+            break;
+        case DEVICE_RTC:
             break;
         default:
             PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Invalid Device:%d!", device);

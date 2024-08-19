@@ -227,7 +227,7 @@ bool COpencvImgProcess::line_scale_image(QLabel *label, QString Path)
             else if (tmp < 192)
             {
                 *tmp_ptr = tmp + (tmp / 2);
-            }
+            } 
             else
             {
                *tmp_ptr = tmp / 2;

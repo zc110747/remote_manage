@@ -40,7 +40,7 @@ public:
 
     /// \brief get_id
     /// - This method is used to get the id.
-    /// \return the id of the event.   
+    /// \return the id of the event.
     uint16_t get_id()           { return id_;}
 
 private:
@@ -58,7 +58,7 @@ public:
 
     /// \brief get_data
     /// - This method is used to get the data.
-    /// \return the data of the event.   
+    /// \return the data of the event.
     T &get_data()
     {
         static_assert(std::is_trivially_copyable_v<EventExtend>, "Not Allow C memory process");
@@ -84,4 +84,4 @@ struct Buffer
 using EventU8Message = EventExtend<uint8_t>;
 using EventU16Message = EventExtend<uint16_t>;
 using EventU32Message = EventExtend<uint32_t>;
-using EventBufMessage = EventExtend<Buffer<16>>;
+using EventBufMessage = EventExtend<Buffer<32>>;

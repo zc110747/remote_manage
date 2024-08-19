@@ -75,17 +75,11 @@ int InterfaceProcess(void)
     if (SendBufferInfo.m_nProtocolStatus == PROTOCOL_UART)
     {
        return pCUartProtocolTreadInfo->UartLoopThread(&SendBufferInfo);
-    }
-    else if (SendBufferInfo.m_nProtocolStatus == PROTOCOL_TCP)
-    {
+    } else if (SendBufferInfo.m_nProtocolStatus == PROTOCOL_TCP) {
        return pCTcpSocketThreadInfo->TcpClientSocketLoopThread(&SendBufferInfo);
-    }
-    else if (SendBufferInfo.m_nProtocolStatus == PROTOCOL_UDP)
-    {
+    } else if (SendBufferInfo.m_nProtocolStatus == PROTOCOL_UDP) {
        return pCUdpSocketThreadInfo->UdpClientSocketLoopThread(&SendBufferInfo);
-    }
-    else
-    {
+    } else {
         qDebug()<<"Invalid Protocol Type";
     }
 

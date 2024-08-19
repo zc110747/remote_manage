@@ -93,12 +93,9 @@ void device_process::run()
             //update rx buffer to internal
             info_.copy_to_device(rx_buffer_);
 
-            //buffer to string
-            update_info_string();
+            device_loop_update();
 
-            #if MODULE_DEFINE_MQTT == 1
-            mqtt_manage::get_instance()->mqtt_publish(info_str_);
-            #endif
+            update_device_status();
         }
         else
         {
@@ -106,6 +103,17 @@ void device_process::run()
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         }
     }
+}
+
+void device_process::device_loop_update(void)
+{
+    get_disk_info();
+
+    get_ram_info();
+
+    get_cpu_used();
+
+    update_device_info();
 }
 
 int device_process::send_buffer(const char* ptr, int size)
@@ -120,7 +128,7 @@ int device_process::set_device(int dev, char *buf, int size)
 
     EventBuf.set_id(DEVICE_HW_SET_EVENT);
 
-    if(size > data.size-1)
+    if (size > data.size-1)
     {
         return -1;
     }
@@ -137,7 +145,7 @@ int device_process::sync_info(char *buf, int size)
 
     EventBuf.set_id(DEVICE_SYNC_EVENT);
 
-    if(size > data.size)
+    if (size > data.size)
     {
         return -1;
     }
@@ -162,7 +170,44 @@ bool device_process::system_info_init()
     return result;
 }
 
-#define MAX_LINE_LENGTH 512
+CpuStats readCpuStats() {  
+    std::ifstream file("/proc/stat");  
+    std::string line;  
+    while (std::getline(file, line)) {  
+        if (line.substr(0, 3) == "cpu") {  
+            return CpuStats(line);  
+        }  
+    }  
+    throw std::runtime_error("Failed to read CPU stats");  
+}  
+
+bool device_process::get_cpu_used()
+{
+    static uint8_t step = 0;
+    static CpuStats prevStat;
+    static CpuStats curStat;
+    static auto time = xGetCurrentTimes();
+
+    if((xGetCurrentTimes() - time) > 1)
+    {
+        time = xGetCurrentTimes();
+        if(step == 0)
+        {
+            prevStat = readCpuStats();
+            step = 1;
+        }
+        else
+        {
+            curStat = readCpuStats();
+            sysinfo_.cpu_used_precent = static_cast<uint8_t>(curStat.calculateUsage(prevStat));
+            PRINT_LOG(LOG_DEBUG, xGetCurrentTimes(), "cpu percent:%d", sysinfo_.cpu_used_precent);
+            step = 0;
+        }
+    }
+
+    return true;
+}
+
 bool device_process::get_cpu_info()
 {
     bool is_success = false;
@@ -194,7 +239,7 @@ bool device_process::get_cpu_info()
                 is_success = true;
                 sysinfo_.cpu_info = fmt::format("{}", token);
                 sysinfo_.cpu_info.pop_back();
-                PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "cpu info:%s", sysinfo_.cpu_info.c_str());
+                PRINT_LOG(LOG_DEBUG, xGetCurrentTimes(), "cpu info:%s", sysinfo_.cpu_info.c_str());
                 break;
             }
             token = strtok_r(NULL, ":", &end);
@@ -212,6 +257,7 @@ bool device_process::get_cpu_info()
 
 bool device_process::get_kernel_info()
 {
+    //获取内核信息
     struct utsname uname_info;
     if (uname(&uname_info) == -1)
     {
@@ -219,7 +265,23 @@ bool device_process::get_kernel_info()
         return false;
     }
     sysinfo_.kernel_info = fmt::format("{0}", uname_info.release);
-    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "kernel info:%s", sysinfo_.kernel_info.c_str());
+
+    //获取hostname
+    std::array<char, 1024> buffer;  
+    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen("hostname", "r"), pclose);  
+    if (!pipe) {  
+        throw std::runtime_error("popen() failed!");  
+    }  
+    while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {  
+        size_t len = strlen(buffer.data());  
+        if (len > 0 && buffer[len-1] == '\n') 
+        {  
+            buffer[len-1] = '\0';  
+        }  
+        sysinfo_.host_name = std::string(buffer.data());
+        break;
+    }  
+    PRINT_LOG(LOG_DEBUG, xGetCurrentTimes(), "kernel info:%s", sysinfo_.kernel_info.c_str());
     return true;
 }
 
@@ -235,7 +297,7 @@ bool device_process::get_disk_info()
     //单位为B, 转换为MB
     sysinfo_.disk_total = ((uint64_t)diskInfo.f_blocks*diskInfo.f_bsize)/(1024*1024);
     sysinfo_.disk_used = ((uint64_t)diskInfo.f_bavail*diskInfo.f_bsize)/(1024*1024);
-    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "disk:%d, %d", sysinfo_.disk_total, sysinfo_.disk_used);
+    PRINT_LOG(LOG_DEBUG, xGetCurrentTimes(), "disk:%d, %d", sysinfo_.disk_total, sysinfo_.disk_used);
     return true;
 }
 
@@ -252,41 +314,81 @@ bool device_process::get_ram_info()
     sysinfo_.ram_total = info.totalram/(1024*1024);
     sysinfo_.ram_used = info.freeram/(1024*1024);
 
-    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "ram:%d, %d", sysinfo_.ram_total, sysinfo_.ram_used);
+    PRINT_LOG(LOG_DEBUG, xGetCurrentTimes(), "ram:%d, %d", sysinfo_.ram_total, sysinfo_.ram_used);
     return true;
 }
 
-void device_process::update_info_string()
+void device_process::update_device_status()
 {
     Json::Value root;
+
+    root["command"] = "rep_getstat";
+    root["replay"] = "OK";
+
+    root["data"]["key_area"]["led_status"] = info_.led_io_;
+    root["data"]["key_area"]["beep_status"] = info_.beep_io_;
+    root["data"]["pwm_area"]["pwm_duty"] = info_.pwm_duty_;
     
-    root["command"] = COMMAND_UPDATE_LOCAL; 
-    root["data"]["led"] = info_.led_io_;
-    root["data"]["beep"] = info_.beep_io_;
+    root["data"]["time_area"]["rtc_time"] = std::string(info_.rtc_timer.buffer, info_.rtc_timer.size);
+
+    root["data"]["status_area"]["angle"] = info_.angle_;
+    root["data"]["status_area"]["temperature"] = info_.icm_info_.temp_act;
+    root["data"]["status_area"]["voltage"] = info_.vf610_adc_;
+    root["data"]["status_area"]["als"] = info_.ap_info_.als;
 
     root["data"]["ap"]["ir"] = info_.ap_info_.ir;
     root["data"]["ap"]["als"] = info_.ap_info_.als;
     root["data"]["ap"]["ps"] = info_.ap_info_.ps;
 
-    root["data"]["icm"]["gyro_x"] = info_.icm_info_.gyro_x_act;
-    root["data"]["icm"]["gyro_y"] = info_.icm_info_.gyro_y_act;
-    root["data"]["icm"]["gyro_z"] = info_.icm_info_.gyro_z_act;
-    root["data"]["icm"]["accel_x"] = info_.icm_info_.accel_x_act;
-    root["data"]["icm"]["accel_y"] = info_.icm_info_.accel_y_act;
-    root["data"]["icm"]["accel_z"] = info_.icm_info_.accel_z_act;
-    root["data"]["icm"]["temp_act"] = info_.icm_info_.temp_act;
+    {
+        std::lock_guard<std::mutex> lock{mutex_};
+        info_str_[DATA_DEVICE_STATUS] = root.toStyledString();
+    }
+}
 
-    root["data"]["angle"] = info_.angle_;
-    root["data"]["hx711"] = info_.hx711_;
-    root["data"]["vf610_adc"] = info_.vf610_adc_;
+void device_process::update_device_info()
+{
+    Json::Value root;
 
-    //system information
-    root["data"]["sysinfo"]["cpu_info"] = sysinfo_.cpu_info;
-    root["data"]["sysinfo"]["kernel_info"] = sysinfo_.kernel_info;
-    root["data"]["sysinfo"]["disk_total"] = sysinfo_.disk_total;
-    root["data"]["sysinfo"]["disk_used"] = sysinfo_.disk_used;
-    root["data"]["sysinfo"]["ram_total"] = sysinfo_.ram_total;
-    root["data"]["sysinfo"]["ram_used"] = sysinfo_.ram_used;
+    root["command"] = "rep_getinfo";
+    root["replay"] = "OK";
 
-    info_str_ = root.toStyledString();
+    root["data"]["hw_area"]["cpuinfo"] = sysinfo_.cpu_info;
+    root["data"]["hw_area"]["cpuused"] = sysinfo_.cpu_used_precent;
+    root["data"]["hw_area"]["diskused"] = sysinfo_.disk_used;
+    root["data"]["hw_area"]["disktotal"] = sysinfo_.disk_total;
+    root["data"]["hw_area"]["ramused"] = sysinfo_.ram_used;
+    root["data"]["hw_area"]["ramtotal"] = sysinfo_.ram_total;
+
+    root["data"]["kernel_area"]["kernelinfo"] = sysinfo_.kernel_info;
+    root["data"]["kernel_area"]["hostname"] = sysinfo_.host_name;
+    root["data"]["kernel_area"]["ipaddress"] = system_config::get_instance()->get_ipaddress();
+
+        
+    {
+        std::lock_guard<std::mutex> lock{mutex_};
+        info_str_[DATA_DEVICE_INFO] = root.toStyledString();
+    }
+}
+
+std::string device_process::get_dev_info()
+{
+    std::string str;
+
+    {
+        std::lock_guard<std::mutex> lock{mutex_};
+        str = info_str_[DATA_DEVICE_INFO];      
+    }
+    return str;
+}
+
+std::string device_process::get_dev_status()
+{
+    std::string str;
+
+    {
+        std::lock_guard<std::mutex> lock{mutex_};
+        str = info_str_[DATA_DEVICE_STATUS];
+    }
+    return str;
 }

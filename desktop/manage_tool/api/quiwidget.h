@@ -56,7 +56,7 @@ class QUIWidget : public QDialog
 
 {
     Q_OBJECT
-    Q_ENUMS(Style)    
+    Q_ENUMS(Style)
     Q_PROPERTY(QString title READ getTitle WRITE setTitle)
     Q_PROPERTY(Qt::Alignment alignment READ getAlignment WRITE setAlignment)
     Q_PROPERTY(bool minHide READ getMinHide WRITE setMinHide)

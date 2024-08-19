@@ -59,6 +59,7 @@
 		usr_loopled {
 			compatible = "rmk,usr-loopled";
 			pinctrl-names = "default";
+			leds-num = <3>;
 			pinctrl-0 = <&pinctrl_loopled>;
 			leds-gpios = <&gpio4 21 GPIO_ACTIVE_HIGH>,
 						<&gpio4 23 GPIO_ACTIVE_HIGH>,
@@ -74,6 +75,21 @@
 						<&gpio4 24 GPIO_ACTIVE_HIGH>;
 			status = "okay";
 		};
+
+		usr_wdt {
+			compatible = "rmk,usr-wdt";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_wdt_pin>;
+			wdt-gpios = <&gpio4 26 GPIO_ACTIVE_HIGH>;
+			status = "okay";
+		};
+	};
+
+	fan0: pwm-fan {
+		compatible = "rmk,pwm-fan";
+		#cooling-cells = <2>;
+		pwms = <&pwm7 0 10000 0>;
+		cooling-levels = <0 102 170 230 255>;
 	};
 
 	regulators {
@@ -130,6 +146,12 @@
             MX6UL_PAD_CSI_DATA01__GPIO4_IO22		0x17059
 			MX6UL_PAD_CSI_DATA03__GPIO4_IO24		0x17059
         >;
+	};
+
+	pinctrl_wdt_pin: gpio-wdt {
+	    fsl,pins = <
+            MX6UL_PAD_CSI_DATA05__GPIO4_IO26		0x17059
+        >;	
 	};
 
 	pinctrl_gpio_key: gpio-key {
@@ -201,6 +223,7 @@
 };
 
 &pwm7 {
+	compatible = "rmk,pwm";
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pwm7>;
 	status = "okay";
@@ -226,6 +249,7 @@
 	ap3216@1e {
 		compatible = "rmk,ap3216";
 		reg = <0x1e>;
+		rmk,sysconf = /bits/ 8 <0x03>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_ap3216_tsc>;
 		interrupt-parent = <&gpio1>;
@@ -278,10 +302,19 @@
 	pinctrl-0 = <&pinctrl_ecspi3>;
 	status = "okay";
 
-	spidev0:icm20608@0 {
+	icm20608:icm20608@0 {
 		compatible = "rmk,icm20608";
 		spi-max-frequency = <8000000>;
 		reg = <0>;
+
+		smplrt_div 		= /bits/ 8 <0x00>;
+		gyro_config 	= /bits/ 8 <0x18>;
+		accel_config 	= /bits/ 8 <0x18>;
+		config			= /bits/ 8 <0x04>;
+		accel_config2 	= /bits/ 8 <0x04>;
+		pwr_mgmt_2 		= /bits/ 8 <0x00>;
+		lp_mode_cfg 	= /bits/ 8 <0x00>;
+		fifo_en			= /bits/ 8 <0x00>;
 	};
 };
 

@@ -71,6 +71,10 @@ struct device_read_info
     /// \brief beep_io_
     /// - beep i/o status.
     uint8_t   beep_io_; 
+    
+    /// \brief pwm_duty_
+    /// - current pwm duty. 
+    uint8_t   pwm_duty_;
 
     /// \brief ap_info_
     /// - ap3216 information.
@@ -85,15 +89,15 @@ struct device_read_info
     int32_t   angle_;
 
     /// \brief hx711_
-    /// - hx711 value.   
+    /// - hx711 value.
     uint32_t hx711_;
 
     /// \brief vf610_adc_
-    /// - vf610 value.  
+    /// - vf610 value.
     float vf610_adc_;
 
     /// \brief rtc_time
-    /// - rtc time value.    
+    /// - rtc time value.
     STRUCT_STRING rtc_timer;
 
     /// \brief operator !=
@@ -127,7 +131,7 @@ struct device_read_info
 
         buffer[size++] = led_io_;
         buffer[size++] = beep_io_;
-
+        buffer[size++] = pwm_duty_;
         buffer[size++] = ap_info_.als>>8;
         buffer[size++] = ap_info_.als;
         buffer[size++] = ap_info_.ir>>8;
@@ -153,7 +157,7 @@ struct device_read_info
         }
 
         buffer[size++] = rtc_timer.size; 
-        if(rtc_timer.size > 0)
+        if (rtc_timer.size > 0)
         {
             memcpy(&buffer[size], rtc_timer.buffer, rtc_timer.size);
             size += rtc_timer.size;
@@ -169,7 +173,8 @@ struct device_read_info
 
         led_io_ = buffer[size++];
         beep_io_ = buffer[size++];
-
+        pwm_duty_ = buffer[size++];
+        
         ap_info_.als = CREATE_UINT16(buffer[size], buffer[size+1]);
         size += 2;
         ap_info_.ir = CREATE_UINT16(buffer[size], buffer[size+1]);
@@ -218,7 +223,7 @@ struct device_read_info
         size += 4;
 
         rtc_timer.size = buffer[size++];
-        if(rtc_timer.size > 0)
+        if (rtc_timer.size > 0)
         {
             memcpy(rtc_timer.buffer, &buffer[size], rtc_timer.size);
         }

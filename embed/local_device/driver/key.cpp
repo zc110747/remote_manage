@@ -55,7 +55,7 @@ void key_device::run()
 
     PRINT_LOG(LOG_INFO, 0, "key device run start!");
 
-    while(1)
+    while (1)
     {
         flags = read(device_fd_, &event, sizeof(event));
         if (flags > 0) 
@@ -63,9 +63,9 @@ void key_device::run()
             switch (event.type) 
             {
                 case EV_KEY:
-                        for(auto key_action:key_action_list)
+                        for (auto key_action:key_action_list)
                         {
-                            if(event.code == key_action.key_num
+                            if (event.code == key_action.key_num
                             && event.value == key_action.key_event)
                             {
                                 key_action.func(key_action.key_num, key_action.key_event);
@@ -82,7 +82,7 @@ void key_device::run()
                 case EV_SW:
                     break;
             }
-        } 
+        }
         else 
         {
             printf("read data failed!\n");

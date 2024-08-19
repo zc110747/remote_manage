@@ -73,6 +73,7 @@ ENUM_PROTOCOL_STATUS protocol_info::check_rx_frame(uint8_t data)
             rx_timeout_ = xGetCurrentTimes();
         }
     }
+    
     //接收到一个head字节，检测第二个字节
     else if (rx_status_ == PROTOCOL_FRAME_HEAD_RX)
     {
@@ -87,7 +88,9 @@ ENUM_PROTOCOL_STATUS protocol_info::check_rx_frame(uint8_t data)
             rx_status_ = PROTOCOL_FRAME_DATA_RX;
         }
         else
+        {
             rx_status_ = PROTOCOL_FRAME_EMPTY;
+        }
     }
     //数据接收处理
     else
@@ -117,7 +120,7 @@ ENUM_PROTOCOL_STATUS protocol_info::check_rx_frame(uint8_t data)
     }
     
     return rx_status_;
-}     
+}
 
 void protocol_info::process_rx_frame()
 {

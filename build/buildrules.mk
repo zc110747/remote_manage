@@ -94,7 +94,6 @@ else
 endif
 	
 	rm -rf $(objects)
-	cp $(buildout) $(lib_dist)/
 
 	if [ ! -d $(run_dist) ]; then \
 		mkdir -m 777 -p $(run_dist); \
@@ -109,7 +108,7 @@ $(buildout): $(objects)
 	$(AR_COMPILE) -cr $(buildout).a $(objects)
 
 	rm -rf $(objects)
-	mv $(buildout).a $(lib_dist)/
+	mv $(buildout).a $(SUPPORT_ENV_INSTALL)/lib/
 endif
 
 #build dynamic library

@@ -25,6 +25,7 @@ _Pragma("once")
 
 #define DEFAULT_LOCAL_IPADRESS      "127.0.0.1"
 #define DEFAULT_IPADDRESS           "127.0.0.1"
+#define DEFAULT_MQTT_PORT           1883
 #define DEFAULT_FW_VERSION          "0.0.0.0"
 
 #define DEFAULT_LED_INIT            0
@@ -37,6 +38,10 @@ _Pragma("once")
 #define DEFAULT_API2C_DEV           "/dev/ap3216"
 #define DEFAULT_VF610_DEV           "/sys/bus/iio/devices/iio:device0/in_voltage4_raw" 
 #define DEFAULT_HX711_DEV           "/sys/bus/iio/devices/iio:device1/in_voltage1_raw"
+#define DEFAULT_PWM_CHIP            "pwmchip0"
+#define DEFAULT_PWM_STATE           0
+#define DEFAULT_PWM_PEROID          0
+#define DEFAULT_PWM_DUTY            0
 
 #define DEFAULT_LOWER_DEVICE_LOGGER_PORT    15201
 #define DEFAULT_LOWER_DEVICE_REMOTE_PORT    15202
@@ -54,6 +59,8 @@ _Pragma("once")
 #define DEFAULT_GUI_DEVICE_PORT     8004
 #define DEFAULT_NODE_WEB_PORT       8100
 #define DEFAULT_LOGGER_LEVEL        2
+
+#define DEFAULT_NODE_PAGES          "/device/dist"
 
 #define DEFAULT_LOGGER_PASSWD       "user123"
 #define DEFAULT_ALLOW_NO_PASSWD     false
@@ -79,10 +86,19 @@ typedef struct
 
 typedef struct 
 {
+    JString pwm_chip;
+    int state;
+    uint32_t peroid;
+    uint32_t duty_cycle;
+}PWMSysConfig;
+
+typedef struct 
+{
     DeviceSysConfig ap_i2c;
     DeviceSysConfig icm_spi;
     DeviceSysConfig key;
     DeviceSysConfig rtc;
+    PWMSysConfig pwm;
     IoSysConfig led;
     IoSysConfig beep;
     IIOSysConfig iio;
@@ -91,9 +107,7 @@ typedef struct
 typedef struct 
 {
     JString id;
-    int port;
     JString sub_topic;
-    JString pub_topic;
     int keepalive;
     int qos;
 }MqttDeivceInfo;
@@ -111,7 +125,19 @@ typedef struct
 typedef struct 
 {
     int web_port;
+    JString pages;
+    MqttDeivceInfo mqtt_device;
 }NodeServerConfig;
+
+typedef struct 
+{
+    MqttDeivceInfo mqtt_device;    
+}GuiManageConfig;
+
+typedef struct 
+{
+    MqttDeivceInfo mqtt_device;    
+}WinformConfig;
 
 typedef struct 
 {
@@ -156,13 +182,21 @@ typedef struct
     
     JString ipaddress;
 
+    JString mqtt_host;
+
+    uint16_t mqtt_port;
+
     JString version;
 
     LocalDeviceConfig local_device;
 
     MainProcessConfig main_process;
 
-    NodeServerConfig node_sever;
+    NodeServerConfig node_server;
+
+    GuiManageConfig gui_manage;
+
+    WinformConfig winform;
 
     LowerDeviceConfig lower_device;
 
@@ -213,6 +247,8 @@ public:
     const std::string &get_config_file_path()   const   {return file_path_;}
     const JString &get_local_ipaddress()        const   {return parameter_.local_ipaddress;}
     const JString &get_ipaddress()              const   {return parameter_.ipaddress;}
+    const JString &get_mqtthost()               const   {return parameter_.mqtt_host;}
+    const uint16_t get_mqttport()               const   {return parameter_.mqtt_port;}
     const JString &get_version()                const   {return parameter_.version;}
 
     const IoSysConfig &get_led_config()         const   {return parameter_.local_device.led;}
@@ -222,6 +258,7 @@ public:
     const DeviceSysConfig &get_icm_config()     const   {return parameter_.local_device.icm_spi;}
     const DeviceSysConfig &get_ap_config()      const   {return parameter_.local_device.ap_i2c;}
     const IIOSysConfig &get_iio_config()        const   {return parameter_.local_device.iio;}
+    const PWMSysConfig &get_pwm_config()        const   {return parameter_.local_device.pwm;}
 
     const int &get_lower_device_logger_port()   const    {return parameter_.lower_device.logger_port;}
     const int &get_lower_device_remote_port()   const    {return parameter_.lower_device.remote_port;}
@@ -231,12 +268,19 @@ public:
     const JString &get_download_path()          const    {return parameter_.main_process.download_path;}
     const int get_node_port()                   const    {return parameter_.main_process.node_port;}
     const int get_local_port()                  const    {return parameter_.main_process.local_port;}
-    const int get_logger_port()                 const    {return parameter_.main_process.logger_port;}   
+    const int get_logger_port()                 const    {return parameter_.main_process.logger_port;}
     const int get_gui_device_port()             const    {return parameter_.main_process.gui_port;}
-    const MqttDeivceInfo &get_mqtt_config()     const    {return parameter_.main_process.mqtt_device;}
-    
+    const MqttDeivceInfo &get_mp_mqtt_config()     const    {return parameter_.main_process.mqtt_device;}
+
     //node info
-    const int get_node_web_port()               const    {return parameter_.node_sever.web_port;}
+    const int get_node_web_port()               const    {return parameter_.node_server.web_port;}
+    const MqttDeivceInfo &get_node_mqtt_config()     const    {return parameter_.node_server.mqtt_device;}
+
+    //gui info
+    const MqttDeivceInfo &get_gui_mqtt_config() const    {return parameter_.gui_manage.mqtt_device; }
+
+    //winform
+    const MqttDeivceInfo &get_winform_mqtt_config() const    {return parameter_.winform.mqtt_device; }
 
     const LoggerPrivilege& get_logger_privilege() const  {return parameter_.logger_privilege;}
 

@@ -1,6 +1,8 @@
 {
 	"local_ipaddress":"127.0.0.1",
 	"ipaddress":"172.27.83.254",
+	"mqtt_host":"172.27.83.254",
+	"mqtt_port":1883,
 	"version" : "1.0.0.9",
 	"local_device" : {
 		"ap_i2c" : {
@@ -23,6 +25,14 @@
 		"rtc" : {
 			"dev" : "/dev/rtc0"
 		},
+		"pwm" : {
+			"dev": "pwmchip7",
+			"init": {
+				"peroid": 50000,
+				"duty": 25000,
+				"state": 0
+			}
+		},
 		"iio" : {
 			"vf610_adc" : "/sys/bus/iio/devices/iio:device0/in_voltage4_raw",
 			"hx711_dev": "/sys/bus/iio/devices/iio:device1/in_voltage1_raw"
@@ -36,20 +46,33 @@
 		"node_port"		:15005,
 		"mqtt_device"	:{
 			"id"   : "cl_usr",
-			"port" : 1883,
-			"sub_topic" : "/info/sub",
-			"pub_topic" : "/info/pub",
+			"sub_topic" : "/info/mp_topic",
 			"keepalive": 60,
 			"qos":1
 		}
 	},
 	"node_server" : {
 		"web_port" 		:15101,
+		"pages"			:"/device/dist",
 		"mqtt_device"	:{
 			"id"   : "cl_node",
-			"port" : 1883,
-			"sub_topic" : "/info/pub",
-			"pub_topic" : "/info/sub",
+			"sub_topic" : "/info/node_topic",
+			"keepalive": 60,
+			"qos":1
+		}
+	},
+	"gui_manage" : {
+		"mqtt_device"	:{
+			"id"   : "cl_gui",
+			"sub_topic" : "/info/gui_topic",
+			"keepalive": 60,
+			"qos":1
+		}
+	},
+	"winform" : {
+		"mqtt_device"	:{
+			"id"   : "cl_winform",
+			"sub_topic" : "/info/winform_topic",
 			"keepalive": 60,
 			"qos":1
 		}
