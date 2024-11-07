@@ -45,18 +45,18 @@ alias SysSetPlatformWanlutpi='set_platform WalnutPi'
 
 # SysSetRootfs
 # - set_rootfs
-# set the run rootfs platform, can be debain, buildroot, ubuntu.
-# example：SysSetRootfs debain
+# set the run rootfs platform, can be debian, buildroot, ubuntu.
+# example：SysSetRootfs debian
 function set_rootfs
 {
     if [ x"$1" != x ]; then  
-        current_rootfs="debain"
+        current_rootfs="debian"
         case "$1" in
 			"buildroot")
                 current_rootfs="buildroot"
             ;;
-            "debain")
-                current_rootfs="debain"
+            "debian")
+                current_rootfs="debian"
             ;;
             "ubuntu")
                 current_rootfs="ubuntu"
@@ -66,11 +66,11 @@ function set_rootfs
         export ROOTFS_RUN=$current_rootfs       
         save_global_config
     else
-        echo "set rootfs must with parameter ${greenText}'buildroot debain ubuntu'${defText}'"
+        echo "set rootfs must with parameter ${greenText}'buildroot debian ubuntu'${defText}'"
     fi
 }
 alias SysSetRootfsBuildRoot='set_rootfs buildroot'
-alias SysSetRootfsDebain='set_rootfs debain'
+alias SysSetRootfsDebian='set_rootfs debian'
 alias SysSetRootfsUbuntu='set_rootfs ubuntu'
 
 function set_firmware_ver

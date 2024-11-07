@@ -98,6 +98,8 @@ struct local_sysinfo final
 
         ram_total = 0;
         ram_used = 0;
+
+        cpu_used_precent = 0;
     }
 };
 

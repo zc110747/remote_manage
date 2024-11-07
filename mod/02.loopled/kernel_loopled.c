@@ -8,9 +8,9 @@
 //  Purpose:
 //      三色灯控制输出(3-pin).
 //      LED硬件接口: 
-//          GPIO4_21
-//          GPIO4_23
-//          GPIO4_25
+//          GPIO4_21 -- CSI-D0
+//          GPIO4_23 -- CSI-D2
+//          GPIO4_25 -- CSI-D4
 //
 // Author:
 //     @听心跳的声音
@@ -93,12 +93,12 @@ static void led_hardware_set(struct loopled_data *chip, u8 index, u8 status)
     switch (status)
     {
         case LED_ON:
-            dev_info(&pdev->dev, "on\n");
+            dev_info(&pdev->dev, "index: %d, on\n", index);
             gpiod_set_value(chip->desc[index], 1);
             chip->status[index] = 1;
             break;
         case LED_OFF:
-            dev_info(&pdev->dev, "off\n");
+            dev_info(&pdev->dev, "index: %d, off\n", index);
             gpiod_set_value(chip->desc[index], 0);
             chip->status[index] = 0;
             break;
@@ -156,7 +156,7 @@ ssize_t led_write(struct file *filp, const char __user *buf, size_t size,  loff_
     }
 
     led_hardware_set(chip, data[0], data[1]);
-    return 0;
+    return size;
 }
 
 //ioctl格式为
@@ -273,8 +273,7 @@ static int led_hardware_init(struct loopled_data *chip)
     }
     
     //2.获取"leds-gpio"属性中LED，设置GPIO输出并控制
-    for (index=0; index<chip->leds_num; index++)
-    {
+    for (index=0; index<chip->leds_num; index++) {
         chip->desc[index] = devm_gpiod_get_index(&pdev->dev, "leds", index, GPIOD_OUT_HIGH);
         if (chip->desc[index] == NULL) {
             dev_err(&pdev->dev, "find gpio in dts failed!\n");
@@ -282,7 +281,7 @@ static int led_hardware_init(struct loopled_data *chip)
         }
 
         gpiod_direction_output(chip->desc[index], 1);
-        led_hardware_set(chip, index, LED_ON);
+        led_hardware_set(chip, index, LED_OFF);
         dev_info(&pdev->dev, "gpio %d init success", index);
     }
 
@@ -298,7 +297,7 @@ static int led_probe(struct platform_device *pdev)
     
     //1.申请loopled控制块
     chip = devm_kzalloc(&pdev->dev, sizeof(*chip), GFP_KERNEL);
-    if (!chip){
+    if (!chip) {
         dev_err(&pdev->dev, "memory alloc failed!\n");
         return -ENOMEM;
     }
@@ -307,14 +306,14 @@ static int led_probe(struct platform_device *pdev)
 
     //2.初始化loopled硬件设备
     ret = led_hardware_init(chip);
-    if (ret){
+    if (ret) {
         dev_err(&pdev->dev, "hardware init faile, error:%d!\n", ret);
         return ret;
     }
 
     //3.创建内核访问接口
     ret = led_device_create(chip);
-    if (ret){
+    if (ret) {
         dev_err(&pdev->dev, "device create faile, error:%d!\n", ret);
         return ret;
     }

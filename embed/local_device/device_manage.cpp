@@ -72,6 +72,9 @@ bool device_manage::init()
     //start thread
     std::thread(std::bind(&device_manage::run, this)).detach();
     PRINT_NOW("%s:device manage init success!\r\n", PRINT_NOW_HEAD_STR);
+
+    srand_init();
+
     return true;
 }
 
@@ -92,7 +95,7 @@ void device_manage::update()
     else
     {
 #if MOCK_DEBUG
-        inter_info_.led_io_ = 1;
+        inter_info_.led_io_ = get_random_int(0, 1);
 #endif
     }
 
@@ -104,7 +107,7 @@ void device_manage::update()
     else
     {
 #if MOCK_DEBUG
-        inter_info_.beep_io_ = 1;
+        inter_info_.beep_io_ = get_random_int(0, 1);
 #endif
     }
 
@@ -116,12 +119,9 @@ void device_manage::update()
     else
     {
 #if MOCK_DEBUG
-        inter_info_.ap_info_.als = test_start;
-        test_start++;
-        inter_info_.ap_info_.ir = test_start;
-        test_start++;
-        inter_info_.ap_info_.ps = test_start;
-        test_start++;
+        inter_info_.ap_info_.als = get_random_int(0, 512);
+        inter_info_.ap_info_.ir = get_random_int(0, 1024);
+        inter_info_.ap_info_.ps = get_random_int(0, 1024);
 #endif
     }
 
@@ -136,20 +136,14 @@ void device_manage::update()
     else
     {
 #if MOCK_DEBUG
-        inter_info_.icm_info_.accel_x_act = test_start;
-        test_start++;
-        inter_info_.icm_info_.accel_y_act = test_start;
-        test_start++;
-        inter_info_.icm_info_.accel_z_act = test_start;
-        test_start++;
-        inter_info_.icm_info_.gyro_x_act = test_start;
-        test_start++;
-        inter_info_.icm_info_.gyro_y_act = test_start;
-        test_start++;
-        inter_info_.icm_info_.gyro_z_act = test_start;
-        test_start++;
-        inter_info_.angle_ = test_start;
-        test_start++;
+        inter_info_.icm_info_.accel_x_act = get_random_float(0, 90);
+        inter_info_.icm_info_.accel_y_act = get_random_float(0, 90);
+        inter_info_.icm_info_.accel_z_act = get_random_float(0, 90);
+        inter_info_.icm_info_.gyro_x_act = get_random_float(0, 90);
+        inter_info_.icm_info_.gyro_y_act = get_random_float(0, 90);
+        inter_info_.icm_info_.gyro_z_act = get_random_float(0, 90);
+        inter_info_.icm_info_.temp_act = get_random_float(0, 100);
+        inter_info_.angle_ = get_random_float(0, 90);
 #endif
     }
 
@@ -164,7 +158,7 @@ void device_manage::update()
     else
     {
 #if MOCK_DEBUG
-        inter_info_.vf610_adc_ = test_start;
+        inter_info_.vf610_adc_ = get_random_float(0, 3.3);
         test_start++;
 #endif
     }
@@ -179,7 +173,7 @@ void device_manage::update()
     else
     {
 #if MOCK_DEBUG
-        inter_info_.hx711_ = test_start;
+        inter_info_.hx711_ = get_random_int(0, 2000);
         test_start++;
 #endif
     }
@@ -210,8 +204,8 @@ void device_manage::update()
         size = outer_info_.copy_to_buffer(tx_buffer_);
 
         device_info_fifo_point_->write(tx_buffer_, size);
-        PRINT_LOG(LOG_DEBUG, xGetCurrentTimes(), "update to main porcess, data:%d,%f, size:%d!", 
-                                                inter_info_.hx711_, 
+        PRINT_LOG(LOG_DEBUG, xGetCurrentTimes(), "update to main porcess, data:%d,%.2f, size:%d!", 
+                                                inter_info_.hx711_,    
                                                 inter_info_.icm_info_.gyro_y_act, 
                                                 size);
     }
@@ -298,6 +292,14 @@ void device_manage::process_hardware(Event *pEvent)
                 PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "pwm run:%d, %d, %d!", state, peroid, duty);
             }
             break;
+        case DEVICE_LOOPLED:
+            {
+                uint8_t action = data.buffer[1];
+                auto loopled_ptr = driver_manage::get_instance()->get_loopled_dev();
+                loopled_ptr->set_state(action == 1?true:false);
+                PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "loopled process:%d, %d!", device, action);
+            }
+            break;
         case DEVICE_RTC:
             break;
         default:
@@ -319,6 +321,11 @@ void device_manage::run()
     time_manage::get_instance()->register_action(DEVICE_LOOP_EVENT, TIME_TICK(1000), TIME_ACTION_ALWAYS, [&](int id){
         Event event(id);
         send_message(reinterpret_cast<char *>(&event), sizeof(event));
+    });
+
+    time_manage::get_instance()->register_action(DEVICE_PER_SECOND_EVENT, TIME_TICK(1000), TIME_ACTION_ALWAYS, [&](int id){
+        auto loopled_ptr = driver_manage::get_instance()->get_loopled_dev();
+        loopled_ptr->loop_refresh_per_second();
     });
 
     //register action for key process

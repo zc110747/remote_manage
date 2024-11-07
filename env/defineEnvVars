@@ -85,7 +85,7 @@ export SUPPORT_ENV_PACKAGE="${PROGRAM_SDK_PLATFORM_PATH}"/package
 
 #二级rootfs目录:sdk/arm/rootfs
 export SUPPORT_FS_BUILDROOT_DIR="${SUPPORT_ENV_ROOTFS_DIR}"/buildroot
-export SUPPORT_FS_DEBAIN_DIR="${SUPPORT_ENV_ROOTFS_DIR}"/debain
+export SUPPORT_FS_DEBIAN_DIR="${SUPPORT_ENV_ROOTFS_DIR}"/debian
 export SUPPORT_FS_UBUNTU_DIR="${SUPPORT_ENV_ROOTFS_DIR}"/ubuntu
 export PROGRAM_FS_IMG="${SUPPORT_ENV_ROOTFS_DIR}"/img
 
@@ -100,7 +100,6 @@ if [[ "${supportedPlatforms[0]}" == "${FIRMWARE_CURRENT_PLATFORMS}" ]]; then
     export APP_CC_COMPILE=arm-none-linux-gnueabihf-g++
     export APP_AR_COMPILE=arm-none-linux-gnueabihf-ar
 
-    export APPLICATION_BUILDOUT="${ENV_PATH_ROOT}"/buildout/arm
     export PLATFORM_LINUX_PATH="${ENV_PATH_ROOT}"/platform/I.MX6ULL/linux-imx-lf-6.1.y-patch
     export PLATFORM_UBOOT_PATH="${ENV_PATH_ROOT}"/platform/I.MX6ULL/uboot-imx-lf_v2022.04-patch
     export PLATFORM_BUILDROOT_PATH="${ENV_PATH_ROOT}"/platform/I.MX6ULL/buildroot-2023.02.9-patch
@@ -112,7 +111,6 @@ else
     export APP_C_COMPILE=aarch64-none-linux-gnu-gcc
     export APP_CC_COMPILE=aarch64-none-linux-gnu-g++
     export APP_AR_COMPILE=aarch64-none-linux-gnu-ar
-    export APPLICATION_BUILDOUT="${ENV_PATH_ROOT}"/buildout/aarch64
 
     export NEW_KERNEL_CC="${SUPPORT_GCC_PATH}"/aarch64-none-linux-gnu-
     export GCC_LIB="${PROGRAM_SUPPORT}"/compiler/arm-none-linux-gnueabihf

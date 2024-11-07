@@ -58,8 +58,7 @@
 	"ethaddr=00:01:02:03:04:05\0" \
 	"eth1addr=00:01:02:03:04:06\0" \
 	"nfspath=/home/freedom/Desktop/sdk/arm/build/nfs_root/\0" \
-	"bootargs=console=ttymxc0,115200 root=/dev/nfs " \
-		"nfsroot=192.168.2.29:${nfspath},proto=tcp rw ip=192.168.2.99:192.168.2.29:192.168.2.1:255.255.255.0::eth0:off\0" \
+	"bootargs=console=tty1 console=ttymxc0,115200 panic=5 rootwait root=/dev/mmcblk0p2 earlyprintk rw\0" \
 	"fdt_file=imx6ull-14x14-emmc-4.3-800x480-c.dtb\0" \
 	"serverip=192.168.2.29\0" \
 	"ipaddr=192.168.2.99\0" \
@@ -68,7 +67,7 @@
 	"netboot_cmd=tftp 80800000 zImage; tftp 83000000 ${fdt_file}; bootz 80800000 - 83000000;\0" \
 	"mmcboot_cmd=mmc dev ${mmcdev}; run loadimage; run mmcboot\0" \
 	"srcboot_cmd=tftp 80800000 boot.scr; source\0" \
-	"bootcmd=run srcboot_cmd\0"\
+	"bootcmd=run mmcboot_cmd\0"\
 
 #define CONFIG_MFG_ENV_SETTINGS \
 	CONFIG_MFG_ENV_SETTINGS_DEFAULT \

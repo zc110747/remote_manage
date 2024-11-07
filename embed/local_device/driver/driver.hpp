@@ -26,6 +26,7 @@ _Pragma("once")
 #include "rtc.hpp"
 #include "spi_icm.hpp"
 #include "pwm_dev.hpp"
+#include "loopled.hpp"
 
 class driver_manage
 {
@@ -94,6 +95,12 @@ public:
     /// - This method is used to get pwm device point.
     /// \return the pwm device point.
     pwm_device *get_pwm_dev()  {return &pwm_dev_;}
+
+    /// \brief get_loopled_dev
+    /// - This method is used to get loopled device point.
+    /// \return the loopled device point.
+    loopled_device *get_loopled_dev() {return &loopled_dev_;}
+
 private:
     /// \brief instance_pointer_
     /// - object used to implement the singleton pattern.
@@ -134,5 +141,9 @@ private:
     /// \brief pwm_dev_
     /// - pwm device object.   
     pwm_device pwm_dev_;
+
+    /// \brief loopled_dev_
+    /// - loopled device object.  
+    loopled_device loopled_dev_;
 };
 

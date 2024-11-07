@@ -37,7 +37,10 @@ const static std::map<std::string, mqtt_format_t> JsonCmdMap = {
 const static std::map<std::string, int> JsonDevMap = {
     {"led",     DEVICE_LED},
     {"beep",    DEVICE_BEEP},
-    {"pwm",     DEVICE_PWM}
+    {"loopled", DEVICE_LOOPLED},
+    {"pwm",     DEVICE_PWM},
+    {"rtc",     DEVICE_RTC},
+    {"alarm",   DEVICE_RTC_ALARM}
 };
 
 const static std::map<std::string, int> JsonSourceMap = {
@@ -61,8 +64,9 @@ mqtt_protocol* mqtt_protocol::get_instance()
 }
 
 /*
-{"command":"setdev", source:0, "device":"led", "data":"on"}
-{"command":"setdev", source:1, "device":"pwm", "data":"1,50000,25000"}
+A0{"command":"req_getinfo","source":"SRC_DESKTOP"}
+A0{"command":"req_setdev", "source":"SRC_DESKTOP", "data": {"device":"led", "data":"on"}}
+A0{"command":"setdev", source:1, "device":"pwm", "data":"1,50000,25000"}
 */
 bool mqtt_protocol::decode_json_command(char *ptr, int size)
 {
@@ -106,31 +110,37 @@ bool mqtt_protocol::decode_json_command(char *ptr, int size)
             case mqGetStatus:
                 {
                     std::string&& device_info = device_process::get_instance()->get_dev_status();
-                    mqtt_manage::get_instance()->mqtt_publish(get_topic(source), get_qos(source), device_info);
+                    send_message(source, device_info);
                 }
                 break;
 
             case mqGetInfo:
                 {
                     std::string&& device_info = device_process::get_instance()->get_dev_info();
-                    mqtt_manage::get_instance()->mqtt_publish(get_topic(source), get_qos(source), device_info);
+                    send_message(source, device_info);
                 }
                 break;
 
             case mqSetDevice:
                 {
                     int dev;
-                    data = root["device"].asString();
+                    data = root["data"]["device"].asString();
                     if (JsonDevMap.count(data) == 0)
                     {
                         PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "invalid device:%s", data.c_str());
                         return false;
                     } 
                     dev = JsonDevMap.find(data)->second;
-                    data = root["data"].asString();
+                    data = root["data"]["value"].asString();
                     if(cmd_process::get_instance()->process_device(dev, data))
                     {
-                        mqtt_manage::get_instance()->mqtt_publish(get_topic(source), get_qos(source), "node");
+                        const std::string ok_replay = "{\"replay\": \"rep_setdev\", \"status\": \"ok\"}";
+                        send_message(source, ok_replay);
+                    }
+                    else
+                    {
+                        const std::string error_replay = "{\"replay\": \"rep_setdev\", \"status\": \"error\"}";
+                        send_message(source, error_replay);                  
                     }
                 }
                 break;
@@ -144,6 +154,11 @@ bool mqtt_protocol::decode_json_command(char *ptr, int size)
         std::cerr << e.what() << '\n';
         return false;
     }
+}
+
+void mqtt_protocol::send_message(int source, const std::string& str)
+{
+    mqtt_manage::get_instance()->mqtt_publish(get_topic(source), get_qos(source), str);  
 }
 
 const std::string& mqtt_protocol::get_topic(int source)

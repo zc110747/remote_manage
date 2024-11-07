@@ -117,4 +117,3 @@ bool io_base::trigger()
     }
     return ret;
 }
-

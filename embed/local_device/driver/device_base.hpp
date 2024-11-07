@@ -18,8 +18,7 @@
 //  Revision History:
 //      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
-#ifndef __device_base_HPP
-#define __device_base_HPP
+_Pragma("once")
 
 #include "json_config.hpp"
 #include "common_unit.hpp"
@@ -151,10 +150,8 @@ public:
 protected:
     /// \brief data
     /// - The information of the device.
-    union{
+    union {
         char buffer[MAX_INFO_SIZE];
         T info;
-    }data;
+    } data;
 };
-
-#endif

@@ -124,6 +124,8 @@ struct device_read_info
 
     /// \brief copy_to_buffer
     /// - This method is used to convert internal data to buffer
+    /// \param buffer - buffer used to save the convert data
+    /// \return the convert buffer size
     uint8_t copy_to_buffer(char *buffer) const
     {
         uint8_t size = 0;
@@ -166,6 +168,9 @@ struct device_read_info
         return size;
     }
 
+    /// \brief copy_to_device
+    /// - This method is used to convert buffer to internal data
+    /// \param buffer - the buffer used for convert
     void copy_to_device(char *buffer)
     {
         uint8_t size = 0;

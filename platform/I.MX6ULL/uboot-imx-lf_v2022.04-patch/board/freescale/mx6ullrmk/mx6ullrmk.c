@@ -319,6 +319,14 @@ static const struct boot_mode board_boot_modes[] = {
 };
 #endif
 
+int setup_led(void)
+{
+    gpio_request(IMX_GPIO_NR(1, 3), "led shows");
+    gpio_direction_output(IMX_GPIO_NR(1, 3), 0);
+
+    return 0;
+}
+
 int board_late_init(void)
 {
 #ifdef CONFIG_CMD_BMODE
@@ -345,6 +353,8 @@ int board_late_init(void)
 #endif
 
     setup_lcd();
+
+    setup_led();
 
 #ifdef CONFIG_ENV_IS_IN_MMC
     board_late_mmc_env_init();

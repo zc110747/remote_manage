@@ -20,8 +20,9 @@ _Pragma("once")
 
 #include "driver.hpp"
 #include "fifo_manage.hpp"
+#include "mock.hpp"
 
-class device_manage final
+class device_manage final: public Mock
 {
 public:
     /// \brief constructor

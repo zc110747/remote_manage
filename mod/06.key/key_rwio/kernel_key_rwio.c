@@ -3,7 +3,7 @@
 //  All Rights Reserved
 //
 //  Name:
-//      kernel_key.c
+//      kernel_key_rwio.c
 //          GPIO1_18
 //
 //  Purpose:
@@ -110,18 +110,13 @@ ssize_t key_read(struct file *filp, char __user *buf, size_t count, loff_t *f_po
     chip = (struct key_data *)filp->private_data;
     pdev = chip->pdev;
 
-    if (filp->f_flags & O_NONBLOCK) 
-    {
-        if (KEY_KEEP == atomic_read(&chip->status)) 
-        {
+    if (filp->f_flags & O_NONBLOCK) {
+        if (KEY_KEEP == atomic_read(&chip->status)) {
             return -EAGAIN;
         }
-    }
-    else
-    {
+    } else {
         ret = wait_event_interruptible(chip->r_wait, KEY_KEEP != atomic_read(&chip->status));
-        if (ret)
-        {
+        if (ret) {
             return ret;
         }
     }
@@ -147,8 +142,7 @@ static unsigned int key_poll(struct file *filp, struct poll_table_struct *wait)
 
     poll_wait(filp, &chip->r_wait, wait);
 
-    if(KEY_KEEP != atomic_read(&chip->status))
-    {
+    if(KEY_KEEP != atomic_read(&chip->status)) {
 		mask = POLLIN | POLLRDNORM;	// 返回PLLIN
     }
     return mask;
@@ -166,8 +160,7 @@ static irqreturn_t key_handler(int irq, void *data)
 {
     struct key_data* chip = (struct key_data*)data;
 
-    if (atomic_read(&chip->protect) == 0)
-    {
+    if (atomic_read(&chip->protect) == 0) {
         atomic_set(&chip->protect, 1);
         mod_timer(&chip->key_timer, jiffies + msecs_to_jiffies(50));
     }
@@ -185,21 +178,15 @@ void key_timer_func(struct timer_list *arg)
     pdev = chip->pdev;
     
     value = gpio_get_value(chip->key_gpio);
-    if(value != chip->key_value)
-    {
+    if(value != chip->key_value) {
         chip->key_value = value;
-        if(value == 1)
-        {
+        if(value == 1) {
             atomic_set(&chip->status, KEY_PRESS);
-        }
-        else
-        {
+        } else {
             atomic_set(&chip->status, KEY_RELEASE);
         }
         wake_up_interruptible(&chip->r_wait);
-    }
-    else
-    {
+    } else {
         atomic_set(&chip->status, KEY_KEEP);
     }
 
@@ -231,7 +218,7 @@ static int key_hw_init(struct key_data *chip)
                             IRQF_SHARED | IRQF_ONESHOT | IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING,       
                             "key0", 
                             (void *)chip);
-    if (ret < 0){
+    if (ret < 0) {
         dev_err(&pdev->dev, "key interrupt config error:%d\n", ret);
         return -EINVAL;
     }
@@ -251,33 +238,34 @@ static int key_device_create(struct key_data *chip)
     minor = DEFAULT_MINOR;
     pdev = chip->pdev;
 
-    if (major){
+    //1.创建或申请设备号
+    if (major) {
         chip->dev_id = MKDEV(major, minor);
         ret = register_chrdev_region(chip->dev_id, 1, DEVICE_NAME);
     } else {
         ret = alloc_chrdev_region(&chip->dev_id, 0, 1, DEVICE_NAME);
     }
-
-    if (ret < 0){
+    if (ret < 0) {
         dev_err(&pdev->dev, "id alloc failed!\n");
         goto exit;
     }
-    
+
+    //2.创建字符型设备，关联设备号并添加到内核中
     cdev_init(&chip->cdev, &key_fops);
     chip->cdev.owner = THIS_MODULE;
     ret = cdev_add(&chip->cdev, chip->dev_id, 1);
-    if (ret){
+    if (ret) {
         dev_err(&pdev->dev, "cdev add failed:%d!\n", ret);
         goto exit_cdev_add;
     }
 
+    //3.创建设备类和设备文件，关联设备号并添加到系统中
     chip->class = class_create(THIS_MODULE, DEVICE_NAME);
     if (IS_ERR(chip->class)) {
         dev_err(&pdev->dev, "class create failed!\n");
         ret = PTR_ERR(chip->class);
         goto exit_class_create;
     }
-
     chip->device = device_create(chip->class, NULL, chip->dev_id, NULL, DEVICE_NAME);
     if (IS_ERR(chip->device)) {
         dev_err(&pdev->dev, "device create failed!\n");
@@ -303,25 +291,26 @@ static int key_probe(struct platform_device *pdev)
     int result;
     struct key_data *chip = NULL;
 
+    //1.申请按键管理控制块
     chip = devm_kzalloc(&pdev->dev, sizeof(struct key_data), GFP_KERNEL);
-    if (!chip){
+    if (!chip) {
         dev_err(&pdev->dev, "malloc error\n");
         return -ENOMEM;
     }
     chip->pdev = pdev;
     platform_set_drvdata(pdev, chip);
-    
-    result = key_device_create(chip);
-    if (result != 0)
-    {
-        dev_err(&pdev->dev, "device create failed!\n");
+
+    //2.key相关引脚硬件初始化 
+    result = key_hw_init(chip);
+    if (result != 0) {
+        dev_err(&pdev->dev, "Key gpio init failed!\r\n");
         return result;
     }
 
-    result = key_hw_init(chip);
-    if (result != 0)
-    {
-        dev_err(&pdev->dev, "Key gpio init failed!\r\n");
+    //3.创建内核访问接口
+    result = key_device_create(chip);
+    if (result != 0) {
+        dev_err(&pdev->dev, "device create failed!\n");
         return result;
     }
 

@@ -7,7 +7,8 @@
                 "${workspaceFolder}/embed/common",
                 "${workspaceFolder}/embed/common/event",
                 "${workspaceFolder}/embed/lower_device/include",
-                "${workspaceFolder}/embed/logger_tool/include"
+                "${workspaceFolder}/embed/logger_tool/include",
+                "${workspaceFolder}/embed/main_process/mb/include"
             ],
             "defines": [
                 "_DEBUG",

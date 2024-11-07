@@ -19,6 +19,7 @@
 /////////////////////////////////////////////////////////////////////////////
 #include <stdio.h>
 #include <fcntl.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/time.h>
@@ -27,10 +28,10 @@
 #include <sys/ioctl.h>
 #include <linux/ioctl.h>
 
-#define PWM_EXPORT  "/sys/class/pwm/pwmchip7/export"
-#define PWM_ENABLE  "/sys/class/pwm/pwmchip7/pwm0/enable"
-#define PWM_PEROID  "/sys/class/pwm/pwmchip7/pwm0/period"
-#define PWM_DUTYCLE "/sys/class/pwm/pwmchip7/pwm0/duty_cycle"
+#define PWM_EXPORT  "/sys/class/pwm/pwmchip1/export"
+#define PWM_ENABLE  "/sys/class/pwm/pwmchip1/pwm0/enable"
+#define PWM_PEROID  "/sys/class/pwm/pwmchip1/pwm0/period"
+#define PWM_DUTYCLE "/sys/class/pwm/pwmchip1/pwm0/duty_cycle"
 
 #define MAX_SIZE    64
 
@@ -44,8 +45,7 @@ int pwm_setup(int state, unsigned int peroid, unsigned int duty_cycle)
     fd_peroid = open(PWM_PEROID, O_RDWR);
     fd_duty = open(PWM_DUTYCLE, O_RDWR);
 
-    if (fd_state<0 || fd_peroid<0 || fd_duty<0)
-    {
+    if (fd_state<0 || fd_peroid<0 || fd_duty<0) {
         ret = -1;
         printf("fd open failed\n");
         goto __exit;
@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
     int fd, ret;
     int peroid, duty;
 
-    fd = open("/sys/class/pwm/pwmchip7/export", O_WRONLY);
+    fd = open(PWM_EXPORT, O_WRONLY);
     if (fd < 0) {
         printf("export open failed\n");
         return -1;
@@ -97,8 +97,7 @@ int main(int argc, char *argv[])
     }
     close(fd);
     
-    if (argc > 2)
-    {   
+    if (argc > 2) {   
         peroid = atoi(argv[1]);
         duty = atoi(argv[2]);
         pwm_setup(1, peroid, duty);

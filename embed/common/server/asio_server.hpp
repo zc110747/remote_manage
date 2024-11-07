@@ -39,7 +39,7 @@ public:
 
     /// \brief init
     /// - This method is used to init the group
-    /// \param handler -- function used to main workflow.
+    /// \param handler -- function for the server main workflow.
     void init(std::function<void(char* ptr, int size)> handler);
 
     /// \brief run
@@ -57,7 +57,7 @@ public:
     /// - This method is used to write buffer.
     /// \param buffer -- tx data pointer.
     /// \param size -- tx data size.
-    void do_write(char *buffer, int size);
+    void do_write(const char *buffer, int size);
 
     /// \brief join
     /// - This method is push session into group.
@@ -116,7 +116,7 @@ public:
     /// - This method is used to do write buffer.
     /// \param pdata - pointer to start of write buffer.
     /// \param length - length of the write buffer.
-    void do_write(char *pdate, std::size_t length);
+    void do_write(const char *pdate, std::size_t length);
 
     /// \brief do_close
     /// - This method is used to do close session.
@@ -175,7 +175,7 @@ public:
     /// - This method is used to write buffer.
     /// \param buffer -- tx data pointer.
     /// \param size -- tx data size.
-    void do_write(char *buffer, int size);
+    void do_write(const char *buffer, int size);
 
     /// \brief get_session
     /// - This method is get current work session.

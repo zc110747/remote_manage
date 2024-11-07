@@ -46,16 +46,16 @@
 			status = "okay";
 		};
 
-		usr_key {
-			compatible = "rmk,usr-key";
-			pinctrl-names = "default";
-			pinctrl-0 = <&pinctrl_gpio_key>;
-			key-gpios = <&gpio1 18 GPIO_ACTIVE_LOW>;
-			interrupt-parent = <&gpio1>;
-			interrupts = <18 (IRQ_TYPE_EDGE_FALLING|IRQ_TYPE_EDGE_RISING)>;
-			status = "okay";
-		};
-
+		// usr_key {
+		// 	compatible = "rmk,usr-key";
+		// 	pinctrl-names = "default";
+		// 	pinctrl-0 = <&pinctrl_gpio_key>;
+		// 	key-gpios = <&gpio1 18 GPIO_ACTIVE_LOW>;
+		// 	interrupt-parent = <&gpio1>;
+		// 	interrupts = <18 (IRQ_TYPE_EDGE_FALLING|IRQ_TYPE_EDGE_RISING)>;
+		// 	status = "okay";
+		// };
+	
 		usr_loopled {
 			compatible = "rmk,usr-loopled";
 			pinctrl-names = "default";
@@ -83,6 +83,27 @@
 			wdt-gpios = <&gpio4 26 GPIO_ACTIVE_HIGH>;
 			status = "okay";
 		};
+	};
+
+	gpio_keys: gpio_keys@0 {
+		compatible = "gpio-keys";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpio_keys>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+		autorepeat;
+
+		key1@1 {
+			label = "USER-KEY1";
+			linux,code = <114>;
+			gpios = <&gpio1 18 GPIO_ACTIVE_LOW>;
+			gpio-key,wakeup;
+		};
+	};
+	
+	usr_nvmem {
+		compatible = "rmk,usr-nvmem";
+		status = "okay";		
 	};
 
 	fan0: pwm-fan {
@@ -121,6 +142,12 @@
 };
 
 &iomuxc {
+	pinctrl_gpio_keys: gpio-keys{
+        fsl,pins = <
+            MX6UL_PAD_UART1_CTS_B__GPIO1_IO18		0x40000000
+        >;
+	};
+
     pinctrl_gpio_led: gpio-led {
         fsl,pins = <
             MX6UL_PAD_GPIO1_IO03__GPIO1_IO03		0x17059

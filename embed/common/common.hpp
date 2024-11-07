@@ -93,6 +93,7 @@ typedef union
 #define DEVICE_LOOP_EVENT               0
 #define DEVICE_HW_SET_EVENT             1
 #define DEVICE_SYNC_EVENT               2
+#define DEVICE_PER_SECOND_EVENT         3
 
 //process hardware chage
 #define DEVICE_LED                      0x00
@@ -100,6 +101,7 @@ typedef union
 #define DEVICE_PWM                      0x02
 #define DEVICE_RTC                      0x03
 #define DEVICE_RTC_ALARM                0x04
+#define DEVICE_LOOPLED                  0x05
 
 #define LOCAL_DEVICE_ID                 0
 

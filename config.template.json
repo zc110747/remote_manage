@@ -1,7 +1,7 @@
 {
 	"local_ipaddress":"127.0.0.1",
-	"ipaddress":"172.27.83.254",
-	"mqtt_host":"172.27.83.254",
+	"ipaddress":"192.168.2.99",
+	"mqtt_host":"192.168.2.99",
 	"mqtt_port":1883,
 	"version" : "1.0.0.9",
 	"local_device" : {
@@ -10,7 +10,7 @@
 		},
 		"beep" : {
 			"init" : 0,
-			"dev" : "/dev/beep"
+			"dev" : "/dev/miscbeep"
 		},
 		"icm_spi" : {
 			"dev" : "/dev/icm20608"
@@ -21,6 +21,9 @@
 		"led" : {
 			"init" : 0,
 			"dev" : "/dev/led"
+		},
+		"loopled": {
+			"dev" : "/dev/loopled"
 		},
 		"rtc" : {
 			"dev" : "/dev/rtc0"
@@ -49,6 +52,13 @@
 			"sub_topic" : "/info/mp_topic",
 			"keepalive": 60,
 			"qos":1
+		},
+		"serial" : {
+			"stopBits" 	:1,
+			"baud" 		:115200,
+			"dataBits" 	:8,
+			"parity" 	:"n",
+			"dev" 		:"/dev/ttymxc2"
 		}
 	},
 	"node_server" : {
@@ -81,11 +91,11 @@
 		"logger_port"	:15201,
 		"remote_port"  :15202,
 		"serial" : {
-			"stopBits" 	:0,
+			"stopBits" 	:1,
 			"baud" 		:115200,
 			"dataBits" 	:8,
 			"parity" 	:"n",
-			"dev" 		:"/dev/ttyS3"
+			"dev" 		:"/dev/ttymxc3"
 		}
 	}
 }

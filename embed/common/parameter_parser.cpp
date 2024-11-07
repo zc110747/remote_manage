@@ -58,7 +58,7 @@ static void usage(char *prog_name)
             "-f | --file   [file]   指定配置文件\n"
             "e.g. :\n"
             "   ./%s -f /home/sys/config/config.json \n"
-            "   ./%s -f /home/sys/config/config.json -i 192.168.3.99 -m -i 192.168.3.99 \n",
+            "   ./%s -f /home/sys/config/config.json -i [ipaddress] -m -i [ipaddress]\n",
             prog_name, prog_name, prog_name);
 }
 

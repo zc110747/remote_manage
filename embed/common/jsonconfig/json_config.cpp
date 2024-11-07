@@ -172,6 +172,7 @@ bool system_config::init(const char* path)
         parameter_.local_device.led.dev             = root["local_device"]["led"]["dev"].asString();
         parameter_.local_device.beep.init           = root["local_device"]["beep"]["init"].asInt();
         parameter_.local_device.beep.dev            = root["local_device"]["beep"]["dev"].asString();
+        parameter_.local_device.loopled.dev         = root["local_device"]["loopled"]["dev"].asString();
         parameter_.local_device.key.dev             = root["local_device"]["key"]["dev"].asString();
         parameter_.local_device.icm_spi.dev         = root["local_device"]["icm_spi"]["dev"].asString();
         parameter_.local_device.ap_i2c.dev          = root["local_device"]["ap_i2c"]["dev"].asString();
@@ -193,6 +194,11 @@ bool system_config::init(const char* path)
         parameter_.main_process.mqtt_device.sub_topic     = root["main_process"]["mqtt_device"]["sub_topic"].asString();
         parameter_.main_process.mqtt_device.keepalive     = root["main_process"]["mqtt_device"]["keepalive"].asInt();
         parameter_.main_process.mqtt_device.qos           = root["main_process"]["mqtt_device"]["qos"].asInt();
+        parameter_.main_process.serial.stopBits           = root["main_process"]["serial"]["stopBits"].asInt();
+        parameter_.main_process.serial.baud           = root["main_process"]["serial"]["baud"].asInt();
+        parameter_.main_process.serial.dataBits       = root["main_process"]["serial"]["dataBits"].asInt();
+        parameter_.main_process.serial.parity         = root["main_process"]["serial"]["parity"].asString();
+        parameter_.main_process.serial.dev            = root["main_process"]["serial"]["dev"].asString();
 
         //node server
         parameter_.node_server.web_port              = root["node_server"]["web_port"].asInt();
@@ -249,6 +255,7 @@ void system_config::default_init() noexcept
     parameter_.local_device.led.dev         = DEFAULT_LED_DEV;
     parameter_.local_device.beep.init       = DEFAULT_BEEP_INIT;
     parameter_.local_device.beep.dev        = DEFAULT_BEEP_DEV;
+    parameter_.local_device.loopled.dev     = DEFAULT_LOOPLED_DEV;
     parameter_.local_device.key.dev         = DEFAULT_KEY_DEV;
     parameter_.local_device.icm_spi.dev     = DEFAULT_ICMSPI_DEV;
     parameter_.local_device.ap_i2c.dev      = DEFAULT_API2C_DEV;
@@ -269,7 +276,12 @@ void system_config::default_init() noexcept
     parameter_.main_process.mqtt_device.sub_topic = "/info/null0",
     parameter_.main_process.mqtt_device.keepalive = 60;
     parameter_.main_process.mqtt_device.qos   = 0;
-
+    parameter_.main_process.serial.baud     = DEFAULT_SERIAL_BAUD;
+    parameter_.main_process.serial.dataBits = DEFAULT_SERIAL_DATABITS;
+    parameter_.main_process.serial.stopBits = DEFAULT_SERIAL_STOPBITS;
+    parameter_.main_process.serial.parity   = DEFAULT_SERIAL_PARITY;
+    parameter_.main_process.serial.dev      = DEFAULT_SERIAL_DEV;
+    
     parameter_.node_server.web_port          = DEFAULT_NODE_WEB_PORT;
     parameter_.node_server.pages             = DEFAULT_NODE_PAGES;
     parameter_.node_server.mqtt_device.id    = "default";
@@ -350,6 +362,7 @@ void system_config::save_configfile()
     root["local_device"]["icm_spi"]["dev"]      = parameter_.local_device.icm_spi.dev;
     root["local_device"]["ap_i2c"]["dev"]       = parameter_.local_device.ap_i2c.dev;
     root["local_device"]["rtc"]["dev"]          = parameter_.local_device.rtc.dev  ;
+    root["local_device"]["loopled"]["dev"]       = parameter_.local_device.loopled.dev  ;
 
     root["local_device"]["pwm"]["dev"] = parameter_.local_device.pwm.pwm_chip;
     root["local_device"]["pwm"]["init"]["state"] = parameter_.local_device.pwm.state;
@@ -365,7 +378,12 @@ void system_config::save_configfile()
     root["main_process"]["mqtt_device"]["sub_topic"] = parameter_.main_process.mqtt_device.sub_topic;
     root["main_process"]["mqtt_device"]["keepalive"] = parameter_.main_process.mqtt_device.keepalive;
     root["main_process"]["mqtt_device"]["qos"]       = parameter_.main_process.mqtt_device.qos;
-        
+    root["main_process"]["serial"]["stopBits"]       = parameter_.main_process.serial.stopBits;
+    root["main_process"]["serial"]["baud"]      =  parameter_.main_process.serial.baud ;
+    root["main_process"]["serial"]["dataBits"]  =  parameter_.main_process.serial.dataBits;
+    root["main_process"]["serial"]["parity"]    =  parameter_.main_process.serial.parity;
+    root["main_process"]["serial"]["dev"] =    parameter_.main_process.serial.dev;
+     
     root["node_server"]["web_port"]              = parameter_.node_server.web_port;
     root["node_server"]["pages"]                 = parameter_.node_server.pages;
     root["node_server"]["mqtt_device"]["id"]     = parameter_.node_server.mqtt_device.id; 
@@ -483,6 +501,7 @@ std::ostream& operator<<(std::ostream& os, const system_config& config)
     os<<"------------------local device info ------------------------------\n";
     os<<"led:"<<config.get_led_config().dev<<" "<<config.get_led_config().init<<"\n";
     os<<"beep:"<<config.get_beep_config().dev<<" "<<config.get_beep_config().init<<"\n";
+    os<<"loopled"<<config.get_loopled_config().dev<<"\n";
     os<<"key:"<<config.get_key_config().dev<<"\n";
     os<<"icm_spi:"<<config.get_icm_config().dev<<"\n";
     os<<"ap_i2c:"<<config.get_ap_config().dev<<"\n";
@@ -509,6 +528,11 @@ std::ostream& operator<<(std::ostream& os, const system_config& config)
     os<<"mqtt keepalive:"<<sys_parameter_->main_process.mqtt_device.keepalive<<"\n";
     os<<"mqtt sub_topic:"<<sys_parameter_->main_process.mqtt_device.sub_topic<<"\n";
     os<<"mqtt qos:"<<sys_parameter_->main_process.mqtt_device.qos<<"\n"; 
+    os<<"serial baud:"<<sys_parameter_->main_process.serial.baud<<"\n";
+    os<<"serial dataBits:"<<sys_parameter_->main_process.serial.dataBits<<"\n";
+    os<<"serial stopBits:"<<sys_parameter_->main_process.serial.stopBits<<"\n";
+    os<<"serial parity:"<<sys_parameter_->main_process.serial.parity<<"\n";
+    os<<"serial serial dev:"<<sys_parameter_->main_process.serial.dev<<"\n";
 
     os<<"------------------node server info ------------------------------\n";
     os<<"node port:"<<config.get_node_port()<<"\n";

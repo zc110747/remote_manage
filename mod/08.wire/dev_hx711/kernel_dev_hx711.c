@@ -81,12 +81,10 @@ static void delay_us(int us)
     u64 pre,last;
     kt = ktime_get();
     pre = ktime_to_ns(kt);
-    while (1)
-    {
+    while (1) {
         kt = ktime_get();
         last = ktime_to_ns(kt);
-        if (last-pre >= us*1000)
-        {
+        if (last-pre >= us*1000) {
             break;
         }
     }
@@ -113,12 +111,10 @@ uint32_t read_hx711_adc(struct hx711_data *chip)
     
     SCK_LOWER(chip->sck_gpio);
     Count=0;
-    while (SDA_VALUE(chip->sda_gpio))
-    {
-        usleep_range(100, 200);         //200us
+    while (SDA_VALUE(chip->sda_gpio)) {
+        usleep_range(100, 200);             //200us
         chip->wait_delay++;
-        if (chip->wait_delay > 1000)     //more than 200ms, read failed.
-        {
+        if (chip->wait_delay > 1000) {      //more than 200ms, read failed.
             chip->wait_delay = 0;
             dev_err(&chip->pdev->dev, "%s read timeout!\n", __func__);
             return 0;                   
@@ -126,8 +122,7 @@ uint32_t read_hx711_adc(struct hx711_data *chip)
     }
     chip->wait_delay = 0;
 
-    for (i=0; i<24; i++)
-    {
+    for (i=0; i<24; i++) {
         SCK_HIGH(chip->sck_gpio);
         Count = Count<<1;
         SCK_LOWER(chip->sck_gpio)
@@ -181,33 +176,34 @@ static int hx711_device_create(struct hx711_data *chip)
     minor = DEFAULT_MINOR;
     pdev = chip->pdev;
 
-    if (major){
+    //1.申请设备号
+    if (major) {
         chip->dev_id = MKDEV(major, minor);
         ret = register_chrdev_region(chip->dev_id, 1, DEVICE_NAME);
     } else {
         ret = alloc_chrdev_region(&chip->dev_id, 0, 1, DEVICE_NAME);
     }
-
-    if (ret < 0){
+    if (ret < 0) {
         dev_err(&pdev->dev, "id alloc faihx711!\n");
         goto exit;
     }
 
+    //2.创建字符设备，关联设备号，并添加到内核
     cdev_init(&chip->cdev, &hx711_fops);
     chip->cdev.owner = THIS_MODULE;
     ret = cdev_add(&chip->cdev, chip->dev_id, 1);
-    if (ret){
+    if (ret) {
         dev_err(&pdev->dev, "cdev add faihx711:%d!\n", ret);
         goto exit_cdev_add;
     }
 
+    //3.创建设备类和设备文件，关联设备号，用于应用层访问
     chip->class = class_create(THIS_MODULE, DEVICE_NAME);
     if (IS_ERR(chip->class)) {
         dev_err(&pdev->dev, "class create faihx711!\n");
         ret = PTR_ERR(chip->class);
         goto exit_class_create;
     }
-
     chip->device = device_create(chip->class, NULL, chip->dev_id, NULL, DEVICE_NAME);
     if (IS_ERR(chip->device)) {
         dev_err(&pdev->dev, "device create faihx711!\r\n");
@@ -234,25 +230,27 @@ static int hx711_hardware_init(struct hx711_data *chip)
     struct platform_device *pdev = chip->pdev;
     struct device_node *hx711_nd = pdev->dev.of_node;
 
+    //获取sck指定gpio
     chip->sck_gpio = of_get_named_gpio(hx711_nd, "hx711-gpios", 0);
-    if (chip->sck_gpio < 0){
+    if (chip->sck_gpio < 0) {
         dev_err(&pdev->dev, "find sck_gpio in dts failed!\n");
         return -EINVAL;
     }
     ret = devm_gpio_request(&pdev->dev, chip->sck_gpio, "hx711-sck");
-    if (ret < 0){
+    if (ret < 0) {
         dev_err(&pdev->dev, "request sck_gpio failed!\n");
         return -EINVAL;   
     }
     gpio_direction_output(chip->sck_gpio, 0);
 
+    //获取sda指定gpio
     chip->sda_gpio = of_get_named_gpio(hx711_nd, "hx711-gpios", 1);
-    if (chip->sda_gpio < 0){
+    if (chip->sda_gpio < 0) {
         dev_err(&pdev->dev, "find sda_gpio in dts failed!\n");
         return -EINVAL;
     }
     ret = devm_gpio_request(&pdev->dev, chip->sda_gpio, "hx711-sda");
-    if (ret < 0){
+    if (ret < 0) {
         dev_err(&pdev->dev, "request sda_gpio failed!\n");
         return -EINVAL;   
     }
@@ -267,8 +265,9 @@ static int hx711_probe(struct platform_device *pdev)
     int ret;
     static struct hx711_data *chip;
 
+    //1.申请hx711控制块
     chip = devm_kzalloc(&pdev->dev, sizeof(*chip), GFP_KERNEL);
-    if (!chip){
+    if (!chip) {
         dev_err(&pdev->dev, "memory alloc failedd hx711!\n");
         return -ENOMEM;
     }
@@ -276,14 +275,16 @@ static int hx711_probe(struct platform_device *pdev)
     chip->pdev = pdev;
     chip->wait_delay = 0;
     
+    //2.初始化hx711硬件设备
     ret = hx711_hardware_init(chip);
-    if (ret){
+    if (ret) {
         dev_err(&pdev->dev, "hardware init failed, error:%d!\n", ret);
         return ret;
     }
 
+    //3.创建内核访问接口
     ret = hx711_device_create(chip);
-    if (ret){
+    if (ret) {
         dev_err(&pdev->dev, "device create failed, error:%d!\n", ret);
         return ret;
     }

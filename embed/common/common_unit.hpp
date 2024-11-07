@@ -21,6 +21,7 @@ _Pragma("once")
 #include "common.hpp"
 
 //common unit for all application
+#include "tty.hpp"
 #include "time_manage.hpp"
 #include "fifo/fifo_manage.hpp"
 #include "jsonconfig/json_config.hpp"

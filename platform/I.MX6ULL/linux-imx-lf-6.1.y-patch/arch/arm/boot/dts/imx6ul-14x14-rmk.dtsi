@@ -38,45 +38,45 @@
 		status = "okay";
 	};
 
-	reg_sd1_vmmc: regulator-sd1-vmmc {
-		compatible = "regulator-fixed";
-		regulator-name = "VSD_3V3";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-		//gpio = <&gpio1 9 GPIO_ACTIVE_HIGH>;
-		off-on-delay-us = <20000>;
-		enable-active-high;
-	};
+	// reg_sd1_vmmc: regulator-sd1-vmmc {
+	// 	compatible = "regulator-fixed";
+	// 	regulator-name = "VSD_3V3";
+	// 	regulator-min-microvolt = <3300000>;
+	// 	regulator-max-microvolt = <3300000>;
+	// 	//gpio = <&gpio1 9 GPIO_ACTIVE_HIGH>;
+	// 	off-on-delay-us = <20000>;
+	// 	enable-active-high;
+	// };
 
-	reg_peri_3v3: regulator-peri-3v3 {
-		compatible = "regulator-fixed";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_peri_3v3>;
-		regulator-name = "VPERI_3V3";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-		gpio = <&gpio5 2 GPIO_ACTIVE_LOW>;
-		/*
-		 * If you want to want to make this dynamic please
-		 * check schematics and test all affected peripherals:
-		 *
-		 * - sensors
-		 * - ethernet phy
-		 * - can
-		 * - bluetooth
-		 * - wm8960 audio codec
-		 * - ov5640 camera
-		 */
-		regulator-always-on;
-	};
+	// reg_peri_3v3: regulator-peri-3v3 {
+	// 	compatible = "regulator-fixed";
+	// 	pinctrl-names = "default";
+	// 	pinctrl-0 = <&pinctrl_peri_3v3>;
+	// 	regulator-name = "VPERI_3V3";
+	// 	regulator-min-microvolt = <3300000>;
+	// 	regulator-max-microvolt = <3300000>;
+	// 	gpio = <&gpio5 2 GPIO_ACTIVE_LOW>;
+	// 	/*
+	// 	 * If you want to want to make this dynamic please
+	// 	 * check schematics and test all affected peripherals:
+	// 	 *
+	// 	 * - sensors
+	// 	 * - ethernet phy
+	// 	 * - can
+	// 	 * - bluetooth
+	// 	 * - wm8960 audio codec
+	// 	 * - ov5640 camera
+	// 	 */
+	// 	regulator-always-on;
+	// };
 
-	reg_can_3v3: regulator-can-3v3 {
-		compatible = "regulator-fixed";
-		regulator-name = "can-3v3";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-		// gpios = <&gpio_spi 3 GPIO_ACTIVE_LOW>;
-	};
+	// reg_can_3v3: regulator-can-3v3 {
+	// 	compatible = "regulator-fixed";
+	// 	regulator-name = "can-3v3";
+	// 	regulator-min-microvolt = <3300000>;
+	// 	regulator-max-microvolt = <3300000>;
+	// 	// gpios = <&gpio_spi 3 GPIO_ACTIVE_LOW>;
+	// };
 
 	sound-wm8960 {
 		compatible = "fsl,imx-audio-wm8960";
@@ -99,7 +99,7 @@
 			"Mic Jack", "MICB",
 			"AMIC", "MICB";
 	};
-
+	
 	// spi-4 {
 	// 	compatible = "spi-gpio";
 	// 	pinctrl-names = "default";
@@ -200,7 +200,7 @@
 	phy-handle = <&ethphy0>;
 	phy-reset-gpios = <&gpio5 7 GPIO_ACTIVE_LOW>;
 	phy-reset-duration = <26>;
-	phy-supply = <&reg_peri_3v3>;
+	// phy-supply = <&reg_peri_3v3>;
 	status = "okay";
 };
 
@@ -210,7 +210,7 @@
 				&pinctrl_fec2_reset>;
 	phy-mode = "rmii";
 	phy-handle = <&ethphy1>;
-	phy-supply = <&reg_peri_3v3>;
+	// phy-supply = <&reg_peri_3v3>;
 	phy-reset-gpios = <&gpio5 8 GPIO_ACTIVE_LOW>;
 	phy-reset-duration = <26>;
 	status = "okay";
@@ -241,7 +241,7 @@
 &can1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexcan1>;
-	xceiver-supply = <&reg_can_3v3>;
+	//xceiver-supply = <&reg_can_3v3>;
 	status = "okay";
 };
 
@@ -417,7 +417,7 @@
 	cd-gpios = <&gpio1 19 GPIO_ACTIVE_LOW>;
 	keep-power-in-suspend;
 	wakeup-source;
-	vmmc-supply = <&reg_sd1_vmmc>;
+	// vmmc-supply = <&reg_sd1_vmmc>;
 	status = "okay";
 };
 
@@ -439,6 +439,12 @@
 &iomuxc {
 	pinctrl-names = "default";
 
+    pinctrl_gpio_led: gpio-led {
+        fsl,pins = <
+            MX6UL_PAD_GPIO1_IO03__GPIO1_IO03		0x17059
+        >;
+    };
+	
 	pinctrl_camera_clock: cameraclockgrp {
 		fsl,pins = <
 			MX6UL_PAD_CSI_MCLK__CSI_MCLK		0x1b088
@@ -582,11 +588,11 @@
 		>;
 	};
 
-	pinctrl_peri_3v3: peri3v3grp {
-		fsl,pins = <
-			MX6UL_PAD_SNVS_TAMPER2__GPIO5_IO02	0x1b0b0
-		>;
-	};
+	// pinctrl_peri_3v3: peri3v3grp {
+	// 	fsl,pins = <
+	// 		MX6UL_PAD_SNVS_TAMPER2__GPIO5_IO02	0x1b0b0
+	// 	>;
+	// };
 
 	pinctrl_pwm1: pwm1grp {
 		fsl,pins = <

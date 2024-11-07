@@ -1,5 +1,5 @@
 dir ?= ${ENV_PATH_ROOT}
-subdirs := $(wildcard $(dir)/*)  
+subdirs ?= $(wildcard $(dir)/*)  
 with_kernel ?=1
 
 modules:

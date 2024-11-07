@@ -100,6 +100,8 @@ alias SysBuildRootfs='build_rootfs'
 # prepare build thirdparts package. 
 function install_library()
 {
+	SysMountRootfs
+
     sudo cp -Rv "${SUPPORT_ENV_INSTALL}"/usr/local/lib/* "${SUPPORT_ENV_INSTALL}"/lib/
 
     sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/bin
@@ -112,9 +114,10 @@ function install_library()
   	sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/plugins
   	sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/share
   	sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/ssl
-  	sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/usr
+  	sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/usr/lib
 
 	sudo cp -Rv "${SUPPORT_ENV_INSTALL}"/* "${BUILD_NFS_PATH}"/
+	sudo cp -Rv "${SUPPORT_ENV_INSTALL}"/lib/* "${BUILD_NFS_PATH}"/usr/lib/
 
 	sudo mkdir -p "${BUILD_NFS_PATH}"/home/sys/
 	sudo cp -ravf "${ENV_PATH_ROOT}"/rootfs/home/sys/* "${BUILD_NFS_PATH}"/home/sys/
@@ -127,7 +130,7 @@ function install_library()
 	sudo cp "${PLATFORM_INSTALL_SHELL}"/kill_all.sh "${BUILD_NFS_PATH}"/home/sys/
 	sudo cp "${PLATFORM_INSTALL_SHELL}"/start_app.sh "${BUILD_NFS_PATH}"/home/sys/
 }
-alias install_library='install_library'
+alias SysInstallLibrary='install_library'
 
 function pre_build_thirdparts()
 {
@@ -137,13 +140,8 @@ function pre_build_thirdparts()
 
 	#set shell run
 	chmod 777 install-thirdparts.sh && ./install-thirdparts.sh
-
-	SysMountRootfs
-
-	exit_if_last_error
-
-	install_library
 }
+
 alias SysPreThirdParts='pre_build_thirdparts'	#install thirdpart library for the application
 
 # SysBuildModules

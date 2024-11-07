@@ -5,7 +5,7 @@
 # Original Author: 1107473010@qq.com
 #
 ################################################################################
-obj-m := kernel_spi_icm.o
+obj-m := kernel_bus_spi.o
 FIRMWARE_CLEAN := 1
 
 include $(ENV_PATH_ROOT)/build/buildmod.mk

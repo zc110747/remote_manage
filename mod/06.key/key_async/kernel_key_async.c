@@ -24,7 +24,7 @@ usr_key {
     pinctrl-0 = <&pinctrl_gpio_key>;
     key-gpios = <&gpio1 18 GPIO_ACTIVE_LOW>;
     interrupt-parent = <&gpio1>;
-    interrupts = <18 IRQ_TYPE_EDGE_FALLING>;
+    interrupts = <18 (IRQ_TYPE_EDGE_FALLING | IRQ_TYPE_EDGE_RISING)>;
     status = "okay";
 };
 
@@ -111,18 +111,14 @@ ssize_t key_read(struct file *filp, char __user *buf, size_t count, loff_t *f_po
     chip = (struct key_data *)filp->private_data;
     pdev = chip->pdev;
 
-    if (filp->f_flags & O_NONBLOCK) 
-    {
-        if (KEY_KEEP == atomic_read(&chip->status)) 
-        {
+    if (filp->f_flags & O_NONBLOCK) {
+        if (KEY_KEEP == atomic_read(&chip->status)) {
             return -EAGAIN;
         }
     }
-    else
-    {
+    else {
         ret = wait_event_interruptible(chip->r_wait, KEY_KEEP != atomic_read(&chip->status));
-        if (ret)
-        {
+        if (ret) {
             return ret;
         }
     }
@@ -157,8 +153,7 @@ static irqreturn_t key_handler(int irq, void *data)
 {
     struct key_data* chip = (struct key_data*)data;
 
-    if (atomic_read(&chip->protect) == 0)
-    {
+    if (atomic_read(&chip->protect) == 0) {
         atomic_set(&chip->protect, 1);
         mod_timer(&chip->key_timer, jiffies + msecs_to_jiffies(50));
     }
@@ -176,20 +171,18 @@ void key_timer_func(struct timer_list *arg)
     pdev = chip->pdev;
     
     value = gpio_get_value(chip->key_gpio);
-    if(value != chip->key_value)
-    {
+    if (value != chip->key_value) {
         chip->key_value = value;
-        if(value == 1)
-        {
+        if (value == 1) {
             atomic_set(&chip->status, KEY_PRESS);
         }
-        else
-        {
+        else {
             atomic_set(&chip->status, KEY_RELEASE);
         }
         wake_up_interruptible(&chip->r_wait);
-        if(chip->async_queue)
+        if (chip->async_queue) {
 			kill_fasync(&chip->async_queue, SIGIO, POLL_IN);
+        }
     }
     else
     {
@@ -206,16 +199,17 @@ static int key_hw_init(struct key_data *chip)
     struct platform_device *pdev = chip->pdev;  
     struct device_node *nd = pdev->dev.of_node;
 
+    //1.获取gpio线号，申请资源，设置输入模式
     chip->key_gpio = of_get_named_gpio(nd, "key-gpios", 0);
     if (chip->key_gpio < 0){
         dev_err(&pdev->dev, "gpio %s no find\n",  "key-gpios");
         return -EINVAL;
     }
-
     devm_gpio_request(&pdev->dev, chip->key_gpio, "key0");
     gpio_direction_input(chip->key_gpio);
     chip->key_value = gpio_get_value(chip->key_gpio);
 
+    //2.根据gpio线号申请中断资源
     //cat /proc/interrupts可以查看是否增加中断向量
     chip->irq = irq_of_parse_and_map(nd, 0);
     ret = devm_request_threaded_irq(&pdev->dev,

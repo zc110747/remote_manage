@@ -18,6 +18,12 @@ if [ ! -d ${DST_DIR}/firmware ]; then
 fi
 cp -rv ${SRC_DIR}/firmware/* ${DST_DIR}/firmware/
 
+#drivers
+cp -rv ${SRC_DIR}/drivers/* ${DST_DIR}/drivers/
+
+#include
+cp -rv ${SRC_DIR}/include/* ${DST_DIR}/include/
+
 #.vscode
 if [ ! -d ${DST_DIR}/.vscode ]; then
     mkdir ${DST_DIR}/.vscode

@@ -1,19 +1,30 @@
-/*
- * File      : loopled_test.c
- * test for loopled driver.
- * COPYRIGHT (C) 2023, zc
- *
- * Change Logs:
- * Date           Author       Notes
- * 2024-02-25     zc           the first version
- */
+////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2024-by Persional Inc.
+//  All Rights Reserved
+//
+//  Name:
+//      loopled_test.c
+//
+//  Purpose:
+//      LED红绿灯带应用层控制。
+//      设备文件: /dev/loopled
+//      
+// Author:
+//     @听心跳的声音
+//
+//  Assumptions:
+//
+//  Revision History:
+//      12/19/2022  Create New Version.
+//      23/08/202   Format update.     
+/////////////////////////////////////////////////////////////////////////////
 #include<fcntl.h>
 #include<stdio.h>
 #include<stdlib.h>
 #include<unistd.h>
 
-#define LOOP_LED_DEVICE "/dev/loopled"
-#define LOOP_LED_NUM    3
+#define LOOP_LED_DEVICE     "/dev/loopled"
+#define LOOP_LED_NUM        3
 
 /**
  * 测试LED工作
@@ -40,7 +51,7 @@ int main(int argc, const char *argv[])
     }
 
     while (1) {
-        for (index=0; index<LOOP_LED_NUM; index++){
+        for (index=0; index<LOOP_LED_NUM; index++) {
             val[0] = index;
             if (index == on_num){
                 val[1] = 1;

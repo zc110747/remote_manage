@@ -86,6 +86,8 @@ public:
         int ret;
         std::string data;
 
+        duty_ = duty_cycle;
+
         pwm_state = fmt::format(PWM_ENABLE, device_path_);
         pwm_peroid = fmt::format(PWM_PEROID, device_path_);
         pwm_duty = fmt::format(PWM_DUTYCLE, device_path_);

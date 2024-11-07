@@ -48,6 +48,7 @@ bool driver_manage::init()
     ret &= vf610_adc_dev_.init(pConfig->get_iio_config().vf610_adc_dev);
     ret &= pwm_dev_.init(pConfig->get_pwm_config().pwm_chip);
     ret &= pwm_dev_.pwm_setup(pConfig->get_pwm_config().state, pConfig->get_pwm_config().peroid, pConfig->get_pwm_config().duty_cycle);
+    ret &= loopled_dev_.init(pConfig->get_loopled_config().dev, O_RDWR | O_NONBLOCK);
     
     if (ret)
     {

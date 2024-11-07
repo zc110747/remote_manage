@@ -42,16 +42,17 @@ static const std::map<std::string, CMD_DEVICE> command_map = {
     {"!local_dev ",     CMD_LOCAL_DEV},
     {"!lower_dev ",     CMD_LOWER_DEV},
     {"!main_proc ",     CMD_MAIN_DEV},
-    {"!passwd ",         CMD_PASSWD},
+    {"!passwd ",        CMD_PASSWD},
     {"!?",              CMD_HELP},
     {"!help",           CMD_HELP},
 };
 
 static const std::map<CMD_DEVICE, std::string> command_help_map = {
-    {CMD_GUI_DEV, "!gui [command]:gui cmd"},
-    {CMD_LOCAL_DEV, "!local_dev [command]: local device cmd"},
-    {CMD_LOWER_DEV, "!lower_dev [command]: lower device cmd"},
-    {CMD_MAIN_DEV, "!main_process [command]: main process cmd"},
+    {CMD_GUI_DEV,   "[!gui ?] show gui command"},
+    {CMD_LOCAL_DEV, "[!local_dev ?]: show local device comnand"},
+    {CMD_LOWER_DEV, "[!lower_dev ?]: show lower device command"},
+    {CMD_MAIN_DEV,  "[!main_proc ?]: show main process command"},
+    {CMD_PASSWD, "[!passwd]: login in the command system"},
     {CMD_HELP, "!? or !help"},
 };
 

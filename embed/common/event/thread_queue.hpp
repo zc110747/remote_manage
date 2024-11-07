@@ -29,10 +29,10 @@ template<typename T>
 class Thread_Queue
 {
 public:
-    /// \brief queue_send
+    /// \brief send
     /// - This method is used to post queue.
     /// \param Object - the object send to queue.
-    void queue_send(T& Object)
+    void send(T& Object)
     {
         {
             std::unique_lock<std::mutex> lock(mutex_);
@@ -42,12 +42,12 @@ public:
         semaphore_.signal();
     }
 
-    /// \brief queue_receive
+    /// \brief receive
     /// - This method is used to receive queue.
     /// \param timeout - timeout wait for the queue.
     /// \param Object - the object receive from queue.
     /// \return wheather success receive the queue.
-    bool queue_receive(uint32_t timeout, T& Object)
+    bool receive(T& Object, uint32_t timeout)
     {
         int ret = false;
 

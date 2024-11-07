@@ -332,9 +332,11 @@ void device_process::update_device_status()
     root["data"]["time_area"]["rtc_time"] = std::string(info_.rtc_timer.buffer, info_.rtc_timer.size);
 
     root["data"]["status_area"]["angle"] = info_.angle_;
-    root["data"]["status_area"]["temperature"] = info_.icm_info_.temp_act;
-    root["data"]["status_area"]["voltage"] = info_.vf610_adc_;
+    root["data"]["status_area"]["temperature"] = (uint32_t)(info_.icm_info_.temp_act*100);
+    root["data"]["status_area"]["voltage"] = (uint32_t)(info_.vf610_adc_*1000);
     root["data"]["status_area"]["als"] = info_.ap_info_.als;
+    root["data"]["status_area"]["ir"] = info_.ap_info_.ir;
+    root["data"]["status_area"]["ps"] = info_.ap_info_.ps>512?1:0;
 
     root["data"]["ap"]["ir"] = info_.ap_info_.ir;
     root["data"]["ap"]["als"] = info_.ap_info_.als;

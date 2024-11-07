@@ -115,7 +115,9 @@
         "signal.h": "c",
         "time.h": "c",
         "zram_drv.h": "c",
-        "select.h": "c"
+        "select.h": "c",
+        "stdlib.h": "c",
+        "buffer.h": "c"
     },
     "files.exclude": {
         "**/.git": true,

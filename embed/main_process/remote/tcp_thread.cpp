@@ -90,7 +90,7 @@ void tcp_thread_manage::tcp_tx_run()
         {
             if (socket_tcp_server.is_valid())
             {
-                socket_tcp_server.do_write(buffer, size);
+                socket_tcp_server.do_write((const char *)buffer, size);
             }
         }
     }

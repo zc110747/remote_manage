@@ -70,21 +70,21 @@
 #include <linux/interrupt.h>
 #include <linux/timer.h>
 
-#define AP3216C_SYSTEMCONG        0x00    /* 配置寄存器       */
-#define AP3216C_INTSTATUS        0X01    /* 中断状态寄存器   */
-#define AP3216C_INTCLEAR        0X02    /* 中断清除寄存器   */
-#define AP3216C_IRDATALOW        0x0A    /* IR数据低字节     */
-#define AP3216C_IRDATAHIGH        0x0B    /* IR数据高字节     */
-#define AP3216C_ALSDATALOW        0x0C    /* ALS数据低字节    */
-#define AP3216C_ALSDATAHIGH        0X0D    /* ALS数据高字节    */
-#define AP3216C_PSDATALOW        0X0E    /* PS数据低字节     */
-#define AP3216C_PSDATAHIGH        0X0F    /* PS数据高字节     */
+#define AP3216C_SYSTEMCONG          0x00    /* 配置寄存器       */
+#define AP3216C_INTSTATUS           0X01    /* 中断状态寄存器   */
+#define AP3216C_INTCLEAR            0X02    /* 中断清除寄存器   */
+#define AP3216C_IRDATALOW           0x0A    /* IR数据低字节     */
+#define AP3216C_IRDATAHIGH          0x0B    /* IR数据高字节     */
+#define AP3216C_ALSDATALOW          0x0C    /* ALS数据低字节    */
+#define AP3216C_ALSDATAHIGH         0X0D    /* ALS数据高字节    */
+#define AP3216C_PSDATALOW           0X0E    /* PS数据低字节     */
+#define AP3216C_PSDATAHIGH          0X0F    /* PS数据高字节     */
 
-#define DEVICE_NAME            "ap3216"
-#define DEVICE_CNT              1
+#define DEVICE_NAME                 "ap3216"
+#define DEVICE_CNT                  1
 
-#define DEFAULT_MAJOR           0         
-#define DEFAULT_MINOR           0  
+#define DEFAULT_MAJOR               0         
+#define DEFAULT_MINOR               0  
 
 struct read_data
 {
@@ -136,6 +136,19 @@ static int read_values(struct ap3216_data* chip, int *readbuf)
         }
     }
 
+    if (readbuf[0]&(1<<7)){
+        chip->data.ir = 0;
+    } else{
+        chip->data.ir = ((unsigned short)readbuf[1] << 2) | (readbuf[0] & 0X03);
+    }
+
+    chip->data.als = ((unsigned short)readbuf[3] << 8) | readbuf[2];
+    if (readbuf[4]&(1<<6)) {
+        chip->data.ps = 0;
+    } else {
+        chip->data.ps = ((unsigned short)(readbuf[5] & 0X3F) << 4) | (readbuf[4] & 0X0F); 
+    }
+
     return 0;
 }
 
@@ -151,19 +164,6 @@ static ssize_t ap3216_read(struct file *filp, char __user *buf, size_t cnt, loff
     err = read_values(chip, readbuf);
     if (err) {
         return -EIO;
-    }
-
-    if (readbuf[0]&(1<<7)){
-        chip->data.ir = 0;
-    } else{
-        chip->data.ir = ((unsigned short)readbuf[1] << 2) | (readbuf[0] & 0X03);
-    }
-
-    chip->data.als = ((unsigned short)readbuf[3] << 8) | readbuf[2];
-    if (readbuf[4]&(1<<6)) {
-        chip->data.ps = 0;
-    } else {
-        chip->data.ps = ((unsigned short)(readbuf[5] & 0X3F) << 4) | (readbuf[4] & 0X0F); 
     }
 
     data[0] = chip->data.ir;
@@ -195,7 +195,7 @@ static irqreturn_t irq_handler(int irq, void *data)
 
     if (read_values(chip, readbuf) == 0)
     {
-        dev_info(&client->dev, "%s handler success!\n", __func__);
+        dev_info(&client->dev, "irq success, value:%d, %d, %d!\n", chip->data.als, chip->data.ir, chip->data.ps);
     }
 
     return IRQ_RETVAL(IRQ_HANDLED);
@@ -206,12 +206,6 @@ static const struct file_operations ap3216_ops = {
     .open = ap3216_open,
     .read = ap3216_read,
     .release = ap3216_release,
-};
-
-const struct regmap_config ap3216_regmap_config = {
-    .reg_bits = 8,
-    .val_bits = 8,
-    .max_register = 255,
 };
 
 static int i2c_device_create(struct ap3216_data *chip)
@@ -271,6 +265,12 @@ exit:
     return result;
 }
 
+const struct regmap_config ap3216_regmap_config = {
+    .reg_bits = 8,
+    .val_bits = 8,
+    .max_register = 255,
+};
+
 static int i2c_probe(struct i2c_client *client, const struct i2c_device_id *id)
 {
     int ret;
@@ -320,13 +320,12 @@ static int i2c_probe(struct i2c_client *client, const struct i2c_device_id *id)
                             IRQF_SHARED | IRQF_ONESHOT | IRQF_TRIGGER_FALLING, 
                             "ap3216_int", 
                             (void *)chip);
-
     if (ret < 0){
         dev_err(&client->dev, "ap3216 i2c int error:%d\n", ret);
         return -EINVAL;
     }
 
-    //5.创建i2c设备到内核中
+    //5.创建i2c设备到内核和系统中
     ret = i2c_device_create(chip);
     if (ret){
         dev_err(&client->dev, "device create failed!\n");
@@ -378,5 +377,5 @@ module_init(ap3216_module_init);
 module_exit(ap3216_module_exit);
 MODULE_AUTHOR("zc");                      
 MODULE_LICENSE("GPL v2");                  
-MODULE_DESCRIPTION("ap3216 driver");      
+MODULE_DESCRIPTION("ap3216 remap driver");      
 MODULE_ALIAS("i2c_ap3216_driver");

@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="97HLYAoYRTmnaLsdLiow" name="MainFrameWork">
-        <mxGraphModel dx="-208" dy="455" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="89" dy="797" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -187,7 +187,7 @@
                 <mxCell id="82" value="Embed Linux&amp;nbsp; Manage System" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;dashed=1;" parent="1" vertex="1">
                     <mxGeometry x="913" y="202" width="180" height="40" as="geometry"/>
                 </mxCell>
-                <mxCell id="87" value="Linux Platform support functional:&lt;br&gt;1. ssh service.&lt;br&gt;2. vnc viewer remote service.&lt;br&gt;3. node run environment.&lt;br&gt;4.support busybox rootfs and debain rootfs." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;dashed=1;" parent="1" vertex="1">
+                <mxCell id="87" value="Linux Platform support functional:&lt;br&gt;1. ssh service.&lt;br&gt;2. vnc viewer remote service.&lt;br&gt;3. node run environment.&lt;br&gt;4.support busybox rootfs and debia&lt;br&gt;n rootfs." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;dashed=1;" parent="1" vertex="1">
                     <mxGeometry x="1019" y="603" width="190" height="93" as="geometry"/>
                 </mxCell>
                 <mxCell id="90" value="fifo rx/tx&lt;br&gt;manage" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">

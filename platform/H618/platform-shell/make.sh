@@ -33,9 +33,9 @@ THREAD_COUNT=3
 FILE_CROSS_COMPILE="${PATH_PWD}/toolchain/${GCC_VERSION}/bin/${CROSS_COMPILE}"
 
 #rootfs information
-DEBAIN_SIZE=4096
+DEBIAN_SIZE=4096
 ROOTFS_SHELL_PATH="${ROOTFS_PATH}/shell"
-ROOFTS_DEBAIN_PATH="${ROOTFS_PATH}/debain"
+ROOFTS_DEBIAN_PATH="${ROOTFS_PATH}/debian"
 
 #########################################################################################################
 
@@ -122,26 +122,26 @@ compile_kernel()
     make dtbs_install INSTALL_DTBS_PATH="${PACKAGE_PATH}" ARCH=${CHIP_ARCH}
 }
 
-compile_debain()
+compile_debian()
 {
-    echo "====== start create debain ======"
+    echo "====== start create debian ======"
 
     cd "${PACKAGE_PATH}" || return
 
-    if [ ! -f debain.img ]; then
-        dd if=/dev/zero of=debain.img bs=1M count=${DEBAIN_SIZE}
-        mkfs.ext4 debain.img
+    if [ ! -f debian.img ]; then
+        dd if=/dev/zero of=debian.img bs=1M count=${DEBIAN_SIZE}
+        mkfs.ext4 debian.img
     fi
 
-    sudo mount -o loop "${PACKAGE_PATH}"/debain.img  "${ROOFTS_DEBAIN_PATH}"/
+    sudo mount -o loop "${PACKAGE_PATH}"/debian.img  "${ROOFTS_DEBIAN_PATH}"/
 
     cd "${ROOTFS_SHELL_PATH}" || return
 
-    chmod 777 install-debain.sh && ./install-debain.sh "${ROOFTS_DEBAIN_PATH}"
+    chmod 777 install-debian.sh && ./install-debian.sh "${ROOFTS_DEBIAN_PATH}"
 
-    echo "====== debain build finished, success! ======"
+    echo "====== debian build finished, success! ======"
 
-    sudo umount "${ROOFTS_DEBAIN_PATH}"/
+    sudo umount "${ROOFTS_DEBIAN_PATH}"/
 }
 
 compile_clean()
@@ -179,8 +179,8 @@ function process_args()
             compile_kernel
             exit 0
             ;;
-        debain)
-            compile_debain
+        debian)
+            compile_debian
             exit 0
             ;;
         clean)

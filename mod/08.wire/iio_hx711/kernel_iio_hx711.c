@@ -53,12 +53,10 @@ static void delay_us(int us)
     u64 pre,last;
     kt = ktime_get();
     pre = ktime_to_ns(kt);
-    while (1)
-    {
+    while (1) {
         kt = ktime_get();
         last = ktime_to_ns(kt);
-        if (last-pre >= us*1000)
-        {
+        if (last-pre >= us*1000) {
             break;
         }
     }
@@ -68,15 +66,13 @@ uint32_t read_hx711_adc(struct hx711_data *chip)
 {
     uint32_t Count;
     unsigned char i;
-    
+
     SCK_LOWER(chip->sck_desc);
     Count=0;
-    while (SDA_VALUE(chip->sda_desc))
-    {
+    while (SDA_VALUE(chip->sda_desc)) {
         usleep_range(100, 200);         //200us
         chip->wait_delay++;
-        if (chip->wait_delay > 1000)     //more than 200ms, read failed.
-        {
+        if (chip->wait_delay > 1000) {
             chip->wait_delay = 0;
             dev_err(&chip->pdev->dev, "%s read timeout!\n", __func__);
             return 0;                   
@@ -84,8 +80,7 @@ uint32_t read_hx711_adc(struct hx711_data *chip)
     }
     chip->wait_delay = 0;
 
-    for (i=0; i<24; i++)
-    {
+    for (i=0; i<24; i++) {
         SCK_HIGH(chip->sck_desc);
         Count = Count<<1;
         SCK_LOWER(chip->sck_desc)
@@ -116,14 +111,13 @@ static int hx711_read_raw(struct iio_dev *indio_dev,
         return -EIO;
     }
 
-    switch (mask) 
-    {
+    switch (mask) {
         case IIO_CHAN_INFO_RAW:                            
             *val = chip->adc_value;
             *val2 = 0;
-        break;
+            break;
         case IIO_CHAN_INFO_SCALE:
-        break;
+            break;
     }
 
     dev_info(&pdev->dev, "hx711 read raw:0x%x", chip->adc_value);
@@ -163,14 +157,14 @@ static int hx711_hardware_init(struct hx711_data *chip)
     struct platform_device *pdev = chip->pdev;
 
     chip->sck_desc = devm_gpiod_get_index(&pdev->dev, "hx711", 0, GPIOD_OUT_LOW);
-    if (chip->sck_desc == NULL){
+    if (chip->sck_desc == NULL) {
         dev_err(&pdev->dev, "request sck_desc failed!\n");
         return -EINVAL;   
     }
     gpiod_direction_output(chip->sck_desc, 0);
 
     chip->sda_desc = devm_gpiod_get_index(&pdev->dev, "hx711", 1, GPIOD_IN);
-    if (chip->sda_desc == NULL){
+    if (chip->sda_desc == NULL) {
         dev_err(&pdev->dev, "request sda_desc failed!\n");
         return -EINVAL;   
     }
@@ -186,37 +180,39 @@ static int hx711_probe(struct platform_device *pdev)
     struct hx711_data *chip;
     struct iio_dev *indio_dev;
 
+    //1.申请iio设备块
     indio_dev = devm_iio_device_alloc(&pdev->dev, sizeof(struct hx711_data));
-    if (!indio_dev)
+    if (!indio_dev) {
+        dev_err(&pdev->dev, "iio device alloc failed\n");
         return -ENOMEM;
-
+    }
     chip = iio_priv(indio_dev);
     chip->pdev = pdev;
     chip->wait_delay = 0;
     platform_set_drvdata(pdev, indio_dev);
 
+    //2.初始化iio设备控制块，并注册到内核和系统中
     indio_dev->dev.parent = &pdev->dev;
     indio_dev->info = &hx711_info;
-    indio_dev->name = DEVICE_NAME;    
+    indio_dev->name = DEVICE_NAME;
     indio_dev->modes = INDIO_DIRECT_MODE;
     indio_dev->channels = hx711_channels;
     indio_dev->num_channels = ARRAY_SIZE(hx711_channels);
-
     ret = devm_iio_device_register(&pdev->dev, indio_dev);
     if (ret < 0) {
         dev_err(&pdev->dev, "iio_device_register failed\n");
         return -EIO;
     }
 
+    //3.驱动对应硬件初始化
     ret = hx711_hardware_init(chip);
     if (ret){
         dev_err(&pdev->dev, "hardware init failed, error:%d!\n", ret);
         return ret;
     }
-
     chip->adc_value = read_hx711_adc(chip);
 
-    dev_info(&pdev->dev, "driver %s init success, value:0x%x!\n", __func__, chip->adc_value);
+    dev_info(&pdev->dev, "driver %s init success, adc value:0x%x!\n", __func__, chip->adc_value);
     return 0;
 }
 

@@ -197,7 +197,7 @@ class time_manage
 {
 public:
     /// \brief constructor
-    time_manage(): ticks_(0){
+    time_manage(): ticks_(0) {
     }
     time_manage(const time_manage&)=delete;
 

@@ -233,7 +233,7 @@ function process_jsoncpp()
 {
     json_ver=jsoncpp
 
-    if [ -f ${APPLICATION_BUILDOUT}/libjsoncpp.a ]; then
+    if [ -f ${SUPPORT_ENV_INSTALL}/lib/libjsoncpp.a ]; then
         echo "libjsoncpp already build, not install!"
         return 0
     fi

@@ -41,6 +41,10 @@ public:
     /// \return Wheather parse is success or failed.
     bool decode_json_command(char *ptr, int size);
 
+    /// \brief parse_data
+    /// - This method is used to send message.
+    void send_message(int source, const std::string& str);
+
 private:
     const std::string& get_topic(int source);
 

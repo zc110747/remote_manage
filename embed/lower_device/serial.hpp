@@ -71,21 +71,14 @@ private:
     /// - read from protocol tx fifo and do write data.
     void uart_tx_run();
 
-    /// \brief write_data
-    /// - this method is used to write data to uart interface.
-    /// \param pbuffer - the buffer of data write to uart interface.
-    /// \param size - size of data write to uart interface.
-    /// \return data already send to uart interface.
-    int write_data(char *pbuffer, uint16_t size);
-
 private:
     /// \brief instance_pointer_
     /// - object used to implement the singleton pattern.
     static serial_manage* instance_pointer_;
 
-    /// \brief com_fd_
-    /// - the fd of uart device.
-    int com_fd_{-1};
+    /// \brief tty_
+    /// - tty used to control the interface.
+    tty_control tty_;
 
     /// \brief mutex_
     /// - mutex used to protect com send.

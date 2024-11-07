@@ -21,17 +21,14 @@ int main(int argc, const char *argv[])
     int size = 0;
 
     fd = open(HX711_DEVICE_NAME, O_RDWR | O_NDELAY);
-    if (fd == -1)
-    {
+    if (fd == -1) {
         printf("open %s error", HX711_DEVICE_NAME);
         return -1;
     }
 
-    while (1)
-    {
+    while (1) {
         size = read(fd, (char *)&val, sizeof(val));
-        if (size >= 0)
-        {
+        if (size >= 0) {
             printf("read size:%d\n", size);
             printf("value:%d, 0x%x\n", val, val);
         }

@@ -31,7 +31,8 @@ _Pragma("once")
 #define DEFAULT_LED_INIT            0
 #define DEFAULT_LED_DEV             "/dev/led"        
 #define DEFAULT_BEEP_INIT           0
-#define DEFAULT_BEEP_DEV            "/dev/beep"   
+#define DEFAULT_BEEP_DEV            "/dev/beep"
+#define DEFAULT_LOOPLED_DEV         "/dev/loopled"   
 #define DEFAULT_KEY_DEV             "/dev/key"
 #define DEFAULT_RTC_DEV             "/dev/rtc0"
 #define DEFAULT_ICMSPI_DEV          "/dev/icm20608"
@@ -94,10 +95,20 @@ typedef struct
 
 typedef struct 
 {
+    int baud;
+    int dataBits;
+    int stopBits;
+    JString parity;
+    JString dev;
+}SerialSysConfig;
+
+typedef struct 
+{
     DeviceSysConfig ap_i2c;
     DeviceSysConfig icm_spi;
     DeviceSysConfig key;
     DeviceSysConfig rtc;
+    DeviceSysConfig loopled;
     PWMSysConfig pwm;
     IoSysConfig led;
     IoSysConfig beep;
@@ -120,6 +131,7 @@ typedef struct
     int gui_port;
     int logger_port;
     MqttDeivceInfo mqtt_device;
+    SerialSysConfig serial;
 }MainProcessConfig;
 
 typedef struct 
@@ -138,15 +150,6 @@ typedef struct
 {
     MqttDeivceInfo mqtt_device;    
 }WinformConfig;
-
-typedef struct 
-{
-    int baud;
-    int dataBits;
-    int stopBits;
-    JString parity;
-    JString dev;
-}SerialSysConfig;
 
 typedef struct 
 {
@@ -257,12 +260,13 @@ public:
     const DeviceSysConfig &get_rtc_config()     const   {return parameter_.local_device.rtc;}
     const DeviceSysConfig &get_icm_config()     const   {return parameter_.local_device.icm_spi;}
     const DeviceSysConfig &get_ap_config()      const   {return parameter_.local_device.ap_i2c;}
+    const DeviceSysConfig &get_loopled_config() const   {return parameter_.local_device.loopled;}
     const IIOSysConfig &get_iio_config()        const   {return parameter_.local_device.iio;}
     const PWMSysConfig &get_pwm_config()        const   {return parameter_.local_device.pwm;}
 
     const int &get_lower_device_logger_port()   const    {return parameter_.lower_device.logger_port;}
     const int &get_lower_device_remote_port()   const    {return parameter_.lower_device.remote_port;}
-    const SerialSysConfig &get_serial_config()  const    {return parameter_.lower_device.serial;}
+    const SerialSysConfig &get_lower_device_serial_config()  const    {return parameter_.lower_device.serial;}
 
     //main process
     const JString &get_download_path()          const    {return parameter_.main_process.download_path;}
@@ -270,7 +274,8 @@ public:
     const int get_local_port()                  const    {return parameter_.main_process.local_port;}
     const int get_logger_port()                 const    {return parameter_.main_process.logger_port;}
     const int get_gui_device_port()             const    {return parameter_.main_process.gui_port;}
-    const MqttDeivceInfo &get_mp_mqtt_config()     const    {return parameter_.main_process.mqtt_device;}
+    const MqttDeivceInfo &get_mp_mqtt_config()  const    {return parameter_.main_process.mqtt_device;}
+    const SerialSysConfig &get_serial_config()  const    {return parameter_.main_process.serial;}
 
     //node info
     const int get_node_web_port()               const    {return parameter_.node_server.web_port;}

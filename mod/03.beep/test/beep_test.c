@@ -26,14 +26,12 @@ int main(int argc, const char *argv[])
     int fd;
 
     fd = open(DEVICE_BEEP, O_RDWR | O_NDELAY);
-    if (fd == -1)
-    {
+    if (fd == -1) {
         printf("open %s error\r\n", DEVICE_BEEP);
         return -1;
     }
 
-    if (argc > 1)
-    {
+    if (argc > 1) {
         val = atoi(argv[1]);
     }
 

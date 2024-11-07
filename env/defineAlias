@@ -79,14 +79,14 @@ alias SysExitChroot='exit_chroot'
 # mount manage
 function create_roofts_img()
 {
-	rootfs_ver=debain.img
+	rootfs_ver=debian.img
 	rootfs_size=1024
 	case "$ROOTFS_RUN" in
 		"buildroot")
 			rootfs_ver=buildroot.img
 		;;
-		"debain")
-			rootfs_ver=debain.img
+		"debian")
+			rootfs_ver=debian.img
 			rootfs_size=4096
 		;;
 		"ubuntu")

@@ -32,9 +32,9 @@
 	>;
 };
 
-&ocotp {
-	compatible = "fsl,imx6ull-ocotp", "syscon";
-};
+// &ocotp {
+// 	compatible = "fsl,imx6ull-ocotp", "syscon";
+// };
 
 &gpc {
 	fsl,mf-mix-wakeup-irq = <0xfc00000 0x7d00 0x0 0x1400640>;

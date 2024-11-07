@@ -16,8 +16,7 @@
 //  Revision History:
 //      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
-#ifndef _INCLUDE_BEEP_H
-#define _INCLUDE_BEEP_H
+_Pragma("once")
 
 #include "device_base.hpp"
 
@@ -27,5 +26,3 @@ public:
     /// \brief constructor
     using io_base::io_base;
 };
-
-#endif

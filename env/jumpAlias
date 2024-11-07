@@ -30,7 +30,7 @@ alias cdk="cd ${SUPPORT_ENV_KERNEL_DIR}"
 
 #rootfs
 alias cdrb="cd ${SUPPORT_FS_BUILDROOT_DIR}"
-alias cdrd="cd ${SUPPORT_FS_DEBAIN_DIR}"
+alias cdrd="cd ${SUPPORT_FS_DEBIAN_DIR}"
 alias cdru="cd ${SUPPORT_FS_UBUNTU_DIR}"
 alias cdrimg="cd ${PROGRAM_FS_IMG}"
 alias cdri="cd ${SUPPORT_ENV_INSTALL}"

@@ -19,12 +19,14 @@
 #include "cmd_process.hpp"
 #include "common_unit.hpp"
 #include "device_process.hpp"
+#include "mqtt_protocol.hpp"
 #include "json/json.h"
 
 const static std::map<std::string, cmd_format_t> CmdMapM = {
     {"getos",           cmdGetOS},
     {"setlevel",        cmdSetLevel},
     {"setdev",          cmdSetDevice},
+    {"publish",         cmdPublish},
     {"?",               cmdGetHelp},
     {"help",            cmdGetHelp},
 };
@@ -34,6 +36,7 @@ const static std::map<cmd_format_t, std::string> CmdHelpMapM = {
     {cmdSetLevel,       "!main_proc setlevel [app],[lev 0-5]"},
     {cmdSetDevice,      "!main_proc setdev [dev],[data]"},
     {cmdGetHelp,        "!main_proc ? or !mainprocess help"},
+    {cmdPublish,        "!main_proc publish [string]"},
 };
 
 const static std::map<std::string, int> DevMap = {
@@ -187,6 +190,12 @@ bool cmd_process::process_data()
                 process_device(dev, token[1]);
             }
             break;
+        case cmdPublish:
+            {
+                std::string data_str(cmd_data_pointer_);
+                mqtt_protocol::get_instance()->send_message(MQTT_SOURCE_DESKTOP, data_str);
+            }
+            break;
         case cmdGetHelp:
             {
                 for (auto &[x, y] : CmdHelpMapM)
@@ -207,6 +216,7 @@ bool cmd_process::process_device(int dev, const std::string& data)
     {
         case DEVICE_LED:
         case DEVICE_BEEP:
+        case DEVICE_LOOPLED:
             {
                 int state;
                 state = (data == "on"?1:0);  
@@ -236,68 +246,6 @@ bool cmd_process::process_device(int dev, const std::string& data)
     }
 
     return true;
-}
-
-
-/*
-{"command":"setdev", source:0, "device":"led", "data":"on"}
-{"command":"setdev", source:1, "device":"pwm", "data":"1,50000,25000"}
-*/
-bool cmd_process::mqtt_decode_command(char *ptr, int size)
-{
-    try
-    {
-        Json::CharReaderBuilder readerBuilder;
-        std::unique_ptr<Json::CharReader> const reader(readerBuilder.newCharReader());
-        Json::Value root;
-        char const* begin = ptr;
-        char const* end = begin + size;
-        JSONCPP_STRING errs;
-        std::string data;
-        cmd_format_t format;
-        int source;
-
-        if(!reader->parse(begin, end, &root, &errs))
-        {
-            PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "json reader parse failed");
-            return false;
-        }
-
-        data = root["command"].asString();
-        if (CmdMapM.count(data) == 0)
-        {
-            PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "invalid commnd:%s", data.c_str());
-            return false;
-        } 
-        format = CmdMapM.find(data)->second;
-        PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "commnd:%s, index:%d", data.c_str(), format);
-        source = root["source"].asInt();
-        switch(format)
-        {
-            case cmdSetDevice:
-                {
-                    int dev;
-                    data = root["device"].asString();
-                    if (DevMap.count(data) == 0)
-                    {
-                        PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "invalid device:%s", data.c_str());
-                        return false;
-                    } 
-                    dev = DevMap.find(data)->second;
-                    data = root["data"].asString();
-                    process_device(dev, data);
-                }
-                break;
-        }
-
-        /* code */
-        return true;
-    }
-    catch(const std::exception& e)
-    {
-        std::cerr << e.what() << '\n';
-        return false;
-    }
 }
 
 void cmd_process::run()

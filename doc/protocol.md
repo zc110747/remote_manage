@@ -182,7 +182,7 @@ A0{"command":"req_getinfo","source":"SRC_DESKTOP"}
 }
 //replay
 {
-    "replay": "rep_getinfo",
+    "replay": "rep_setdev",
     "status": "ok", "error-state",
     "data": {
         //...

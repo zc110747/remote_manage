@@ -65,4 +65,3 @@ uint16_t crc16(uint16_t crc, uint8_t const *buffer, uint16_t len)
         crc = crc16_byte(crc, *buffer++);
     return crc;
 }
-

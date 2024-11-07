@@ -4,9 +4,9 @@
 
 本项目用于实现具有远程访问，调试权限管理，本机硬件控制，下位机项目管理的嵌入式Linux应用和驱动开发综合产品。对于一个完整的Linux应用项目，主要包含功能有Linux系统运行平台(U-Boot，Kernel，Rootfs)，用于操作硬件的驱动实现，支持应用功能的第三方软件和库(如mosquitto，cJson，asio，fmt，ssh，qt/lvgl support library等)，以及实现具体功能的应用程序，按照功能模块划分如下所示。
 
-1. 嵌入式系统运行平台构建(platform目录)
+1. platform: 嵌入式系统运行平台构建
 2. 嵌入式系统驱动开发(mod目录)
-3. 第三方库功能支持(thirdparts目录)                 -- 目录: thirdparts/
+3. 第三方库功能支持(thirdparts目录)
 4. 应用功能，图形界面管理(embed)
 5. 系统文档(doc)
 6. 构建SDK环境脚本(env)
@@ -94,7 +94,7 @@ arm
     - kernel                #kernel目录
     - rootfs                #文件系统目录
         - buildroot         #buildroot文件系统构建目录
-        - debain            #debain文件系统构建目录
+        - debian            #debian文件系统构建目录
         - ubuntu            #ubuntu文件系统构建目录
 ```
 
@@ -151,7 +151,7 @@ SysBulidApplication
 
 ```shell
 SysPreThirdParts
-    pull all thirdparts, install library and debain rootfs.
+    pull all thirdparts, install library and debian rootfs.
 SysSetPlatformARM
     Set Current Platform to ARM Complier(NXP I.MX6ull).
 SysSetPlatformAARCH64
@@ -202,7 +202,7 @@ Linux系统 - Ubuntu 22.04 LTS
 交叉编译工具 - gcc-arm-11.2-2022.02-x86_64-arm-none-linux-gnueabihf
 u-boot: uboot-imx-lf_v2022.04(https://codeload.github.com/nxp-imx/uboot-imx/zip/refs/heads/lf_v2022.04)
 kernel: linux-imx-lf-6.1.y(https://codeload.github.com/nxp-imx/linux-imx/zip/refs/heads/lf-6.1.y)
-rootfs: buildroot-2023.02.9(https://buildroot.org/downloads/buildroot-2023.02.9.tar.gz), debain11(http://mirrors.tuna.tsinghua.edu.cn/debian/dists/bookworm)
+rootfs: buildroot-2023.02.9(https://buildroot.org/downloads/buildroot-2023.02.9.tar.gz), debian11(http://mirrors.tuna.tsinghua.edu.cn/debian/dists/bookworm)
 
 #AARCH64(RK3568s, H616)
 交叉编译工具 - gcc-arm-11.2-2022.02-x86_64-aarch64-none-linux-gnu

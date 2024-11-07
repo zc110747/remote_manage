@@ -7,10 +7,10 @@
 ################################################################################
 BUILD =e
 
-c_objects = hx711_test.o
+c_objects = hx711_iio_test.o
 
 # This is the file name of the executables and path where 
 # place the executables
-buildout = hx711_test
+buildout = hx711_iio_test
 
 include $(ENV_PATH_ROOT)/build/buildrules.mk

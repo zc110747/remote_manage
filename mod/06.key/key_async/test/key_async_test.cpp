@@ -1,3 +1,22 @@
+////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2024-by Persional Inc.
+//  All Rights Reserved
+//
+//  Name:
+//      key_async_test.cpp
+//          GPIO1_18
+//
+//  Purpose:
+//     测试按键输入
+//
+// Author:
+//     @听心跳的声音
+//
+//  Assumptions:
+//
+//  Revision History:
+//      4/3/2022   Create New Version
+/////////////////////////////////////////////////////////////////////////////
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -27,8 +46,7 @@ int main(int argc, char *argv[])
     int flags = 0;
 
     fd = open(KEY_DEV_NAME, O_RDONLY | O_NONBLOCK);
-    if (0 > fd) 
-    {
+    if (0 > fd) {
         printf("ERROR: %s file open failed!\n", KEY_DEV_NAME);
         return -1;
     }
@@ -38,8 +56,7 @@ int main(int argc, char *argv[])
     flags = fcntl(fd, F_GETFD);
     fcntl(fd, F_SETFL, flags | FASYNC);
 
-    for (;;) 
-    {
+    for (;;) {
         sleep(2);
     }
 

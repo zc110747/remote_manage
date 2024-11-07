@@ -48,7 +48,7 @@ struct serial_opt opt = {115200, 8, 1, "n"};
 /**************************************************************************
 * Global Variable Declaration
 ***************************************************************************/
-#define RS232_DRIVER_NAME   "ttymxc2"
+#define RS232_DRIVER_NAME   "/dev/ttymxc2"
 
 /**************************************************************************
 * Local Function Declaration
@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        if (set_opt(fd, &opt) != 0)
+        if (set_opt(fd, &opt) == 0)
         {
             do
             {

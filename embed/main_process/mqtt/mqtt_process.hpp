@@ -141,6 +141,3 @@ private:
     /// - mqtt device manage pointer.
     std::unique_ptr<mqtt_device> mqtt_device_ptr;
 };
-
-bool mqtt_init(void);
-int mqtt_publish(const std::string &str);

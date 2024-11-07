@@ -34,17 +34,14 @@ int main(int argc, char *argv[])
     int ret = 0;
 
     fd = open(ICM_DEV_NAME, O_RDWR);
-    if (fd < 0)
-    {
+    if (fd < 0) {
         printf("can't open file %s\r\n", ICM_DEV_NAME);
         return -1;
     }
 
-    while (1)
-    {
+    while (1) {
         ret = read(fd, databuf, sizeof(databuf));
-        if (ret >= 0) 
-        {
+        if (ret >= 0) {
             gyro_x_adc = databuf[0];
             gyro_y_adc = databuf[1];
             gyro_z_adc = databuf[2];

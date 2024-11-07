@@ -24,7 +24,7 @@
 #       - toolchain             #交叉编译工具
 #       - rootfs                #文件系统目录
 #           - buildroot         #buildroot文件系统源码
-#           - debain            #debain系统构建目录
+#           - debian            #debian系统构建目录
 #           - qt                #qt系统编译目录
 #           - ubuntu            #ubuntu系统构建目录
 #           - shell             #构建脚本 
@@ -58,7 +58,7 @@ echo "  ${greenText}${GLOBAL_PROGRAM_PATH}/[core]/kernel/${defText}             
 echo "  ${greenText}${GLOBAL_PROGRAM_PATH}/[core]/package/${defText}                :系统打包的目录(文件系统img存放再此目录)"
 echo "  ${greenText}${GLOBAL_PROGRAM_PATH}/[core]/toolchain/${defText}              :交叉编译工具"
 echo "  ${greenText}${GLOBAL_PROGRAM_PATH}/[core]/rootfs/buildroot/${defText}       :buildroot文件系统目录(support qt)"
-echo "  ${greenText}${GLOBAL_PROGRAM_PATH}/[core]/rootfs/debain/${defText}          :debain文件系统目录"
+echo "  ${greenText}${GLOBAL_PROGRAM_PATH}/[core]/rootfs/debian/${defText}          :debian文件系统目录"
 echo "  ${greenText}${GLOBAL_PROGRAM_PATH}/[core]/rootfs/ubuntu/${defText}          :ubuntu文件系统目录"
 echo "  ${greenText}${GLOBAL_PROGRAM_PATH}/[core]/rootfs/shell/${defText}           :shell文件系统目录"
 echo "未复制则后续编译时会显示找不到文件或者直接编译失败"
@@ -178,7 +178,7 @@ function creat_arm_sdk()
     #rootfs install
     global_program_rootfs=${GLOBAL_PROGRAM_ARM_PATH}/rootfs
     mkdir -m 755 -p "${global_program_rootfs}/buildroot"
-    mkdir -m 755 -p "${global_program_rootfs}/debain"
+    mkdir -m 755 -p "${global_program_rootfs}/debian"
     mkdir -m 755 -p "${global_program_rootfs}/qt"
     mkdir -m 755 -p "${global_program_rootfs}/shell"
     mkdir -m 755 -p "${global_program_rootfs}/ubuntu"
@@ -186,8 +186,8 @@ function creat_arm_sdk()
     chmod 777 "${IMX_PLATFORM_PATH}/platform-shell/make.sh"
     cp "${IMX_PLATFORM_PATH}/platform-shell/make.sh" "${GLOBAL_PROGRAM_ARM_PATH}/"
 
-    chmod 777 "${IMX_PLATFORM_PATH}/platform-shell/install-debain.sh"
-    cp "${IMX_PLATFORM_PATH}/platform-shell/install-debain.sh" "${global_program_rootfs}/shell/"
+    chmod 777 "${IMX_PLATFORM_PATH}/platform-shell/install-debian.sh"
+    cp "${IMX_PLATFORM_PATH}/platform-shell/install-debian.sh" "${global_program_rootfs}/shell/"
 }
 
 function creat_aarch64_sdk()
@@ -209,7 +209,7 @@ function creat_aarch64_sdk()
     mkdir -m 755 -p "${global_program_support}"/uboot/
     mkdir -m 755 -p "${global_program_support}"/kernel/
     mkdir -m 755 -p "${global_program_support}"/rs_buildroot/ 
-    mkdir -m 755 -p "${global_program_support}"/rs_debain/
+    mkdir -m 755 -p "${global_program_support}"/rs_debian/
     mkdir -m 755 -p "${global_program_support}"/rs_ubuntu/ 
 
     local_gcc_toolchain="${DOWNLOAD_PATH}/${AARCH_gcc_toolchain}".tar.xz

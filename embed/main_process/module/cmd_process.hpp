@@ -25,6 +25,7 @@ typedef enum
     cmdGetStatus,
     cmdSetDevice,
     cmdGetDevice,
+    cmdPublish,
     cmdGetHelp,
     cmdGetOS,
 }cmd_format_t;
@@ -48,11 +49,6 @@ public:
     /// - This method is used to init the object.
     /// \return Wheather initialization is success or failed.
     bool init();
-
-    /// \brief parse_data
-    /// - This method is used to decode command received.
-    /// \return Wheather parse is success or failed.
-    bool mqtt_decode_command(char *ptr, int size);
 
     /// \brief process_data
     /// - This method is used to process device.

@@ -3,7 +3,7 @@
 //  All Rights Reserved
 //
 //  Name:
-//      key_test.c
+//      key_test.cpp
 //          GPIO1_18
 //
 //  Purpose:
@@ -48,15 +48,11 @@ static int check_button_pressed(int fd) {
         return -1;
     }
 
-    switch (buf.type) 
-    {
+    switch (buf.type) {
         case EV_KEY:
-            if (buf.code < BTN_MISC) 
-            {
+            if (buf.code < BTN_MISC) {
                 printf("key %d %s\n", buf.code, buf.value ? "press" : "release");
-            }
-            else 
-            {
+            } else {
                 printf("button %d %s\n", buf.code, buf.value ? "press" : "release");
             }
             break;
@@ -72,24 +68,18 @@ static int check_button_pressed(int fd) {
     return buf.code;
 }
 
-
 int main(int argc, const char *argv[])
 {
     unsigned char val = 1;
-    int flags;
     int fd;
     struct input_event inputevent;
 
     fd = open(KEY_DEV_NAME, O_RDWR);
-    if (fd < 0)
-    {
+    if (fd < 0) {
         printf("%s open failed!\n", KEY_DEV_NAME);
         return -1;
-    }
-    else
-    {
-        while (1) 
-        {
+    } else {
+        while (1) {
             int key_code = check_button_pressed(fd);
             if (key_code < 0)
                 continue;

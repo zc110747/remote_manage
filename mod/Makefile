@@ -6,5 +6,25 @@
 #
 ################################################################################
 dir := ${ENV_PATH_ROOT}/mod
+
+subdirs := 	${dir}/01.led \
+		${dir}/02.loopled \
+		${dir}/03.beep \
+		${dir}/04.i2c_ap/bus_i2c \
+		${dir}/04.i2c_ap/regmap_i2c \
+		${dir}/05.spi_icm/bus_spi \
+		${dir}/05.spi_icm/regmap_spi \
+		${dir}/06.key/key_async \
+		${dir}/06.key/key_input \
+		${dir}/06.key/key_rwio \
+		${dir}/07.adc \
+		${dir}/08.wire/dev_hx711 \
+		${dir}/08.wire/iio_hx711 \
+		${dir}/09.rtc/bus_rtc \
+		${dir}/09.rtc/regmap_rtc \
+		${dir}/10.rng \
+		${dir}/11.nvmem
+
+
 with_kernel :=0
 include $(ENV_PATH_ROOT)/build/buildmulti.mk

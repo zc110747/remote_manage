@@ -24,6 +24,7 @@
 #include "tcp_thread.hpp"
 #include "cmd_process.hpp"
 #include "parameter_parser.hpp"
+#include "mb_app.hpp"
 
 #if MODULE_DEFINE_MQTT == 1
 #include "mqtt_process.hpp"
@@ -97,6 +98,7 @@ static bool system_init(int is_default, const char* path)
     ret &= device_process::get_instance()->init();
     ret &= tcp_thread_manage::get_instance()->init();
     ret &= cmd_process::get_instance()->init();
+    ret &= mb_app_manage::get_instance()->init();
 
     return ret;
 }

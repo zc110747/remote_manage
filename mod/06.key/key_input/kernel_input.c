@@ -24,7 +24,7 @@ usr_key {
     pinctrl-0 = <&pinctrl_gpio_key>;
     key-gpios = <&gpio1 18 GPIO_ACTIVE_LOW>;
     interrupt-parent = <&gpio1>;
-    interrupts = <18 IRQ_TYPE_EDGE_FALLING>;
+    interrupts = <18 (IRQ_TYPE_EDGE_FALLING | IRQ_TYPE_EDGE_RISING)>;
     status = "okay";
 };
 
@@ -119,21 +119,22 @@ static int key_hw_init(struct key_data *chip)
     struct platform_device *pdev = chip->pdev;  
     struct device_node *nd = pdev->dev.of_node;
 
+    //1.获取gpio线号，申请资源，设置输入模式
     chip->key_gpio = of_get_named_gpio(nd, "key-gpios", 0);
     if (chip->key_gpio < 0){
         dev_err(&pdev->dev, "gpio %s no find\n",  "key-gpios");
         return -EINVAL;
     }
-
     devm_gpio_request(&pdev->dev, chip->key_gpio, "key0");
     gpio_direction_input(chip->key_gpio);
     
+    //2.根据gpio线号申请中断资源
     //cat /proc/interrupts可以查看是否增加中断向量
     chip->irq = irq_of_parse_and_map(nd, 0);
     ret = devm_request_threaded_irq(&pdev->dev,
                             chip->irq, 
                             NULL, key_handler, 
-                            IRQF_SHARED | IRQF_ONESHOT | IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING,       
+                            IRQF_SHARED | IRQF_ONESHOT | IRQF_TRIGGER_FALLING | IRQ_TYPE_EDGE_RISING,       
                             "key0", 
                             (void *)chip);
     if (ret < 0){
@@ -153,6 +154,7 @@ static int key_device_create(struct key_data *chip)
     int result;
     struct platform_device *pdev = chip->pdev;
 
+    //1.申请按键管理控制块
     chip->input_dev = devm_input_allocate_device(&pdev->dev);
     if (!chip->input_dev)
     {
@@ -161,8 +163,12 @@ static int key_device_create(struct key_data *chip)
     }
     input_set_drvdata(chip->input_dev, chip);
 
+    //3.创建input设备
     chip->key_code = KEY_0; 
     chip->input_dev->name = pdev->name;
+
+    //支持双击的动作
+    //__set_bit(EV_REP, chip->input_dev->evbit);
 
     //将EV_KEY定义成按键的动作
     input_set_capability(chip->input_dev, EV_KEY, chip->key_code);
@@ -183,6 +189,7 @@ static int key_probe(struct platform_device *pdev)
     int result;
     struct key_data *chip = NULL;
 
+    //1.申请按键管理控制块
     chip = devm_kzalloc(&pdev->dev, sizeof(struct key_data), GFP_KERNEL);
     if (!chip){
         dev_err(&pdev->dev, "malloc error\n");
@@ -191,17 +198,19 @@ static int key_probe(struct platform_device *pdev)
     chip->pdev = pdev;
     platform_set_drvdata(pdev, chip);
 
-    result = key_device_create(chip);
-    if (result != 0)
-    {
-        dev_err(&pdev->dev, "device create failed!\n");
-        return result;
-    }
-
+    //2.key相关引脚硬件初始化
     result = key_hw_init(chip);
     if (result != 0)
     {
         dev_err(&pdev->dev, "Key gpio init failed!\r\n");
+        return result;
+    }
+
+    //3.创建内核访问接口
+    result = key_device_create(chip);
+    if (result != 0)
+    {
+        dev_err(&pdev->dev, "device create failed!\n");
         return result;
     }
 

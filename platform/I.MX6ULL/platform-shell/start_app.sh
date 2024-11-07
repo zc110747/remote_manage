@@ -12,7 +12,7 @@ if [ ! -d /tmp/app ]; then
 fi
 
 #start application
-mosquitto -c /etc/mosquitto/mosquitto.conf &
+/usr/local/sbin/mosquitto -c /etc/mosquitto/mosquitto.conf &
 
 sleep 1
 
@@ -27,6 +27,8 @@ sleep 2
 #run server.js
 cd /home/sys/server/
 if [ ! -d /home/sys/server/node_module ]; then
-    tar -xvf node_modules.tar.bz2
+    if [ -f node_modules.tar.bz2 ]; then
+        tar -xvf node_modules.tar.bz2
+    fi
 fi
 #/usr/bin/node/bin/node main.js &

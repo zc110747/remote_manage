@@ -36,6 +36,7 @@ public:
 
     /// \brief set_id
     /// - This method is used to set the id
+    /// \param id - the set event id
     void set_id(uint16_t id)    { id_ = id; }
 
     /// \brief get_id
