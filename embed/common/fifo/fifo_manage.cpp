@@ -17,7 +17,7 @@
 //      12/19/2022   Add explian and update structure.
 /////////////////////////////////////////////////////////////////////////////
 #include "fifo_manage.hpp"
-#include "time_manage.hpp"
+#include "timer_manage.hpp"
 #include "logger_manage.hpp"
 
 fifo_manage::fifo_manage(const std::string& fstr, int mode, ENUM_FIFO_MODE fifomode)

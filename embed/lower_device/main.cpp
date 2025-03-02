@@ -84,7 +84,7 @@ static bool system_init(int is_default, const char* path)
     log_manage::get_instance()->set_level(level);
 
     ret &= log_manage::get_instance()->init();
-    ret &= time_manage::get_instance()->init();
+    ret &= timer_manage::get_instance()->init();
     ret &= serial_manage::get_instance()->init();
     ret &= asio_client::get_instance()->init();
 

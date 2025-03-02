@@ -134,9 +134,18 @@ static iomux_v3_cfg_t const uart1_pads[] = {
     MX6_PAD_UART1_RX_DATA__UART1_DCE_RX | MUX_PAD_CTRL(UART_PAD_CTRL),
 };
 
+static iomux_v3_cfg_t const uart3_pads[] = {
+    MX6_PAD_UART3_TX_DATA__UART3_DCE_TX | MUX_PAD_CTRL(UART_PAD_CTRL),
+    MX6_PAD_UART3_RX_DATA__UART3_DCE_RX | MUX_PAD_CTRL(UART_PAD_CTRL),
+};
+
 static void setup_iomux_uart(void)
 {
+    //setup uart1 pins
     imx_iomux_v3_setup_multiple_pads(uart1_pads, ARRAY_SIZE(uart1_pads));
+
+    //setup uart3 pins
+    imx_iomux_v3_setup_multiple_pads(uart3_pads, ARRAY_SIZE(uart3_pads));
 }
 
 #ifdef CONFIG_FSL_QSPI
@@ -347,7 +356,7 @@ int board_late_init(void)
         env_set("board_rev", "14X14");
 
     if (is_cpu_type(MXC_CPU_MX6ULZ)) {
-        env_set("board_name", "ULZ-EVK");
+        env_set("board_name", "ULZ-RMK");
         env_set("usb_net_cmd", "usb start");
     }
 #endif
@@ -368,11 +377,11 @@ int board_late_init(void)
 int checkboard(void)
 {
     if (is_mx6ull_9x9_evk())
-        puts("Board: MX6ULL 9x9 EVK\n");
+        puts("Board: MX6ULL 9x9 RMK\n");
     else if (is_cpu_type(MXC_CPU_MX6ULZ))
-        puts("Board: MX6ULZ 14x14 EVK\n");
+        puts("Board: MX6ULZ 14x14 RMK\n");
     else
-        puts("Board: MX6ULL 14x14 EVK\n");
+        puts("Board: MX6ULL 14x14 RMK\n");
 
     return 0;
 }

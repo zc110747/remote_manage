@@ -22,8 +22,11 @@ subdirs := 	${dir}/01.led \
 		${dir}/08.wire/iio_hx711 \
 		${dir}/09.rtc/bus_rtc \
 		${dir}/09.rtc/regmap_rtc \
-		${dir}/10.rng \
-		${dir}/11.nvmem
+		${dir}/10.rng/hw-rngc \
+		${dir}/11.nvmem \
+		${dir}/14.touch_key/goodix_ts_i2c \
+		${dir}/17.pwm/pwm_consumer \
+		${dir}/18.pwm/pwm_provider
 
 
 with_kernel :=0

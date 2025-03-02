@@ -132,11 +132,11 @@ ssize_t led_read(struct file *filp, char __user *buf, size_t count, loff_t *f_po
         return -1;
 
     ret = copy_to_user(buf, chip->status, count);
-    if (ret < 0) {
+    if (ret) {
         dev_err(&pdev->dev, "read failed!\n");
         return -EFAULT;
     }
-    return 1;
+    return count;
 }
 
 ssize_t led_write(struct file *filp, const char __user *buf, size_t size,  loff_t *f_pos)
@@ -150,7 +150,7 @@ ssize_t led_write(struct file *filp, const char __user *buf, size_t size,  loff_
     pdev = chip->pdev;
 
     ret = copy_from_user(data, buf, 2);
-    if (ret < 0 || data[0] >= chip->leds_num){
+    if (ret || data[0] >= chip->leds_num){
         dev_err(&pdev->dev, "write failed:%d!\n", data[0]);
         return -EFAULT;
     }
@@ -167,7 +167,7 @@ long led_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
     struct loopled_data *chip;
     unsigned int arglen;
     char *pbuf;
-    int err;
+    int ret;
 
     arglen = cmd;
     chip = (struct loopled_data *)filp->private_data;
@@ -178,12 +178,14 @@ long led_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
         dev_err(&pdev->dev, "kmalloc return empty!\n");
         return -ENOMEM;
     }
-    err = copy_from_user(pbuf, (char *)arg, arglen);
-    if (err) {
+
+    ret = copy_from_user(pbuf, (char *)arg, arglen);
+    if (ret) {
         dev_err(&pdev->dev, "kmalloc return empty!\n");
         kfree(pbuf);
         return -EFAULT;  
     }
+    
     led_hardware_set(chip, pbuf[0], pbuf[1]);
     kfree(pbuf);
     return 0;

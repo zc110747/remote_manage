@@ -105,35 +105,35 @@ int beep_release(struct inode *inode, struct file *filp)
 
 ssize_t beep_read(struct file *filp, char __user *buf, size_t count, loff_t *f_pos)
 {
-    int result;
+    int ret;
     u8 databuf[2];
     struct beep_data *chip = (struct beep_data *)filp->private_data;
     struct platform_device *pdev = chip->pdev;
 
     databuf[0] = chip->status;
-    result = copy_to_user(buf, databuf, 1);
-    if (result < 0) {
+    ret = copy_to_user(buf, databuf, 1);
+    if (ret) {
         dev_err(&pdev->dev, "read failed!\n");
         return -EFAULT;
     }
-    return 1;
+    return count;
 }
 
 ssize_t beep_write(struct file *filp, const char __user *buf, size_t count,  loff_t *f_pos)
 {
-    int result;
+    int ret;
     u8 databuf[2];
     struct beep_data *chip = (struct beep_data *)filp->private_data;
     struct platform_device *pdev = chip->pdev;
 
-    result = copy_from_user(databuf, buf, count);
-    if (result < 0) {
+    ret = copy_from_user(databuf, buf, count);
+    if (ret) {
         dev_err(&pdev->dev, "write failed!\n");
         return -EFAULT;
     }
 
     beep_hardware_set(chip, databuf[0]);
-    return 0;
+    return count;
 }
 
 long beep_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)

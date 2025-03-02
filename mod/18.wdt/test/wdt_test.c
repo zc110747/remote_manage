@@ -13,6 +13,8 @@
 #include <sys/ioctl.h>
 #include <linux/input.h>
 #include <linux/watchdog.h>
+#include <stdlib.h>
+#include <string.h>
 
 static unsigned int flag = 0;
 
@@ -22,18 +24,28 @@ int main(int argc, char *argv[])
 {
     int wdt_fd;
     int retval, flags;
-    int timeout = 60;
+    int timeout = 5;
+    int ioctl_alive = 0;
+    int errno;
 
+    if (argc > 1) {
+        ioctl_alive = atoi(argv[1]);
+    }
+    printf("ioctl_alive:%d\n", ioctl_alive);
+
+    // open会直接开启对应的watchdog
     wdt_fd = open(WATCHDOG_DEVICE, O_RDWR | O_NONBLOCK);
 
     if (wdt_fd>=0)
     {
-        ioctl(wdt_fd, WDIOC_SETOPTIONS, WDIOS_ENABLECARD);
         ioctl(wdt_fd, WDIOC_SETTIMEOUT, &timeout);
 
         while (!flag)
         {
-            ioctl(wdt_fd, WDIOC_KEEPALIVE, NULL);
+            if (ioctl_alive == 0) {
+                ioctl(wdt_fd, WDIOC_KEEPALIVE, NULL);
+            }
+
             sleep(1);
         }
 

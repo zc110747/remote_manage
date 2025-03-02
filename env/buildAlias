@@ -11,16 +11,15 @@
 #************************************************************************
 function imx_build_uboot()
 {
+	# support uboot
+	cd "${PLATFORM_UBOOT_SHELL}"/ || return
+    chmod 777 build_shell.sh && ./build_shell.sh
+
     cd "${PLATFORM_UBOOT_PATH}"/ || return
-
     chmod 777 uboot_upgrade.sh && ./uboot_upgrade.sh
-
     cdp || return
-
     ./make.sh uboot $1
-
     cp -fv ${SUPPORT_ENV_PACKAGE}/u-boot-dtb.imx "${BUILD_TFTP_PATH}"/
-    cp -fv ${SUPPORT_ENV_PACKAGE}/boot.scr "${BUILD_TFTP_PATH}"/
 }
 alias imx_build_uboot="imx_build_uboot"
 
@@ -35,7 +34,10 @@ function imx_build_kernel()
     ./make.sh kernel $1
 
     cp -fv ${SUPPORT_ENV_PACKAGE}/*.dtb "${BUILD_TFTP_PATH}"/
-    cp -fv ${SUPPORT_ENV_PACKAGE}/zImage "${BUILD_TFTP_PATH}"/ 
+    cp -fv ${SUPPORT_ENV_PACKAGE}/zImage "${BUILD_TFTP_PATH}"/
+	
+	cd "${BUILD_TFTP_PATH}"/ || return
+	mkimage -A arm -O linux -T kernel -C none -a 80800000 -e 80800040 -n linux-6.1 -d zImage uImage
 }
 alias imx_build_kernel="imx_build_kernel"
 

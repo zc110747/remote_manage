@@ -94,6 +94,7 @@ compile_u_boot()
     #create boot.scr
     mkimage -C none -A arm -T script -d boot.cmd boot.scr
     mv boot.scr "${PACKAGE_PATH}"/
+    cp config.txt "${PACKAGE_PATH}"/
 
     #build u-boot
     make "${config_file}" 

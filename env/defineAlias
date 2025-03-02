@@ -12,21 +12,37 @@ echo "Config global alias defined..."
 # This section defines the function for program management.
 # The Extend Command for program compiler, package, push.
 #-------------------------------------------------------------------------------
+
+# Function:
+# exit_if_last_error
+#
+# Description:
+# exit the shell command with error, which is the last process
+#
+# Parameters:
+# none
 exit_if_last_error() 
 {
     if [[ $? -ne 0 ]]; then
-		read -r -p "shell faild, wheather exit?(y/n, default is y)" exit_val
+        read -r -p "shell faild, wheather exit?(y/n, default is y)" exit_val
 
-		if [ -z "${exit_val}" ] || [ "${exit_val}" == 'y' ]; then
-        	exit 1
-		fi
+        if [ -z "${exit_val}" ] || [ "${exit_val}" == 'y' ]; then
+            exit 1
+        fi
     fi
 }
 alias exit_if_last_error="exit_if_last_error"
 
 source "${ENV_PATH_ENVIRONMENT}"/jumpAlias
 
-# chroot manage
+# Function:
+# mount_chroot
+#
+# Description:
+# mount kernel process in the chroot directory then can run
+#
+# Parameters:
+# none
 mount_chroot()
 {
     sudo mount -t proc chproc "${BUILD_NFS_PATH}"/proc
@@ -35,6 +51,14 @@ mount_chroot()
     sudo mount -t devpts chpts "${BUILD_NFS_PATH}"/dev/pts
 }
 
+# Function:
+# umount_chroot
+#
+# Description:
+# umount kernel process in the chroot directory for exit
+#
+# Parameters:
+# none
 umount_chroot()
 {
     while grep -Eq "${BUILD_NFS_PATH}.*(dev|proc|sys)" /proc/mounts
@@ -46,127 +70,174 @@ umount_chroot()
     done
 }
 
+# Function:
+# enter_chroot
+#
+# Description:
+# enter the chroot mode.
+# -- mount the rootfs image on the directory
+# -- umount the process for next mount
+# -- mount the process on the directory
+# -- call chroot and change the root run
+#
+# Parameters:
+# none
 enter_chroot()
 {
-	cd "${BUILD_NFS_PATH}"/ || return
+    cd "${BUILD_NFS_PATH}"/ || return
 
-	mount_rootfs
-	
-	#exit the chroot
-	umount_chroot
+    mount_rootfs
+    
+    #exit the chroot
+    umount_chroot
 
-	#enter chroot
-	mount_chroot
+    #enter chroot
+    mount_chroot
 
-	if [ -f "${BUILD_NFS_PATH}"/bin/bash ]; then
-		LC_ALL=C LANGUAGE=C LANG=C sudo chroot "${BUILD_NFS_PATH}" chown root:root /usr/bin/sudo
-		LC_ALL=C LANGUAGE=C LANG=C sudo chroot "${BUILD_NFS_PATH}" chmod u+s /usr/bin/sudo
-		LC_ALL=C LANGUAGE=C LANG=C sudo chroot "${BUILD_NFS_PATH}"
-	else
-		LC_ALL=C LANGUAGE=C LANG=C sudo chroot "${BUILD_NFS_PATH}" /bin/sh
-	fi	
+    if [ -f "${BUILD_NFS_PATH}"/bin/bash ]; then
+        LC_ALL=C LANGUAGE=C LANG=C sudo chroot "${BUILD_NFS_PATH}" chown root:root /usr/bin/sudo
+        LC_ALL=C LANGUAGE=C LANG=C sudo chroot "${BUILD_NFS_PATH}" chmod u+s /usr/bin/sudo
+        LC_ALL=C LANGUAGE=C LANG=C sudo chroot "${BUILD_NFS_PATH}"
+    else
+        LC_ALL=C LANGUAGE=C LANG=C sudo chroot "${BUILD_NFS_PATH}" /bin/sh
+    fi    
 }
 alias SysEnterChroot='enter_chroot'
 
+# Function:
+# exit_chroot
+#
+# Description:
+# exit the chroot mode.
+# -- umount the process for next mount
+# -- umount the directory
+#
+# Parameters:
+# none
 exit_chroot()
 {
-	umount_chroot
+    umount_chroot
 
-	umount_rootfs
+    umount_rootfs
 }
 alias SysExitChroot='exit_chroot'
 
-# mount manage
+# Function:
+# create_roofts_img
+#
+# Description:
+# create the rootfs image by current rootfs
+#
+# Parameters:
+# none
 function create_roofts_img()
 {
-	rootfs_ver=debian.img
-	rootfs_size=1024
-	case "$ROOTFS_RUN" in
-		"buildroot")
-			rootfs_ver=buildroot.img
-		;;
-		"debian")
-			rootfs_ver=debian.img
-			rootfs_size=4096
-		;;
-		"ubuntu")
-			rootfs_ver=ubuntu.img
-			rootfs_size=4096
-		;;
-	esac
-	export ROOTFS_VER=$rootfs_ver
+    rootfs_ver=debian.img
+    rootfs_size=1024
+    case "$ROOTFS_RUN" in
+        "buildroot")
+            rootfs_ver=buildroot.img
+        ;;
+        "debian")
+            rootfs_ver=debian.img
+            rootfs_size=4096
+        ;;
+        "ubuntu")
+            rootfs_ver=ubuntu.img
+            rootfs_size=4096
+        ;;
+    esac
+    export ROOTFS_VER=$rootfs_ver
 
-	if [ ! -f "${SUPPORT_ENV_PACKAGE}/${ROOTFS_VER}" ]; then
-		cd "${SUPPORT_ENV_PACKAGE}"/ || return
-		dd if=/dev/zero of="${ROOTFS_VER}" bs=1M count="${rootfs_size}"
-		mkfs.ext4 "${ROOTFS_VER}"
-	fi
+    if [ ! -f "${SUPPORT_ENV_PACKAGE}/${ROOTFS_VER}" ]; then
+        cd "${SUPPORT_ENV_PACKAGE}"/ || return
+        dd if=/dev/zero of="${ROOTFS_VER}" bs=1M count="${rootfs_size}"
+        mkfs.ext4 "${ROOTFS_VER}"
+    fi
 }
 
+# Function:
+# mount_rootfs
+#
+# Description:
+# mount rootfs by current image on nfs directory.
+#
+# Parameters:
+# none
 function mount_rootfs()
 {
-	umount_chroot
+    umount_chroot
 
-	create_roofts_img
+    create_roofts_img
 
-	mstate=$(mount | grep "${BUILD_NFS_PATH}")
+    mstate=$(mount | grep "${BUILD_NFS_PATH}")
 
-	if [ -n "${mstate}" ]; then
-		sudo umount -l "${BUILD_NFS_PATH}"/
-	fi
+    if [ -n "${mstate}" ]; then
+        sudo umount -l "${BUILD_NFS_PATH}"/
+    fi
 
-	sudo mount -o loop "${SUPPORT_ENV_PACKAGE}/${ROOTFS_VER}" "${BUILD_NFS_PATH}"/
-
-	cdn
+    sudo mount -o loop "${SUPPORT_ENV_PACKAGE}/${ROOTFS_VER}" "${BUILD_NFS_PATH}"/
 }
 alias SysMountRootfs='mount_rootfs'
 
+# Function:
+# umount_rootfs
+#
+# Description:
+# umount rootfs already mount on nfs directory
+#
+# Parameters:
+# none
 function umount_rootfs()
 {
-	cda 
-	
-	sudo umount -l "${BUILD_NFS_PATH}"/
+    sudo umount -l "${BUILD_NFS_PATH}"/
 }
 alias SysUmountRootfs='umount_rootfs'
 
+# Function:
+# run_qemu
+#
+# Description:
+# execute kernel and rootfs by virtual machine qemu
+#
+# Parameters:
+# none
 function run_qemu()
 {
-	cd "${PLATFORM_INSTALL_SHELL}"/ || return
-	
-	chmod 777 qemu-nogui.sh && ./qemu-nogui.sh
+    cd "${PLATFORM_INSTALL_SHELL}"/ || return
+    
+    chmod 777 qemu-nogui.sh && ./qemu-nogui.sh
 }
 alias SysRunQemu='run_qemu'
 
 source "${ENV_PATH_ENVIRONMENT}"/buildAlias
 source "${ENV_PATH_ENVIRONMENT}"/configAlias
 
-############################################################
-#SysHelpCommand
-#function: phelo command
-#############################################################
-function SysHelpCommand
+# Function:
+# help_command
+#
+# Description:
+# show current spport all command.
+#
+# Parameters:
+# none
+function help_command
 {
-	echo "${blueText}SysPreThirdParts${defText}"
-	echo "    ${limityellowText}pull all thirdparts, install library."
-	echo "${blueText}SysSetPlatform${defText}"
-	echo "    ${limityellowText}Set Platform to ARM/AARCH64 Complier."
-	echo "${blueText}SysSetApplicationVer${defText}"
-	echo "    ${limityellowText}example:${cyanText}SysSetApplicationVer 1.0.0.1."
-	echo "    ${limityellowText}Set the verison of the firmware when build"
-	echo "${blueText}SysBuildApplication${defText}"
-	echo "    ${limityellowText}Build Application, Package Firmware."
-	echo "${blueText}SysCleanApplication${defText}"
-	echo "    ${limityellowText}Clean the app firmware for next."
-	echo "${blueText}SysBuildKernel${defText}"
-	echo "    ${limityellowText}Build the linux kernal, copy to tftp directory, if failed, execute SysCleanKernel first."
-	echo "${blueText}SysBuildUboot${defText}"
-	echo "    ${limityellowText}Build the uboot, copy to tftp directory, if failed, execute SysCleanUboot first."
-	echo "${blueText}SysBuildRootfs${defText}"
-	echo "    ${limityellowText}build the rootfs, copy to nfs directory, if failed, execut SysCleanRootfs first."
-	echo "${blueText}SysPackageFirmware${defText}"
-	echo "    ${limityellowText}Package the uboot, kernal, rootfs and application, can use tools download."
-	echo "${blueText}SysHelpCommand${defText}"
-	echo "    ${limityellowText}Show the help command.${defText}"
+    echo "${blueText}SysPreThirdParts${defText}:     ${limityellowText}pull all thirdparts, install library."
+    echo "${blueText}SysSetPlatform${defText}:       ${limityellowText}Set Platform to ARM/AARCH64 Complier."
+    echo "${blueText}SysSetApplicationVer${defText}: ${limityellowText}Set the verison of the firmware when build"
+    echo "    ${limityellowText}example:${cyanText}SysSetApplicationVer 1.0.0.1."
+    echo "${blueText}SysBuildApplication${defText}:  ${limityellowText}Build Application, Package Firmware."
+    echo "${blueText}SysBuildKernel${defText}:       ${limityellowText}Build the linux kernal, copy to tftp directory, if failed, execute SysCleanKernel first."
+    echo "${blueText}SysBuildUboot${defText}:        ${limityellowText}Build the uboot, copy to tftp directory, if failed, execute SysCleanUboot first."
+    echo "${blueText}SysBuildRootfs${defText}:       ${limityellowText}build the rootfs, copy to nfs directory, if failed, execut SysCleanRootfs first."
+    echo "${blueText}SysPackageFirmware${defText}:   ${limityellowText}Package the uboot, kernal, rootfs and application, can use tools download."
+    echo "${blueText}SysHelpCommand${defText}:       ${limityellowText}Show the help command."
+    echo "${blueText}SysMountRootfs${defText}:       ${limityellowText}mount current rootfs img on nfs directory"
+    echo "${blueText}SysUnMountRootfs${defText}:     ${limityellowText}unmount current nfs directory"
+    echo "${blueText}SysEnterChroot${defText}:       ${limityellowText}enter chroot mode use rootfs img"
+    echo "${blueText}SysExitChroot${defText}:        ${limityellowText}exit chroot mode for used"  
+    echo "${blueText}SysRunQemu${defText}:           ${limityellowText}execute kernel and rootfs by virtual machine qemu."
 }
-alias SysHelpCommand='SysHelpCommand'
+alias SysHelpCommand='help_command'
 echo "Update the Alias Command Success!"

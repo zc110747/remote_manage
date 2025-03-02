@@ -85,7 +85,7 @@ static bool system_init(int is_default, const char *path)
     log_manage::get_instance()->set_level(level);
 
     ret &= log_manage::get_instance()->init();
-    ret &= time_manage::get_instance()->init();
+    ret &= timer_manage::get_instance()->init();
     ret &= driver_manage::get_instance()->init();
     ret &= device_manage::get_instance()->init();
     ret &= cmd_process::get_instance()->init();

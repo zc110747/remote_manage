@@ -7,7 +7,8 @@
 //
 //  Purpose:
 //      ADC硬件接口: 
-//          GPIO1_4 - jp6-20
+//          GPIO1_2 - ADC2
+//          GPIO1_4 - ADC4
 //
 // Author:
 //     @听心跳的声音
@@ -434,6 +435,7 @@ static const struct iio_chan_spec_ext_info vf610_ext_info[] = {
 }
 
 static const struct iio_chan_spec vf610_adc_iio_channels[] = {
+    VF610_ADC_CHAN(2, IIO_VOLTAGE),
     VF610_ADC_CHAN(4, IIO_VOLTAGE),
     /* sentinel */
 };
@@ -458,7 +460,7 @@ static int vf610_adc_read_data(struct vf610_adc *info)
         break;
     }
 
-    dev_info(info->dev, "read result:%d!\n", result);
+    //dev_info(info->dev, "read result:%d!\n", result);
     return result;
 }
 
@@ -675,11 +677,12 @@ static int vf610_adc_reg_access(struct iio_dev *indio_dev,
     return 0;
 }
 
+// iio设备的信息
 static const struct iio_info vf610_adc_iio_info = {
-    .read_raw = &vf610_read_raw,
-    .write_raw = &vf610_write_raw,
-    .debugfs_reg_access = &vf610_adc_reg_access,
-    .attrs = &vf610_attribute_group,
+    .read_raw = &vf610_read_raw,                    //iio设备读取数据的函数
+    .write_raw = &vf610_write_raw,                  //iio设备写入数据的函数
+    .debugfs_reg_access = &vf610_adc_reg_access,    //iio设备调试读取寄存器
+    .attrs = &vf610_attribute_group,                //iio设备的属性
 };
 
 static const struct of_device_id vf610_adc_match[] = {
@@ -697,7 +700,7 @@ static int vf610_adc_probe(struct platform_device *pdev)
     int ret;
     u32 channels;
 
-    //1.申请iio设备
+    // 申请iio设备，设置私有数据
     indio_dev = devm_iio_device_alloc(&pdev->dev, sizeof(struct vf610_adc));
     if (!indio_dev) {
         dev_err(&pdev->dev, "Failed allocating iio device\n");
@@ -707,14 +710,14 @@ static int vf610_adc_probe(struct platform_device *pdev)
     info->dev = &pdev->dev;
     platform_set_drvdata(pdev, indio_dev);
 
-    //2.获取reg寄存器属性地址资源，可通过regmap访问
+    // 获取reg寄存器属性地址资源，可通过regmap访问
     info->regs = devm_platform_ioremap_resource(pdev, 0);
     if (IS_ERR(info->regs)) {
         dev_err(&pdev->dev, "Failed to get reg resource\n");
         return PTR_ERR(info->regs);
     }
 
-    //3.获取中断对象，并申请中端处理函数
+    // 获取中断对象，并申请中端处理函数
     irq = platform_get_irq(pdev, 0);
     if (irq < 0) 
         return irq;
@@ -726,7 +729,7 @@ static int vf610_adc_probe(struct platform_device *pdev)
         return ret;
     }
 
-    //4.获取clock-names为adc的时钟资源
+    // 获取clock名称为adc的时钟对象，后续管理模块时钟
     info->clk = devm_clk_get(&pdev->dev, "adc");
     if (IS_ERR(info->clk)) {
         dev_err(&pdev->dev, "failed getting clock, err = %ld\n",
@@ -734,7 +737,7 @@ static int vf610_adc_probe(struct platform_device *pdev)
         return PTR_ERR(info->clk);
     }
 
-    //5.获取电源管理相关信息，使能并获取基准电压
+    // 获取电源管理相关信息，使能并获取基准电压
     info->vref = devm_regulator_get(&pdev->dev, "vref");
     if (IS_ERR(info->vref)) {
         dev_err(&pdev->dev, "failed get vref regulator");
@@ -746,52 +749,56 @@ static int vf610_adc_probe(struct platform_device *pdev)
         return ret;
     }
     info->vref_uv = regulator_get_voltage(info->vref);
+
+    // 获取adc的最大采样频率
     device_property_read_u32_array(dev, "fsl,adck-max-frequency", info->max_adck_rate, 3);
+
+    // 获取adc的最小采样时间
     ret = device_property_read_u32(dev, "min-sample-time", &info->adc_feature.default_sample_time);
     if (ret) {
         info->adc_feature.default_sample_time = DEFAULT_SAMPLE_TIME;
     }
     init_completion(&info->completion);
+
+    // 获取adc的通道数
     ret  = of_property_read_u32(pdev->dev.of_node,
                     "num-channels", &channels);
     if (ret)
         channels = ARRAY_SIZE(vf610_adc_iio_channels);
 
-    //6.初始化iio设备信息
-    indio_dev->name = dev_name(&pdev->dev);
-    indio_dev->info = &vf610_adc_iio_info;
-    indio_dev->modes = INDIO_DIRECT_MODE;
-    indio_dev->channels = vf610_adc_iio_channels;
-    indio_dev->num_channels = (int)channels;
-
+    // 使能模块时钟，并初始化ADC模块
     ret = clk_prepare_enable(info->clk);
     if (ret) {
         dev_err(&pdev->dev,
             "Could not prepare or enable the clock.\n");
         goto error_adc_clk_enable;
     }
-
     vf610_adc_cfg_init(info);
     vf610_adc_hw_init(info);
 
-    ret = iio_triggered_buffer_setup(indio_dev, &iio_pollfunc_store_time,
+    // 初始化iio设备信息，用于后续使能缓存和设备注册
+    indio_dev->name = dev_name(&pdev->dev);
+    indio_dev->info = &vf610_adc_iio_info;
+    indio_dev->modes = INDIO_DIRECT_MODE;
+    indio_dev->channels = vf610_adc_iio_channels;
+    indio_dev->num_channels = (int)channels;
+
+    ret = devm_iio_triggered_buffer_setup(&pdev->dev, indio_dev, &iio_pollfunc_store_time,
                     NULL, &iio_triggered_buffer_setup_ops);
     if (ret < 0) {
         dev_err(&pdev->dev, "Couldn't initialise the buffer\n");
         goto error_iio_device_register;
     }
 
-    ret = iio_device_register(indio_dev);
+    ret = devm_iio_device_register(&pdev->dev, indio_dev);
     if (ret) {
         dev_err(&pdev->dev, "Couldn't register the device.\n");
-        goto error_adc_buffer_init;
+        goto error_iio_device_register;
     }
 
     dev_info(&pdev->dev, "kernel iio adc init success!\n");
     return 0;
 
-error_adc_buffer_init:
-    iio_triggered_buffer_cleanup(indio_dev);
 error_iio_device_register:
     clk_disable_unprepare(info->clk);
 error_adc_clk_enable:
@@ -805,14 +812,13 @@ static int vf610_adc_remove(struct platform_device *pdev)
     struct iio_dev *indio_dev = platform_get_drvdata(pdev);
     struct vf610_adc *info = iio_priv(indio_dev);
 
-    iio_device_unregister(indio_dev);
-    iio_triggered_buffer_cleanup(indio_dev);
     regulator_disable(info->vref);
     clk_disable_unprepare(info->clk);
 
     return 0;
 }
 
+// 用于低功耗挂起的函数
 static int vf610_adc_suspend(struct device *dev)
 {
     struct iio_dev *indio_dev = dev_get_drvdata(dev);
@@ -830,6 +836,7 @@ static int vf610_adc_suspend(struct device *dev)
     return 0;
 }
 
+// 用于低功耗恢复的函数
 static int vf610_adc_resume(struct device *dev)
 {
     struct iio_dev *indio_dev = dev_get_drvdata(dev);

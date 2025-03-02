@@ -318,12 +318,12 @@ void device_manage::run()
     int size;
 
     PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "device_manage start!");
-    time_manage::get_instance()->register_action(DEVICE_LOOP_EVENT, TIME_TICK(1000), TIME_ACTION_ALWAYS, [&](int id){
+    timer_manage::get_instance()->register_action(DEVICE_LOOP_EVENT, TIME_TICK(1000), TIME_ACTION_ALWAYS, [&](int id){
         Event event(id);
         send_message(reinterpret_cast<char *>(&event), sizeof(event));
     });
 
-    time_manage::get_instance()->register_action(DEVICE_PER_SECOND_EVENT, TIME_TICK(1000), TIME_ACTION_ALWAYS, [&](int id){
+    timer_manage::get_instance()->register_action(DEVICE_PER_SECOND_EVENT, TIME_TICK(1000), TIME_ACTION_ALWAYS, [&](int id){
         auto loopled_ptr = driver_manage::get_instance()->get_loopled_dev();
         loopled_ptr->loop_refresh_per_second();
     });

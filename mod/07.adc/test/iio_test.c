@@ -1,19 +1,33 @@
-/*
- * File      : hx711_test.c
- * test for key driver.
- * COPYRIGHT (C) 2023, zc
- *
- * Change Logs:
- * Date           Author       Notes
- * 2023-11-22     zc           the first version
- */
+////////////////////////////////////////////////////////////////////////////
+//  (c) copyright 2024-by Persional Inc.
+//  All Rights Reserved
+//
+//  Name:
+//      iio_test.c
+//
+//  Purpose:
+//      读取iio设备目录下的文件，对应文件
+//      /sys/bus/iio/devices/iio:device0/in_voltage%d_raw
+//      GPIO_1_2 - CSI_RESET
+//      GPIO_1_4 - CSI_PWDN 
+//
+// Author:
+//     @听心跳的声音
+//
+//  Assumptions:
+//
+//  Revision History:
+//      12/19/2022  Create New Version.
+//      14/02/2025   Format update.     
+/////////////////////////////////////////////////////////////////////////////
 #include <fcntl.h>
 #include <linux/input.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
-#define h711_path "/sys/bus/iio/devices/iio:device0/in_voltage4_raw"
+#define DEFAILT_RAW_NUM     2
+#define IIO_CHANNEL_FILE    "/sys/bus/iio/devices/iio:device0/in_voltage%d_raw"
 
 int file_data_read(char *filename, char *str, size_t size)
 {
@@ -41,13 +55,21 @@ int main(int argc, const char *argv[])
 {
     int ret;
     int value;
-    char str[50];
+    char str[50], filepath[50];
+    int val = DEFAILT_RAW_NUM;
+
+    if (argc > 1) {   
+        val = atoi(argv[1]);
+    }
+
+    sprintf(filepath, IIO_CHANNEL_FILE, val);
 
     while (1) {
-        ret = file_data_read(h711_path, str, sizeof(str));
+
+        ret = file_data_read(filepath, str, sizeof(str));
         if (ret == 0) {
             value = atoi(str);
-            printf("read_gx711:%d, voltage:%3f\n", value, (float)value/4096*3.3);
+            printf("read_adc vol:%d, voltage:%3f\n", value, (float)value/4096*3.3);
         } else {
             printf("read failed, error flag:%d", ret);
         }

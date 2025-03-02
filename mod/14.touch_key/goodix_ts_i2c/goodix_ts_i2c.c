@@ -71,7 +71,6 @@ struct goodix_chip_data
 {
     /* 硬件相关 */
     struct i2c_client *client;              //i2c adapter对应终端
-    struct regmap *map;                     //regmap映射管理结构
     int reset_pin;                          //复位引脚线号
     int irq_pin;                            //中断引脚线号
     u8 irqflags;                            //irq标志触发条件

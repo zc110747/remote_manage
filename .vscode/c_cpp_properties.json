@@ -20,10 +20,10 @@
                 "CONFIG_CPU_FREQ=y"
             ],
             "windowsSdkVersion": "8.1",
-            "compilerPath": "D:/Software/Visual Studio 2015/VC/bin/cl.exe",
+            "compilerPath": "/bin/gcc",
             "cStandard": "c11",
             "cppStandard": "c++17",
-            "intelliSenseMode": "msvc-x64"
+            "intelliSenseMode": "gcc-arm"
         }
     ],
     "version": 4

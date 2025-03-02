@@ -64,30 +64,30 @@
 	};
 
 	//访问路径: /sys/class/leds/led0, /sys/class/leds/led1, /sys/class/leds/led2
-	leds-gpio {
-		compatible = "leds-gpio";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_leds_gpio>;
-		status = "okay";
+	// leds-gpio {
+	// 	compatible = "leds-gpio";
+	// 	pinctrl-names = "default";
+	// 	pinctrl-0 = <&pinctrl_leds_gpio>;
+	// 	status = "okay";
 
-		led0 {
-			label = "led0";
-			gpios = <&gpio2 16 GPIO_ACTIVE_LOW>;
-			default-state = "off";
-		};
+	// 	led0 {
+	// 		label = "led0";
+	// 		gpios = <&gpio2 16 GPIO_ACTIVE_LOW>;
+	// 		default-state = "off";
+	// 	};
 
-		led1 {
-			label = "led1";
-			gpios = <&gpio2 20 GPIO_ACTIVE_LOW>;
-			default-state = "off";
-		};
+	// 	led1 {
+	// 		label = "led1";
+	// 		gpios = <&gpio2 20 GPIO_ACTIVE_LOW>;
+	// 		default-state = "off";
+	// 	};
 
-		led2 {
-			label = "led2";
-			gpios = <&gpio4 25 GPIO_ACTIVE_LOW>;
-			default-state = "off";
-		};
-	};
+	// 	led2 {
+	// 		label = "led2";
+	// 		gpios = <&gpio4 25 GPIO_ACTIVE_LOW>;
+	// 		default-state = "off";
+	// 	};
+	// };
 
 	usr_led {
 		compatible = "rmk,usr-led";
@@ -147,19 +147,110 @@
 		status = "okay";
 	};
 
-	usr_nvmem {
-		compatible = "rmk,usr-nvmem";
-		status = "okay";		
-	};
-	
-	usr_fan {
-		compatible = "rmk,pwm-fan";
-		#cooling-cells = <2>;
-		pwms = <&pwm7 0 10000 0>;
-		cooling-levels = <0 102 170 230>;
+	usr_nref {
+		compatible = "rmk,usr_nref";
+		nvmem-cells = <&nvmem_user_cell>,
+					<&ocotp_cfg0>,
+					<&ocotp_cfg1>;
+		nvmem-cell-names = "nvmem_user_cell", "uid-high", "uid-low";
 		status = "okay";
 	};
+
+	usr_nvmem {
+		compatible = "rmk,usr_nvmem";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		status = "okay";	
+
+		nvmem_user_cell: nvmem_user_cell@10 {
+			reg = <0x10 4>;
+		};
+	};
 	
+	// usr_fan {
+	// 	compatible = "rmk,pwm-fan";
+	// 	#cooling-cells = <2>;
+	// 	pwms = <&pwm7 0 10000 0>;
+	// 	cooling-levels = <0 102 170 230>;
+	// 	status = "okay";
+	// };
+	
+	usr_rngc {
+		compatible = "rmk,usr-rngc";
+		rmk,quality = <1>;
+		status = "okay";
+	};
+
+	// usr_pwm_consumer {
+	// 	compatible = "rmk,pwm_consumer";
+	// 	pwms = <&pwm7 0 10000 0>;       //PWM引用，内部索引，周期， pwm极性
+	// 	default-duty = <10>;             //0 - 100，占空比
+	// 	status = "okay";
+	// };
+	
+	// thermal_sensor {
+	// 	compatible = "rmk,thermal_sensor";
+	// 	io-channels = <&adc1 0>;
+
+	// 	polling-delay-passive = <100>;
+	// 	polling-delay = <8000>;
+
+	// 	active,temp = <30000>;
+	// 	passive,temp = <50000>;
+	// 	hot,temp = <70000>;
+	// 	critical,temp = <95000>;
+	// };
+
+	// thermal cooling device
+	thermal_fan: pwm-fan {
+		compatible = "rmk,thermal_fan";
+		pwms = <&pwm7 0 10000 0>;
+		#cooling-cells = <2>;
+		cooling-levels = <0 102 170 230 255>;
+		default-fan-level = <2>;
+		status = "okay";
+	};
+
+	// thermal zone device
+	thermal_sensor {
+		compatible = "rmk,thermal_sensor";
+		io-channels = <&adc1 0>;
+		polling-delay-passive = <100>;
+		polling-delay = <8000>;
+		status = "okay";
+
+		cooling-map {
+			active_trip {
+				active,temp = <30000>;
+				cooling-device = <&thermal_fan 1 1>;
+			};
+
+			passive_trip {
+				passive,temp = <40000>;
+				cooling-device = <&thermal_fan 2 2>;
+			};
+
+			hot_trip {
+				hot,temp = <50000>;
+				cooling-device = <&thermal_fan 3 3>;
+			};
+
+			crit_trip {
+				crit,temp = <60000>;
+				cooling-device = <&thermal_fan 4 4>;
+			};
+		};
+	};
+};
+
+&ocotp {
+	ocotp_cfg0: uid-high@4 {
+		reg = <0x4 4>;					
+	};
+
+	ocotp_cfg1: uid-low@8 {
+		reg = <0x8 4>;					
+	};
 };
 
 &cpu0 {
@@ -330,6 +421,7 @@
 			fsl,pins = <
 				MX6UL_PAD_UART1_CTS_B__GPIO1_IO18	0x80000000
 			>;
+			bias-pull-up;
 		};
 
 		pinctrl_loopled: gpio-loopleds {
@@ -569,6 +661,8 @@
 };
 
 &adc1 {
+	#io-channel-cells = <1>;
+	io-channel-rangs;
 	pinctrl-name = "default";
 	pinctrl-0 = <&pinctrl_adc1>;
 	num-channels = <1>;
@@ -641,5 +735,11 @@
 };
 
 &pxp {
+	status = "okay";
+};
+
+&qspi {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_qspi>;
 	status = "okay";
 };

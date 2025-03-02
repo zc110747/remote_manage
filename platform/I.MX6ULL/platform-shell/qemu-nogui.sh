@@ -1,5 +1,5 @@
-kernel_file="${SUPPORT_ENV_PACKAGE}/zImage"
-dtb_file="${SUPPORT_ENV_PACKAGE}/imx6ull-qemu.dtb"
+kernel_file="${BUILD_TFTP_PATH}/zImage"
+dtb_file="${BUILD_TFTP_PATH}/imx6ull-qemu.dtb"
 rootfs_file="${SUPPORT_ENV_PACKAGE}/buildroot.img"
 
 #nogui

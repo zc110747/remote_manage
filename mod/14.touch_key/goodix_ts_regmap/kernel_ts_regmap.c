@@ -340,8 +340,9 @@ static int goodix_inputdev_create(struct goodix_chip_data *chip)
 }
 
 const struct regmap_config goodix_regmap_config = {
-    .reg_bits = 16,                 //寄存器16位         
+    .reg_bits = 16,                 //寄存器16位  
     .val_bits = 8,                  //数据8位
+    .reg_stride = 1,                //寄存器步进的个数0x8001，0x8002..
     .max_register = 0xFFFF,         //最大寄存器地址0xFFFF
     .cache_type = REGCACHE_NONE,    //不使用cache
     .volatile_reg = false,

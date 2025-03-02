@@ -122,7 +122,7 @@ ssize_t key_read(struct file *filp, char __user *buf, size_t count, loff_t *f_po
     }
 
     ret = copy_to_user(buf, &chip->status, sizeof(chip->status));
-    if (ret < 0) {
+    if (ret) {
         dev_err(&pdev->dev, "read failed!\n");
         return -EFAULT;
     }

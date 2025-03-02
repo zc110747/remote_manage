@@ -1,0 +1,47 @@
+/*
+ * U-Boot uImage source file containing a single kernel and FDT blob
+ */
+
+/dts-v1/;
+
+/ {
+    description = "image with Linux kernel and FDT blob";
+    #address-cells = <1>;
+
+    images {
+        kernel {
+            description = "Linux kernel";
+			data = /incbin/("./zImage");
+            type = "kernel";
+            arch = "arm";
+            os = "linux";
+            compression = "none";
+            load = <0x80800000>;
+            entry = <0x80800000>;
+            hash-1 {
+                algo = "crc32";
+            };
+        };
+
+		fdt-1 {
+			description = "Flattened Device Tree blob 1";
+			data = /incbin/("./imx6ull-14x14-emmc-4.3-800x480-c.dtb");
+			type = "flat_dt";
+			arch = "arm";
+			load = <0x83000000>;
+			compression = "none";
+			hash-1 {
+				algo = "crc32";
+			};
+		};
+    };
+
+    configurations {
+		default = "conf-1";
+		conf-1 {
+			description = "Boot Linux kernel with FDT blob";
+			kernel = "kernel";
+			fdt = "fdt-1";
+		};
+	};
+};

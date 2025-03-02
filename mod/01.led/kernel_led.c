@@ -144,7 +144,7 @@ ssize_t led_read(struct file *filp, char __user *buf, size_t count, loff_t *f_po
     pdev = chip->pdev;
 
     ret = copy_to_user(buf, &chip->status, 1);
-    if (ret < 0) {
+    if (ret) {
         dev_err(&pdev->dev, "read failed!\n");
         return -EFAULT;
     }
@@ -162,13 +162,13 @@ ssize_t led_write(struct file *filp, const char __user *buf, size_t size,  loff_
     pdev = chip->pdev;
 
     ret = copy_from_user(&data, buf, 1);
-    if (ret < 0) {
+    if (ret) {
         dev_err(&pdev->dev, "write failed!\n");
         return -EFAULT;
     }
 
     led_hardware_set(chip, data);
-    return 0;
+    return 1;
 }
 
 long led_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
@@ -205,11 +205,26 @@ static struct file_operations led_fops = {
 
 static ssize_t led_show(struct device *dev, struct device_attribute *attr, char *buf)
 {
-    int size;
+    int size, index;
     static struct led_data *chip;
-    
+    u32 regval[5] = {0};
+    void *__iomem io_reg;
+
+    for (index=0; index<5; index++) {
+        io_reg = of_iomap(dev->of_node, index);
+        if (io_reg != NULL) {
+            regval[index] = readl(io_reg);
+        }
+    }
     chip = container_of(attr, struct led_data, led_attr);
-    size = sprintf(buf, "status=%d\n", gpiod_get_value(chip->led_desc));
+    size = snprintf(buf, PAGE_SIZE, 
+                    "LED_STATUS = %d\n"
+                    "CCM_CCGR1 = 0x%08x\n"
+                    "SW_MUX_GPIO1_IO03 = 0x%08x\n"
+                    "SW_PAD_GPIO1_IO03 = 0x%08x\n"
+                    "GPIO_DR = 0x%08x\n"
+                    "GPIO_GDIR = 0x%08x\n", 
+                    gpiod_get_value(chip->led_desc), regval[0], regval[1], regval[2], regval[3], regval[4]);
 
     return size;
 }
@@ -297,11 +312,11 @@ static int led_device_create(struct led_data *chip)
         goto exit_device_create;
     }
 
-    //4.创建设备管理文件/sys/devices/platform/20c406c.usr_led/pinctrl-led
-    //cat pinctrl-led (status=1)
-    //echo 0 > pinctrl-led #选择配置0
-    //echo 1 > pinctrl-led #选择配置1
-    chip->led_attr.attr.name = "pinctrl-led";
+    //4.创建设备管理文件/sys/devices/platform/20c406c.usr_led/info
+    //cat info (status=1)
+    //echo 0 > info #选择配置0
+    //echo 1 > info #选择配置1
+    chip->led_attr.attr.name = "info";
     chip->led_attr.attr.mode = 0666;
     chip->led_attr.show = led_show;
     chip->led_attr.store = led_store;
@@ -312,7 +327,7 @@ static int led_device_create(struct led_data *chip)
     }
 
     //5.创建类管理文件，创建/sys/class/leds/led0目录，其下brigntness文件可以控制gpio状态
-    //echo 0 > brightness #关闭LED
+    //echo 0 > brightness #关闭LEDcd
     //echo 1 > brightness #开启LED
 	chip->led.name = "led0";
 	chip->led.brightness_set = gpio_led_set;

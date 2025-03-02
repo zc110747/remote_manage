@@ -151,10 +151,9 @@ static ssize_t icm20608_read(struct file *filp, char __user *buf, size_t cnt, lo
     data[5] = chip->data.accel_z_adc;
     data[6] = chip->data.temp_adc;
     ret = copy_to_user(buf, data, sizeof(data));
-    if (ret < 0)
-    {
-        dev_err(&spi->dev, "copy_to_user failed:%d\n", ret);
-        return ret;
+    if (ret) {
+        dev_err(&spi->dev, "copy_to_user failed, num:%d\n", ret);
+        return -EFAULT;
     }
 
     return cnt;
@@ -175,6 +174,7 @@ static const struct file_operations spi_icm_ops = {
 const struct regmap_config icm20608_regmap_config = {
     .reg_bits = 8,
     .val_bits = 8,
+    .reg_stride = 1,
     .read_flag_mask = BIT(7),
     .max_register = 255,
 };

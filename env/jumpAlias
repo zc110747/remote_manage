@@ -6,31 +6,64 @@ echo "Jump directory command alias update."
 #-------------------------------------------------------------------------------
 # This section defines the alias of the command.
 # The command abbreviation for use.
+# Aliases to help with navigation and file handling.
 #-------------------------------------------------------------------------------
 alias ll="ls -alF"
 alias pe="printenv"
 alias se="saveenv"
 
+# Alias to jump to the program
 alias cda="cd ${ENV_PATH_ROOT}"
 alias cdae="cd ${ENV_PATH_ROOT}/embed"
-alias cdab="cd ${ENV_PATH_ROOT}/buildout"
 alias cdam="cd ${ENV_PATH_ROOT}/mod"
 alias cdap="cd ${ENV_PATH_ROOT}/platform"
-alias cdat="cd ${ENV_PATH_ROOT}/thirdparts"
-alias cds="cd ${PROGRAM_SDK_PATH}"
-alias cdt="cd ${PROGRAM_SDK_PATH}/tftp"
-alias cdn="cd ${BUILD_NFS_PATH}"
-alias cdp="cd ${PROGRAM_SDK_PLATFORM_PATH}"
-alias cdpp="cd ${PROGRAM_SDK_PLATFORM_PATH}/package"
-alias cdd="cd ${PROGRAM_DOWNLOAD}"
-alias cdpb="cd ${PROGRAM_BUILD}"
-alias cdt="cd ${BUILD_TFTP_PATH}"
-alias cdu="cd ${SUPPORT_ENV_BOOT_DIR}"
-alias cdk="cd ${SUPPORT_ENV_KERNEL_DIR}"
 
-#rootfs
+# Alias to jump to the sdk
+alias cds="cd ${PROGRAM_SDK_PATH}"
+alias cdst="cd ${PROGRAM_SDK_PATH}/tftp"
+alias cdsn="cd ${BUILD_NFS_PATH}"
+alias cdsd="cd ${PROGRAM_DOWNLOAD}"
+
+# Alias to jump to the platform
+alias cdp="cd ${PROGRAM_SDK_PLATFORM_PATH}"
+alias cdpu="cd ${SUPPORT_ENV_BOOT_DIR}"
+alias cdpk="cd ${SUPPORT_ENV_KERNEL_DIR}"
+alias cdpp="cd ${PROGRAM_SDK_PLATFORM_PATH}/package"
+alias cdpi="cd ${SUPPORT_ENV_INSTALL}"
+alias cdpimg="cd ${PROGRAM_FS_IMG}"
+
+# Alias to jump to the rootfs
 alias cdrb="cd ${SUPPORT_FS_BUILDROOT_DIR}"
 alias cdrd="cd ${SUPPORT_FS_DEBIAN_DIR}"
 alias cdru="cd ${SUPPORT_FS_UBUNTU_DIR}"
-alias cdrimg="cd ${PROGRAM_FS_IMG}"
-alias cdri="cd ${SUPPORT_ENV_INSTALL}"
+
+# We use a function shows all cd command for the program.
+# list all feature support.
+function cd_help()
+{
+    # 用于跳转到工程目录下的指令
+	echo "${blueText}cda${defText}: 跳转到工程目录"
+    echo "${blueText}cdae${defText}: 跳转到工程下embed目录"
+    echo "${blueText}cdam${defText}: 跳转到工程下mod目录"
+    echo "${blueText}cdap${defText}: 跳转到工程下platform目录"
+
+    # 跳转sdk的指令
+    echo "${blueText}cds${defText}: 跳转到sdk目录"
+    echo "${blueText}cdst${defText}: 跳转到sdk下tftp目录"
+    echo "${blueText}cdsn${defText}: 跳转到sdk下nfs目录"
+    echo "${blueText}cdsd${defText}: 跳转到sdk下download目录"
+
+    # 跳转到sdk中当前平台目录
+    echo "${blueText}cdp${defText}: 跳转到sdk下工作平台目录(arm/aarch6/...)"
+    echo "${blueText}cdpu${defText}: 跳转到工作平台下uboot目录"
+    echo "${blueText}cdpk${defText}: 跳转到工作平台下kernel目录"
+    echo "${blueText}cdpp${defText}: 跳转到工作平台下package目录"
+    echo "${blueText}cdpi${defText}: 跳转到工作平台下install目录"
+    echo "${blueText}cdpimg${defText}: 跳转到工作平台下img目录"
+
+    # 跳转到当前平台下的支持文件系统目录
+    echo "${blueText}cdrb${defText}: 跳转到文件系统下buildroot目录"
+    echo "${blueText}cdrd${defText}: 跳转到文件系统下debian目录"
+    echo "${blueText}cdru${defText}: 跳转到文件系统下ubuntu目录"
+}
+alias cdh="cd_help"

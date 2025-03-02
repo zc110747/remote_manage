@@ -22,7 +22,7 @@ _Pragma("once")
 
 //common unit for all application
 #include "tty.hpp"
-#include "time_manage.hpp"
+#include "timer_manage.hpp"
 #include "fifo/fifo_manage.hpp"
 #include "jsonconfig/json_config.hpp"
 #include "logger/logger_manage.hpp"

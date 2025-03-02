@@ -190,7 +190,7 @@ static ssize_t ap3216_read(struct file *filp, char __user *buf, size_t cnt, loff
     data[1] = chip->data.als;
     data[2] = chip->data.ps;
     err = copy_to_user(buf, data, sizeof(data));
-    if (err < 0) {
+    if (err) {
         dev_err(&chip->client->dev, "kernel copy failed, %s\n", __func__);
         return -EFAULT;
     }

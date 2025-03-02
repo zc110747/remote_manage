@@ -210,7 +210,7 @@ static int icm20608_open(struct inode *inode, struct file *filp)
 static ssize_t icm20608_read(struct file *filp, char __user *buf, size_t cnt, loff_t *off)
 {
     signed int data[7];
-    int err;
+    int ret;
     unsigned char readbuf[14];
     struct spi_icm_data *chip = (struct spi_icm_data *)filp->private_data;
     struct spi_device *spi = (struct spi_device *)chip->private_data;
@@ -233,11 +233,12 @@ static ssize_t icm20608_read(struct file *filp, char __user *buf, size_t cnt, lo
     data[4] = chip->data.accel_y_adc;
     data[5] = chip->data.accel_z_adc;
     data[6] = chip->data.temp_adc;
-    err = copy_to_user(buf, data, sizeof(data));
-
-    if (err != 0) {
-        return err;
+    ret = copy_to_user(buf, data, sizeof(data));
+    if (ret) {
+        dev_err(&spi->dev, "copy_to_user failed, num:%d\n", ret);
+        return -EFAULT;
     }
+
     return cnt;
 }
 

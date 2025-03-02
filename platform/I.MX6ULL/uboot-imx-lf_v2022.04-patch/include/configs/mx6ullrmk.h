@@ -64,10 +64,11 @@
 	"ipaddr=192.168.2.99\0" \
 	"netmask=255.255.255.0\0" \
 	"gateway=192.168.2.1\0" \
+	"boot_mod=net\0" \
 	"netboot_cmd=tftp 80800000 zImage; tftp 83000000 ${fdt_file}; bootz 80800000 - 83000000;\0" \
 	"mmcboot_cmd=mmc dev ${mmcdev}; run loadimage; run mmcboot\0" \
 	"srcboot_cmd=tftp 80800000 boot.scr; source\0" \
-	"bootcmd=run mmcboot_cmd\0"\
+	"bootcmd=run srcboot_cmd\0"\
 
 #define CONFIG_MFG_ENV_SETTINGS \
 	CONFIG_MFG_ENV_SETTINGS_DEFAULT \
@@ -209,7 +210,7 @@
 				"fi; " \
 			"fi;\0" \
 		USER_ENV_SETTINGS \
-
+ 
 #endif
 
 /* Miscellaneous configurable options */

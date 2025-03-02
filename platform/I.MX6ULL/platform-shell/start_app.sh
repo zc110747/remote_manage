@@ -27,8 +27,8 @@ sleep 2
 #run server.js
 cd /home/sys/server/
 if [ ! -d /home/sys/server/node_module ]; then
-    if [ -f node_modules.tar.bz2 ]; then
-        tar -xvf node_modules.tar.bz2
+    if [ -f node_modules.tar ]; then
+        tar -xvf node_modules.tar
     fi
 fi
 #/usr/bin/node/bin/node main.js &

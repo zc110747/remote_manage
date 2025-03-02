@@ -6,9 +6,6 @@ DST_DIR=${SUPPORT_ENV_BOOT_DIR}
 
 echo "start copy u-boot patch..."
 
-#boot script
-cp -fv ${SRC_DIR}/boot.cmd ${DST_DIR}/
-
 #configs
 cp -fv ${SRC_DIR}/configs/* ${DST_DIR}/configs/
 

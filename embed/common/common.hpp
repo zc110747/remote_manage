@@ -30,6 +30,7 @@ _Pragma("once")
 #include <sys/time.h>
 #include <signal.h>
 #include <stdarg.h>
+#include <pthread.h>
 
 //c++ interface
 #include <new>

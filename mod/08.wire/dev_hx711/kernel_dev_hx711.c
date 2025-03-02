@@ -150,7 +150,7 @@ ssize_t hx711_read(struct file *filp, char __user *buf, size_t count, loff_t *f_
     chip->adc_value = read_hx711_adc(chip);
 
     ret = copy_to_user(buf, (char *)&chip->adc_value, 4);
-    if (ret < 0) {
+    if (ret) {
         dev_err(&pdev->dev, "copy to user failed!\n");
         return -EFAULT;
     }

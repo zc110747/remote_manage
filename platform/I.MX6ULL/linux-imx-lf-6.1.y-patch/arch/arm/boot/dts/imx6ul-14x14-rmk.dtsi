@@ -84,7 +84,6 @@
 		audio-cpu = <&sai2>;
 		audio-codec = <&codec>;
 		audio-asrc = <&asrc>;
-		hp-det-gpio = <&gpio5 4 0>;
 		audio-routing =
 			"Headphone Jack", "HP_L",
 			"Headphone Jack", "HP_R",
@@ -161,15 +160,17 @@
 		compatible = "ovti,ov5640";
 		reg = <0x3c>;
 		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_csi1 &pinctrl_camera_clock>;
+		// pinctrl-0 = <&pinctrl_csi1 
+		// 			&pinctrl_camera_pwrt>;
 		clocks = <&clks IMX6UL_CLK_CSI>;
 		clock-names = "csi_mclk";
-		// pwn-gpios = <&gpio_spi 6 1>;
-		// rst-gpios = <&gpio_spi 5 0>;
+		pwn-gpios = <&gpio1 4 1>;
+		rst-gpios = <&gpio1 2 0>;
 		csi_id = <0>;
 		mclk = <24000000>;
 		mclk_source = <0>;
 		status = "disabled";
+
 		port {
 			ov5640_ep: endpoint {
 				remote-endpoint = <&csi1_ep>;
@@ -445,14 +446,16 @@
         >;
     };
 	
-	pinctrl_camera_clock: cameraclockgrp {
+	pinctrl_camera_pwrt: camera_pwrtgrp {
 		fsl,pins = <
-			MX6UL_PAD_CSI_MCLK__CSI_MCLK		0x1b088
+			MX6UL_PAD_GPIO1_IO02__GPIO1_IO02	0x10b0
+			MX6UL_PAD_GPIO1_IO04__GPIO1_IO04	0x10b0
 		>;
 	};
 
 	pinctrl_csi1: csi1grp {
 		fsl,pins = <
+			MX6UL_PAD_CSI_MCLK__CSI_MCLK		0x1b088
 			MX6UL_PAD_CSI_PIXCLK__CSI_PIXCLK	0x1b088
 			MX6UL_PAD_CSI_VSYNC__CSI_VSYNC		0x1b088
 			MX6UL_PAD_CSI_HSYNC__CSI_HSYNC		0x1b088

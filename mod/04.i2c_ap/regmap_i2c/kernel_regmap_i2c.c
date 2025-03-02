@@ -170,7 +170,7 @@ static ssize_t ap3216_read(struct file *filp, char __user *buf, size_t cnt, loff
     data[1] = chip->data.als;
     data[2] = chip->data.ps;
     err = copy_to_user(buf, data, sizeof(data));
-    if (err < 0) {
+    if (err) {
         dev_err(&chip->client->dev, "kernel copy failed, %s\n", __func__);
         return -EFAULT;
     }
@@ -268,6 +268,7 @@ exit:
 const struct regmap_config ap3216_regmap_config = {
     .reg_bits = 8,
     .val_bits = 8,
+    .reg_stride = 1,
     .max_register = 255,
 };
 
