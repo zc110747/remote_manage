@@ -84,7 +84,7 @@ bool cmd_process::parse_data()
     strDst.resize(strVal.size());
     std::transform(strVal.begin(), strVal.end(), strDst.begin(), ::tolower);
 
-    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "rx command:%s", strDst.c_str());
+    LOG_INFO(xGetCurrentTimes(), "rx command:%s", strDst.c_str());
     if (CmdMapM.count(strDst) == 0)
     {
         return false;
@@ -109,7 +109,7 @@ bool cmd_process::process_data()
             {
                 for (auto &[x, y] : CmdHelpMapM)
                 {
-                    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), y.c_str());
+                    LOG_INFO(xGetCurrentTimes(), "%s", y.c_str());
                     std::this_thread::sleep_for(std::chrono::microseconds(100));
                 }
             }
@@ -130,18 +130,15 @@ void cmd_process::run()
             rx_buffer_[len] = '\0';
             rx_size_ = len;
 
-            if (parse_data())
-            {
+            if (parse_data()) {
                 process_data();
-            }
-            else
-            {
-                PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "cmd_process parse fail, buffer:%s!", rx_buffer_);
+            } else {
+                LOG_ERROR(xGetCurrentTimes(), "cmd_process parse fail, buffer:%s!", rx_buffer_);
             }
         } else if (len == 0) {
-            PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "%s read empty fifo data:%d\n", __func__, len);
+            LOG_ERROR(xGetCurrentTimes(), "%s read empty fifo data:%d\n", __func__, len);
         } else {
-            PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "%s read failed:%d\n", __func__, len);
+            LOG_ERROR(xGetCurrentTimes(), "%s read failed:%d\n", __func__, len);
             break;
         }
     }

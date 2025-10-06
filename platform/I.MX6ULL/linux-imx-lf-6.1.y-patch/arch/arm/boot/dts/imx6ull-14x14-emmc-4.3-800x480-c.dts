@@ -144,28 +144,28 @@
 		thermal_sensor: adc-temp {
 			compatible = "rmk,thermal_sensor";
 			io-channels = <&adc1 0>;
-			polling-delay-passive = <100>;
+			polling-delay-passive = <1000>;
 			polling-delay = <8000>;
 			status = "okay";
 
 			cooling-map {
 				active_trip {
-					trip,temp = <30000>;
+					trip,temp = <40000>;
 					cooling-device = <&thermal_fan 1 1>;
 				};
 
 				passive_trip {
-					trip,temp = <40000>;
+					trip,temp = <60000>;
 					cooling-device = <&thermal_fan 2 2>;
 				};
 
 				hot_trip {
-					trip,temp = <50000>;
+					trip,temp = <70000>;
 					cooling-device = <&thermal_fan 3 3>;
 				};
 
 				crit_trip {
-					trip,temp = <60000>;
+					trip,temp = <95000>;
 					cooling-device = <&thermal_fan 4 4>;
 				};
 			};
@@ -225,10 +225,11 @@
 		compatible = "rmk,usr_nvmem";
 		#address-cells = <1>;
 		#size-cells = <1>;
+		mem,size = <1024>;
 		status = "okay";
 
-		nvmem_user_cell: nvmem_user_cell@00 {
-			reg = <0x00 4>;
+		nvmem_user_cell: nvmem_user_cell@10 {
+			reg = <0x10 64>;
 		};
 	};
 
@@ -242,6 +243,24 @@
 			regulator-name = "VREF_3V";
 			regulator-min-microvolt = <3300000>;
 			regulator-max-microvolt = <3300000>;
+		};
+
+		regulator_vref_3v3: regulator@2 {
+			compatible = "regulator-fixed";
+			regulator-name = "VREF_3V3";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			regulator-boot-on;
+			regulator-always-on;
+		};
+
+		regulator_vref_1v8: regulator@3 {
+			compatible = "regulator-fixed";
+			regulator-name = "VREF_1V8";
+			regulator-min-microvolt = <1800000>;
+			regulator-max-microvolt = <1800000>;
+			regulator-boot-on;
+			regulator-always-on;
 		};
 	};
 };

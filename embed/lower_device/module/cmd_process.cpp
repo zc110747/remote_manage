@@ -43,7 +43,7 @@ bool cmd_process::parse_data(char *ptr, int size)
 {
     if (ptr[0] != '!')
     {
-        PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "error command:%s", ptr);
+        LOG_ERROR(xGetCurrentTimes(), "error command: %s", ptr);
         return false;
     }
 
@@ -61,7 +61,7 @@ bool cmd_process::parse_data(char *ptr, int size)
     strDst.resize(strVal.size());
     std::transform(strVal.begin(), strVal.end(), strDst.begin(), ::tolower);
 
-    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "rx command:%s", ptr);
+    LOG_INFO(xGetCurrentTimes(), "rx command:%s", ptr);
     if (CmdMapM.count(strDst) == 0)
     {
         return false;
@@ -81,15 +81,15 @@ bool cmd_process::process_data()
             {
                 auto pSysConfig = system_config::get_instance();
                 auto pVersion = pSysConfig->get_version().c_str();
-                PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "FW_Version:%d, %d, %d, %d", pVersion[0], pVersion[1], pVersion[2], pVersion[3]);
-                PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "Logger Level:%d ", (int)log_manage::get_instance()->get_level());
+                LOG_FATAL(xGetCurrentTimes(), "FW_Version:%d, %d, %d, %d", pVersion[0], pVersion[1], pVersion[2], pVersion[3]);
+                LOG_FATAL(xGetCurrentTimes(), "Logger Level:%d ", (int)log_manage::get_instance()->get_level());
             }
             break;
         case cmdGetHelp:
             {
                 for (auto &[x, y] : CmdHelpMapM)
                 {
-                    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), y.c_str());
+                    LOG_INFO(xGetCurrentTimes(), y.c_str());
                     std::this_thread::sleep_for(std::chrono::microseconds(100));
                 }
             }
@@ -101,7 +101,7 @@ bool cmd_process::process_data()
 
     if (!ret)
     {
-        PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "Invalid Formate:%d, data:%s", cmd_format_, cmd_data_pointer_);
+        LOG_ERROR(xGetCurrentTimes(), "Invalid Formate:%d, data:%s", cmd_format_, cmd_data_pointer_);
     }
     return ret;
 }

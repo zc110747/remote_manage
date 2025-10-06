@@ -91,11 +91,6 @@ compile_u_boot()
 
     echo "====== start u-boot build, Config file:$config_file ======"
 
-    #create boot.scr
-    mkimage -C none -A arm -T script -d boot.cmd boot.scr
-    mv boot.scr "${PACKAGE_PATH}"/
-    cp config.txt "${PACKAGE_PATH}"/
-
     #build u-boot
     make "${config_file}" 
     make V=1 ARCH=arm CROSS_COMPILE="${FILE_CROSS_COMPILE}"

@@ -199,6 +199,7 @@ function build_application()
 	mkdir -m 755 -p "${BUILD_NFS_PATH}"/home/sys/configs/
 	chmod 755 "${BUILD_NFS_PATH}"/home/sys/configs/
 	cp -fv config.template.json "${BUILD_NFS_PATH}"/home/sys/configs/config.json
+	cp -fv dynamic.json "${BUILD_NFS_PATH}"/home/sys/configs/dynamic.json
     exit_if_last_error
 
 	#build executable

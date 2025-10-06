@@ -18,9 +18,9 @@
 //      7/30/2022   Create New Version
 //
 /////////////////////////////////////////////////////////////////////////////
-#include "mb_app.hpp"
 #include "mb.h"
 #include "mbport.h"
+#include "mb_app.hpp"
 #include "common_unit.hpp"
 
 /* mb_tcp 格式 */
@@ -64,30 +64,30 @@ void mb_app_manage::mb_workflow_run()
 #if MODBUS_RUN_MODE == 0    
     eStatus = eMBInit( MB_RTU, MODBUS_DEF_ADDRESS, 0, MODBUS_DEF_UBAUD, MODBUS_DEF_PARITY );
     if( eStatus != MB_ENOERR ) {
-        PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "eMBInit RTU Mode Failed, ErroCode:%d!", eStatus);
+        LOG_ERROR(xGetCurrentTimes(), "eMBInit RTU Mode Failed, ErroCode: %d!", eStatus);
         return;
     }
 #elif MODBUS_RUN_MODE == 1
     eStatus = eMBInit( MB_ASCII, MODBUS_DEF_ADDRESS, 0, MODBUS_DEF_UBAUD, MODBUS_DEF_PARITY );
     if( eStatus != MB_ENOERR ) {
-        PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "eMBInit ASCII Mode Failed, ErroCode:%d!", eStatus);
+        LOG_ERROR(xGetCurrentTimes(), "eMBInit ASCII Mode Failed, ErroCode: %d!", eStatus);
         return;
     }
 #elif MODBUS_RUN_MODE == 2
     eStatus = eMBTCPInit(MODBUS_TCP_PORT);
     if( eStatus != MB_ENOERR ) {
-        PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "eMBInit TCP Mode Failed, ErroCode:%d!", eStatus);
+        LOG_ERROR(xGetCurrentTimes(), "eMBInit TCP Mode Failed, ErroCode: %d!", eStatus);
         return;
     }
 #endif
 
     eStatus = eMBEnable(  );
     if( eStatus != MB_ENOERR ) {
-        PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "eMBInit Enabled Failed, ErroCode:%d!", eStatus);
+        LOG_ERROR(xGetCurrentTimes(), "eMBInit Enabled Failed, ErroCode: %d!", eStatus);
         return;
     }
 
-    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "eMBInit Init and Enable success!");
+    LOG_INFO(xGetCurrentTimes(), "eMBInit Init and Enable success!");
 
     while(1)
     {
@@ -113,7 +113,7 @@ mb_app_manage* mb_app_manage::get_instance()
         instance_pointer_ = new(std::nothrow) mb_app_manage;
         if (instance_pointer_ == nullptr)
         {
-            PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "mp manage init failed!");
+            LOG_ERROR(xGetCurrentTimes(), "mp manage init failed!");
         }
     }
     return instance_pointer_;

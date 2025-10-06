@@ -27,7 +27,8 @@ void tcp_thread_manage::tcp_server_run()
     const auto& ipaddr = system_config::get_instance()->get_ipaddress();
     const auto& port = system_config::get_instance()->get_local_port();
 
-    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "tcp info:%s:%d", ipaddr.c_str(), port);
+    LOG_INFO(xGetCurrentTimes(), "tcp info: %s,%d", ipaddr.c_str(), port);
+    
     try
     {
         socket_tcp_server.init(ipaddr, std::to_string(port), [this](char* ptr, int length){
@@ -37,7 +38,7 @@ void tcp_thread_manage::tcp_server_run()
     }
     catch (std::exception& e)
     {
-        PRINT_LOG(LOG_DEBUG, xGetCurrentTimes(), "tcp_thread_manage, Exception:%s", e.what());
+        LOG_DEBUG(xGetCurrentTimes(), "tcp_thread_manage, Exception: %s", e.what());
     }
 }
 
@@ -102,7 +103,7 @@ bool tcp_thread_manage::init()
     tcp_protocol_pointer_ = std::make_unique<protocol_info>();
     if (tcp_protocol_pointer_ == nullptr)
     {
-        PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "tcp_protocol_pointer_ create failed!");
+        LOG_ERROR(xGetCurrentTimes(), "tcp_protocol_pointer_ create failed!");
         return false;
     }
 
@@ -111,7 +112,7 @@ bool tcp_thread_manage::init()
     });
     if (!ret)
     {
-        PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "tcp_protocol_pointer_ init failed!");
+        LOG_ERROR(xGetCurrentTimes(), "tcp_protocol_pointer_ init failed!");
         return false;
     }
 
@@ -122,7 +123,7 @@ bool tcp_thread_manage::init()
     tcp_tx_thread_ = std::thread(std::bind(&tcp_thread_manage::tcp_tx_run, this));
     tcp_tx_thread_.detach();
 
-    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "tcp thread init success!");
+    LOG_INFO(xGetCurrentTimes(), "tcp thread init success!");
     return true;
 }
 
@@ -134,7 +135,7 @@ tcp_thread_manage* tcp_thread_manage::get_instance()
         instance_pointer_ = new(std::nothrow) tcp_thread_manage;
         if (instance_pointer_ == nullptr)
         {
-            PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "Tcp thread manage new failed!");
+            LOG_ERROR(xGetCurrentTimes(), "Tcp thread manage new failed!");
         }
     }
     return instance_pointer_;

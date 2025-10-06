@@ -6,7 +6,7 @@
 //      device_manage.cpp
 //
 //  Purpose:
-//      包含应用配置信息的文件
+//      用于管理设备操作的类。
 //
 // Author:
 //     @听心跳的声音
@@ -131,7 +131,7 @@ void device_manage::update()
         icm_dev_ptr->calculate_angle();
         inter_info_.icm_info_ = icm_dev_ptr->get_icm_info();
         inter_info_.angle_ = icm_dev_ptr->get_angle();
-        //PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "Angle:%d!", icm_dev_ptr->get_angle());
+        //LOG_INFO(xGetCurrentTimes(), "Angle: %d!", icm_dev_ptr->get_angle());
     }
     else
     {
@@ -204,14 +204,14 @@ void device_manage::update()
         size = outer_info_.copy_to_buffer(tx_buffer_);
 
         device_info_fifo_point_->write(tx_buffer_, size);
-        PRINT_LOG(LOG_DEBUG, xGetCurrentTimes(), "update to main porcess, data:%d,%.2f, size:%d!", 
+        LOG_DEBUG(xGetCurrentTimes(), "update to main porcess, data:%ld, %.2f, size:%d!", 
                                                 inter_info_.hx711_,    
                                                 inter_info_.icm_info_.gyro_y_act, 
                                                 size);
     }
     else
     {
-        PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "device no change!");
+        LOG_INFO(xGetCurrentTimes(), "device no change!");
     }
 }
 
@@ -221,7 +221,7 @@ void device_manage::process_event(Event *pEvent)
 
     if (id != DEVICE_LOOP_EVENT)
     {
-        PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "Device event:%d!", id);
+        LOG_INFO(xGetCurrentTicks(), "Device event: %d!", id);
     }
 
     switch (id)
@@ -251,8 +251,8 @@ void device_manage::process_sync(Event *pEvent)
     {
         case 0:
             uint8_t level = data.buffer[1];
-            log_manage::get_instance()->set_level((LOG_LEVEL)level);
-            PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "log level:%d", level);
+            log_manage::get_instance()->set_level(static_cast<log_manage::LOG_LEVEL>(level));
+            LOG_FATAL(xGetCurrentTimes(), "log level: %d", level);
             break;
     }
 }
@@ -271,7 +271,7 @@ void device_manage::process_hardware(Event *pEvent)
                 uint8_t action = data.buffer[1];
                 auto led_ptr = driver_manage::get_instance()->get_led_zero();
                 led_ptr->write_io_status(action);
-                PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "led process:%d, %d!", device, action);
+                LOG_INFO(xGetCurrentTicks(), "led process:%d, %d!", device, action);
             }
             break;
         case DEVICE_BEEP:
@@ -279,7 +279,7 @@ void device_manage::process_hardware(Event *pEvent)
                 uint8_t action = data.buffer[1];
                 auto beep_ptr = driver_manage::get_instance()->get_beep_zero();
                 beep_ptr->write_io_status(action);
-                PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "beep process:%d, %d!", device, action);
+                LOG_INFO(xGetCurrentTicks(), "beep process:%d, %d!", device, action);
             }
             break;
         case DEVICE_PWM:
@@ -289,7 +289,7 @@ void device_manage::process_hardware(Event *pEvent)
                 uint32_t duty = ArraryToUint32(&data.buffer[6]);
                 auto pwm_ptr = driver_manage::get_instance()->get_pwm_dev();
                 pwm_ptr->pwm_setup(state, peroid, duty);
-                PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "pwm run:%d, %d, %d!", state, peroid, duty);
+                LOG_INFO(xGetCurrentTicks(), "pwm run:%d, %d, %d!", state, peroid, duty);
             }
             break;
         case DEVICE_LOOPLED:
@@ -297,13 +297,13 @@ void device_manage::process_hardware(Event *pEvent)
                 uint8_t action = data.buffer[1];
                 auto loopled_ptr = driver_manage::get_instance()->get_loopled_dev();
                 loopled_ptr->set_state(action == 1?true:false);
-                PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "loopled process:%d, %d!", device, action);
+                LOG_INFO(xGetCurrentTicks(), "loopled process:%d, %d!", device, action);
             }
             break;
         case DEVICE_RTC:
             break;
         default:
-            PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "Invalid Device:%d!", device);
+            LOG_ERROR(xGetCurrentTicks(), "Invalid Device:%d!", device);
             break;
     }
 }
@@ -317,7 +317,7 @@ void device_manage::run()
 {
     int size;
 
-    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "device_manage start!");
+    LOG_INFO(xGetCurrentTimes(), "device_manage start!");
     timer_manage::get_instance()->register_action(DEVICE_LOOP_EVENT, TIME_TICK(1000), TIME_ACTION_ALWAYS, [&](int id){
         Event event(id);
         send_message(reinterpret_cast<char *>(&event), sizeof(event));
@@ -332,7 +332,7 @@ void device_manage::run()
     driver_manage::get_instance()->get_key_zero()->register_func(KEY_NUM, KEY_PREES, [this](uint16_t num, uint16_t value){
         static uint8_t status = 0;
 
-        PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "key num %d, value:%d", num, value);
+        LOG_INFO(xGetCurrentTimes(), "key num %d, value:%d", num, value);
         
         status = status == 0?1:0;
 
@@ -352,7 +352,7 @@ void device_manage::run()
         }
         else
         {
-            PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "device_cmd_fifo_point_ rx failed!");
+            LOG_ERROR(xGetCurrentTimes(), "device_cmd_fifo_point_ rx failed!");
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         }
     }

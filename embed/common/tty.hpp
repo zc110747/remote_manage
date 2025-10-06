@@ -18,11 +18,12 @@
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
-#include <string>
 #include <termios.h>
 #include <unistd.h>
 #include <stdint.h>
 #include <fcntl.h>
+
+#include <string>
 #include <cstring>
 
 class tty_control 
@@ -32,7 +33,7 @@ public:
     tty_control() = default;
 
     /// \brief destructor, delete not allow for singleton pattern.
-    ~tty_control() {};
+    ~tty_control() {}
 
     /// \brief init
     /// - This method is used to init the object.
@@ -168,7 +169,12 @@ public:
             return -1;
         }
 
-        return ::write(fd_, buffer, len);
+        // logger: add flush cache to ensure data send out
+        len = ::write(fd_, buffer, len);
+        if (len > 0) {
+            ::tcflush(fd_, TCIOFLUSH);
+        }
+        return len;
     }
 
     /// \brief read

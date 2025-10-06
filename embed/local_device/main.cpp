@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
         return val;
     }
 
-    system_init(gParameter.is_default_config, gParameter.configfile.c_str());
+    result = system_init(gParameter.is_default_config, gParameter.configfile.c_str());
 
     // only result protect the sem
     if (result)
@@ -81,7 +81,7 @@ static bool system_init(int is_default, const char *path)
         system_config::get_instance()->default_init();
     }
     
-    LOG_LEVEL level = (LOG_LEVEL)system_config::get_instance()->get_logger_privilege().local_device_level;
+    log_manage::LOG_LEVEL level = static_cast<log_manage::LOG_LEVEL>(system_config::get_instance()->get_logger_privilege().local_device_level);
     log_manage::get_instance()->set_level(level);
 
     ret &= log_manage::get_instance()->init();

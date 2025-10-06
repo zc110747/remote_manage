@@ -148,6 +148,7 @@ bool system_config::init(const char* path)
     ifs.open(path);
     if (!ifs.is_open())
     {
+        PRINT_NOW("%s:open config file %s failed!\n", PRINT_NOW_HEAD_STR, path)
         return false;
     }
 
@@ -155,7 +156,7 @@ bool system_config::init(const char* path)
     builder["collectComments"] = true;
     JSONCPP_STRING errs;
     if (!parseFromStream(builder, ifs, &root, &errs)) {
-        std::cout << errs << std::endl;
+        PRINT_NOW("%s: parse from stream %s failed!\n", PRINT_NOW_HEAD_STR, errs.c_str());
         return false;
     }
     //std::cout << root << std::endl;
@@ -237,6 +238,7 @@ bool system_config::init(const char* path)
 
     if (dynamic_init(DYNAMIC_CONFIG_PATH) != true)
     {
+        PRINT_NOW("%s:dynamic %s init failed!\n", PRINT_NOW_HEAD_STR, DYNAMIC_CONFIG_PATH);
         return false;
     }
     
@@ -478,7 +480,7 @@ bool system_config::set_logger_level(int dev, int level)
             break;
     }
 
-    PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "set level:%d, %d, ret:%d", dev, level, ret);
+    LOG_FATAL(xGetCurrentTimes(), "set level:%d, %d, ret:%d", dev, level, ret);
     if (ret == 1)
     {
         save_dynamicfile();

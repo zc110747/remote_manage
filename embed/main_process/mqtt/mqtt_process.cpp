@@ -36,7 +36,7 @@ void mqtt_device::mqtt_run()
 {
     mosqpp::lib_init();
 
-    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "Mqtt start run!");
+    LOG_INFO(xGetCurrentTimes(), "Mqtt start run!");
     connect(info_.host.c_str(), info_.port, info_.keepalive);
 
     while (1)
@@ -57,7 +57,7 @@ bool mqtt_device::start()
 
 void mqtt_device::on_connect(int rc)
 {
-    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "Connected with code:%d!", rc);
+    LOG_INFO(xGetCurrentTimes(), "Connected with code: %d!", rc);
     if (rc == 0)
     {
         /* Only attempt to subscribe on a successful connect. */
@@ -82,7 +82,7 @@ void mqtt_device::on_message(const struct mosquitto_message *message)
 
 void mqtt_device::on_subscribe(int mid, int qos_count, const int *granted_qos)
 {
-    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "subscription topic:%s, succeeded!", info_.sub_topic.c_str());
+    LOG_INFO(xGetCurrentTimes(), "subscription topic: %s, succeeded!", info_.sub_topic.c_str());
 }
 
 int mqtt_device::publish_msg(const std::string &topic, int qos, const char* ptr, int size)
@@ -92,7 +92,7 @@ int mqtt_device::publish_msg(const std::string &topic, int qos, const char* ptr,
     if (is_connet_ && size > 0)
     {
         ret = publish(NULL, topic.c_str(), size, ptr, qos);
-        //PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "publisher, topic:%s, ret:%d!", info_.pub_topic.c_str(), ret);
+        //LOG_INFO(xGetCurrentTimes(), "publisher, topic: %s, ret:%d!", info_.pub_topic.c_str(), ret);
     }
     
     return ret;
@@ -134,7 +134,7 @@ bool mqtt_manage::init()
 
         mqtt_device_ptr = std::make_unique<mqtt_device>(mqtt_process_info, [](char *ptr, int size)
         {
-            PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "rx_buffer_size:%d, buffer:%s.", size, ptr);
+            LOG_INFO(xGetCurrentTimes(), "rx_buffer_size:%d, buffer:%s.", size, ptr);
 
             if(size > 2)
             {
@@ -144,7 +144,7 @@ bool mqtt_manage::init()
                 }
                 else if(memcmp(ptr, HEX_DATA_HEAD, 2) == 0)
                 {
-                    PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "hex data receive!");
+                    LOG_INFO(xGetCurrentTicks(), "hex data receive!");
                 }
             }
         });
@@ -168,7 +168,7 @@ int mqtt_manage::mqtt_publish(const std::string &topic, int qos, const std::stri
 
     if (mqtt_device_ptr != nullptr)
     {
-        PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "topic:%s, data:%s", topic.c_str(), str.c_str());
+        LOG_INFO(xGetCurrentTicks(), "topic:%s, data:%s", topic.c_str(), str.c_str());
         ret = mqtt_device_ptr->publish_msg(topic, qos, str.c_str(), str.size());
     }
     return ret;
@@ -180,7 +180,7 @@ int mqtt_manage::mqtt_publish(const std::string &topic, int qos, char *ptr, uint
 
     if (mqtt_device_ptr != nullptr)
     {
-        PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "topic:%s, data:%s", topic.c_str(), ptr);
+        LOG_INFO(xGetCurrentTicks(), "topic:%s, data:%s", topic.c_str(), ptr);
         ret = mqtt_device_ptr->publish_msg(topic, qos, ptr, size);
     }
     return ret;   

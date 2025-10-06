@@ -23,10 +23,9 @@ static unsigned int flag = 0;
 int main(int argc, char *argv[])
 {
     int wdt_fd;
-    int retval, flags;
     int timeout = 5;
     int ioctl_alive = 0;
-    int errno;
+    int ops;
 
     if (argc > 1) {
         ioctl_alive = atoi(argv[1]);
@@ -43,13 +42,15 @@ int main(int argc, char *argv[])
         while (!flag)
         {
             if (ioctl_alive == 0) {
+                // 执行ping操作，喂狗
                 ioctl(wdt_fd, WDIOC_KEEPALIVE, NULL);
             }
 
             sleep(1);
         }
 
-        ioctl(wdt_fd, WDIOC_SETOPTIONS, WDIOS_DISABLECARD);
+        ops = WDIOS_DISABLECARD;
+        ioctl(wdt_fd, WDIOC_SETOPTIONS, &ops);
         close(wdt_fd);
     }
 

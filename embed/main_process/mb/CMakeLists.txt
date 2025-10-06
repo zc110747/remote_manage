@@ -1,0 +1,22 @@
+
+# 收集目录下的源文件
+file(GLOB LIB_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/*.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/ascii/*.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/functions/*.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/port/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/rtu/*.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tcp/*.c")
+set(INCLUDE_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/"
+        "${CMAKE_CURRENT_SOURCE_DIR}/ascii/"
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/"
+        "${CMAKE_CURRENT_SOURCE_DIR}/port/"
+        "${CMAKE_CURRENT_SOURCE_DIR}/rtu/"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tcp/")
+
+
+# 将LIB_SOURCES变量传递给父级作用域
+set(LIB_SOURCES ${LIB_SOURCES} PARENT_SCOPE)
+
+# 将INCLUDE_HEADERS变量传递给父级作用域
+set(INCLUDE_HEADERS ${INCLUDE_HEADERS} PARENT_SCOPE)

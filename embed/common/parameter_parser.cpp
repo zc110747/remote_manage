@@ -25,6 +25,7 @@
 #include <getopt.h>
 #include <libgen.h>
 
+#include "common_unit.hpp"
 #include "json_config.hpp"
 #include "parameter_parser.hpp"
 
@@ -103,7 +104,8 @@ bool parse_parameter(struct _Params *params, int argc, char **argv)
         }
     }
 
-    printf("default_config:%d, config_file:%s, ip:%s, host:%s, port:%d\n",
+    PRINT_NOW("%s:default_config:%d, config_file:%s, ip:%s, host:%s, port:%d\n",
+        PRINT_NOW_HEAD_STR,
         params->is_default_config,
         params->configfile.c_str(),
         params->ipaddress.c_str(),

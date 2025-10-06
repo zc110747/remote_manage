@@ -87,7 +87,7 @@ bool cmd_process::init()
 
 bool cmd_process::parse_data()
 {
-    PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "data:%s", rx_buffer_);
+    LOG_FATAL(xGetCurrentTimes(), "data: %s", rx_buffer_);
     //replace first ' ' by '\0'
     char *pStart = rx_buffer_;
     while ((*pStart != ' ') && (*pStart != '\0'))
@@ -114,8 +114,8 @@ bool cmd_process::parse_data()
 void cmd_process::show_os()
 {
     auto pSysConfig = system_config::get_instance();
-    PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "FW_Version:%s", pSysConfig->get_version().c_str());
-    PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "Logger Level:%d ", (int)log_manage::get_instance()->get_level());
+    LOG_FATAL(xGetCurrentTimes(), "FW_Version:%s", pSysConfig->get_version().c_str());
+    LOG_FATAL(xGetCurrentTimes(), "Logger Level:%d", static_cast<int>(log_manage::get_instance()->get_level()));
 }
 
 void cmd_process::sync_level(int dev, int level)
@@ -146,7 +146,7 @@ void cmd_process::sync_level(int dev, int level)
             last_level = system_config::get_instance()->get_logger_privilege().main_process_level;
             if (last_level != level)
             {
-                log_manage::get_instance()->set_level((LOG_LEVEL)level);
+                log_manage::get_instance()->set_level(static_cast<log_manage::LOG_LEVEL>(level));
             }
             break;
         case NODE_LOGGGE_DEV:
@@ -171,7 +171,7 @@ bool cmd_process::process_data()
                 int dev, level;
                 
                 sscanf(cmd_data_pointer_, "%d,%d", &dev, &level);
-                PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "dev:%d, level:%d", dev, level);
+                LOG_FATAL(xGetCurrentTimes(), "dev: %d, level:%d", dev, level);
                 sync_level(dev, level);
             }
             break;
@@ -183,7 +183,7 @@ bool cmd_process::process_data()
 
                 if (DevMap.count(token[0].c_str()) == 0)
                 {
-                    PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "invalid device:%s", token[0].c_str());
+                    LOG_ERROR(xGetCurrentTicks(), "invalid device: %s", token[0].c_str());
                     return false;
                 } 
                 dev = DevMap.find(token[0].c_str())->second;
@@ -200,7 +200,7 @@ bool cmd_process::process_data()
             {
                 for (auto &[x, y] : CmdHelpMapM)
                 {
-                    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), y.c_str());
+                    LOG_INFO(xGetCurrentTimes(), "%s", y.c_str());
                     std::this_thread::sleep_for(std::chrono::microseconds(100));
                 }
             }
@@ -221,7 +221,7 @@ bool cmd_process::process_device(int dev, const std::string& data)
                 int state;
                 state = (data == "on"?1:0);  
                 device_process::get_instance()->set_device(dev, (char *)&state, 1);
-                PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "set device:%d,%d", dev, state);
+                LOG_INFO(xGetCurrentTicks(), "set device:%d,%d", dev, state);
             }
             break;
         case DEVICE_PWM:
@@ -240,7 +240,7 @@ bool cmd_process::process_device(int dev, const std::string& data)
                 buffer[size++] = duty_cycle>>8;                               
                 buffer[size++] = duty_cycle;
                 device_process::get_instance()->set_device(dev, (char *)buffer, size);
-                PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "pwm set:%d,%d,%d", state, peroid, duty_cycle);
+                LOG_INFO(xGetCurrentTicks(), "pwm set:%d,%d,%d", state, peroid, duty_cycle);
             }
             break;
     }
@@ -266,16 +266,16 @@ void cmd_process::run()
             }
             else
             {
-                PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "cmd_process parse fail, buffer:%s!", rx_buffer_);
+                LOG_ERROR(xGetCurrentTimes(), "cmd_process parse fail, buffer: %s!", rx_buffer_);
             }
         }
         else if (len == 0)
         {
-            PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "%s read empty fifo data:%d\n", __func__, len);
+            LOG_ERROR(xGetCurrentTimes(), "%s read empty fifo data: %d\n", __func__, len);
         }
         else
         {
-            PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "%s read failed:%d\n", __func__, len);
+            LOG_ERROR(xGetCurrentTimes(), "%s read failed: %d\n", __func__, len);
             break;
         }
     }

@@ -371,7 +371,7 @@ static int __init ap3216_module_init(void)
 
 static void __exit ap3216_module_exit(void)
 {
-    return i2c_del_driver(&ap3216_driver);
+    i2c_del_driver(&ap3216_driver);
 }
 
 module_init(ap3216_module_init);

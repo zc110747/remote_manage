@@ -70,13 +70,13 @@
 	// 	regulator-always-on;
 	// };
 
-	// reg_can_3v3: regulator-can-3v3 {
-	// 	compatible = "regulator-fixed";
-	// 	regulator-name = "can-3v3";
-	// 	regulator-min-microvolt = <3300000>;
-	// 	regulator-max-microvolt = <3300000>;
-	// 	// gpios = <&gpio_spi 3 GPIO_ACTIVE_LOW>;
-	// };
+	reg_can_3v3: regulator-can-3v3 {
+		compatible = "regulator-fixed";
+		regulator-name = "can-3v3";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		// gpios = <&gpio_spi 3 GPIO_ACTIVE_LOW>;
+	};
 
 	sound-wm8960 {
 		compatible = "fsl,imx-audio-wm8960";
@@ -242,7 +242,7 @@
 &can1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexcan1>;
-	//xceiver-supply = <&reg_can_3v3>;
+	xceiver-supply = <&reg_can_3v3>;
 	status = "okay";
 };
 

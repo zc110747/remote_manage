@@ -25,14 +25,14 @@ usr_nref {
     status = "okay";
 };
 
-user_nvmem {
-    compatible = "rmk,user-nvmem";
+usr_nvmem {
+    compatible = "rmk,usr_nvmem";
     #address-cells = <1>;
     #size-cells = <1>;
-    status = "okay";	
+    status = "okay";
 
-    nvmem_user_cell_attr: nvmem_user_cell_attr@10 {
-        reg = <0x10 4>;
+    nvmem_user_cell: nvmem_user_cell@10 {
+        reg = <0x10 64>;
     };
 };
 
@@ -49,10 +49,13 @@ user_nvmem {
 a9 14 7f 67  d2 81 21 3c
 
 /sys/bus/platform/devices/21bc000.efuse/imx-ocotp0/nvmem
-hexdump -C /sys/devices/platform/usr_nref/uid_low
-hexdump -C /sys/devices/platform/usr_nref/uid_high
+
+dd if=/dev/zero of=user_cell bs=16 count=1
 hexdump -C /sys/devices/platform/usr_nref/user_cell
 echo "123" > /sys/devices/platform/usr_nref/user_cell
+
+hexdump -C /sys/devices/platform/usr_nref/uid_low
+hexdump -C /sys/devices/platform/usr_nref/uid_high
 */
 
 #include <linux/types.h>
@@ -64,53 +67,64 @@ echo "123" > /sys/devices/platform/usr_nref/user_cell
 #include <linux/of_device.h>
 #include <linux/platform_device.h>
 #include <linux/nvmem-consumer.h>
+#include <linux/slab.h>
 
-struct nref_data
+struct nvmem_ref_data
 {
     /*device info*/
     struct class *class;
     struct platform_device *pdev;
     struct device_attribute user_cell_attr;
     struct device_attribute uid_high_attr;
-    struct device_attribute uid_low_attr;  
+    struct device_attribute uid_low_attr;
+    
+    /*nvmem info*/
+    struct nvmem_cell *nref_cell;
+    int len;
 };
 
 static ssize_t nref_show(struct device *dev, struct device_attribute *attr, char *buf)
 {
-    int size, ret;
-    u32 val;
+    char *pbuffer;
+    int len;
+    struct nvmem_ref_data *chip;
 
-    ret = nvmem_cell_read_u32(dev, "nvmem_user_cell", &val);
-    if(ret) {
-        dev_err(dev, "cell read failed, ret:%d!\n", ret);
+    // 读取cell对应nvmem节点数据
+    // 必定读取cell中指定的长度
+    chip = container_of(attr, struct nvmem_ref_data, user_cell_attr);
+    pbuffer = nvmem_cell_read(chip->nref_cell, &len);
+    if (IS_ERR(pbuffer)) {
+        dev_err(dev, "cell read failed, ret:%ld, len %d!\n", PTR_ERR(pbuffer), len);
         return 0;
     }
-
-    size = sprintf(buf, "val=0x%x", val);
-    return size;
+    dev_info(dev, "cell read success, len: %d!\n", len);
+    memcpy(buf, pbuffer, len);
+    
+    kfree(pbuffer);
+    return len;
 }
 
 static ssize_t nref_store(struct device *dev, struct device_attribute *attr,  const char *buf, size_t count)
 {
-    int ret;
-    struct nvmem_cell *cell;
-    uint8_t inbuf[4] = {0};
+    int ret, len;
+    struct nvmem_ref_data *chip;
+    char *pbuffer;
+    ssize_t size;
 
-    cell = devm_nvmem_cell_get(dev, "nvmem_user_cell");
-    if(!cell) {
-        dev_err(dev, "cell null");
-        return 0;
+    // 拷贝数据到cell地址中
+    chip = container_of(attr, struct nvmem_ref_data, user_cell_attr); 
+    pbuffer = nvmem_cell_read(chip->nref_cell, &len);
+    count = count>len?len:count;
+    memcpy(pbuffer, buf, count);
+
+    dev_info(dev, "cell write buffer:%d\n", count);
+    
+    // 将数据写入到cell中，cell要求写入长度等于entry->bytes
+    size = nvmem_cell_write(chip->nref_cell, pbuffer, len);
+    if (size != len) {
+        dev_err(dev, "cell write failed, ret:%d!\n", ret);
     }
-
-    count = count<sizeof(inbuf)?count:sizeof(inbuf);
-    memcpy(inbuf, buf, count);
-    dev_err(dev, "cell write:%d", count);
-    ret = nvmem_cell_write(cell, inbuf, 4);
-    if(ret != 4) {
-        dev_err(dev, "cell write failed:%d", ret);
-        return ret;
-    }
-
+    kfree(pbuffer);
     return count;
 }
 
@@ -153,7 +167,7 @@ static ssize_t uid_low_show(struct device *dev, struct device_attribute *attr, c
 static int nref_probe(struct platform_device *pdev)
 {
     int ret;
-    static struct nref_data *chip;
+    static struct nvmem_ref_data *chip;
 
     chip = devm_kzalloc(&pdev->dev, sizeof(*chip), GFP_KERNEL);
     if (!chip) {
@@ -163,6 +177,7 @@ static int nref_probe(struct platform_device *pdev)
     platform_set_drvdata(pdev, chip);
     chip->pdev = pdev;
 
+    // 创建user_cell对应文件
     chip->user_cell_attr.attr.name = "user_cell";
     chip->user_cell_attr.attr.mode = 0666;
     chip->user_cell_attr.show = nref_show;
@@ -172,6 +187,11 @@ static int nref_probe(struct platform_device *pdev)
         dev_err(&pdev->dev, "device create user_cell_attr file failed!\n");
         return -ENOMEM;
     }
+    chip->nref_cell = devm_nvmem_cell_get(&pdev->dev, "nvmem_user_cell");
+    if (IS_ERR(chip->nref_cell)) {  
+        dev_err(&pdev->dev, "get nvmem cell failed!\n");
+        goto exit_cell_get;
+    }
 
     chip->uid_high_attr.attr.name = "uid_high";
     chip->uid_high_attr.attr.mode = 0444;
@@ -179,7 +199,7 @@ static int nref_probe(struct platform_device *pdev)
     ret = device_create_file(&pdev->dev, &chip->uid_high_attr);
     if (ret != 0) {
         dev_err(&pdev->dev, "device create uid_high_attr file failed!\n");
-        return -ENOMEM;
+        goto exit_uid_high_create_file;
     }
 
     chip->uid_low_attr.attr.name = "uid_low";
@@ -188,16 +208,24 @@ static int nref_probe(struct platform_device *pdev)
     ret = device_create_file(&pdev->dev, &chip->uid_low_attr);
     if (ret != 0) {
         dev_err(&pdev->dev, "device create uid_low_attr file failed!\n");
-        return -ENOMEM;
+        goto exit_uid_low_create_file;
     }
 
     dev_info(&pdev->dev, "nref driver init success!\n");
     return 0;
+
+exit_uid_low_create_file:
+    device_remove_file(&pdev->dev, &chip->uid_high_attr);
+exit_uid_high_create_file:
+    nvmem_cell_put(chip->nref_cell);
+exit_cell_get:
+    device_remove_file(&pdev->dev, &chip->user_cell_attr);
+    return -ENODEV;
 }
 
 static int nref_remove(struct platform_device *pdev)
 {
-    struct nref_data *chip = platform_get_drvdata(pdev);
+    struct nvmem_ref_data *chip = platform_get_drvdata(pdev);
 
     device_remove_file(&pdev->dev, &chip->user_cell_attr);
     device_remove_file(&pdev->dev, &chip->uid_high_attr);
@@ -237,4 +265,4 @@ module_exit(nvmem_ref_exit);
 MODULE_AUTHOR("wzdxf");
 MODULE_LICENSE("GPL v2");
 MODULE_DESCRIPTION("platform driver for led");
-MODULE_ALIAS("nref_data");
+MODULE_ALIAS("nvmem_ref_data");

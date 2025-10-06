@@ -30,7 +30,7 @@ timer_manage *timer_manage::get_instance()
         instance_pointer_ = new(std::nothrow) timer_manage();
         if (instance_pointer_ == nullptr)
         {
-            PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "timer_manage new error!");
+           LOG_ERROR(xGetCurrentTimes(), "timer_manage new error!");
         }
     }
     return instance_pointer_;

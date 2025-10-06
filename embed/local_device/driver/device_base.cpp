@@ -39,11 +39,11 @@ bool device_base::open(int flags)
     device_fd_ = ::open(device_path_.c_str(), flags);
     if (device_fd_ == -1)
     {
-        PRINT_LOG(LOG_INFO, 0, "open %s device failed!", device_path_.c_str());
+        LOG_ERROR(0, "open %s device failed!", device_path_.c_str());
         return false;
     }
 
-    PRINT_LOG(LOG_INFO, 0, "open %s device success, fd:%d!", device_path_.c_str(), device_fd_);
+    LOG_INFO(0, "open %s device success, fd:%d!", device_path_.c_str(), device_fd_);
     return true;
 }
 
@@ -57,8 +57,8 @@ void device_base::close()
 {
     if (device_fd_ != -1)
     {
-        device_fd_ = -1;
         ::close(device_fd_);
+        device_fd_ = -1;
     }
 }
 

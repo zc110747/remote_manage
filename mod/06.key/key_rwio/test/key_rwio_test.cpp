@@ -64,8 +64,7 @@ int noblock_io_process(void)
         read(fd, &key_val, sizeof(int));
         if (0 == key_val) {
             printf("Key Press\n");
-        }
-        else if (1 == key_val) {
+        } else if (1 == key_val) {
             printf("Key Release\n");
         }
     }
@@ -102,8 +101,7 @@ int blockio_process(void)
                 read(fd, &key_val, sizeof(int));
                 if (0 == key_val) {
                     printf("Key Press\n");
-                }
-                else if (1 == key_val) {
+                } else if (1 == key_val) {
                     printf("Key Release\n");
                 }
             }

@@ -49,13 +49,16 @@ int main(int argc, char* argv[])
         return result;
     }
 
-    system_init(gParameter.is_default_config, gParameter.configfile.c_str());
+    result = system_init(gParameter.is_default_config, gParameter.configfile.c_str());
 
-    for (;;)
+    if (result)
     {
-        if (global_exit_sem.wait())
+        for (;;)
         {
-            break;
+            if (global_exit_sem.wait())
+            {
+                break;
+            }
         }
     }
 
@@ -83,10 +86,10 @@ static bool system_init(int is_default, const char* path)
     else
     {
         system_config::get_instance()->default_init();
-        PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "System Config use default!");
+        LOG_INFO(xGetCurrentTimes(), "System Config use default!");
     }
     std::cout<<*(system_config::get_instance())<<std::endl;
-    LOG_LEVEL level = (LOG_LEVEL)system_config::get_instance()->get_logger_privilege().main_process_level;
+    log_manage::LOG_LEVEL level = static_cast<log_manage::LOG_LEVEL>(system_config::get_instance()->get_logger_privilege().main_process_level);
     log_manage::get_instance()->set_level(level);
     
     ret &= log_manage::get_instance()->init();

@@ -175,7 +175,7 @@ void asio_server::init(const std::string& address, const std::string& port, std:
     //update for rx handler
     group_.init(handler);
 
-    PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "asio_server start, bind:%s:%s!", address.c_str(), port.c_str());
+    LOG_FATAL(xGetCurrentTimes(), "asio_server start, bind:%s,%s!", address.c_str(), port.c_str());
     
     // Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
     asio::ip::tcp::resolver resolver(io_context_);
@@ -204,7 +204,7 @@ void asio_server::do_accept()
                 //if accept, close other socket
                 close_all_session();
                 std::make_shared<session>(std::move(socket), group_)->start();
-                PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "Connect from client!");
+                LOG_FATAL(xGetCurrentTimes(), "Connect from client!");
             }
 
             do_accept();

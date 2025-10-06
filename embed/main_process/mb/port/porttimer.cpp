@@ -20,13 +20,13 @@
  */
 
 /* ----------------------- Platform includes --------------------------------*/
-#include "port.h"
 #include <unistd.h>        //pause()
 #include <signal.h>        //signal()
 #include <string.h>        //memset()
 #include <sys/time.h>    //struct itimerval, setitimer()
 
 /* ----------------------- Modbus includes ----------------------------------*/
+#include "port.h"
 #include "mb.h"
 #include "mbport.h"
 #include "common_unit.hpp"
@@ -37,7 +37,7 @@
 
 void vTimerCallback( int singo)
 {
-    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "vTimerCallback!");
+    LOG_INFO(xGetCurrentTimes(), "vTimerCallback!");
 
     EnterCriticalSection();
     ( void )pxMBPortCBTimerExpired(  );

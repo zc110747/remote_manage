@@ -163,7 +163,7 @@
 		status = "okay";	
 
 		nvmem_user_cell: nvmem_user_cell@10 {
-			reg = <0x10 4>;
+			reg = <0x10 64>;
 		};
 	};
 	
@@ -215,28 +215,28 @@
 	thermal_sensor {
 		compatible = "rmk,thermal_sensor";
 		io-channels = <&adc1 0>;
-		polling-delay-passive = <100>;
+		polling-delay-passive = <1000>;
 		polling-delay = <8000>;
 		status = "okay";
 
 		cooling-map {
 			active_trip {
-				active,temp = <30000>;
+				trip,temp = <40000>;
 				cooling-device = <&thermal_fan 1 1>;
 			};
 
 			passive_trip {
-				passive,temp = <40000>;
+				trip,temp = <60000>;
 				cooling-device = <&thermal_fan 2 2>;
 			};
 
 			hot_trip {
-				hot,temp = <50000>;
+				trip,temp = <70000>;
 				cooling-device = <&thermal_fan 3 3>;
 			};
 
 			crit_trip {
-				crit,temp = <60000>;
+				trip,temp = <95000>;
 				cooling-device = <&thermal_fan 4 4>;
 			};
 		};

@@ -3258,7 +3258,6 @@ QByteArray QUIHelper::asciiStrToByteArray(const QString &str)
         }
 
         buffer.append(str.mid(i, 1).toLatin1());
-
     }
 
     return buffer;
@@ -3537,7 +3536,6 @@ QString QUIHelper::setProgressBarQss(QProgressBar *bar, int barHeight,
                                      const QString &normalColor,
                                      const QString &chunkColor)
 {
-
     QStringList list;
     list.append(QString("QProgressBar{font:%1pt;background:%2;max-height:%3px;border-radius:%4px;text-align:center;border:1px solid %2;}")
                 .arg(fontSize).arg(normalColor).arg(barHeight).arg(barRadius));

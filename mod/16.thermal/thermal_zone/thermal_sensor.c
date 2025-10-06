@@ -64,9 +64,9 @@ thermal_sensor {
 #define THERMAL_SENSOR_POLLING_DELAY        2000 /* millisecond */
 
 struct thermal_cooling_trip {
-	struct device_node *cooling_device;
-	unsigned long min;
-	unsigned long max;
+    struct device_node *cooling_device;
+    unsigned long min;
+    unsigned long max;
     int trip_id;
     int trip_temperature;
     enum thermal_trip_type type;
@@ -92,7 +92,7 @@ static int parse_thermal_dts(struct thermal_sensor_data *data)
     struct device *dev = data->dev;
     struct device_node *np = dev->of_node;
     struct device_node *cooling_map_np, *trip_np;
-	struct of_phandle_args cooling_spec;
+    struct of_phandle_args cooling_spec;
 
     ret = of_property_read_u32(np, "polling-delay-passive", &data->polling_delay_passive);
     if (ret < 0) {
@@ -106,11 +106,11 @@ static int parse_thermal_dts(struct thermal_sensor_data *data)
 
     data->chans = devm_iio_channel_get_all(dev);
     if (IS_ERR(data->chans)) {
-		ret = PTR_ERR(data->chans);
-		if (ret != -EPROBE_DEFER)
-			dev_err(dev, "Unable to get IIO channels");
-		return ret;
-	}
+        ret = PTR_ERR(data->chans);
+        if (ret != -EPROBE_DEFER)
+            dev_err(dev, "Unable to get IIO channels");
+        return ret;
+    }
 
     // 解析cooling-map
     cooling_map_np = of_find_node_by_name(np, "cooling-map");
@@ -134,7 +134,7 @@ static int parse_thermal_dts(struct thermal_sensor_data *data)
     // 解析cooling-map下的trip，保存信息
     index = 0;
     for_each_child_of_node(cooling_map_np, trip_np) {
-    	ret = of_property_read_u32(trip_np, "trip,temp", &data->param[index].trip_temperature);
+        ret = of_property_read_u32(trip_np, "trip,temp", &data->param[index].trip_temperature);
         if (ret < 0) {
             dev_err(dev, "Unable to get trip,temp");
             return ret;
@@ -268,13 +268,13 @@ static int tm_sensor_get_trip_temp(struct thermal_zone_device *tz, int trip,
 static int tm_sensor_get_crit_temp(struct thermal_zone_device *tz, int *temp)
 {
     struct thermal_sensor_data *data = tz->devdata;
-	int i;
+    int i;
 
-	for (i = 0; i < data->trip_nums; i++) {
-		if (data->param[i].type == THERMAL_TRIP_CRITICAL) {
-			*temp = data->param[i].trip_temperature;
-			return 0;
-		}
+    for (i = 0; i < data->trip_nums; i++) {
+        if (data->param[i].type == THERMAL_TRIP_CRITICAL) {
+            *temp = data->param[i].trip_temperature;
+            return 0;
+        }
     }
 
     return 0;

@@ -17,8 +17,8 @@
  * File: $Id: portserial.c,v 1.60 2019/07/11 17:04:32 flybreak $
  */
 
-#include "port.h"
 #include <string.h>
+#include "port.h"
 
 /* ----------------------- Modbus includes ----------------------------------*/
 #include "mb.h"
@@ -42,7 +42,7 @@ void mb_tcp_server_task(int port)
 {
     const auto& ipaddr = system_config::get_instance()->get_ipaddress();
 
-    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "mb tcp server info:%s:%d", ipaddr.c_str(), port);
+    LOG_INFO(xGetCurrentTimes(), "mb tcp server info:%s:%d", ipaddr.c_str(), port);
 
     try
     {
@@ -55,7 +55,7 @@ void mb_tcp_server_task(int port)
     }
     catch (std::exception& e)
     {
-        PRINT_LOG(LOG_DEBUG, xGetCurrentTimes(), "mb_tcp_server_task, Exception:%s", e.what());
+        LOG_DEBUG(xGetCurrentTimes(), "mb_tcp_server_task, Exception:%s", e.what());
     }
 }
 
@@ -77,7 +77,7 @@ vMBTCPPortDisable(void)
 BOOL
 xMBTCPPortGetRequest(UCHAR **ppucMBTCPFrame, USHORT *usTCPLength)
 {
-    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "getrequest, %d", rx_tcp_size);
+    LOG_INFO(xGetCurrentTimes(), "getrequest, %d", rx_tcp_size);
     *ppucMBTCPFrame = &rx_tcp_buffer[0];
     *usTCPLength = rx_tcp_size;
     return TRUE;

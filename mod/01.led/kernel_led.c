@@ -231,7 +231,7 @@ static ssize_t led_show(struct device *dev, struct device_attribute *attr, char 
 
 static ssize_t led_store(struct device *dev, struct device_attribute *attr,  const char *buf, size_t count)
 {
-    static struct led_data *chip;
+    struct led_data *chip;
     struct platform_device *pdev;
     u32 regval;
 
@@ -244,8 +244,7 @@ static ssize_t led_store(struct device *dev, struct device_attribute *attr,  con
     } else if (0 == memcmp(buf, "1", 1)) {
         pinctrl_select_state(chip->led_pinctrl, chip->pinctrl_state[1]);
         dev_info(&pdev->dev, "led pinctrl 1!\n");
-    }
-    else {
+    } else {
         dev_info(&pdev->dev, "led store issue!\n");
     }
 
@@ -256,13 +255,13 @@ static ssize_t led_store(struct device *dev, struct device_attribute *attr,  con
 
 static void gpio_led_set(struct led_classdev *led_cdev, enum led_brightness value)
 {
-	struct led_data *chip = container_of(led_cdev, struct led_data, led);
-	int level;
+    struct led_data *chip = container_of(led_cdev, struct led_data, led);
+    int level;
 
-	if (value == LED_OFF)
-		level = 0;
-	else
-		level = 1;
+    if (value == LED_OFF)
+        level = 0;
+    else
+        level = 1;
     
     led_hardware_set(chip, level);
 }
@@ -329,12 +328,12 @@ static int led_device_create(struct led_data *chip)
     //5.创建类管理文件，创建/sys/class/leds/led0目录，其下brigntness文件可以控制gpio状态
     //echo 0 > brightness #关闭LEDcd
     //echo 1 > brightness #开启LED
-	chip->led.name = "led0";
-	chip->led.brightness_set = gpio_led_set;
-	chip->led.flags = LED_CORE_SUSPENDRESUME;
-	chip->led.max_brightness = 1;
-	chip->led.default_trigger = "trigger_one";
-	ret = devm_led_classdev_register(&pdev->dev, &chip->led);
+    chip->led.name = "led0";
+    chip->led.brightness_set = gpio_led_set;
+    chip->led.flags = LED_CORE_SUSPENDRESUME;
+    chip->led.max_brightness = 1;
+    chip->led.default_trigger = "trigger_one";
+    ret = devm_led_classdev_register(&pdev->dev, &chip->led);
     if (ret != 0) {
         dev_info(&pdev->dev, "device create led class failed!\n");
         goto exit_device_create;

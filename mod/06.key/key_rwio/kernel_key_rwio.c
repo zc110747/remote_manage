@@ -61,12 +61,12 @@ enum key_status {
 struct key_data
 {      
     struct platform_device *pdev;
-    dev_t dev_id;     
+    dev_t dev_id;
     struct cdev cdev;
     struct class *class;
     struct device *device;
 
-    int key_gpio;             
+    int key_gpio;
     int irq;    
 
     struct timer_list key_timer;
@@ -133,7 +133,7 @@ ssize_t key_read(struct file *filp, char __user *buf, size_t count, loff_t *f_po
 
 static unsigned int key_poll(struct file *filp, struct poll_table_struct *wait)
 {
-	unsigned int mask = 0;
+    unsigned int mask = 0;
     struct key_data *chip;
     struct platform_device *pdev;
 
@@ -143,7 +143,7 @@ static unsigned int key_poll(struct file *filp, struct poll_table_struct *wait)
     poll_wait(filp, &chip->r_wait, wait);
 
     if(KEY_KEEP != atomic_read(&chip->status)) {
-		mask = POLLIN | POLLRDNORM;	// 返回PLLIN
+        mask = POLLIN | POLLRDNORM;    // 返回PLLIN
     }
     return mask;
 }
@@ -317,7 +317,7 @@ static int key_probe(struct platform_device *pdev)
     //初始化全局变量
     atomic_set(&chip->status, KEY_KEEP);
     atomic_set(&chip->protect, 0);
-	init_waitqueue_head(&chip->r_wait);
+    init_waitqueue_head(&chip->r_wait);
     
     //配置中断保护急促器
     timer_setup(&chip->key_timer, key_timer_func, 0);

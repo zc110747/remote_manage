@@ -27,24 +27,24 @@
 /*
 设备树
 &i2c2 {
-	clock-frequency = <100000>;
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_i2c2>;
-	status = "okay";
+    clock-frequency = <100000>;
+    pinctrl-names = "default";
+    pinctrl-0 = <&pinctrl_i2c2>;
+    status = "okay";
 
     //...
-	gt9147: gt9147@14 {
-		compatible = "rmk,gt9147";
-		reg = <0x14>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_tsc 
-					&pinctrl_tsc_reset>;
-		interrupt-parent = <&gpio1>;
-		interrupts = <9 IRQ_TYPE_EDGE_FALLING>;
-		reset-gpios = <&gpio5 9 GPIO_ACTIVE_LOW>;
-		interrupt-gpios = <&gpio1 9 GPIO_ACTIVE_LOW>;
-		status = "okay";
-	};
+    gt9147: gt9147@14 {
+        compatible = "rmk,gt9147";
+        reg = <0x14>;
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_tsc 
+                    &pinctrl_tsc_reset>;
+        interrupt-parent = <&gpio1>;
+        interrupts = <9 IRQ_TYPE_EDGE_FALLING>;
+        reset-gpios = <&gpio5 9 GPIO_ACTIVE_LOW>;
+        interrupt-gpios = <&gpio1 9 GPIO_ACTIVE_LOW>;
+        status = "okay";
+    };
 };
 */
 
@@ -146,7 +146,7 @@ static irqreturn_t goodix_irq_handler(int irq, void *pdata)
             input_mt_slot(chip->input_dev, slot_id);
             input_mt_report_slot_state(chip->input_dev, MT_TOOL_FINGER, true);
             touchscreen_report_pos(chip->input_dev, &chip->prop,
-					       input_x, input_y, true);
+                           input_x, input_y, true);
         }
     } else {
         // 没有触摸点或者触摸到松开时的上报
@@ -436,7 +436,7 @@ static int __init goodix_module_init(void)
 
 static void __exit goodix_module_exit(void)
 {
-    return i2c_del_driver(&goodix_driver);
+    i2c_del_driver(&goodix_driver);
 }
 
 module_init(goodix_module_init);

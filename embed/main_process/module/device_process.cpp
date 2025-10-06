@@ -37,7 +37,7 @@ device_process* device_process::get_instance()
         instance_pointer_ = new(std::nothrow) device_process();
         if (instance_pointer_ == nullptr)
         {
-            PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "device_process new error!");
+            LOG_ERROR(xGetCurrentTimes(), "device_process new error!");
         }
     }
     return instance_pointer_;
@@ -99,7 +99,7 @@ void device_process::run()
         }
         else
         {
-            PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "device rx failed:%d", size);
+            LOG_ERROR(xGetCurrentTimes(), "device rx failed:%d", size);
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         }
     }
@@ -151,7 +151,7 @@ int device_process::sync_info(char *buf, int size)
     }
     memcpy(data.buffer, buf, size);
     
-    PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "sync_info:%d, %d", size, EventBuf.get_data().get_buffer()[0]);
+    LOG_FATAL(xGetCurrentTimes(), "sync_info:%d, %d", size, EventBuf.get_data().get_buffer()[0]);
     return send_buffer(reinterpret_cast<char *>(&EventBuf), sizeof(EventBuf));   
 }
 
@@ -200,7 +200,7 @@ bool device_process::get_cpu_used()
         {
             curStat = readCpuStats();
             sysinfo_.cpu_used_precent = static_cast<uint8_t>(curStat.calculateUsage(prevStat));
-            PRINT_LOG(LOG_DEBUG, xGetCurrentTimes(), "cpu percent:%d", sysinfo_.cpu_used_precent);
+            LOG_DEBUG(xGetCurrentTimes(), "cpu percent: %.2f", sysinfo_.cpu_used_precent);
             step = 0;
         }
     }
@@ -219,7 +219,7 @@ bool device_process::get_cpu_info()
     file = fopen("/proc/cpuinfo", "r");
     if (file == NULL)
     {
-        PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "system info open failed!");
+        LOG_ERROR(xGetCurrentTimes(), "system info open failed!");
         return false;
     }
 
@@ -239,7 +239,7 @@ bool device_process::get_cpu_info()
                 is_success = true;
                 sysinfo_.cpu_info = fmt::format("{}", token);
                 sysinfo_.cpu_info.pop_back();
-                PRINT_LOG(LOG_DEBUG, xGetCurrentTimes(), "cpu info:%s", sysinfo_.cpu_info.c_str());
+                LOG_DEBUG(xGetCurrentTimes(), "cpu info: %s", sysinfo_.cpu_info.c_str());
                 break;
             }
             token = strtok_r(NULL, ":", &end);
@@ -261,7 +261,7 @@ bool device_process::get_kernel_info()
     struct utsname uname_info;
     if (uname(&uname_info) == -1)
     {
-        PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "uname open failed!");
+        LOG_ERROR(xGetCurrentTimes(), "uname open failed!");
         return false;
     }
     sysinfo_.kernel_info = fmt::format("{0}", uname_info.release);
@@ -281,7 +281,7 @@ bool device_process::get_kernel_info()
         sysinfo_.host_name = std::string(buffer.data());
         break;
     }  
-    PRINT_LOG(LOG_DEBUG, xGetCurrentTimes(), "kernel info:%s", sysinfo_.kernel_info.c_str());
+    LOG_DEBUG(xGetCurrentTimes(), "kernel info: %s", sysinfo_.kernel_info.c_str());
     return true;
 }
 
@@ -290,14 +290,14 @@ bool device_process::get_disk_info()
     struct statfs diskInfo;
     if (statfs("/", &diskInfo) < 0)
     {
-        PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "disk info read faile!");
+        LOG_ERROR(xGetCurrentTimes(), "disk info read faile!");
         return false;
     }
 
     //单位为B, 转换为MB
     sysinfo_.disk_total = ((uint64_t)diskInfo.f_blocks*diskInfo.f_bsize)/(1024*1024);
     sysinfo_.disk_used = ((uint64_t)diskInfo.f_bavail*diskInfo.f_bsize)/(1024*1024);
-    PRINT_LOG(LOG_DEBUG, xGetCurrentTimes(), "disk:%d, %d", sysinfo_.disk_total, sysinfo_.disk_used);
+    LOG_DEBUG(xGetCurrentTimes(), "disk:%ld, %ld", sysinfo_.disk_total, sysinfo_.disk_used);
     return true;
 }
 
@@ -307,14 +307,14 @@ bool device_process::get_ram_info()
 
     if (sysinfo(&info) == -1)
     {
-        PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "ram info read faile!");
+        LOG_ERROR(xGetCurrentTimes(), "ram info read faile!");
         return -1;
     }
 
     sysinfo_.ram_total = info.totalram/(1024*1024);
     sysinfo_.ram_used = info.freeram/(1024*1024);
 
-    PRINT_LOG(LOG_DEBUG, xGetCurrentTimes(), "ram:%d, %d", sysinfo_.ram_total, sysinfo_.ram_used);
+    LOG_DEBUG(xGetCurrentTimes(), "ram:%ld, %ld", sysinfo_.ram_total, sysinfo_.ram_used);
     return true;
 }
 

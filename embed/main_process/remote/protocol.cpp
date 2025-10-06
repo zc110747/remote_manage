@@ -113,7 +113,7 @@ ENUM_PROTOCOL_STATUS protocol_info::check_rx_frame(uint8_t data)
                 else
                 {
                     rx_status_ = PROTOCOL_FRAME_EMPTY;
-                    PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "Console Crc Error:0x%x, 0x%x", crc_value, crc_calc);
+                    LOG_ERROR(xGetCurrentTimes(), "Console Crc Error: 0x%x, 0x%x", crc_value, crc_calc);
                 }
             }
         }
@@ -153,7 +153,7 @@ void protocol_info::process_rx_frame()
         }
         else
         {
-            PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "protocol rx length is too small!");
+            LOG_ERROR(xGetCurrentTimes(), "protocol rx length is too small!");
         }
     }
 }

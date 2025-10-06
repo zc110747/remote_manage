@@ -53,13 +53,13 @@ public:
 
         fd = open(export_file.c_str(), O_WRONLY);
         if (fd < 0) {
-            PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "pwm export open failed:%s", export_file.c_str());
+            LOG_ERROR(xGetCurrentTicks(), "pwm export open failed: %s", export_file.c_str());
             return false;
         }   
 
         ret = write(fd, "0", strlen("0"));
         if (ret < 0) {
-            PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "pwm export write failed");
+            LOG_ERROR(xGetCurrentTicks(), "pwm export write failed");
             return -1;
         }
         close(fd);
@@ -99,7 +99,7 @@ public:
         if (fd_state<0 || fd_peroid<0 || fd_duty<0)
         {
             ret = -1;
-            PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "open failed:%s,%d,\n%s,%d,\n%s,%d", 
+            LOG_INFO(xGetCurrentTicks(), "open failed:%s,%d,\n%s,%d,\n%s,%d", 
                     pwm_state.c_str(),
                     fd_state,
                     pwm_peroid.c_str(),
@@ -112,7 +112,7 @@ public:
         data = std::to_string(peroid);
         ret = write(fd_peroid, data.c_str(), data.size());
         if (ret < 0) {
-            PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "write peroid failed:%s", 
+            LOG_INFO(xGetCurrentTicks(), "write peroid failed:%s", 
                     data.c_str());
             goto __exit;       
         }
@@ -120,7 +120,7 @@ public:
         data = std::to_string(duty_cycle);
         ret = write(fd_duty, data.c_str(), data.size());
         if (ret < 0) {
-            PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "write duty failed:%s", 
+            LOG_INFO(xGetCurrentTicks(), "write duty failed:%s", 
                     data.c_str());
             goto __exit;       
         }
@@ -128,12 +128,12 @@ public:
         data = std::to_string(state);
         ret = write(fd_state, data.c_str(), data.size());
         if (ret < 0) {
-            PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "write state failed:%s", 
+            LOG_INFO(xGetCurrentTicks(), "write state failed:%s", 
                     data.c_str());
             goto __exit;       
         }
 
-        PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "pwm init ok, dev:%s, state:%d, peroid:%d, duty:%d",
+        LOG_INFO(xGetCurrentTicks(), "pwm init ok, dev:%s, state:%d, peroid:%d, duty:%d",
                 device_path_.c_str(),
                 state,
                 peroid,

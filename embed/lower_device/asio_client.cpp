@@ -61,7 +61,8 @@ void asio_client::asio_client_tx_run()
 {
     int size;
 
-    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "%s start", __func__);
+    LOG_INFO(xGetCurrentTimes(), "%s start", __func__);
+
     while (1)
     {
         size = client_tx_fifo_->read(tx_buffer_, CLIENT_TX_MAX_BUFFER_SIZE);
@@ -82,16 +83,16 @@ void asio_client::asio_client_rx_run()
     const auto& ipaddress = system_config::get_instance()->get_local_ipaddress();
     const auto& port = system_config::get_instance()->get_lower_device_remote_port();
 
-    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "%s start", __func__);
+    LOG_INFO(xGetCurrentTimes(), "%s start", __func__);
 
     while (1)
     {
         try
         {
-            PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "start asio client connet:%s:%d", ipaddress.c_str(), port);
+            LOG_INFO(xGetCurrentTimes(), "start asio client connet:%s:%d", ipaddress.c_str(), port);
             asio::connect(socket_, resolver.resolve(ipaddress, std::to_string(port)));
             is_client_link_ = true;
-            PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "asio client connet success!");
+            LOG_INFO(xGetCurrentTimes(), "asio client connet success!");
 
             do
             {
@@ -109,7 +110,8 @@ void asio_client::asio_client_rx_run()
         catch(std::exception& e)
         {
             is_client_link_ = false;
-            PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "asio client run error:%s", e.what());
+            
+            LOG_ERROR(xGetCurrentTimes(), "asio client run error:%s", e.what());
 
             //for client, detect link every 15s
             std::this_thread::sleep_for(std::chrono::seconds(15));

@@ -355,7 +355,6 @@ public Q_SLOTS:
     void setParameter(const QString &title, int type = 0, int closeSec = 0,
                       QString placeholderText = QString(), bool pwd = false,
                       const QString &defaultValue = QString());
-
 };
 
 //弹出日期选择对话框
@@ -414,7 +413,6 @@ public:
 public Q_SLOTS:
     void setIconMain(const QChar &str, quint32 size = 12);
     void setFormat(const QString &format);
-
 };
 
 //图形字体处理类

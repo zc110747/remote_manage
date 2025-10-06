@@ -16,10 +16,16 @@
 //      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
 /*
-设备树
     usr_nvmem {
         compatible = "rmk,usr_nvmem";
-        status = "okay";        
+        #address-cells = <1>;
+        #size-cells = <1>;
+        mem,size = <1024>;
+        status = "okay";
+
+        nvmem_user_cell: nvmem_user_cell@10 {
+            reg = <0x10 64>;
+        };
     };
 */
 
@@ -37,6 +43,8 @@
 #include <linux/acpi.h>
 #include <linux/nvmem-provider.h>
 
+#define DEFAULT_MEM_SIZE 2048
+
 struct nvmem_data {
     /*
      * Lock protects against activities from other Linux tasks,
@@ -44,22 +52,24 @@ struct nvmem_data {
      */
     struct mutex lock;
 
-    u32 byte_len;
-
     struct device* dev;
     struct nvmem_device *nvmem;
-};
 
-static u8 static_mem[2048] = {0};
+    char *mem_buffer;
+    u32 byte_len;
+};
 
 static int nvmem_read(void *priv, unsigned int off, void *val, size_t count)
 {
-    struct nvmem_data* nvmem; 
+    struct nvmem_data* nvmem = (struct nvmem_data*)priv; 
 
-    nvmem = priv;
+    if (off + count >= nvmem->byte_len) {
+        dev_err(nvmem->dev, "nvmem_read, off:%d, count:%d, out of range!\n", off, count);
+        return -ENOMEM;
+    }
 
     mutex_lock(&nvmem->lock);
-    memcpy(val, &static_mem[off], count);
+    memcpy(val, &nvmem->mem_buffer[off], count);
     mutex_unlock(&nvmem->lock);
 
     dev_info(nvmem->dev, "nvmem_read, off:%d, count:%d!\n", off, count);
@@ -69,12 +79,15 @@ static int nvmem_read(void *priv, unsigned int off, void *val, size_t count)
 //val已经是内核memory, 不需要使用copy_from_user转换
 static int nvmem_write(void *priv, unsigned int off, void *val, size_t count)
 {
-    struct nvmem_data* nvmem; 
+    struct nvmem_data* nvmem = (struct nvmem_data*)priv; 
 
-    nvmem = priv;
+    if (off + count >= nvmem->byte_len) {
+        dev_err(nvmem->dev, "nvmem_read, off:%d, count:%d, out of range!\n", off, count);
+        return -ENOMEM;
+    }
 
     mutex_lock(&nvmem->lock);
-    memcpy(&static_mem[off], val, count);
+    memcpy(&nvmem->mem_buffer[off], val, count);
     mutex_unlock(&nvmem->lock);
     
     dev_info(nvmem->dev, "nvmem_write, off:%d, count:%d!\n", off, count);
@@ -83,20 +96,33 @@ static int nvmem_write(void *priv, unsigned int off, void *val, size_t count)
 
 static int nvmem_probe(struct platform_device *pdev)
 {
+    int ret;
     struct nvmem_data* nvmem;
-    struct nvmem_config config = { };
+    struct nvmem_config config;
     struct device *dev = &pdev->dev;
 
-    nvmem = devm_kzalloc(&pdev->dev, sizeof(*nvmem), GFP_KERNEL);
+    nvmem = devm_kzalloc(dev, sizeof(*nvmem), GFP_KERNEL);
     if (!nvmem) {
-        dev_err(&pdev->dev, "[devm_kzalloc]malloc failed!\n");
+        dev_err(&pdev->dev, "devm_kzalloc nvmem failed!\n");
         return -ENOMEM;
     }
 
-    mutex_init(&nvmem->lock);
+    ret = of_property_read_u32(dev->of_node, "mem,size", &nvmem->byte_len);
+    if (ret < 0) {
+        dev_warn(dev, "of_property_read_u32 failed, use default:%d\n", DEFAULT_MEM_SIZE);
+        nvmem->byte_len = DEFAULT_MEM_SIZE;
+    }
 
-    nvmem->byte_len = 2048;
+    mutex_init(&nvmem->lock);
     nvmem->dev = dev;
+    nvmem->mem_buffer = devm_kzalloc(dev, nvmem->byte_len, GFP_KERNEL);
+    if (IS_ERR(nvmem->mem_buffer)) {
+        dev_err(&pdev->dev, "devm_kzalloc mem_buffer failed!\n");
+        return -ENOMEM;      
+    }
+
+    // 清除config配置
+    memset((char *)&config, 0, sizeof(config));
 
     config.name = "kernel_nvmem";              //定义nvmem的名称
     config.dev = dev;
@@ -114,7 +140,7 @@ static int nvmem_probe(struct platform_device *pdev)
 
     nvmem->nvmem = devm_nvmem_register(dev, &config);
     if (IS_ERR(nvmem->nvmem)) {
-        dev_err(&pdev->dev, "[devm_nvmem_register]register failed!\n");
+        dev_err(&pdev->dev, "devm_nvmem_register failed!\n");
         return PTR_ERR(nvmem->nvmem);
     }
 

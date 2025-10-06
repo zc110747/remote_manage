@@ -93,7 +93,6 @@ static int thermal_fan_get_cur_state(struct thermal_cooling_device *cdev,
 static int thermal_fan_set_cur_state(struct thermal_cooling_device *cdev, unsigned long state)
 {
     struct thermal_fan_data *data = cdev->devdata;
-    int ret;
 
     if (state > data->max_fan_level)
         return -EINVAL;
@@ -104,7 +103,7 @@ static int thermal_fan_set_cur_state(struct thermal_cooling_device *cdev, unsign
     set_pwm(data, data->cooling_levels[state]);
     data->cur_fan_level = state;
 
-    return ret;
+    return 0;
 }
 
 static const struct thermal_cooling_device_ops thermal_fan_cooling_ops = {

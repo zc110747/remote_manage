@@ -1,7 +1,7 @@
 ## nfs network
-serverip=192.168.2.29
-ipaddr=192.168.2.99
-gateway=192.168.2.1
+serverip=192.168.10.240
+ipaddr=192.168.10.99
+gateway=192.168.10.1
 netmask=255.255.255.0
 nfspath=/home/freedom/Desktop/user_git/sdk/nfs
 

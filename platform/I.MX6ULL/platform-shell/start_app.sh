@@ -18,11 +18,11 @@ sleep 1
 
 #start all device
 /home/sys/executable/logger_tool -f /home/sys/configs/config.json &
-sleep 2
+sleep 3
 /home/sys/executable/local_device -f /home/sys/configs/config.json &
-sleep 2
+sleep 3
 /home/sys/executable/main_process -f /home/sys/configs/config.json &
-sleep 2
+sleep 3
 
 #run server.js
 cd /home/sys/server/

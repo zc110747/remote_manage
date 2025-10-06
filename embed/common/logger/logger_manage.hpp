@@ -26,20 +26,19 @@ _Pragma("once")
 #define LOGGER_MAX_BUFFER_SIZE      1024
 #define LOGGER_MESSAGE_BUFFER_SIZE  16384
 
-typedef enum
-{
-    LOG_TRACE = 0,
-    LOG_DEBUG,
-    LOG_INFO,
-    LOG_WARN,
-    LOG_ERROR,
-    LOG_FATAL,
-}LOG_LEVEL;
-
-
 class log_manage final
 {
 public:
+    enum class LOG_LEVEL
+    {
+        TRACE = 0,
+        DEBUG,
+        INFO,
+        WARN,
+        ERROR,
+        FATAL,
+    };
+
     /// \brief constructor
     log_manage() = default;
 
@@ -106,7 +105,7 @@ private:
 
     /// \brief log_level_
     /// - log level defined.
-    LOG_LEVEL log_level_{LOG_INFO};
+    LOG_LEVEL log_level_{LOG_LEVEL::DEBUG};
 
     /// \brief mutex_
     /// - mutex used to protect output.
@@ -119,3 +118,18 @@ private:
 
 #define PRINT_NOW(...)    { printf(__VA_ARGS__); fflush(stdout);}
 #define PRINT_LOG(level, time, fmt, ...) do{ log_manage::get_instance()->print_log(level, time, fmt, ##__VA_ARGS__); }while (0);
+#define LOG_DEBUG(time, ...)      do { \
+    PRINT_LOG(log_manage::LOG_LEVEL::DEBUG, time, __VA_ARGS__); \
+}while(0);          
+#define LOG_INFO(time, ...)       do {  \
+    PRINT_LOG(log_manage::LOG_LEVEL::INFO, time, __VA_ARGS__); \
+}while(0);
+#define LOG_WARN(time, ...)       do {  \
+    PRINT_LOG(log_manage::LOG_LEVEL::WARN, time, __VA_ARGS__); \
+}while(0);
+#define LOG_ERROR(time, ...)      do {  \
+    PRINT_LOG(log_manage::LOG_LEVEL::ERROR, time, __VA_ARGS__); \
+}while(0);
+#define LOG_FATAL(time, ...)      do {  \
+    PRINT_LOG(log_manage::LOG_LEVEL::FATAL, time, __VA_ARGS__); \
+}while(0);

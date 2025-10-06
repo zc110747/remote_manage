@@ -232,7 +232,7 @@ struct device_read_info
         {
             memcpy(rtc_timer.buffer, &buffer[size], rtc_timer.size);
         }
-        PRINT_LOG(LOG_DEBUG, xGetCurrentTimes(), "data:%d,%f", hx711_, icm_info_.gyro_y_act);
+        LOG_DEBUG(xGetCurrentTimes(), "data: %ld, %.02f", hx711_, icm_info_.gyro_y_act);
     }
 
     /// \brief size

@@ -186,7 +186,6 @@ void QextSerialPortPrivate::setParity(ParityType parity, bool update)
 void QextSerialPortPrivate::setDataBits(DataBitsType dataBits, bool update)
 {
     switch (dataBits) {
-
         case DATA_5:
             if (settings.StopBits == STOP_2) {
                 QESP_WARNING("QextSerialPort: 5 Data bits cannot be used with 2 stop bits.");
@@ -248,7 +247,6 @@ void QextSerialPortPrivate::setDataBits(DataBitsType dataBits, bool update)
 void QextSerialPortPrivate::setStopBits(StopBitsType stopBits, bool update)
 {
     switch (stopBits) {
-
         /*one stop bit*/
         case STOP_1:
             settings.StopBits = stopBits;

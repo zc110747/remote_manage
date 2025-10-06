@@ -67,9 +67,9 @@ void log_process::logger_rx_run()
         if (len > 0) {
             log_server::get_instance()->send_buffer(rx_buffer, len);
         } else if (len == 0) {
-            PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "%s read empty fifo data:%d\n", __func__, len);
+            LOG_INFO(xGetCurrentTimes(), "%s read empty fifo data:%d\n", __func__, len);
         } else {
-            PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "%s read failed:%d\n", __func__, len);
+            LOG_INFO(xGetCurrentTimes(), "%s read failed:%d\n", __func__, len);
             break;
         }
     }
@@ -151,7 +151,8 @@ void log_process::show_help()
         out_str += fmt::format("{0}\n", y);
     }
     out_str.pop_back();
-    PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "%s", out_str.c_str());
+    
+    LOG_FATAL(xGetCurrentTimes(), "%s", out_str.c_str());
 }
 
 void log_process::release()
@@ -185,7 +186,7 @@ int log_process::send_buffer(char *ptr, int length)
     ret = login(ptr, length);
     if (!ret)
     {
-        PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "not login:%s", ptr);
+        LOG_INFO(xGetCurrentTimes(), "not login:%s", std::string(ptr).c_str());
         return -1;
     }
 
@@ -199,7 +200,7 @@ int log_process::send_buffer(char *ptr, int length)
         }
     }
 
-    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "logger command information:%s", ptr);
+    LOG_INFO(xGetCurrentTimes(), "logger command information:%s", ptr);
 
     if (length >= len)
     {
@@ -231,11 +232,11 @@ int log_process::send_buffer(char *ptr, int length)
                     )
                     {
                         is_login_ = true;
-                        PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "login in, use !? search support command");
+                        LOG_FATAL(xGetCurrentTimes(), "login in, use !? search support command");
                     }
                     else
                     {
-                        PRINT_LOG(LOG_FATAL, xGetCurrentTimes(), "passwd:%s, %s, %d, %d", pdata, passwd.c_str(), size, passwd.length());
+                        LOG_FATAL(xGetCurrentTimes(), "passwd:%s, %s, %d, %d", pdata, passwd.c_str(), size, passwd.length());
                     }
                 }
                 break;
@@ -243,13 +244,13 @@ int log_process::send_buffer(char *ptr, int length)
                 show_help();
                 break;
             default:
-                PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "no equal command:%s", ptr);
+                LOG_ERROR(xGetCurrentTimes(), "no equal command: %s", ptr);
                 break;
         }
     }
     else
     {
-        PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "logger command failed:%d, len:%d, %d\n", cmd, length, len);
+        LOG_ERROR(xGetCurrentTimes(), "logger command failed:%d, len:%d, %d\n", cmd, length, len);
     }
 
     return length;

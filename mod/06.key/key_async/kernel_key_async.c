@@ -115,8 +115,7 @@ ssize_t key_read(struct file *filp, char __user *buf, size_t count, loff_t *f_po
         if (KEY_KEEP == atomic_read(&chip->status)) {
             return -EAGAIN;
         }
-    }
-    else {
+    } else {
         ret = wait_event_interruptible(chip->r_wait, KEY_KEEP != atomic_read(&chip->status));
         if (ret) {
             return ret;
@@ -138,7 +137,7 @@ static int key_fasync(int fd, struct file *filp, int on)
     struct key_data *chip;
 
     chip = (struct key_data *)filp->private_data;
-	return fasync_helper(fd, filp, on, &chip->async_queue);
+    return fasync_helper(fd, filp, on, &chip->async_queue);
 }
 
 static struct file_operations key_fops = {
@@ -175,13 +174,12 @@ void key_timer_func(struct timer_list *arg)
         chip->key_value = value;
         if (value == 1) {
             atomic_set(&chip->status, KEY_PRESS);
-        }
-        else {
+        } else {
             atomic_set(&chip->status, KEY_RELEASE);
         }
         wake_up_interruptible(&chip->r_wait);
         if (chip->async_queue) {
-			kill_fasync(&chip->async_queue, SIGIO, POLL_IN);
+            kill_fasync(&chip->async_queue, SIGIO, POLL_IN);
         }
     }
     else
@@ -318,7 +316,7 @@ static int key_probe(struct platform_device *pdev)
     //4. 初始化全局变量和功能
     atomic_set(&chip->status, KEY_KEEP);
     atomic_set(&chip->protect, 0);
-	init_waitqueue_head(&chip->r_wait);
+    init_waitqueue_head(&chip->r_wait);
     timer_setup(&chip->key_timer, key_timer_func, 0);
 
     dev_info(&pdev->dev, "key driver init ok!\r\n");

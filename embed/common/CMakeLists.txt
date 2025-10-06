@@ -1,0 +1,17 @@
+
+# 收集目录下的源文件
+file(GLOB COMMON_LIB_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/fifo/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/jsonconfig/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/logger/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/server/*.cpp")
+set(COMMON_INCLUDE_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/"
+        "${CMAKE_CURRENT_SOURCE_DIR}/fifo/"
+        "${CMAKE_CURRENT_SOURCE_DIR}/jsonconfig/"
+        "${CMAKE_CURRENT_SOURCE_DIR}/logger/"
+        "${CMAKE_CURRENT_SOURCE_DIR}/server/"
+        "${CMAKE_CURRENT_SOURCE_DIR}/event/")
+
+# 将LIB_SOURCES变量传递给父级作用域
+set(COMMON_LIB_SOURCES ${COMMON_LIB_SOURCES} PARENT_SCOPE)
+set(COMMON_INCLUDE_HEADERS ${COMMON_INCLUDE_HEADERS} PARENT_SCOPE)

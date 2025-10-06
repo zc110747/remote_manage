@@ -462,7 +462,7 @@ static int __init pcf8563_module_init(void)
 
 static void __exit pcf8563_module_exit(void)
 {
-    return i2c_del_driver(&pcf8563_driver);
+    i2c_del_driver(&pcf8563_driver);
 }
 
 module_init(pcf8563_module_init);

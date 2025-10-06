@@ -46,6 +46,7 @@ _Pragma("once")
 #include <chrono>
 #include <vector>
 #include <functional>
+#include <sstream>
 
 #include "event.hpp"
 #include "thread_queue.hpp"
@@ -89,7 +90,7 @@ typedef union
 
 #define CREATE_UINT16(a, b)             ((a)<<8 | (b))
 #define CREATE_UINT32(a, b, c, d)       ((a)<<24 | (b)<<16 | (c)<<8 | d)
-#define CREATE_FLOAT(a, b, c, d)        (float)((a)<<24 | (b)<<16 | (c)<<8 | d)
+#define CREATE_FLOAT(a, b, c, d)        static_cast<float>((a)<<24 | (b)<<16 | (c)<<8 | d)
 
 #define DEVICE_LOOP_EVENT               0
 #define DEVICE_HW_SET_EVENT             1

@@ -20,6 +20,6 @@ done
 
 mv -fv *.dtbo "${BUILD_TFTP_PATH}"/
 
-cp -fv kernel_fit.its "${BUILD_TFTP_PATH}"/
-cd "${BUILD_TFTP_PATH}"/
-mkimage -f kernel_fit.its kernel_fit.itb
+# cp -fv kernel_fit.its "${BUILD_TFTP_PATH}"/
+# cd "${BUILD_TFTP_PATH}"/
+# mkimage -f kernel_fit.its kernel_fit.itb

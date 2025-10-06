@@ -100,7 +100,6 @@ replay:
 
 模块之间通过MQTT服务进行交互， 格式如下
 
-
 ### json数据格式
 
 A0: 表示数据为json格式(A0 + json数据)，后续数据按照json解析
@@ -109,7 +108,7 @@ A0: 表示数据为json格式(A0 + json数据)，后续数据按照json解析
 
 满足此格式的主要为控制命令，如获取设备信息，设置设备信息，获取配置信息, 格式:
 
-#### req_getstat
+#### json_req_getstat
 
 ```json
 A0{"command":"req_getstat","source":"SRC_DESKTOP"}

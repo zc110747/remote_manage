@@ -51,7 +51,7 @@ void port_tty_rx_thread()
     while (1) {
         n_size = port_tty.read(tty_rx_buffer, RX_BUFFER_SIZE);
         if (n_size > 0) {
-            PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "tty_rx_buffer, size:%d", n_size);
+            LOG_INFO(xGetCurrentTimes(), "tty_rx_buffer, size:%d", n_size);
             
             tty_rx_index = 0;
             for (int index=0; index<n_size; index++)
@@ -59,10 +59,10 @@ void port_tty_rx_thread()
                 prvvUARTRxISR();
             }
         } else if ( n_size == 0) {
-            PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "not receive");
+            LOG_INFO(xGetCurrentTimes(), "not receive");
             continue;
         } else {
-            PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "tty failed");
+            LOG_ERROR(xGetCurrentTimes(), "tty failed");
         }
     }
 }

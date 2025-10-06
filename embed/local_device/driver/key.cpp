@@ -38,7 +38,7 @@ bool key_device::init(const std::string &DevicePath, int flags)
     device_fd_ = ::open(device_path_.c_str(), flags);
     if (device_fd_ < 0)
     {
-        PRINT_LOG(LOG_INFO, 0, "open %s device failed!", device_path_.c_str());
+        LOG_INFO(0, "open %s device failed!", device_path_.c_str());
         return false;
     }
     else
@@ -53,7 +53,7 @@ void key_device::run()
     int flags;
     struct input_event event;
 
-    PRINT_LOG(LOG_INFO, 0, "key device run start!");
+    LOG_INFO(0, "key device run start!");
 
     while (1)
     {
@@ -102,7 +102,7 @@ bool key_device::register_func(uint16_t key_num, uint16_t key_event, std::functi
         };
 
         key_action_list.push_back(key_action);
-        PRINT_LOG(LOG_INFO, 0, "key register, totol:%d!", key_action_list.size());
+        LOG_INFO(0, "key register, total:%ld!", key_action_list.size());
         return true;
     }
     return false;

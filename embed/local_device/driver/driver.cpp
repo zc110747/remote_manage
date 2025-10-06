@@ -54,7 +54,7 @@ bool driver_manage::init()
     {
         led_zero_.write_io_status(pConfig->get_led_config().init);
         beep_zero_.write_io_status(pConfig->get_beep_config().init);
-        PRINT_LOG(LOG_INFO, 0, "Device driver_manage Init Success!");
+        LOG_INFO(0, "Device driver_manage Init Success!");
     }
     
     return true;

@@ -3,7 +3,7 @@
 const mqtt = require('mqtt')
 
 //user module
-const { config_info } = require('./config_json.js')
+const { config_info } = require('./config_parser.js')
 
 let subscribe_info = {
     command: 1,

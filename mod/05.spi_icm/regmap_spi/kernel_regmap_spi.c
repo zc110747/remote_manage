@@ -409,7 +409,7 @@ static int __init spi_icm_module_init(void)
 
 static void __exit spi_icm_module_exit(void)
 {
-    return spi_unregister_driver(&icm20608_driver);
+    spi_unregister_driver(&icm20608_driver);
 }
 
 module_init(spi_icm_module_init);

@@ -84,23 +84,23 @@ bool mqtt_protocol::decode_json_command(char *ptr, int size)
 
         if(!reader->parse(begin, end, &root, &errs))
         {
-            PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "json reader parse failed");
+            LOG_ERROR(xGetCurrentTicks(), "json reader parse failed");
             return false;
         }
 
         data = root["command"].asString();
         if (JsonCmdMap.count(data) == 0)
         {
-            PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "invalid commnd:%s", data.c_str());
+            LOG_ERROR(xGetCurrentTicks(), "invalid commnd:%s", data.c_str());
             return false;
         } 
         format = JsonCmdMap.find(data)->second;
-        PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "commnd:%s, index:%d", data.c_str(), format);
+        LOG_INFO(xGetCurrentTicks(), "commnd:%s, index:%d", data.c_str(), format);
         
         data = root["source"].asString();
         if (JsonSourceMap.count(data) == 0)
         {
-            PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "invalid Source:%s", data.c_str());
+            LOG_ERROR(xGetCurrentTicks(), "invalid Source:%s", data.c_str());
             return false;
         } 
         source = JsonSourceMap.find(data)->second;
@@ -127,7 +127,7 @@ bool mqtt_protocol::decode_json_command(char *ptr, int size)
                     data = root["data"]["device"].asString();
                     if (JsonDevMap.count(data) == 0)
                     {
-                        PRINT_LOG(LOG_ERROR, xGetCurrentTicks(), "invalid device:%s", data.c_str());
+                        LOG_ERROR(xGetCurrentTicks(), "invalid device: %s", data);
                         return false;
                     } 
                     dev = JsonDevMap.find(data)->second;

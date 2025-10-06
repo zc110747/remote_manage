@@ -20,7 +20,6 @@
 *.Module*
 
 thirdparts/asio/
-thirdparts/jsoncpp/
 thirdparts/mosquitto/m*
 thirdparts/mosquitto/c*
 thirdparts/mosquitto/o*
@@ -35,6 +34,7 @@ buildout/arm/
 
 embed/lower_device/lower_device
 embed/main_process/main_process
+embed/main_process/build/*
 embed/local_device/local_device
 embed/logger_tool/logger_tool
 embed/node_server/node_modules

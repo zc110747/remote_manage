@@ -84,7 +84,7 @@ public:
             {
                 tick++;
             }
-            PRINT_LOG(LOG_INFO, xGetCurrentTicks(), "%d", tick);
+            LOG_INFO(xGetCurrentTicks(), "%d", tick);
         }
         else
         {

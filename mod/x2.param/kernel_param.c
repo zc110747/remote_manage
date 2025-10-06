@@ -37,7 +37,6 @@ static int __init kernel_module_init(void)
 
 static void __exit kernel_module_exit(void)
 {
-
 }
 
 module_init(kernel_module_init);

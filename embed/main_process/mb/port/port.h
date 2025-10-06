@@ -25,15 +25,15 @@
 #include <assert.h>
 #include <inttypes.h>
 
-#define	INLINE
+#define INLINE
 #define PR_BEGIN_EXTERN_C           extern "C" {
-#define	PR_END_EXTERN_C             }
+#define PR_END_EXTERN_C             }
 
-#define ENTER_CRITICAL_SECTION( )		EnterCriticalSection( )
+#define ENTER_CRITICAL_SECTION( )   EnterCriticalSection( )
 #define EXIT_CRITICAL_SECTION( )    ExitCriticalSection( )
 
-#define CCLK	60000000L
-#define PCLK	CCLK/4
+#define CCLK    60000000L
+#define PCLK    CCLK/4
 
 #ifdef __cplusplus
 PR_BEGIN_EXTERN_C

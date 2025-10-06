@@ -20,10 +20,12 @@
   */
 
 /* ----------------------- System includes --------------------------------*/
+#include <mutex>
+
 #include "port.h"
 #include "mb.h"
 #include "mbport.h"
-#include <mutex>
+
 
 /* ----------------------- Modbus includes ----------------------------------*/
 
@@ -87,14 +89,13 @@ eMBErrorCode eMBRegCoilsCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNCo
     int i;
 
     /* check if we away of table size */
-    if (usAddress < REG_COIL_START 
-    || usAddress + usNCoils > REG_COIL_END) {
+    if (usAddress < REG_COIL_START || usAddress + usNCoils > REG_COIL_END) {
         return MB_ENOREG;
-    } 
+    }
     
     //covert to register list
     usAddress -= REG_COIL_START;
-    
+
     switch (eMode) {
         case MB_REG_WRITE:
             for (i = 0; i < usNCoils; i++) {
@@ -123,7 +124,7 @@ RTU请求:  | 01 | 02 | 00 00 | 00 10 | 79 c6 | => | 从设备地址 | 功能码
 #define REG_DISCRETE_START           0x0001
 #define REG_DISCRETE_NREGS           10
 #define REG_DISCRETE_END             (REG_DISCRETE_START + REG_DISCRETE_NREGS*8)
-static UCHAR   usRegDiscreateBuf[REG_DISCRETE_NREGS] = {0x31, 0x15, 0x01, 0x00, 0x01, 0x01, 0x01};  
+static UCHAR   usRegDiscreateBuf[REG_DISCRETE_NREGS] = {0x31, 0x15, 0x01, 0x00, 0x01, 0x01, 0x01};
 eMBErrorCode eMBRegDiscreteCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNDiscrete )
 {
     eMBErrorCode eStatus = MB_ENOERR;
@@ -134,7 +135,7 @@ eMBErrorCode eMBRegDiscreteCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT us
         return MB_ENOREG;
     }
     usAddress -= REG_COIL_START;
-    
+
     while (usNDiscrete > 0) {
         *pucRegBuffer++ = xMBUtilGetBits(usRegDiscreateBuf, usAddress, (uint8_t)( usNDiscrete > 8 ? 8 : usNDiscrete ) );
         
@@ -145,7 +146,7 @@ eMBErrorCode eMBRegDiscreteCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT us
             break;
         }
     }
-    return eStatus;    
+    return eStatus;
 }
 
 /*
@@ -180,7 +181,7 @@ eMBErrorCode eMBRegHoldingCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usN
                     *pucRegBuffer++ = (usRegHoldingBuf[iRegIndex] >> 8);            
                     *pucRegBuffer++ = (usRegHoldingBuf[iRegIndex] & 0xFF); 
                     iRegIndex++;
-                    usNRegs--;					
+                    usNRegs--;
                 }                            
                 break;
             case MB_REG_WRITE://写 MB_REG_WRITE = 0
@@ -194,7 +195,7 @@ eMBErrorCode eMBRegHoldingCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usN
         }
     } else {
         eStatus = MB_ENOREG;
-    }	
+    }
 
     return eStatus;
 }
@@ -219,7 +220,7 @@ eMBErrorCode eMBRegInputCB(UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNReg
 
     if ((usAddress >= REG_INPUT_START ) 
     && ((usAddress + usNRegs) <= REG_INPUT_END ) ){
-        iRegIndex = ( int )( usAddress - REG_INPUT_START );
+        iRegIndex = static_cast<int>( usAddress - REG_INPUT_START );
         while (usNRegs>0)  {
             *pucRegBuffer++ = ( unsigned char )( usRegInputBuf[iRegIndex] >> 8 );
             *pucRegBuffer++ = ( unsigned char )( usRegInputBuf[iRegIndex] & 0xFF );

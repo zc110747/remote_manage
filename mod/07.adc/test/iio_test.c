@@ -42,6 +42,7 @@ int file_data_read(char *filename, char *str, size_t size)
 
     ret = fread(str, 1, size, file);
     if (ret < 0) {
+        fclose(file);
         return ret;
     }
 
@@ -65,7 +66,6 @@ int main(int argc, const char *argv[])
     sprintf(filepath, IIO_CHANNEL_FILE, val);
 
     while (1) {
-
         ret = file_data_read(filepath, str, sizeof(str));
         if (ret == 0) {
             value = atoi(str);

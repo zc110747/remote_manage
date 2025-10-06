@@ -46,8 +46,8 @@ struct rngc_data
 {
     /* device */
     struct platform_device *pdev;
-    struct hwrng		rng;
-    
+    struct hwrng        rng;
+
     /* status */
     int quality;
 };
@@ -59,12 +59,11 @@ static int rngc_init(struct hwrng *rng)
 
 static void rngc_cleanup(struct hwrng *rng)
 {
-
 }
 
 static int rngc_read(struct hwrng *rng, void *data, size_t max, bool wait)
 {
-	int retval = 0;
+    int retval = 0;
     struct rngc_data *chip = container_of(rng, struct rngc_data, rng);
     struct platform_device *pdev = chip->pdev;
     
@@ -99,18 +98,18 @@ static int rngc_probe(struct platform_device *pdev)
         chip->quality = 1;
     }
 
-	chip->rng.name = pdev->name;
-	chip->rng.init = rngc_init;
-	chip->rng.read = rngc_read;
-	chip->rng.cleanup = rngc_cleanup;
-	chip->rng.quality = chip->quality;
+    chip->rng.name = pdev->name;
+    chip->rng.init = rngc_init;
+    chip->rng.read = rngc_read;
+    chip->rng.cleanup = rngc_cleanup;
+    chip->rng.quality = chip->quality;
 
     //3.将设备注册到内核和系统中
-	ret = devm_hwrng_register(&pdev->dev, &chip->rng);
-	if (ret) {
-		dev_err(&pdev->dev, "hwrng registration failed\n");
-		return ret;
-	}
+    ret = devm_hwrng_register(&pdev->dev, &chip->rng);
+    if (ret) {
+        dev_err(&pdev->dev, "hwrng registration failed\n");
+        return ret;
+    }
 
     dev_info(&pdev->dev, "driver init success!\n");
     return 0;

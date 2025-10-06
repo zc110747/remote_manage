@@ -123,7 +123,7 @@ static int icm20608_read_block(struct spi_device *spi, u8 reg, void *buf, int le
     }
 
     txdata = kzalloc(sizeof(char) * (len + 1), GFP_KERNEL);
-    if (!rxdata) {
+    if (!txdata) {
         ret = -ENOMEM;
         goto err_mem2;
     }    
@@ -483,7 +483,7 @@ static int __init spi_icm_module_init(void)
 
 static void __exit spi_icm_module_exit(void)
 {
-    return spi_unregister_driver(&icm20608_driver);
+    spi_unregister_driver(&icm20608_driver);
 }
 
 module_init(spi_icm_module_init);

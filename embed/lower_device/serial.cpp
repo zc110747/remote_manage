@@ -29,7 +29,7 @@ serial_manage* serial_manage::get_instance()
         instance_pointer_ = new(std::nothrow) serial_manage();
         if (instance_pointer_ == nullptr)
         {
-            PRINT_LOG(LOG_ERROR, xGetCurrentTimes(), "serial_manage new failed!");
+            LOG_ERROR(xGetCurrentTimes(), "serial_manage new failed!");
         }
     }
     return instance_pointer_;
@@ -37,7 +37,7 @@ serial_manage* serial_manage::get_instance()
 
 void serial_manage::uart_server_run()
 {
-    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "%s start", __func__);
+    LOG_INFO(xGetCurrentTimes(), "%s start", __func__);
 
     for (;;)
     {
@@ -48,7 +48,7 @@ void serial_manage::uart_server_run()
         } else if (size == 0) {
             //do nothing
         } else {
-            PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "tty_ maybe close, loop stop!");
+            LOG_INFO(xGetCurrentTimes(), "tty_ maybe close, loop stop!");
             break;
         }
     }
@@ -58,7 +58,7 @@ void serial_manage::uart_tx_run()
 {
     int size;
 
-    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "%s start", __func__);
+    LOG_INFO(xGetCurrentTimes(), "%s start", __func__);
 
     while (1) {
         size = serial_tx_fifo_->read(tx_buffer_, SERIAL_RX_MAX_BUFFER_SIZE);
@@ -98,7 +98,7 @@ bool serial_manage::init()
     uart_tx_thread_ = std::thread(std::bind(&serial_manage::uart_tx_run, this));
     uart_tx_thread_.detach();
 
-    PRINT_LOG(LOG_INFO, xGetCurrentTimes(), "serial_manage init success!");
+    LOG_INFO(xGetCurrentTimes(), "serial_manage init success!");
     return true;
 }
 
