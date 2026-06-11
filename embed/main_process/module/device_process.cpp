@@ -29,20 +29,6 @@
 #define FMT_HEADER_ONLY
 #include "fmt/core.h"
 
-device_process* device_process::instance_pointer_ = nullptr;
-device_process* device_process::get_instance()
-{
-    if (instance_pointer_ == nullptr)
-    {
-        instance_pointer_ = new(std::nothrow) device_process();
-        if (instance_pointer_ == nullptr)
-        {
-            LOG_ERROR(xGetCurrentTimes(), "device_process new error!");
-        }
-    }
-    return instance_pointer_;
-}
-
 bool device_process::init()
 {
     device_info_fifo_point_ = std::make_unique<fifo_manage>(LOCAL_DEVICE_INFO_FIFO,

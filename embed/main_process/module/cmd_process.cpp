@@ -55,28 +55,14 @@ std::vector<std::string> split(const std::string &s, char delimiter) {
     return tokens;
 }
 
-cmd_process* cmd_process::instance_pointer_ = nullptr;
-cmd_process* cmd_process::get_instance()
-{
-    if (instance_pointer_ == nullptr)
-    {
-        instance_pointer_ = new(std::nothrow) cmd_process();
-        if (instance_pointer_ == nullptr)
-        {
-            PRINT_NOW("%s:device_manage new failed\r\n", PRINT_NOW_HEAD_STR);
-        }
-    }
-    return instance_pointer_;
-}
-
 bool cmd_process::init()
 {
-    logger_main_process_tx_fifo_ = std::make_unique<fifo_manage>(LOGGER_MP_TX_FIFO, 
+    logger_mp_tx_fifo_ = std::make_unique<fifo_manage>(LOGGER_MP_TX_FIFO, 
                                                     S_FIFO_WORK_MODE, 
                                                     FIFO_MODE_R);
-    if (logger_main_process_tx_fifo_ == nullptr)
+    if (logger_mp_tx_fifo_ == nullptr)
         return false;
-    if (!logger_main_process_tx_fifo_->create())
+    if (!logger_mp_tx_fifo_->create())
         return false;
 
     cmd_process_thread_ = std::thread(std::bind(&cmd_process::run, this));
@@ -254,7 +240,7 @@ void cmd_process::run()
 
     while (1)
     {
-        len = logger_main_process_tx_fifo_->read(rx_buffer_, DEVICE_RX_BUFFER_SIZE);
+        len = logger_mp_tx_fifo_->read(rx_buffer_, DEVICE_RX_BUFFER_SIZE);
         if (len > 0)
         {
             rx_buffer_[len] = '\0';

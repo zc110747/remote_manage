@@ -40,20 +40,6 @@ const static std::map<cmd_format_t, std::string> CmdHelpMapM = {
     {cmdGetHelp,    "!local_dev ? or !locd help"},
 };
 
-cmd_process* cmd_process::instance_pointer_ = nullptr;
-cmd_process* cmd_process::get_instance()
-{
-    if (instance_pointer_ == nullptr)
-    {
-        instance_pointer_ = new(std::nothrow) cmd_process();
-        if (instance_pointer_ == nullptr)
-        {
-            PRINT_NOW("%s:device_manage new failed\r\n", PRINT_NOW_HEAD_STR);
-        }
-    }
-    return instance_pointer_;
-}
-
 bool cmd_process::init()
 {
     logger_loc_dev_tx_fifo_ = std::make_unique<fifo_manage>(LOGGER_LOC_DEV_TX_FIFO, 

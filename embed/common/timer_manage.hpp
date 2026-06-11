@@ -303,21 +303,12 @@ private:
     uint32_t action_times_;
 };
 
-class timer_manage
+class timer_manage final : public singleton<timer_manage>
 {
 public:
     /// \brief constructor
     timer_manage(): ticks_(0) {
     }
-    timer_manage(const timer_manage&)=delete;
-
-    /// \brief destructor, delete not allow for singleton pattern.
-    virtual ~timer_manage()=delete;
-
-    /// \brief get_instance
-    /// - This method is used to get the pattern of the class.
-    /// \return the singleton pattern point of the object.
-    static timer_manage *get_instance();
 
     /// \brief init
     /// - This method is used to init the object.
@@ -356,10 +347,6 @@ private:
     void run();
 
 private:
-    /// \brief instance_pointer_
-    /// - object used to implement the singleton pattern.
-    static timer_manage *instance_pointer_;
-
     /// \brief timer_
     /// - object used to do timer .
     timer_struct timer_;

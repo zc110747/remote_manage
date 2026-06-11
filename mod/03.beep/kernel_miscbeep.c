@@ -51,13 +51,11 @@ pinctrl_gpio_beep: beep {
 struct beep_data
 {
     /* gpio info */
-    int status;
     struct gpio_desc *desc; 
 
     /*device info*/
     struct platform_device *pdev;
     struct miscdevice misc_dev;
-    struct file_operations misc_fops;
 
     const int *init_data;
 };
@@ -66,34 +64,43 @@ struct beep_data
 #define BEEP_ON                             1
 
 //自定义设备号
-#define DEVICE_NAME                         "miscbeep"      /* 设备名, 应用将以/dev/beep访问 */
+#define DEVICE_NAME                         "miscbeep"      /* 设备名, 应用将以/dev/miscbeep访问 */
 #define MISCBEEP_MINOR                      156             /* 子设备号 */
 
-static void beep_hardware_set(struct beep_data *chip, u8 status)
+static int beep_hardware_set(struct beep_data *chip, u8 status)
 {
     struct platform_device *pdev = chip->pdev;
+    int ret = 0;
 
     switch (status) {
         case BEEP_OFF:
             dev_info(&pdev->dev, "off\n");
-            gpiod_set_value(chip->desc, 0);
-            chip->status = 0;
+            gpiod_set_value_cansleep(chip->desc, 0);
             break;
         case BEEP_ON:
             dev_info(&pdev->dev, "on\n");
-            gpiod_set_value(chip->desc, 1);
-            chip->status = 1;
+            gpiod_set_value_cansleep(chip->desc, 1);
             break;
         default:
+            dev_err(&pdev->dev, "invalid status:%d\n", status);
+            ret = -EINVAL;
             break;
     }
+
+    return ret;
 }
 
 int beep_open(struct inode *inode, struct file *filp)
 {
+    struct miscdevice *mdev;
     struct beep_data *chip;
 
-    chip = container_of(filp->f_op, struct beep_data, misc_fops);
+    mdev = filp->private_data;
+
+    chip = container_of(mdev,
+                        struct beep_data,
+                        misc_dev);
+
     filp->private_data = chip;
     return 0;
 }
@@ -106,68 +113,121 @@ int beep_release(struct inode *inode, struct file *filp)
 ssize_t beep_read(struct file *filp, char __user *buf, size_t count, loff_t *f_pos)
 {
     int ret;
-    u8 databuf[2];
-    struct beep_data *chip = (struct beep_data *)filp->private_data;
+    u8 value;
+    struct beep_data *chip = filp->private_data;
     struct platform_device *pdev = chip->pdev;
 
-    databuf[0] = chip->status;
-    ret = copy_to_user(buf, databuf, 1);
+    if (count < 1) 
+        return -EINVAL;
+
+    if (*f_pos)
+        return 0;
+
+    value= gpiod_get_value_cansleep(chip->desc);
+    ret = copy_to_user(buf, &value, 1);
     if (ret) {
         dev_err(&pdev->dev, "read failed!\n");
         return -EFAULT;
     }
-    return count;
+
+    *f_pos += 1;
+
+    return 1;
 }
 
-ssize_t beep_write(struct file *filp, const char __user *buf, size_t count,  loff_t *f_pos)
+ssize_t beep_write(struct file *filp, const char __user *buf, size_t count, loff_t *f_pos)
 {
     int ret;
-    u8 databuf[2];
-    struct beep_data *chip = (struct beep_data *)filp->private_data;
+    u8 data;
+    struct beep_data *chip = filp->private_data;
     struct platform_device *pdev = chip->pdev;
 
-    ret = copy_from_user(databuf, buf, count);
+    if (count < 1) {
+        return -EINVAL;
+    }
+
+    ret = copy_from_user(&data, buf, 1);
     if (ret) {
         dev_err(&pdev->dev, "write failed!\n");
         return -EFAULT;
     }
 
-    beep_hardware_set(chip, databuf[0]);
+    // 字符'0'转换为0
+    if (data >= '0') {
+        data = data - '0';
+    }
+    
+    ret = beep_hardware_set(chip, data);
+    if (ret) {
+        return ret;
+    }
+
     return count;
 }
 
+#define BEEP_IOC_MAGIC      'L'
+
+#define BEEP_IOC_SET        _IOW(BEEP_IOC_MAGIC, 0, int)
+#define BEEP_IOC_GET        _IOR(BEEP_IOC_MAGIC, 1, int)
+
 long beep_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 {
-    struct beep_data *chip = (struct beep_data *)filp->private_data;
+    struct beep_data *chip = filp->private_data;
+    u8 value;
+    int ret;
+
+    if (_IOC_TYPE(cmd) != BEEP_IOC_MAGIC)
+        return -ENOTTY;
+
     switch (cmd) {
-        case 0:
-            beep_hardware_set(chip, 0);
-            break;
-        case 1:
-            beep_hardware_set(chip, 1);
-            break;
-        default:
-            return -ENOTTY;
+    case BEEP_IOC_SET:
+        ret = copy_from_user(&value,
+                             (void __user *)arg,
+                             sizeof(value));
+        if (ret)
+            return -EFAULT;
+
+        if (value != BEEP_OFF &&
+            value != BEEP_ON)
+            return -EINVAL;
+
+        beep_hardware_set(chip, value);
+        break;
+
+    case BEEP_IOC_GET:
+        value = gpiod_get_value_cansleep(chip->desc);
+        ret = copy_to_user((void __user *)arg,
+                           &value,
+                           sizeof(value));
+        if (ret)
+            return -EFAULT;
+
+        break;
+
+    default:
+        return -ENOTTY;
     }
 
     return 0;
 }
+
+static const struct file_operations misc_fops = {
+    .owner = THIS_MODULE,
+    .open = beep_open,
+    .read = beep_read,
+    .write = beep_write,
+    .unlocked_ioctl = beep_ioctl,
+    .release = beep_release,
+};
 
 static int beep_device_create(struct beep_data *chip)
 {
     int result;
     struct platform_device *pdev = chip->pdev;
 
-    chip->misc_fops.owner = THIS_MODULE;
-    chip->misc_fops.open = beep_open;
-    chip->misc_fops.read = beep_read;
-    chip->misc_fops.write = beep_write;
-    chip->misc_fops.unlocked_ioctl = beep_ioctl;
-    chip->misc_fops.release = beep_release;
-
     chip->misc_dev.minor = MISCBEEP_MINOR;
     chip->misc_dev.name = DEVICE_NAME;
-    chip->misc_dev.fops = &(chip->misc_fops);
+    chip->misc_dev.fops = &misc_fops;
 
     result = misc_register(&(chip->misc_dev));
     if (result < 0) {
@@ -185,9 +245,9 @@ static int beep_hardware_init(struct beep_data *chip)
 
     //1.获取beep gpio属性, 设置为输出模式
     chip->desc = devm_gpiod_get(&pdev->dev, "beep", GPIOD_OUT_LOW);
-    if (!chip->desc) {
+    if (IS_ERR(chip->desc)) {
         dev_err(&pdev->dev, "beep request gpios failed!\n");
-        return -EIO;     
+        return PTR_ERR(chip->desc);     
     }
 
     //2.获取初始化列表中的信息
@@ -196,7 +256,7 @@ static int beep_hardware_init(struct beep_data *chip)
         dev_info(&pdev->dev, "[of_device_get_match_data]read full, null!\n");
         return -ENOMEM;
     }
-    gpiod_direction_output(chip->desc, *(chip->init_data));
+    gpiod_set_value_cansleep(chip->desc, *(chip->init_data));
 
     dev_info(&pdev->dev, "beep_hardware_init is active:%d, init:%d\n", gpiod_is_active_low(chip->desc), *(chip->init_data));
     return 0;
@@ -239,6 +299,8 @@ static int beep_remove(struct platform_device *pdev)
     struct beep_data *chip = platform_get_drvdata(pdev);
 
     misc_deregister(&(chip->misc_dev));
+    
+    beep_hardware_set(chip, BEEP_OFF);
 
     dev_info(&pdev->dev, "beep release!\n");
     return 0;
@@ -262,8 +324,7 @@ static struct platform_driver platform_driver = {
 
 static int __init beep_module_init(void)
 {
-    platform_driver_register(&platform_driver);
-    return 0;
+    return platform_driver_register(&platform_driver);
 }
 
 static void __exit beep_module_exit(void)

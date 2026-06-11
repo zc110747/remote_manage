@@ -21,6 +21,7 @@
 /////////////////////////////////////////////////////////////////////////////
 _Pragma("once")
 
+#include "singleton.hpp"
 #include "json/json.h"
 
 #define DEFAULT_LOCAL_IPADRESS      "127.0.0.1"
@@ -206,22 +207,11 @@ typedef struct
     LoggerPrivilege logger_privilege;
 }SystemParamter;
 
-class system_config
+class system_config: public singleton<system_config>
 {
     friend std::ostream& operator<<(std::ostream&, const system_config&);
 
 public:
-    /// \brief constructor
-    system_config() = default;
-
-    /// \brief destructor, delete not allow for singleton pattern.
-    ~system_config() = delete;
-
-    /// \brief get_instance
-    /// - This method is used to get the pattern of the class.
-    /// \return the singleton pattern point of the object.
-    static system_config* get_instance();
-
     /// \brief init
     /// - This method is used to init the object.
     /// \param path - path of the file for config.
@@ -303,10 +293,6 @@ private:
     bool dynamic_init(const char* path);
 
 private:
-    /// \brief instance_pointer_
-    /// - object used to implement the singleton pattern.
-    static system_config *instance_pointer_;
-
     /// \brief parameter_
     /// - object used to store the system parameter.
     SystemParamter parameter_;

@@ -106,17 +106,17 @@ function install_library()
 
     sudo cp -Rv "${SUPPORT_ENV_INSTALL}"/usr/local/lib/* "${SUPPORT_ENV_INSTALL}"/lib/
 
-    sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/bin
-    sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/doc
-    sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/etc
-    sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/examples
-    sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/include
-  	sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/lib
-  	sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/mkspecs		
-  	sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/plugins
-  	sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/share
-  	sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/ssl
-  	sudo mkdir -m 755 -p "${BUILD_NFS_PATH}"/usr/lib
+    sudo mkdir -m 777 -p "${BUILD_NFS_PATH}"/bin
+    sudo mkdir -m 777 -p "${BUILD_NFS_PATH}"/doc
+    sudo mkdir -m 777 -p "${BUILD_NFS_PATH}"/etc
+    sudo mkdir -m 777 -p "${BUILD_NFS_PATH}"/examples
+    sudo mkdir -m 777 -p "${BUILD_NFS_PATH}"/include
+  	sudo mkdir -m 777 -p "${BUILD_NFS_PATH}"/lib
+  	sudo mkdir -m 777 -p "${BUILD_NFS_PATH}"/mkspecs		
+  	sudo mkdir -m 777 -p "${BUILD_NFS_PATH}"/plugins
+  	sudo mkdir -m 777 -p "${BUILD_NFS_PATH}"/share
+  	sudo mkdir -m 777 -p "${BUILD_NFS_PATH}"/ssl
+  	sudo mkdir -m 777 -p "${BUILD_NFS_PATH}"/usr/lib
 
 	sudo cp -Rv "${SUPPORT_ENV_INSTALL}"/* "${BUILD_NFS_PATH}"/
 	sudo cp -Rv "${SUPPORT_ENV_INSTALL}"/lib/* "${BUILD_NFS_PATH}"/usr/lib/
@@ -195,9 +195,8 @@ function build_application()
 		SysMountRootfs
 	fi
 
-	sudo chmod 777 "${BUILD_NFS_PATH}"
-	mkdir -m 755 -p "${BUILD_NFS_PATH}"/home/sys/configs/
-	chmod 755 "${BUILD_NFS_PATH}"/home/sys/configs/
+	sudo mkdir -m 777 -p "${BUILD_NFS_PATH}"/home/sys/configs/
+	sudo chmod 777 "${BUILD_NFS_PATH}"/home/sys/configs/
 	cp -fv config.template.json "${BUILD_NFS_PATH}"/home/sys/configs/config.json
 	cp -fv dynamic.json "${BUILD_NFS_PATH}"/home/sys/configs/dynamic.json
     exit_if_last_error
@@ -209,7 +208,7 @@ function build_application()
 		
 	#package node sever
 	cd "${APPLICATION_EMBED}"/ || return
-    mkdir -m 755 -p "${BUILD_NFS_PATH}"/home/sys/server/
+    sudo mkdir -m 777 -p "${BUILD_NFS_PATH}"/home/sys/server/
 	cp -rv node_server/* "${BUILD_NFS_PATH}"/home/sys/server/
 
 	cda
@@ -237,7 +236,7 @@ function package_firmware
 	#copy tftp directory
 	if [ -d "${BUILD_TFTP_PATH}" ]; then
 		if [ ! -d "${DST_PATH}" ]; then
-			mkdir -m 755 -p "${DST_PATH}" 
+			mkdir -m 777 -p "${DST_PATH}" 
 		fi
 
 		cd "${BUILD_TFTP_PATH}"/ || return

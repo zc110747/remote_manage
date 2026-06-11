@@ -103,21 +103,9 @@ struct local_sysinfo final
     }
 };
 
-class device_process final
+class device_process final: public singleton<device_process>
 {
 public:
-    /// \brief constructor
-    device_process() = default;
-    device_process(const device_process&)=delete;
-
-    /// - destructor, delete not allow for singleton pattern.
-    virtual ~device_process() = delete;
-
-    /// \brief get_instance
-    /// - This method is used to get the pattern of the class.
-    /// \return the singleton pattern point of the object.
-    static device_process* get_instance();
-
     /// \brief init
     /// - This method is used to init the object.
     /// \return Wheather initialization is success or failed.
@@ -164,6 +152,7 @@ public:
     /// - This method is used to get device string.
     /// \return device info str.  
     std::string get_dev_info();
+
 private:
     /// \brief run
     /// - This method is used for thread run the device management.
@@ -195,10 +184,6 @@ private:
     bool get_cpu_used();
 
 private:
-    /// \brief instance_pointer_
-    /// - object used to implement the singleton pattern.
-    static device_process* instance_pointer_;
-
     /// \brief device_fifo_point_
     /// - fifo point used for the device management.
     std::unique_ptr<fifo_manage> device_cmd_fifo_point_;

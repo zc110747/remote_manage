@@ -23,98 +23,92 @@ _Pragma("once")
 #include "common.hpp"
 #include "fifo_manage.hpp"
 
-#define LOGGER_MAX_BUFFER_SIZE      1024
-#define LOGGER_MESSAGE_BUFFER_SIZE  16384
-
-class log_manage final
+namespace LOGGER
 {
-public:
-    enum class LOG_LEVEL
-    {
-        TRACE = 0,
-        DEBUG,
-        INFO,
-        WARN,
-        ERROR,
-        FATAL,
-    };
+    namespace V1 {
+        #define LOGGER_MAX_BUFFER_SIZE      1024
+        #define LOGGER_MESSAGE_BUFFER_SIZE  16384
 
-    /// \brief constructor
-    log_manage() = default;
+        class log_manage final : public singleton<log_manage>
+        {
+        public:
+            enum class LOG_LEVEL
+            {
+                TRACE = 0,
+                DEBUG,
+                INFO,
+                WARN,
+                ERROR,
+                FATAL,
+            };
 
-    /// \brief destructor, delete not allow for singleton pattern.
-    ~log_manage() = delete;
+            /// \brief init
+            /// - This method is used to init the object.
+            /// \return Wheather initialization is success or failed.
+            bool init();
 
-    /// \brief get_instance
-    /// - This method is used to get the pattern of the class.
-    /// \return the singleton pattern point of the object.
-    static log_manage *get_instance();
+            /// \brief release
+            /// - This method is used to release the object.
+            /// \return Wheather release is success or failed.
+            void release() {
+                logger_fifo_->release();
+            }
+            
+            /// \brief print_log
+            /// - This method is print logger info.
+            /// \param level - logger level for the data
+            /// \param time - time when send the data
+            /// \param fmt - pointer to send data
+            /// \return the logger info already send.
+            int print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...);
 
-    /// \brief init
-    /// - This method is used to init the object.
-    /// \return Wheather initialization is success or failed.
-    bool init();
+            /// \brief set_level
+            /// - This method defined the level can set.
+            /// \param level - logger level can send.
+            void set_level(LOG_LEVEL level)  {log_level_ = level;}
 
-    /// \brief release
-    /// - This method is used to release the object.
-    /// \return Wheather release is success or failed.
-    void release();
+            /// \brief get_level
+            /// - This method get the level can send
+            /// \return logger level can send.
+            LOG_LEVEL get_level()            {return log_level_;}
 
-    /// \brief print_log
-    /// - This method is print logger info.
-    /// \param level - logger level for the data
-    /// \param time - time when send the data
-    /// \param fmt - pointer to send data
-    /// \return the logger info already send.
-    int print_log(LOG_LEVEL level, uint32_t time, const char* fmt, ...);
+        private:
+            /// \brief get_memory_buffer_pointer
+            /// - get buffer pointer of the memory.
+            /// \param size - size of the memory pointer
+            char *get_memory_buffer_pointer(uint16_t size);
 
-    /// \brief set_level
-    /// - This method defined the level can set.
-    /// \param level - logger level can send.
-    void set_level(LOG_LEVEL level)  {log_level_ = level;}
+            /// \brief convert_timer
+            /// - This method convert second to home.
+            /// \param timer - timer by second to convert.
+            /// \return string after convert.
+            std::string convert_timer(uint32_t timer);
 
-    /// \brief get_level
-    /// - This method get the level can send
-    /// \return logger level can send.
-    LOG_LEVEL get_level()            {return log_level_;}
+        private:
+            /// \brief memory_start_pointer_
+            /// - memory point the start to get.
+            char *memory_start_pointer_;
 
-    /// \brief convert_timer
-    /// - This method convert second to home.
-    /// \param timer - timer by second to convert.
-    /// \return string after convert.
-    std::string convert_timer(uint32_t timer);
+            /// \brief memory_end_pointer_
+            /// - memory point the end.
+            char *memory_end_pointer_;
 
-private:
-    /// \brief get_memory_buffer_pointer
-    /// - get buffer pointer of the memory.
-    /// \param size - size of the memory pointer
-    char *get_memory_buffer_pointer(uint16_t size);
+            /// \brief log_level_
+            /// - log level defined.
+            LOG_LEVEL log_level_{LOG_LEVEL::DEBUG};
 
-private:
-    /// \brief instance_pointer_
-    /// - object used to implement the singleton pattern.
-    static log_manage *instance_pointer_;
+            /// \brief mutex_
+            /// - mutex used to protect output.
+            std::mutex mutex_;
 
-    /// \brief memory_start_pointer_
-    /// - memory point the start to get.
-    char *memory_start_pointer_;
+            /// \brief logger_fifo_
+            /// - fifo used for logger manage.
+            std::unique_ptr<fifo_manage> logger_fifo_{nullptr};
+        };
+    }
+}
 
-    /// \brief memory_end_pointer_
-    /// - memory point the end.
-    char *memory_end_pointer_;
-
-    /// \brief log_level_
-    /// - log level defined.
-    LOG_LEVEL log_level_{LOG_LEVEL::DEBUG};
-
-    /// \brief mutex_
-    /// - mutex used to protect output.
-    std::mutex mutex_;
-
-    /// \brief logger_fifo_
-    /// - fifo used for logger manage.
-    std::unique_ptr<fifo_manage> logger_fifo_{nullptr};
-};
+using namespace LOGGER::V1;
 
 #define PRINT_NOW(...)    { printf(__VA_ARGS__); fflush(stdout);}
 #define PRINT_LOG(level, time, fmt, ...) do{ log_manage::get_instance()->print_log(level, time, fmt, ##__VA_ARGS__); }while (0);

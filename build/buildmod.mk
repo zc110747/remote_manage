@@ -9,7 +9,7 @@ endif
 CROSS_COMPILE=${NEW_KERNEL_CC}
 
 build: kernel_modules
-	mkdir -m 755 -p ${APPLICATION_EMBED_MODUILES}/
+	sudo mkdir -m 777 -p ${APPLICATION_EMBED_MODUILES}/
 	mv *.ko ${APPLICATION_EMBED_MODUILES}/
 ifeq ($(FIRMWARE_CLEAN),1)
 	make clean

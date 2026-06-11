@@ -29,6 +29,7 @@ typedef enum
     CMD_NULL = 0,
     CMD_GUI_DEV,
     CMD_LOCAL_DEV,
+    CMD_LOGOUT,
     CMD_LOWER_DEV,
     CMD_MAIN_DEV,
     CMD_PASSWD,
@@ -40,6 +41,7 @@ static char rx_buffer[RX_MAX_BUFFER_SIZE];
 static const std::map<std::string, CMD_DEVICE> command_map = {
     {"!gui ",           CMD_GUI_DEV},
     {"!local_dev ",     CMD_LOCAL_DEV},
+    {"!logout",         CMD_LOGOUT},
     {"!lower_dev ",     CMD_LOWER_DEV},
     {"!main_proc ",     CMD_MAIN_DEV},
     {"!passwd ",        CMD_PASSWD},
@@ -65,6 +67,7 @@ void log_process::logger_rx_run()
     {
         len = logger_rx_fifo_->read(rx_buffer, RX_MAX_BUFFER_SIZE);
         if (len > 0) {
+            rx_buffer[len-1] = '\0';
             log_server::get_instance()->send_buffer(rx_buffer, len);
         } else if (len == 0) {
             LOG_INFO(xGetCurrentTimes(), "%s read empty fifo data:%d\n", __func__, len);
@@ -73,20 +76,6 @@ void log_process::logger_rx_run()
             break;
         }
     }
-}
-
-log_process* log_process::instance_pointer_ = nullptr;
-log_process* log_process::get_instance()
-{
-    if (instance_pointer_ == nullptr)
-    {
-        instance_pointer_ = new(std::nothrow) log_process;
-        if (instance_pointer_ == nullptr)
-        {
-            //do something
-        }
-    }
-    return instance_pointer_;
 }
 
 bool log_process::init()
@@ -110,12 +99,12 @@ bool log_process::init()
         return false;
 
     //local device tx fifo
-    logger_locd_tx_fifo_ = std::make_unique<fifo_manage>(LOGGER_LOC_DEV_TX_FIFO,
+    logger_loc_dev_tx_fifo_ = std::make_unique<fifo_manage>(LOGGER_LOC_DEV_TX_FIFO,
                                                     S_FIFO_WORK_MODE,
                                                     FIFO_MODE_W_CREATE);
-    if (logger_locd_tx_fifo_ == nullptr)
+    if (logger_loc_dev_tx_fifo_ == nullptr)
         return false;
-    if (!logger_locd_tx_fifo_->create())
+    if (!logger_loc_dev_tx_fifo_->create())
         return false;
 
     //lower device tx fifo
@@ -164,14 +153,27 @@ bool log_process::login(char *ptr, int size)
 {
     bool allow_no_passwd = system_config::get_instance()->get_allow_no_passwd();
     
-    if (allow_no_passwd == true
-    || is_login_ == true)
-    {
+    if (allow_no_passwd) {
+        last_login_timers = xGetCurrentTimes();
         return true;
     }
 
-    if (strncmp("!passwd ", ptr, strlen("!passwd ")) != 0)
-    {
+    if (is_login_) {
+        uint32_t now_login_timers = xGetCurrentTimes();
+        if (now_login_timers - last_login_timers > LOGIN_TIMEOUT) {
+            is_login_ = false;
+            LOG_ERROR(xGetCurrentTimes(), "login timeout, log out");
+        }
+        last_login_timers = now_login_timers;
+    } 
+
+    if (is_login_) {
+        return true;
+    } else {
+        last_login_timers = xGetCurrentTimes();
+    }
+
+    if (strncmp("!passwd ", ptr, strlen("!passwd ")) != 0) {
         return false;
     }
     return true;
@@ -184,16 +186,13 @@ int log_process::send_buffer(char *ptr, int length)
     bool ret;
 
     ret = login(ptr, length);
-    if (!ret)
-    {
+    if (!ret) {
         LOG_INFO(xGetCurrentTimes(), "not login:%s", std::string(ptr).c_str());
         return -1;
     }
 
-    for (const auto& command:command_map)
-    {
-        if (strncmp (command.first.c_str(), ptr, command.first.length()) == 0)
-        {
+    for (const auto& command:command_map) {
+        if (strncmp (command.first.c_str(), ptr, command.first.length()) == 0) {
             cmd = command.second;
             len = command.first.length();
             break;
@@ -202,15 +201,17 @@ int log_process::send_buffer(char *ptr, int length)
 
     LOG_INFO(xGetCurrentTimes(), "logger command information:%s", ptr);
 
-    if (length >= len)
-    {
-        switch (cmd)
-        {
+    if (length >= len) {
+        switch (cmd) {
             case CMD_GUI_DEV:
                 logger_gui_tx_fifo_->write(ptr+len, length-len);
                 break;
             case CMD_LOCAL_DEV:
-                logger_locd_tx_fifo_->write(ptr+len, length-len);
+                logger_loc_dev_tx_fifo_->write(ptr+len, length-len);
+                break;
+            case CMD_LOGOUT:
+                is_login_ = false;
+                LOG_FATAL(xGetCurrentTimes(), "logout");
                 break;
             case CMD_LOWER_DEV:
                 logger_low_dev_tx_fifo_->write(ptr+len, length-len);
@@ -227,16 +228,11 @@ int log_process::send_buffer(char *ptr, int length)
                     pdata = ptr + len;
                     size = length - len;
 
+                    // check passwd, error not shows passwd
                     if (size == passwd.length() 
-                    && (memcmp(pdata, passwd.c_str(), passwd.length()) == 0)
-                    )
-                    {
+                    && (memcmp(pdata, passwd.c_str(), passwd.length()) == 0)) {
                         is_login_ = true;
                         LOG_FATAL(xGetCurrentTimes(), "login in, use !? search support command");
-                    }
-                    else
-                    {
-                        LOG_FATAL(xGetCurrentTimes(), "passwd:%s, %s, %d, %d", pdata, passwd.c_str(), size, passwd.length());
                     }
                 }
                 break;
@@ -247,9 +243,7 @@ int log_process::send_buffer(char *ptr, int length)
                 LOG_ERROR(xGetCurrentTimes(), "no equal command: %s", ptr);
                 break;
         }
-    }
-    else
-    {
+    } else {
         LOG_ERROR(xGetCurrentTimes(), "logger command failed:%d, len:%d, %d\n", cmd, length, len);
     }
 

@@ -20,20 +20,6 @@
 #include "common_unit.hpp"
 #include "include/productConfig.hpp"
 
-device_manage* device_manage::instance_pointer_ = nullptr;
-device_manage* device_manage::get_instance()
-{
-    if (instance_pointer_ == nullptr)
-    {
-        instance_pointer_ = new(std::nothrow) device_manage();
-        if (instance_pointer_ == nullptr)
-        {
-            PRINT_NOW("%s:device_manage new failed\r\n", PRINT_NOW_HEAD_STR);
-        }
-    }
-    return instance_pointer_;
-}
-
 bool device_manage::init()
 {
     inter_info_.clear();
@@ -149,14 +135,11 @@ void device_manage::update()
 
     auto vf610_ptr = driver_manage::get_instance()->get_vf610_dev();
     size = vf610_ptr->read_string(buf, sizeof(buf));
-    if (size > 0)
-    {
+    if (size > 0) {
         buf[size] = '\0';
         auto convert_data = atoi(buf);
         inter_info_.vf610_adc_ = (float)convert_data/4096*3.3;
-    }
-    else
-    {
+    } else {
 #if MOCK_DEBUG
         inter_info_.vf610_adc_ = get_random_float(0, 3.3);
         test_start++;

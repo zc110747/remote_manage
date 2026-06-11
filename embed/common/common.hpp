@@ -48,6 +48,7 @@ _Pragma("once")
 #include <functional>
 #include <sstream>
 
+#include "singleton.hpp"
 #include "event.hpp"
 #include "thread_queue.hpp"
 #include "productConfig.hpp"

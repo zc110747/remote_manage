@@ -20,20 +20,12 @@ _Pragma("once")
 
 #include "common_unit.hpp"
 
-class log_process final
+// login timeout, unit: second
+#define LOGIN_TIMEOUT       (60*10)
+
+class log_process final: public singleton<log_process>
 {
 public:
-    /// \brief constructor
-    log_process() = default;
-
-    /// \brief destructor, delete not allow for singleton pattern.
-    ~log_process() = delete;
-
-    /// \brief get_instance
-    /// - This method is used to get the pattern of the class.
-    /// \return the singleton pattern point of the object.
-    static log_process* get_instance();
-
     /// \brief init
     /// - This method is used to init the object.
     /// \return Wheather initialization is success or failed.
@@ -63,10 +55,6 @@ private:
     bool login(char *ptr, int size);
 
 private:
-    /// \brief instance_pointer_
-    /// - object used to implement the singleton pattern.
-    static log_process *instance_pointer_;
-
     /// \brief logger_rx_thread_
     /// - logger rx thread object.
     std::thread logger_rx_thread_;
@@ -81,7 +69,7 @@ private:
 
     /// \brief logger_loc_dev_tx_fifo_
     /// - fifo used for logger server rx and write to local device.
-    std::unique_ptr<fifo_manage> logger_locd_tx_fifo_{nullptr};
+    std::unique_ptr<fifo_manage> logger_loc_dev_tx_fifo_{nullptr};
 
     /// \brief logger_low_dev_tx_fifo_
     /// - fifo used for logger server rx and write to lower device.
@@ -94,4 +82,8 @@ private:
     /// \brief is_login_
     /// - for login information.
     bool is_login_{false};
+
+    /// \brief last_login_timers
+    /// - for login time information.
+    uint32_t last_login_timers{0};
 };

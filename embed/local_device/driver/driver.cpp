@@ -18,20 +18,6 @@
 /////////////////////////////////////////////////////////////////////////////
 #include "driver.hpp"
 
-driver_manage* driver_manage::instance_pointer_ = nullptr;
-driver_manage* driver_manage::get_instance()
-{
-    if (instance_pointer_ == nullptr)
-    {
-        instance_pointer_ = new(std::nothrow) driver_manage;
-        if (instance_pointer_ == nullptr)
-        {
-            //do something
-        }
-    }
-    return instance_pointer_;
-}
-
 bool driver_manage::init()
 {
     bool ret = true;

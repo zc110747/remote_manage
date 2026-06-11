@@ -98,20 +98,6 @@ int mqtt_device::publish_msg(const std::string &topic, int qos, const char* ptr,
     return ret;
 }
 
-mqtt_manage* mqtt_manage::instance_pointer_ = nullptr;
-mqtt_manage* mqtt_manage::get_instance()
-{
-    if (instance_pointer_ == nullptr)
-    {
-        instance_pointer_ = new(std::nothrow) mqtt_manage();
-        if (instance_pointer_ == nullptr)
-        {
-            PRINT_NOW("%s:mqtt_manage new error!", PRINT_NOW_HEAD_STR);
-        }
-    }
-    return instance_pointer_;
-}
-
 //"A0 + json data"
 //"0x41 0x31 + Hex data"
 bool mqtt_manage::init()

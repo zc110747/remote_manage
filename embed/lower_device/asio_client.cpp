@@ -19,20 +19,6 @@
 #include "asio_client.hpp"
 #include "serial.hpp"
 
-asio_client* asio_client::instance_pointer_ = nullptr;
-asio_client* asio_client::get_instance()
-{
-    if (instance_pointer_ == nullptr)
-    {
-        instance_pointer_ = new(std::nothrow) asio_client;
-        if (instance_pointer_ == nullptr)
-        {
-            //do something
-        }
-    }
-    return instance_pointer_;
-}
-
 bool asio_client::init()
 {
     //create the tx fifo

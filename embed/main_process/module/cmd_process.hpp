@@ -30,21 +30,9 @@ typedef enum
     cmdGetOS,
 }cmd_format_t;
 
-class cmd_process
+class cmd_process final: public singleton<cmd_process>
 {
 public:
-    /// \brief constructor
-    cmd_process() = default;
-    cmd_process(const cmd_process&)=delete;
-
-    /// - destructor, delete not allow for singleton pattern.
-    virtual ~cmd_process() = delete;
-
-    /// \brief get_instance
-    /// - This method is used to get the pattern of the class.
-    /// \return the singleton pattern point of the object.
-    static cmd_process* get_instance();
-
     /// \brief init
     /// - This method is used to init the object.
     /// \return Wheather initialization is success or failed.
@@ -79,10 +67,6 @@ private:
     void sync_level(int dev, int level);
 
 private:
-    /// \brief instance_pointer_
-    /// - object used to implement the singleton pattern.
-    static cmd_process* instance_pointer_;
-
     /// \brief rx_buffer_
     /// - buffer used to store rx command.
     char rx_buffer_[DEVICE_RX_BUFFER_SIZE];
@@ -103,7 +87,7 @@ private:
     /// - cmd process thread object.
     std::thread cmd_process_thread_;
 
-    /// \brief logger_main_process_tx_fifo_
+    /// \brief logger_mp_tx_fifo_
     /// - fifo used for logger server rx and write to local device.
-    std::unique_ptr<fifo_manage> logger_main_process_tx_fifo_{nullptr};
+    std::unique_ptr<fifo_manage> logger_mp_tx_fifo_{nullptr};
 };

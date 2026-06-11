@@ -1,10 +1,10 @@
 
 #this shows not include by git
 
-*.o
+*.o*
 *.d
-*.mod.c
-*.mod.o
+*.mod.c*
+*.mod.o*
 *.mod
 *.order
 *.symvers
@@ -13,7 +13,6 @@
 *.so
 *.so*
 *.ko
-*.tar.gz
 *.scr
 *.export*
 *.module*

@@ -65,8 +65,7 @@ void session_group::run(char *pbuf, int size)
 
 bool session_group::is_valid()
 {
-    if (set_.size() != 0) 
-    {
+    if (set_.size() != 0) {
         return true;
     }
 
@@ -96,14 +95,11 @@ void session::do_read()
     socket_.async_read_some(asio::buffer(data_, MAX_LENGTH),
         [this, self](std::error_code ec, std::size_t length)
         {
-            if (!ec)
-            {
+            if (!ec) {
                 data_[length] = 0;
                 group_.run(data_, length);
                 do_read();
-            }
-            else
-            {
+            } else {
                 group_.leave(shared_from_this());
                 std::cout<<ec<<"\n";
             }
@@ -115,16 +111,12 @@ void session::do_write(const char *pdate, std::size_t length)
     auto self(shared_from_this());
 
     asio::async_write(socket_, asio::buffer(pdate, length),
-        [this, self](std::error_code ec, std::size_t /*length*/)
-        {
-        if (!ec)
-        {
-            //do write callback
-        }
-        else
-        {
-            group_.leave(shared_from_this());
-        }
+        [this, self](std::error_code ec, std::size_t ) {
+            if (!ec) {
+                //do write callback
+            } else {
+                group_.leave(shared_from_this());
+            }
         });
 }
 
@@ -152,8 +144,7 @@ share_session_pointer asio_server::get_valid_session()
 void asio_server::close_all_session()
 {
     auto session = group_.get_session();
-    while (session != nullptr)
-    {
+    while (session != nullptr) {
         session->do_close();
         group_.leave(session);
         session = group_.get_session();
@@ -194,13 +185,11 @@ void asio_server::do_accept()
     acceptor_.async_accept(
         [this](std::error_code ec, asio::ip::tcp::socket socket)
         {
-            if (!acceptor_.is_open())
-            {
+            if (!acceptor_.is_open()) {
                 return;
             }
 
-            if (!ec)
-            {
+            if (!ec) {
                 //if accept, close other socket
                 close_all_session();
                 std::make_shared<session>(std::move(socket), group_)->start();

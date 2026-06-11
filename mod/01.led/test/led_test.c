@@ -20,12 +20,18 @@
 //      12/19/2022  Create New Version.
 //      23/08/202   Format update.     
 /////////////////////////////////////////////////////////////////////////////
-#include<fcntl.h>
-#include<stdio.h>
-#include<stdlib.h>
-#include<unistd.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/ioctl.h>
 
 #define LED_DEVICE  "/dev/led"
+
+#define LED_IOC_MAGIC      'L'
+
+#define LED_IOC_SET        _IOW(LED_IOC_MAGIC, 0, int)
+#define LED_IOC_GET        _IOR(LED_IOC_MAGIC, 1, int)
 
 int main(int argc, const char *argv[])
 {
@@ -42,7 +48,14 @@ int main(int argc, const char *argv[])
         val = atoi(argv[1]);
     }
 
+    printf("write test!\n");
     write(fd, &val, 1);
+
+    printf("ioctl set test!\n");
+    ioctl(fd, LED_IOC_SET, &val);
+
+    ioctl(fd, LED_IOC_GET, &val);
+    printf("ioctl get value:%d!\n", val);
 
     close(fd); 
 

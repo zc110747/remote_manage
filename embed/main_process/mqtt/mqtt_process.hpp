@@ -97,21 +97,9 @@ private:
     std::function<void(char *ptr, int size)> func_handler_;
 };
 
-class mqtt_manage
+class mqtt_manage final : public singleton<mqtt_manage>
 {
 public:
-    /// \brief constructor
-    mqtt_manage() = default;
-    mqtt_manage(const mqtt_manage&)=delete;
-
-    /// - destructor, delete not allow for singleton pattern.
-    virtual ~mqtt_manage() = delete;
-
-    /// \brief get_instance
-    /// - This method is used to get the pattern of the class.
-    /// \return the singleton pattern point of the object.
-    static mqtt_manage* get_instance();
-
     /// \brief init
     /// - This method is used to init the object.
     /// \return Wheather initialization is success or failed.
@@ -133,10 +121,6 @@ public:
     int mqtt_publish(const std::string &topic, int qos, char *ptr, uint16_t size);
 
 private:
-    /// \brief instance_pointer_
-    /// - object used to implement the singleton pattern.
-    static mqtt_manage* instance_pointer_;
-
     /// \brief mqtt_device_ptr
     /// - mqtt device manage pointer.
     std::unique_ptr<mqtt_device> mqtt_device_ptr;

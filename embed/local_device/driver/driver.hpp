@@ -28,20 +28,9 @@ _Pragma("once")
 #include "pwm_dev.hpp"
 #include "loopled.hpp"
 
-class driver_manage
+class driver_manage final: public singleton<driver_manage>
 {
 public:
-    /// \brief constructor
-    driver_manage() = default;
-
-    /// - destructor, delete not allow for singleton pattern.
-    ~driver_manage() = delete;
-
-    /// \brief get_instance
-    /// - This method is used to get the pattern of the class.
-    /// \return the singleton pattern point of the object.
-    static driver_manage* get_instance();
-
     /// \brief init
     /// - This method is used to init the object.
     /// \return Wheather initialization is success or failed.
@@ -102,10 +91,6 @@ public:
     loopled_device *get_loopled_dev() {return &loopled_dev_;}
 
 private:
-    /// \brief instance_pointer_
-    /// - object used to implement the singleton pattern.
-    static driver_manage* instance_pointer_;
-
     /// \brief led_zero_
     /// - led device object.
     led_device led_zero_;

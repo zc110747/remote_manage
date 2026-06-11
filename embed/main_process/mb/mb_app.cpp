@@ -104,17 +104,3 @@ bool mb_app_manage::init()
 
     return true;
 }
-
-mb_app_manage* mb_app_manage::instance_pointer_ = nullptr;
-mb_app_manage* mb_app_manage::get_instance()
-{
-    if (instance_pointer_ == nullptr)
-    {
-        instance_pointer_ = new(std::nothrow) mb_app_manage;
-        if (instance_pointer_ == nullptr)
-        {
-            LOG_ERROR(xGetCurrentTimes(), "mp manage init failed!");
-        }
-    }
-    return instance_pointer_;
-}

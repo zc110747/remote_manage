@@ -37,31 +37,14 @@ void log_server::logger_rx_server_run()
 
     PRINT_NOW("%s:logger server start, ipaddr:%s:%d!\n", PRINT_NOW_HEAD_STR, ipaddr.c_str(), port);
 
-    try
-    {
+    try {
         internal_log_server.init(ipaddr, std::to_string(port), [this](char* ptr, int length){
             log_process::get_instance()->send_buffer(ptr, length);
         });
         internal_log_server.run();
-    }
-    catch (std::exception& e)
-    {
+    } catch (std::exception& e) {
         PRINT_NOW("%s:Exception:%s\n", PRINT_NOW_HEAD_STR, e.what());
     }
-}
-
-log_server* log_server::instance_pointer_ = nullptr;
-log_server* log_server::get_instance()
-{
-    if (instance_pointer_ == nullptr)
-    {
-        instance_pointer_ = new(std::nothrow) log_server;
-        if (instance_pointer_ == nullptr)
-        {
-            //do something
-        }
-    }
-    return instance_pointer_;
 }
 
 bool log_server::init()
@@ -77,17 +60,13 @@ int log_server::send_buffer(char *pbuffer, uint32_t size)
 {
     int len = -1;
 
-    if (internal_log_server.is_valid())
-    {
+    if (internal_log_server.is_valid()) {
         internal_log_server.do_write(pbuffer, size);
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    }
-    else
-    {
+    } else {
         len = ::write(STDOUT_FILENO, pbuffer, size);
         fflush(stdout);
-        if (len < 0)
-        {
+        if (len < 0) {
             //do something
         }
     }
@@ -105,17 +84,15 @@ int log_server::logger_file_process(char *buffer, uint32_t size)
 
     time(&timep);
     p = localtime_r(&timep, &mytime);
-    if(p != NULL)
-    {
+    if(p != NULL) {
         filename = fmt::format("/home/sys/logger/{0}-{1}-{2}.txt", mytime.tm_year+1900, mytime.tm_mon+1, mytime.tm_mday);
     }
 
-    if(!outfile.is_open())
-    {
+    if(!outfile.is_open()) {
         outfile.open(filename, std::ios::app);
     }
 
-    outfile<<std::string(buffer, size);
+    outfile << std::string(buffer, size);
     outfile.close();
 
     return 0;

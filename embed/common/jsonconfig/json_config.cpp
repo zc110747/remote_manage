@@ -34,20 +34,6 @@
 
 #define DYNAMIC_CONFIG_PATH "/home/sys/configs/dynamic.json"
 
-system_config* system_config::instance_pointer_ = nullptr;
-system_config* system_config::get_instance()
-{
-    if (instance_pointer_ == nullptr)
-    {
-        instance_pointer_ = new(std::nothrow) system_config();
-        if (instance_pointer_ == nullptr)
-        {
-            //to do error process
-        }
-    }
-    return instance_pointer_;
-}
-
 bool system_config::check_configfile(const std::string &ipaddr)
 {
     struct ifaddrs *ifaddr, *ifa;

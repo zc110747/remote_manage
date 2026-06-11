@@ -23,20 +23,9 @@ _Pragma("once")
 #define SERIAL_RX_MAX_BUFFER_SIZE        1024
 #define SERIAL_TX_MAX_BUFFER_SIZE        1024
 
-class serial_manage
+class serial_manage final: public singleton<serial_manage>
 {
 public:
-    /// \brief constructor
-    serial_manage() = default;
-
-    /// \brief destructor, delete not allow for singleton pattern.
-    ~serial_manage() = delete;
-    
-    /// \brief get_instance
-    /// - This method is used to get the pattern of the class.
-    /// \return the singleton pattern point of the object.
-    static serial_manage* get_instance();
-
     /// \brief init
     /// - This method is used to init the object.
     /// \return Wheather initialization is success or failed.
@@ -72,10 +61,6 @@ private:
     void uart_tx_run();
 
 private:
-    /// \brief instance_pointer_
-    /// - object used to implement the singleton pattern.
-    static serial_manage* instance_pointer_;
-
     /// \brief tty_
     /// - tty used to control the interface.
     tty_control tty_;

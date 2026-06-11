@@ -21,20 +21,6 @@
 #include "asio_client.hpp"
 #include "common_unit.hpp"
 
-serial_manage* serial_manage::instance_pointer_ = nullptr;
-serial_manage* serial_manage::get_instance()
-{
-    if (instance_pointer_ == nullptr)
-    {
-        instance_pointer_ = new(std::nothrow) serial_manage();
-        if (instance_pointer_ == nullptr)
-        {
-            LOG_ERROR(xGetCurrentTimes(), "serial_manage new failed!");
-        }
-    }
-    return instance_pointer_;
-}
-
 void serial_manage::uart_server_run()
 {
     LOG_INFO(xGetCurrentTimes(), "%s start", __func__);

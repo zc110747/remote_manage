@@ -96,7 +96,7 @@ endif
 	rm -rf $(objects)
 
 	if [ ! -d $(run_dist) ]; then \
-		mkdir -m 777 -p $(run_dist); \
+		sudo mkdir -m 777 -p $(run_dist); \
 	fi
 	
 	mv $(buildout) $(run_dist)/

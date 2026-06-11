@@ -21,21 +21,6 @@
 #include "timer_manage.hpp"
 #include "logger_manage.hpp"
 
-timer_manage *timer_manage::instance_pointer_ = nullptr;
-
-timer_manage *timer_manage::get_instance()
-{
-    if (instance_pointer_ == nullptr)
-    {
-        instance_pointer_ = new(std::nothrow) timer_manage();
-        if (instance_pointer_ == nullptr)
-        {
-           LOG_ERROR(xGetCurrentTimes(), "timer_manage new error!");
-        }
-    }
-    return instance_pointer_;
-}
-
 void timer_manage::run()
 {
     auto iter = time_action_vec_.begin();  

@@ -3,10 +3,10 @@
 //  All Rights Reserved
 //
 //  Name:
-//      cmd_process.cpp
+//      device_manage.cpp
 //
 //  Purpose:
-//      用于支持命令行处理的接口, 包含字符串处理和事件触发
+//      command process for local device.
 //
 // Author:
 //     @听心跳的声音
@@ -16,52 +16,52 @@
 //  Revision History:
 //      12/19/2022   Create New Version
 /////////////////////////////////////////////////////////////////////////////
-
 #include "cmd_process.hpp"
-#include "logger_manage.hpp"
+#include "common_unit.hpp"
 
 /*
-!readdev    [index] #index=[0~3 led,beep,ap,icm]
-!setdev     [index],[data] #index=[0~1 led,beep]  
-!getNet     [index] #index=[0~2 udp,tcp,logger] 
-!testDev    [index] #index=[0~3 led,beep,ap,icm]      
-!getSerial  
 !? or !help
 */
 const static std::map<std::string, cmd_format_t> CmdMapM = {
-    {"getos",      CmdGetOS},
     {"?",          cmdGetHelp},
     {"help",       cmdGetHelp},
 };
 
 const static std::map<cmd_format_t, std::string> CmdHelpMapM = {
-    {CmdGetOS,   "!lower_dev getos"},
-    {cmdGetHelp, "!lower_dev ?/help"},
+    {cmdGetHelp,    "!low_dev ? or !low_dev help"},
 };
 
-bool cmd_process::parse_data(char *ptr, int size)
+bool cmd_process::init()
 {
-    if (ptr[0] != '!')
-    {
-        LOG_ERROR(xGetCurrentTimes(), "error command: %s", ptr);
+    logger_low_dev_tx_fifo_ = std::make_unique<fifo_manage>(LOGGER_LOW_DEV_TX_FIFO, 
+                                                    S_FIFO_WORK_MODE, 
+                                                    FIFO_MODE_R);
+    if (logger_low_dev_tx_fifo_ == nullptr)
         return false;
-    }
+    if (!logger_low_dev_tx_fifo_->create())
+        return false;
 
-    ptr[size] = '\0';
+    cmd_process_thread_ = std::thread(std::bind(&cmd_process::run, this));
+    cmd_process_thread_.detach();
 
+    return true;
+}
+
+bool cmd_process::parse_data()
+{
     //replace first ' ' by '\0'
-    char *pStart = ptr;
+    char *pStart = rx_buffer_;
     while ((*pStart != ' ') && (*pStart != '\0'))
         pStart++;
     pStart[0] = '\0';
-    
+
     //将数据lower,解决数据不符合问题
-    auto strVal = std::string(ptr);
+    auto strVal = std::string(rx_buffer_);
     std::string strDst;
     strDst.resize(strVal.size());
     std::transform(strVal.begin(), strVal.end(), strDst.begin(), ::tolower);
 
-    LOG_INFO(xGetCurrentTimes(), "rx command:%s", ptr);
+    LOG_INFO(xGetCurrentTimes(), "rx command:%s", strDst.c_str());
     if (CmdMapM.count(strDst) == 0)
     {
         return false;
@@ -69,6 +69,7 @@ bool cmd_process::parse_data(char *ptr, int size)
 
     cmd_format_ = CmdMapM.find(strDst)->second;
     cmd_data_pointer_ = pStart+1;
+
     return true;
 }
 
@@ -77,31 +78,41 @@ bool cmd_process::process_data()
     bool ret = true;
     switch (cmd_format_)
     {
-        case CmdGetOS:
-            {
-                auto pSysConfig = system_config::get_instance();
-                auto pVersion = pSysConfig->get_version().c_str();
-                LOG_FATAL(xGetCurrentTimes(), "FW_Version:%d, %d, %d, %d", pVersion[0], pVersion[1], pVersion[2], pVersion[3]);
-                LOG_FATAL(xGetCurrentTimes(), "Logger Level:%d ", (int)log_manage::get_instance()->get_level());
-            }
-            break;
         case cmdGetHelp:
             {
                 for (auto &[x, y] : CmdHelpMapM)
                 {
-                    LOG_INFO(xGetCurrentTimes(), y.c_str());
+                    LOG_INFO(xGetCurrentTimes(), "%s", y.c_str());
                     std::this_thread::sleep_for(std::chrono::microseconds(100));
                 }
             }
             break;
-        default:
-            ret = false;
-            break;
     }
 
-    if (!ret)
-    {
-        LOG_ERROR(xGetCurrentTimes(), "Invalid Formate:%d, data:%s", cmd_format_, cmd_data_pointer_);
-    }
     return ret;
+}
+
+void cmd_process::run()
+{
+    int len;
+
+    while (1)
+    {
+        len = logger_low_dev_tx_fifo_->read(rx_buffer_, DEVICE_RX_BUFFER_SIZE);
+        if (len > 0) {
+            rx_buffer_[len] = '\0';
+            rx_size_ = len;
+
+            if (parse_data()) {
+                process_data();
+            } else {
+                LOG_ERROR(xGetCurrentTimes(), "cmd_process parse fail, buffer:%s!", rx_buffer_);
+            }
+        } else if (len == 0) {
+            LOG_ERROR(xGetCurrentTimes(), "%s read empty fifo data:%d\n", __func__, len);
+        } else {
+            LOG_ERROR(xGetCurrentTimes(), "%s read failed:%d\n", __func__, len);
+            break;
+        }
+    }
 }

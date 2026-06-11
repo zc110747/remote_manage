@@ -14,6 +14,7 @@ CCFLAGS := -O3 -std=c++17 -fno-strict-aliasing -lrt
 
 cpp_objects =   main.o    \
                 serial.o \
+                can_socket.o \
                 asio_client.o \
                 module/cmd_process.o  \
                 

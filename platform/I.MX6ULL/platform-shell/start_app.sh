@@ -26,7 +26,7 @@ sleep 3
 
 #run server.js
 cd /home/sys/server/
-if [ ! -d /home/sys/server/node_module ]; then
+if [ ! -d /home/sys/server/node_modules ]; then
     if [ -f node_modules.tar ]; then
         tar -xvf node_modules.tar
     fi

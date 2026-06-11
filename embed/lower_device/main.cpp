@@ -21,6 +21,7 @@
 #include "common_unit.hpp"
 #include "serial.hpp"
 #include "asio_client.hpp"
+#include "cmd_process.hpp"
 #include "parameter_parser.hpp"
 
 //internal data
@@ -90,6 +91,7 @@ static bool system_init(int is_default, const char* path)
     ret &= timer_manage::get_instance()->init();
     ret &= serial_manage::get_instance()->init();
     ret &= asio_client::get_instance()->init();
+    ret &= cmd_process::get_instance()->init();
 
     return ret;
 }

@@ -41,8 +41,7 @@ public:
     {
         device_path_ = DevicePath;
         file_ = fopen(device_path_.c_str(), "r");
-        if (file_ == nullptr)
-        {
+        if (file_ == nullptr) {
             return false;
         }
         return true;
@@ -52,8 +51,7 @@ public:
     /// - release the device.
     virtual void release()
     {
-        if (file_ != nullptr)
-        {
+        if (file_ != nullptr) {
             fclose(file_);
             file_ = nullptr;
         }
@@ -69,14 +67,12 @@ public:
     {
         int ret;
 
-        if (file_ == nullptr)
-        {
+        if (file_ == nullptr) {
             return -1;
         }
             
         ret = fread(str, 1, size, file_);
-        if (ret <= 0) 
-        {
+        if (ret <= 0) {
             printf("file read error!\r\n");
             return -1;
         }

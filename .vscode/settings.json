@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.cmd": "shellscript",
         "*.cpp": "cpp",
         "types.h": "c",
         "fcntl.h": "c",
@@ -117,7 +118,14 @@
         "zram_drv.h": "c",
         "select.h": "c",
         "stdlib.h": "c",
-        "buffer.h": "c"
+        "buffer.h": "c",
+        "ranges": "cpp",
+        "charconv": "cpp",
+        "format": "cpp",
+        "span": "cpp",
+        "queue": "cpp",
+        "stack": "cpp",
+        "text_encoding": "cpp"
     },
     "files.exclude": {
         "**/.git": true,
@@ -152,5 +160,23 @@
         "enableCodeCompletionPro": false
     },
     "marscode.enableInlineCommand": true,
-    "marscode.chatLanguage": "cn"
+    "marscode.chatLanguage": "cn",
+    "MicroPython.executeButton": [
+        {
+            "text": "?",
+            "tooltip": "Run",
+            "alignment": "left",
+            "command": "extension.executeFile",
+            "priority": 3.5
+        }
+    ],
+    "MicroPython.syncButton": [
+        {
+            "text": "$(sync)",
+            "tooltip": "sync",
+            "alignment": "left",
+            "command": "extension.execute",
+            "priority": 4
+        }
+    ]
 }

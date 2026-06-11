@@ -17,30 +17,30 @@
 	compatible = "fsl,imx6ull-14x14-evk", "fsl,imx6ull";
 
 	//访问路径: /sys/class/leds/led-red, /sys/class/leds/led-green, /sys/class/leds/led-blue
-	leds-gpio {
-		compatible = "leds-gpio";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_loopled>;
-		status = "okay";
+	// leds-gpio {
+	// 	compatible = "leds-gpio";
+	// 	pinctrl-names = "default";
+	// 	pinctrl-0 = <&pinctrl_loopled>;
+	// 	status = "okay";
 
-		led-red {
-			label = "led-red";
-			gpios = <&gpio4 21 GPIO_ACTIVE_HIGH>;
-			default-state = "off";
-		};
+	// 	led-red {
+	// 		label = "led-red";
+	// 		gpios = <&gpio4 21 GPIO_ACTIVE_HIGH>;
+	// 		default-state = "off";
+	// 	};
 
-		led-green {
-			label = "led-green";
-			gpios = <&gpio4 23 GPIO_ACTIVE_HIGH>;
-			default-state = "off";
-		};
+	// 	led-green {
+	// 		label = "led-green";
+	// 		gpios = <&gpio4 23 GPIO_ACTIVE_HIGH>;
+	// 		default-state = "off";
+	// 	};
 
-		led-blue {
-			label = "led-blue";
-			gpios = <&gpio4 25 GPIO_ACTIVE_HIGH>;
-			default-state = "off";
-		};
-	};
+	// 	led-blue {
+	// 		label = "led-blue";
+	// 		gpios = <&gpio4 25 GPIO_ACTIVE_HIGH>;
+	// 		default-state = "off";
+	// 	};
+	// };
 
 	gpiosgrp {
 		compatible = "simple-bus";
@@ -80,16 +80,15 @@
 		// 	status = "okay";
 		// };
 	
-		// usr_loopled {
-		// 	compatible = "rmk,usr-loopled";
-		// 	pinctrl-names = "default";
-		// 	leds-num = <3>;
-		// 	pinctrl-0 = <&pinctrl_loopled>;
-		// 	leds-gpios = <&gpio4 21 GPIO_ACTIVE_HIGH>,
-		// 				<&gpio4 23 GPIO_ACTIVE_HIGH>,
-		// 				<&gpio4 25 GPIO_ACTIVE_HIGH>;
-		// 	status = "okay";
-		// };
+		usr_loopled {
+			compatible = "rmk,usr-loopled";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_loopled>;
+			leds-gpios = <&gpio4 21 GPIO_ACTIVE_HIGH>,
+						<&gpio4 23 GPIO_ACTIVE_HIGH>,
+						<&gpio4 25 GPIO_ACTIVE_HIGH>;
+			status = "okay";
+		};
 
 		usr_hx711 {
 			compatible = "rmk,usr-hx711";
@@ -303,9 +302,9 @@
 
 	pinctrl_loopled: gpio-loopleds {
         fsl,pins = <
-            MX6UL_PAD_CSI_DATA00__GPIO4_IO21		0x17059
-			MX6UL_PAD_CSI_DATA02__GPIO4_IO23		0x17059
-			MX6UL_PAD_CSI_DATA04__GPIO4_IO25		0x17059
+            MX6UL_PAD_CSI_DATA00__GPIO4_IO21		0x40017059
+			MX6UL_PAD_CSI_DATA02__GPIO4_IO23		0x40017059
+			MX6UL_PAD_CSI_DATA04__GPIO4_IO25		0x40017059
         >;
 	};
 

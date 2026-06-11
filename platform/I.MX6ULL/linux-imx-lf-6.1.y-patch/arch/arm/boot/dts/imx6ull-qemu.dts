@@ -124,7 +124,6 @@
 	usr_loopled {
 		compatible = "rmk,usr-loopled";
 		pinctrl-0 = <&pinctrl_loopled>;
-	    leds-num = <3>;
 		leds-gpios = <&gpio4 21 GPIO_ACTIVE_LOW>,
 					<&gpio4 23 GPIO_ACTIVE_LOW>,
 					<&gpio4 25 GPIO_ACTIVE_LOW>;

@@ -22,7 +22,7 @@
 #define CLIENT_RX_MAX_BUFFER_SIZE        1024
 #define CLIENT_TX_MAX_BUFFER_SIZE        1024
 
-class asio_client
+class asio_client final: public singleton<asio_client>
 {
 public:
     /// \brief asio_client
@@ -32,9 +32,6 @@ public:
         memset(rx_buffer_, 0, CLIENT_RX_MAX_BUFFER_SIZE);
         memset(tx_buffer_, 0, CLIENT_TX_MAX_BUFFER_SIZE);
     }
-
-    /// \brief destructor
-    ~asio_client() = delete;
 
 public:
     /// \brief send_msg
@@ -49,11 +46,6 @@ public:
     /// \param timeInterval - period for the timer_struct run.
     /// \return Wheather initialization is success or failed.
     bool init();
-
-    /// \brief get_instance
-    /// - This method is used to get the pattern of the class.
-    /// \return the singleton pattern point of the object.
-    static asio_client *get_instance();
 private:
     /// \brief asio_client_rx_run
     /// - tx thread to process asio client rx info.
@@ -71,10 +63,6 @@ private:
     int write_data(char *pbuffer, uint16_t size);
 
 private:
-    /// \brief instance_pointer_
-    /// - object used to implement the singleton pattern.
-    static asio_client *instance_pointer_;
-
     /// \brief is_client_link
     /// - wheather client is link.
     std::atomic<bool> is_client_link_{false};

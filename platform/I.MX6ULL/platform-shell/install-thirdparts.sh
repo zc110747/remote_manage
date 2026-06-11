@@ -216,14 +216,12 @@ function process_mosquitto()
 
 function process_asio()
 {
-    asio_ver=asio-1.28.0
+    asio_ver=asio
 
     cd ${APPLICATION_THIRDPARTS}/
     if [ ! -d ${APPLICATION_THIRDPARTS}/asio/ ]; then
         tar -xvf ${asio_ver}.tar.gz
         sleep 1
-
-        mv ${asio_ver} asio/
     else
         echo "asio already exist, not install!"
     fi

@@ -91,25 +91,23 @@ struct read_data
 
 struct ap3216_data
 {
-    //设备信息
+    // 设备信息
     dev_t dev_id;            
     struct cdev cdev;      
     struct class *class;   
     struct device *device;
 
-    //硬件信息     
-    int cs_gpio;          
+    // 硬件信息           
     struct i2c_client *client;
 
-    //i2c获取信息
-    struct read_data data;
-
-    //config register value
+    // config register value
     u8 sysconf;
 };
 
 static int ap3216_read_block(struct i2c_client *client, u8 reg, void *buf, int len)
 {
+    int ret;
+
     struct i2c_msg msg[2];
 
     msg[0].addr = client->addr;
@@ -122,8 +120,12 @@ static int ap3216_read_block(struct i2c_client *client, u8 reg, void *buf, int l
     msg[1].buf = buf;
     msg[1].len = len;
 
-    if (i2c_transfer(client->adapter, msg, 2) != 2) {
-        dev_err(&client->dev, "%s: read error\n", __func__);
+    ret = i2c_transfer(client->adapter, msg, 2);
+    if (ret < 0)
+        return ret;
+
+    if (ret != 2) {
+        dev_err(&client->dev, "read error:%d\n", ret);
         return -EIO;
     }
     return 0;
@@ -131,8 +133,13 @@ static int ap3216_read_block(struct i2c_client *client, u8 reg, void *buf, int l
 
 static int ap3216_write_block(struct i2c_client *client, u8 reg, u8 *buf, u8 len)
 {
-    u8 b[256];
+    u8 b[64];
+    int ret;
     struct i2c_msg msg;
+
+    if (len > sizeof(b) - 1) {
+        return -EINVAL;
+    }
 
     b[0] = reg;
     memcpy(&b[1], buf, len);
@@ -143,7 +150,16 @@ static int ap3216_write_block(struct i2c_client *client, u8 reg, u8 *buf, u8 len
     msg.buf = b;
     msg.len = len + 1;
 
-    return i2c_transfer(client->adapter, &msg, 1);
+    ret = i2c_transfer(client->adapter, &msg, 1);
+    if (ret < 0)
+        return ret;
+
+    if (ret != 1) {
+        dev_err(&client->dev, "write error:%d\n", ret);
+        return -EIO;
+    }
+
+    return 0;
 }
 
 static int ap3216_open(struct inode *inode, struct file *filp)
@@ -157,43 +173,42 @@ static int ap3216_open(struct inode *inode, struct file *filp)
 
 static ssize_t ap3216_read(struct file *filp, char __user *buf, size_t cnt, loff_t *off)
 {
-    short data[3];
-    int err = 0;
-    u8 i = 0;
-    u8 readbuf[6];
+    int i;
+    int ret = 0;
+    u8 readbuf[6] = {0};
     struct ap3216_data *chip;
-    
-    chip = (struct ap3216_data *)filp->private_data;
+    struct read_data i2c_data;         //i2c获取信息
+
+    chip = filp->private_data;
+
+    cnt = min_t(size_t, cnt, sizeof(i2c_data));
 
     // ap3216c不支持multi-read, 单独读取6次
     for (i = 0; i < 6; i++) {
-        err = ap3216_read_block(chip->client, AP3216C_IRDATALOW + i, &readbuf[i], 1);
-        if (err) {
-            dev_err(&chip->client->dev, "ap316_read err:%s", __func__);
-            return -EIO;
+        ret = ap3216_read_block(chip->client, AP3216C_IRDATALOW + i, &readbuf[i], 1);
+        if (ret) {
+            dev_err(&chip->client->dev, "ap316_read err:%d", ret);
+            return ret;
         }
     }
 
     if (readbuf[0]&(1<<7)) {
-        chip->data.ir = 0;
+        i2c_data.ir = 0;
     } else {
-        chip->data.ir = ((unsigned short)readbuf[1] << 2) | (readbuf[0] & 0X03);
+        i2c_data.ir = ((unsigned short)readbuf[1] << 2) | (readbuf[0] & 0X03);
     }
-    chip->data.als = ((unsigned short)readbuf[3] << 8) | readbuf[2];
+    i2c_data.als = ((unsigned short)readbuf[3] << 8) | readbuf[2];
     if (readbuf[4]&(1<<6)) {
-        chip->data.ps = 0;
+        i2c_data.ps = 0;
     } else {
-        chip->data.ps = ((unsigned short)(readbuf[5] & 0X3F) << 4) | (readbuf[4] & 0X0F); 
+        i2c_data.ps = ((unsigned short)(readbuf[5] & 0X3F) << 4) | (readbuf[4] & 0X0F); 
     }
 
-    data[0] = chip->data.ir;
-    data[1] = chip->data.als;
-    data[2] = chip->data.ps;
-    err = copy_to_user(buf, data, sizeof(data));
-    if (err) {
+    if (copy_to_user(buf, &i2c_data, cnt)) {
         dev_err(&chip->client->dev, "kernel copy failed, %s\n", __func__);
         return -EFAULT;
     }
+    
     return cnt;
 }
 
@@ -268,7 +283,7 @@ exit:
 
 static int i2c_probe(struct i2c_client *client, const struct i2c_device_id *id)
 {
-    int result;
+    int ret;
     struct ap3216_data *chip = NULL;
     struct device_node *np = client->dev.of_node;
     u8 buf;
@@ -283,23 +298,28 @@ static int i2c_probe(struct i2c_client *client, const struct i2c_device_id *id)
     i2c_set_clientdata(client, chip);
     
     // 2.获取"rmk,sysconf"对应的配置信息配置信息(自定义属性)
-    result = of_property_read_u8(np, "rmk,sysconf", &chip->sysconf);
-    if (result) {
-        dev_warn(&client->dev, "read failed, error:%d", result);
+    ret = of_property_read_u8(np, "rmk,sysconf", &chip->sysconf);
+    if (ret) {
+        dev_warn(&client->dev, "read failed, error:%d", ret);
         chip->sysconf = 0x03;
     }
 
     buf = 0x04;     //reset ap3216
-    ap3216_write_block(client, AP3216C_SYSCONFG, &buf, 1);
-    mdelay(50);
-    buf = chip->sysconf;     //enable ALS+PS+LR
-    ap3216_write_block(client, AP3216C_SYSCONFG, &buf, 1);
+    ret = ap3216_write_block(client, AP3216C_SYSCONFG, &buf, 1);
+    if (ret) {
+        return ret;
+    }
 
+    msleep(50);
+    buf = chip->sysconf;     //enable ALS+PS+LR
+    ret = ap3216_write_block(client, AP3216C_SYSCONFG, &buf, 1);
+    if (ret) {
+        return ret;
+    }
     // 3.将设备注册到内核和系统
-    result = i2c_device_create(chip);
-    if (result) {
-        dev_err(&client->dev, "device create failed!\n");
-        return result;   
+    ret = i2c_device_create(chip);
+    if (ret) {
+        return ret;   
     }
 
     dev_info(&client->dev, "i2c driver init ok，sysconf:%d!\n", chip->sysconf);
@@ -325,7 +345,6 @@ static struct i2c_driver ap3216_driver = {
     .probe = i2c_probe,
     .remove = i2c_remove,
     .driver = {
-        .owner = THIS_MODULE,
         .name = "ap3216",
         .of_match_table = ap3216_of_match, 
     },
