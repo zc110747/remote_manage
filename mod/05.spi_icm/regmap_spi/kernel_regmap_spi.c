@@ -41,14 +41,14 @@
 	};
 };
 
-	pinctrl_ecspi3: ecspi3grp {
-        fsl,pins = <
-			MX6UL_PAD_UART2_TX_DATA__GPIO1_IO20		0x100b0     //cs1
-			MX6UL_PAD_UART2_RTS_B__ECSPI3_MISO      0x100b1  
-			MX6UL_PAD_UART2_CTS_B__ECSPI3_MOSI      0x100b1 
-			MX6UL_PAD_UART2_RX_DATA__ECSPI3_SCLK    0x100b1
-        >;
-	};
+pinctrl_ecspi3: ecspi3grp {
+    fsl,pins = <
+        MX6UL_PAD_UART2_TX_DATA__GPIO1_IO20		0x100b0     //cs1
+        MX6UL_PAD_UART2_RTS_B__ECSPI3_MISO      0x100b1  
+        MX6UL_PAD_UART2_CTS_B__ECSPI3_MOSI      0x100b1 
+        MX6UL_PAD_UART2_RX_DATA__ECSPI3_SCLK    0x100b1
+    >;
+};
 */
 #include <linux/types.h>
 #include <linux/kernel.h>

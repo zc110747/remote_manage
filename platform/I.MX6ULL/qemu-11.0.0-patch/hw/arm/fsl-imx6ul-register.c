@@ -48,9 +48,10 @@ typedef struct fsl_device_info
 static FSL_DEVICE_INFO g_device_info = {0};
 
 // internal function prototype
-static void i2c_ap3216_register(FslIMX6ULState *s);
+static void i2c_device_register(FslIMX6ULState *s);
 static void key_gpio_register(FslIMX6ULState *s);
 static void iomuxc_register(DeviceState *dev, FslIMX6ULState *s);
+static void ecspi_device_register(FslIMX6ULState *s);
 
 // global function
 void fsl_imx6ul_device_register(DeviceState *dev, FslIMX6ULState *s)
@@ -58,11 +59,14 @@ void fsl_imx6ul_device_register(DeviceState *dev, FslIMX6ULState *s)
     // 注册iomuxc区域读写
     iomuxc_register(dev, s);
 
-    // i2c器件ap3216注册
-    i2c_ap3216_register(s);
+    // i2c器件注册
+    i2c_device_register(s);
 
     // 注册gpio interrupt设备，按键输入
     key_gpio_register(s);
+
+    // ecspi设备注册
+    ecspi_device_register(s);
 }
 
 void imx6ul_gpio_irq_set(int pin, int level)
@@ -79,7 +83,7 @@ void imx6ul_gpio_irq_set(int pin, int level)
 }
 
 // internal function
-static void i2c_ap3216_register(FslIMX6ULState *s)
+static void i2c_device_register(FslIMX6ULState *s)
 {
     // 注册i2c设备
     if (!s->i2c[0].bus) {
@@ -219,4 +223,28 @@ static void iomuxc_register(DeviceState *dev, FslIMX6ULState *s)
             get_system_memory(),
             FSL_IMX6UL_IOMUXC_ADDR,
             &g_device_info.iomux);
+}
+
+static void ecspi_device_register(FslIMX6ULState *s)
+{
+    DeviceState *dev;
+    SSIBus *bus;
+
+    /*
+     * ECSPI3 的 SPI BUS
+     */
+    bus = (SSIBus *)qdev_get_child_bus(
+                    DEVICE(&s->spi[2]),
+                    "spi");
+
+    if (!bus) {
+        error_report("cannot find ecspi3 spi bus");
+        return;
+    }
+
+    dev = qdev_new("icm20608");
+
+    ssi_realize_and_unref(dev,
+                          bus,
+                          &error_fatal);
 }
