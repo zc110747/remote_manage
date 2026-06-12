@@ -1825,19 +1825,11 @@ ERST
     },
 
     {
-        .name       = "key18-on",
-        .args_type  = "",
-        .params     = "",
-        .help       = "set GPIO1_IO18 high",
-        .cmd        = hmp_key18_on,
-    },
-
-    {
-        .name       = "key18-off",
-        .args_type  = "",
-        .params     = "",
-        .help       = "set GPIO1_IO18 low",
-        .cmd        = hmp_key18_off,
+        .name       = "gpio-set",
+        .args_type  = "pin:i,value:i",
+        .params     = "pin value",
+        .help       = "set gpio pin",
+        .cmd        = hmp_gpio_set,
     },
 
 #if defined(CONFIG_FDT)

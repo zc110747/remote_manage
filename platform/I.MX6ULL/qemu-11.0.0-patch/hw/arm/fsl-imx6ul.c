@@ -19,6 +19,7 @@
 #include "qemu/osdep.h"
 #include "qapi/error.h"
 #include "hw/arm/fsl-imx6ul.h"
+#include "hw/arm/fsl-imx6ul-register.h"
 #include "hw/misc/unimp.h"
 #include "hw/usb/imx-usb-phy.h"
 #include "hw/core/boards.h"
@@ -155,67 +156,6 @@ static void fsl_imx6ul_init(Object *obj)
         snprintf(name, NAME_SIZE, "wdt%d", i);
         object_initialize_child(obj, name, &s->wdt[i], TYPE_IMX2_WDT);
     }
-}
-
-static qemu_irq gpio1_18_irq = NULL;
-static QEMUTimer *press_timer;
-static QEMUTimer *release_timer;
-
-void key_release_cb(void *opaque)
-{
-    if (gpio1_18_irq)
-        qemu_set_irq(gpio1_18_irq, 0);
-
-    timer_mod(press_timer,
-              qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + 1000);
-}
-
-void key_press_cb(void *opaque)
-{ 
-    if (gpio1_18_irq)
-        qemu_set_irq(gpio1_18_irq, 1);
-
-    timer_mod(release_timer,
-              qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + 1000);
-}
-
-void imx6ul_gpio1_18_set(int level)
-{
-    if (gpio1_18_irq)
-        qemu_set_irq(gpio1_18_irq, level);
-}
-
-static void fsl_imx6ul_init_user(FslIMX6ULState *s)
-{
-    // 注册i2c设备
-    if (!s->i2c[0].bus) {
-        return;
-    }
-
-    i2c_slave_create_simple(
-            I2C_BUS(s->i2c[0].bus),
-            "ap3216",
-            0x1e);
-
-    fprintf(stderr, "AP3216 create\n");
-
-    // 注册gpio设备，按键输入
-    gpio1_18_irq = qdev_get_gpio_in(
-        DEVICE(&s->gpio[0]),
-        18);
-
-    // press_timer =
-    //     timer_new_ms(QEMU_CLOCK_VIRTUAL,
-    //                 key_press_cb,
-    //                 s);
-
-    // release_timer =
-    //     timer_new_ms(QEMU_CLOCK_VIRTUAL,
-    //                 key_release_cb,
-    //                 s);
-
-    // timer_mod(press_timer,
-    //         qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + 1000);
 }
 
 static void fsl_imx6ul_realize(DeviceState *dev, Error **errp)
@@ -770,7 +710,8 @@ static void fsl_imx6ul_realize(DeviceState *dev, Error **errp)
     memory_region_add_subregion(get_system_memory(),
                                 FSL_IMX6UL_OCRAM_ALIAS_ADDR, &s->ocram_alias);
 
-    fsl_imx6ul_init_user(s);
+    // register user device
+    fsl_imx6ul_device_register(dev, s);
 }
 
 static const Property fsl_imx6ul_properties[] = {

@@ -437,12 +437,12 @@ static int led_hardware_init(struct led_data *chip)
     is_active = gpiod_is_active_low(chip->led_desc);
     dev_info(&pdev->dev, "reg value:0x%x, active_low:%d\n", regval, is_active);
 
-    //获取"pinctrl-x"属性
+    // 获取"pinctrl-x"属性
     chip->led_pinctrl = devm_pinctrl_get(&pdev->dev);
     if (IS_ERR(chip->led_pinctrl)) {
         dev_info(&pdev->dev, "[devm_pinctrl_get]failed\n");
         ret = PTR_ERR(chip->led_pinctrl);
-goto err_iomap;
+        goto err_iomap;
     }
     chip->pinctrl_state[0] = pinctrl_lookup_state(chip->led_pinctrl, "default");
     if (IS_ERR(chip->pinctrl_state[0])) {

@@ -783,8 +783,11 @@ static int vf610_adc_probe(struct platform_device *pdev)
     indio_dev->channels = vf610_adc_iio_channels;
     indio_dev->num_channels = (int)channels;
 
-    ret = devm_iio_triggered_buffer_setup(&pdev->dev, indio_dev, &iio_pollfunc_store_time,
-                    NULL, &iio_triggered_buffer_setup_ops);
+    ret = devm_iio_triggered_buffer_setup(&pdev->dev, 
+                indio_dev, 
+                &iio_pollfunc_store_time,
+                NULL, 
+                &iio_triggered_buffer_setup_ops);
     if (ret < 0) {
         dev_err(&pdev->dev, "Couldn't initialise the buffer\n");
         goto error_iio_device_register;

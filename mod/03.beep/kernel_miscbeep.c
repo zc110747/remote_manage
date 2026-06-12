@@ -243,14 +243,14 @@ static int beep_hardware_init(struct beep_data *chip)
 {
     struct platform_device *pdev = chip->pdev;
 
-    //1.获取beep gpio属性, 设置为输出模式
+    // 1.获取beep gpio属性, 设置为输出模式
     chip->desc = devm_gpiod_get(&pdev->dev, "beep", GPIOD_OUT_LOW);
     if (IS_ERR(chip->desc)) {
         dev_err(&pdev->dev, "beep request gpios failed!\n");
         return PTR_ERR(chip->desc);     
     }
 
-    //2.获取初始化列表中的信息
+    // 2.获取初始化列表中的信息
     chip->init_data = of_device_get_match_data(&pdev->dev);
     if (!chip->init_data) {
         dev_info(&pdev->dev, "[of_device_get_match_data]read full, null!\n");

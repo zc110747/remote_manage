@@ -791,18 +791,18 @@ void hmp_gpa2hpa(Monitor *mon, const QDict *qdict)
 }
 
 // 增加hmp命令
-extern void imx6ul_gpio1_18_set(int level);
+extern void imx6ul_gpio_irq_set(int pin, int level);
 
-void hmp_key18_on(Monitor *mon,
+void hmp_gpio_set(Monitor *mon,
                   const QDict *qdict)
 {
-    imx6ul_gpio1_18_set(1);
-}
+    int pin;
+    int value;
 
-void hmp_key18_off(Monitor *mon,
-                   const QDict *qdict)
-{
-    imx6ul_gpio1_18_set(0);
+    pin = qdict_get_int(qdict, "pin");
+    value = qdict_get_int(qdict, "value");
+
+    imx6ul_gpio_irq_set(pin, value);
 }
 
 #endif

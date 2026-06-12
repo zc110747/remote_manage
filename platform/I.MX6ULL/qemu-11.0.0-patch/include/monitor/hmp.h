@@ -194,6 +194,5 @@ void hmp_gva2gpa(Monitor *mon, const QDict *qdict);
 void hmp_gpa2hva(Monitor *mon, const QDict *qdict);
 void hmp_gpa2hpa(Monitor *mon, const QDict *qdict);
 
-void hmp_key18_on(Monitor *mon, const QDict *qdict);
-void hmp_key18_off(Monitor *mon, const QDict *qdict);
+void hmp_gpio_set(Monitor *mon, const QDict *qdict);
 #endif
