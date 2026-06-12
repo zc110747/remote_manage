@@ -25,9 +25,36 @@ ${qemu_tools} -M mcimx6ul-evk -m 512M -kernel "${kernel_file}" \
     -nographic -serial mon:stdio \
     -drive  file="${rootfs_file}",format=raw,id=mysdcard -device sd-card,drive=mysdcard \
     -append "console=ttymxc0,115200 rootfstype=ext4 root=/dev/mmcblk1 rw rootwait init=/sbin/init loglevel=8"
+    -monitor telnet:127.0.0.1:4444,server,nowait
+
+telnet 127.0.0.1:4444
+(qemu) gpio-set 0 0
+(qemu) gpio-set 0 1
 
 # 查看qtree支持
 qemu-system-arm -M mcimx6ul-evk -monitor stdio
 
 (qemu)info qtree
+
+# 修复buildroot.img ext4文件错误
+./e2fsck/e2fsck -fy /home/freedom/sdk/arm/package/buildroot.img
+
+# e2fsck的编译方法
+sudo apt update
+
+sudo apt install -y \
+    build-essential \
+    pkg-config \
+    uuid-dev \
+    libblkid-dev 
+
+wget https://mirrors.edge.kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/v1.47.2/e2fsprogs-1.47.2.tar.gz
+
+tar xf e2fsprogs-1.47.2.tar.gz
+cd e2fsprogs-1.47.2
+
+./configure
+make -j$(nproc)
+
+sudo ./e2fsck/e2fsck -fy buildroot.img
 ```

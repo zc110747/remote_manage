@@ -27,6 +27,7 @@
 #include "qemu/module.h"
 #include "target/arm/cpu-qom.h"
 #include "hw/i2c/i2c.h"
+#include "hw/core/qdev.h"
 
 #define NAME_SIZE 20
 
@@ -156,10 +157,37 @@ static void fsl_imx6ul_init(Object *obj)
     }
 }
 
-static void fsl_imx6ul_init_ap3216(FslIMX6ULState *s)
+static qemu_irq gpio1_18_irq = NULL;
+static QEMUTimer *press_timer;
+static QEMUTimer *release_timer;
+
+void key_release_cb(void *opaque)
 {
-    fprintf(stderr, "AP3216: init start\n");
-    
+    if (gpio1_18_irq)
+        qemu_set_irq(gpio1_18_irq, 0);
+
+    timer_mod(press_timer,
+              qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + 1000);
+}
+
+void key_press_cb(void *opaque)
+{ 
+    if (gpio1_18_irq)
+        qemu_set_irq(gpio1_18_irq, 1);
+
+    timer_mod(release_timer,
+              qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + 1000);
+}
+
+void imx6ul_gpio1_18_set(int level)
+{
+    if (gpio1_18_irq)
+        qemu_set_irq(gpio1_18_irq, level);
+}
+
+static void fsl_imx6ul_init_user(FslIMX6ULState *s)
+{
+    // 注册i2c设备
     if (!s->i2c[0].bus) {
         return;
     }
@@ -170,6 +198,24 @@ static void fsl_imx6ul_init_ap3216(FslIMX6ULState *s)
             0x1e);
 
     fprintf(stderr, "AP3216 create\n");
+
+    // 注册gpio设备，按键输入
+    gpio1_18_irq = qdev_get_gpio_in(
+        DEVICE(&s->gpio[0]),
+        18);
+
+    // press_timer =
+    //     timer_new_ms(QEMU_CLOCK_VIRTUAL,
+    //                 key_press_cb,
+    //                 s);
+
+    // release_timer =
+    //     timer_new_ms(QEMU_CLOCK_VIRTUAL,
+    //                 key_release_cb,
+    //                 s);
+
+    // timer_mod(press_timer,
+    //         qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + 1000);
 }
 
 static void fsl_imx6ul_realize(DeviceState *dev, Error **errp)
@@ -724,7 +770,7 @@ static void fsl_imx6ul_realize(DeviceState *dev, Error **errp)
     memory_region_add_subregion(get_system_memory(),
                                 FSL_IMX6UL_OCRAM_ALIAS_ADDR, &s->ocram_alias);
 
-    fsl_imx6ul_init_ap3216(s);
+    fsl_imx6ul_init_user(s);
 }
 
 static const Property fsl_imx6ul_properties[] = {

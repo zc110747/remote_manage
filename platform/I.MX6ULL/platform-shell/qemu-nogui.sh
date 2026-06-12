@@ -16,4 +16,5 @@ ${qemu_tools} -M mcimx6ul-evk -m 512M -kernel "${kernel_file}" \
     -dtb "${dtb_file}"  \
     -nographic -serial mon:stdio \
     -drive  file="${rootfs_file}",format=raw,id=mysdcard -device sd-card,drive=mysdcard \
-    -append "console=ttymxc0,115200 rootfstype=ext4 root=/dev/mmcblk1 rw rootwait init=/sbin/init loglevel=8"
+    -append "console=ttymxc0,115200 rootfstype=ext4 root=/dev/mmcblk1 rw rootwait init=/sbin/init loglevel=8" \
+    -monitor telnet:127.0.0.1:4444,server,nowait

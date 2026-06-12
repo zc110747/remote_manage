@@ -99,17 +99,14 @@ void key_timer_func(struct timer_list *arg)
     value = gpio_get_value(chip->key_gpio);
     pdev = chip->pdev;
 
-    if (value == 0)
-    {
+    if (value == 0) {
         input_report_key(chip->input_dev, chip->key_code, KEY_ON);
-    }
-    else
-    {
+    } else {
         input_report_key(chip->input_dev, chip->key_code, KEY_OFF);          
     }
     input_sync(chip->input_dev);
 
-    dev_info(&pdev->dev, "key timer interrupt!");
+    dev_info(&pdev->dev, "key timer interrupt:%d!", value);
     atomic_set(&chip->protect, 0);
 }
 

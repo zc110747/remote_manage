@@ -16,6 +16,7 @@
 *.scr
 *.export*
 *.module*
+*.Identifiter
 *.Module*
 
 thirdparts/asio/
