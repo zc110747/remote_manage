@@ -31,7 +31,7 @@
         pinctrl-names = "default";
         pinctrl-0 = <&pinctrl_rtc>;
         interrupt-parent = <&gpio1>;
-        interrupts = <2 IRQ_TYPE_LEVEL_LOW>;
+        interrupts = <2 IRQ_TYPE_EDGE_FALLING>;
         interrupt-gpios = <&gpio1 2 GPIO_ACTIVE_LOW>;
         status = "okay";
     };
@@ -405,9 +405,11 @@ static int i2c_probe(struct i2c_client *client, const struct i2c_device_id *id)
         return -EIO;
     }
     gpio_direction_input(chip->irq_gpio);
-    err = devm_request_threaded_irq(&client->dev, client->irq, 
-                            NULL, pcf8563_irq_handler, 
-                            IRQF_SHARED | IRQF_ONESHOT | IRQF_TRIGGER_LOW, 
+    err = devm_request_threaded_irq(&client->dev, 
+                            client->irq, 
+                            NULL, 
+                            pcf8563_irq_handler, 
+                            IRQF_ONESHOT | IRQF_TRIGGER_FALLING, 
                             "rtc_irq", 
                             (void *)chip);
     if (err < 0) {

@@ -106,9 +106,6 @@ struct spi_icm_data
     struct regmap *map;
 
     struct spi_reg_config reg_config;
-
-    /* read data info */
-    struct spi_read_data data;
 };
 
 static int icm20608_open(struct inode *inode, struct file *filp)
@@ -122,35 +119,29 @@ static int icm20608_open(struct inode *inode, struct file *filp)
 
 static ssize_t icm20608_read(struct file *filp, char __user *buf, size_t cnt, loff_t *off)
 {
-    signed int data[7];
     int ret;
     unsigned char readbuf[14];
-    struct spi_icm_data *chip = (struct spi_icm_data *)filp->private_data;
-    struct spi_device *spi = (struct spi_device *)chip->private_data;
+    struct spi_icm_data *chip = filp->private_data;
+    struct spi_device *spi = chip->private_data;
+    struct spi_read_data data;
+
+    cnt = min_t(size_t, cnt, sizeof(data));
 
     ret = regmap_bulk_read(chip->map, ICM20_ACCEL_XOUT_H, readbuf, 14);
-    if (ret < 0)
-    {
+    if (ret < 0) {
         dev_err(&spi->dev, "icm20608 read failed:%d\n", ret);
         return 0;
     }
 
-    chip->data.accel_x_adc = (signed short)((readbuf[0] << 8) | readbuf[1]);
-    chip->data.accel_y_adc = (signed short)((readbuf[2] << 8) | readbuf[3]);
-    chip->data.accel_z_adc = (signed short)((readbuf[4] << 8) | readbuf[5]);
-    chip->data.temp_adc    = (signed short)((readbuf[6] << 8) | readbuf[7]);
-    chip->data.gyro_x_adc  = (signed short)((readbuf[8] << 8) | readbuf[9]);
-    chip->data.gyro_y_adc  = (signed short)((readbuf[10] << 8) | readbuf[11]);
-    chip->data.gyro_z_adc  = (signed short)((readbuf[12] << 8) | readbuf[13]);
+    data.accel_x_adc = (signed short)((readbuf[0] << 8) | readbuf[1]);
+    data.accel_y_adc = (signed short)((readbuf[2] << 8) | readbuf[3]);
+    data.accel_z_adc = (signed short)((readbuf[4] << 8) | readbuf[5]);
+    data.temp_adc    = (signed short)((readbuf[6] << 8) | readbuf[7]);
+    data.gyro_x_adc  = (signed short)((readbuf[8] << 8) | readbuf[9]);
+    data.gyro_y_adc  = (signed short)((readbuf[10] << 8) | readbuf[11]);
+    data.gyro_z_adc  = (signed short)((readbuf[12] << 8) | readbuf[13]);
 
-    data[0] = chip->data.gyro_x_adc;
-    data[1] = chip->data.gyro_y_adc;
-    data[2] = chip->data.gyro_z_adc;
-    data[3] = chip->data.accel_x_adc;
-    data[4] = chip->data.accel_y_adc;
-    data[5] = chip->data.accel_z_adc;
-    data[6] = chip->data.temp_adc;
-    ret = copy_to_user(buf, data, sizeof(data));
+    ret = copy_to_user(buf, &data, cnt);
     if (ret) {
         dev_err(&spi->dev, "copy_to_user failed, num:%d\n", ret);
         return -EFAULT;
@@ -183,60 +174,51 @@ static int icm20608_parse_dt(struct spi_icm_data *chip)
 {
     struct spi_device *spi;
     struct device_node *np;
-    int ret;
 
-    spi = (struct spi_device *)chip->private_data;
+    spi = chip->private_data;
     np = spi->dev.of_node;
 
-    ret = of_property_read_u8(np, "smplrt_div", &chip->reg_config.smplrt_div);
-    if (ret) {
+    if (of_property_read_u8(np, "smplrt_div", &chip->reg_config.smplrt_div)) {
         dev_warn(&spi->dev, "invalid smplrt_div attribute");
         chip->reg_config.smplrt_div = 0x00;
     }
 
-    ret = of_property_read_u8(np, "gyro_config", &chip->reg_config.gyro_config);
-    if (ret) {
+    if (of_property_read_u8(np, "gyro_config", &chip->reg_config.gyro_config)) {
         dev_warn(&spi->dev, "invalid gyro_config attribute");
         chip->reg_config.gyro_config = 0x18;
     }
 
-    ret = of_property_read_u8(np, "accel_config", &chip->reg_config.accel_config);
-    if (ret) {
+    if (of_property_read_u8(np, "accel_config", &chip->reg_config.accel_config)) {
         dev_warn(&spi->dev, "invalid accel_config attribute");
         chip->reg_config.accel_config = 0x18;
     }
 
-    ret = of_property_read_u8(np, "config", &chip->reg_config.config);
-    if (ret) {
+    if (of_property_read_u8(np, "config", &chip->reg_config.config)) {
         dev_warn(&spi->dev, "invalid config attribute");
         chip->reg_config.config = 0x04;
     }
 
-    ret = of_property_read_u8(np, "accel_config2", &chip->reg_config.accel_config2);
-    if (ret) {
+    if (of_property_read_u8(np, "accel_config2", &chip->reg_config.accel_config2)) {
         dev_warn(&spi->dev, "invalid accel_config2 attribute");
         chip->reg_config.accel_config2 = 0x04;
     }
 
-    ret = of_property_read_u8(np, "pwr_mgmt_2", &chip->reg_config.pwr_mgmt_2);
-    if (ret) {
+    if (of_property_read_u8(np, "pwr_mgmt_2", &chip->reg_config.pwr_mgmt_2)) {
         dev_warn(&spi->dev, "invalid pwr_mgmt_2 attribute");
         chip->reg_config.pwr_mgmt_2 = 0x00;
     }
 
-    ret = of_property_read_u8(np, "lp_mode_cfg", &chip->reg_config.lp_mode_cfg);
-    if (ret) {
+    if (of_property_read_u8(np, "lp_mode_cfg", &chip->reg_config.lp_mode_cfg)) {
         dev_warn(&spi->dev, "invalid lp_mode_cfg attribute");
         chip->reg_config.lp_mode_cfg = 0x00;
     }
 
-    ret = of_property_read_u8(np, "fifo_en", &chip->reg_config.fifo_en);
-    if (ret) {
+    if (of_property_read_u8(np, "fifo_en", &chip->reg_config.fifo_en)) {
         dev_warn(&spi->dev, "invalid fifo_en attribute");
         chip->reg_config.fifo_en = 0x00;
     }
 
-    return ret;
+    return 0;
 }
 
 static int spi_hardware_init(struct spi_icm_data *chip)
@@ -244,12 +226,11 @@ static int spi_hardware_init(struct spi_icm_data *chip)
     int data = 0;
     struct spi_device *spi;
 
-    //1.配置spi位regmap操作模式
-    spi = (struct spi_device *)chip->private_data;
+    // 1.配置spi位regmap操作模式
+    spi = chip->private_data;
     chip->map = devm_regmap_init_spi(spi, &icm20608_regmap_config);
-    if (IS_ERR(chip->map))
-    {
-        dev_err(&spi->dev, "chip map init failed\n");
+    if (IS_ERR(chip->map)) {
+        dev_err(&spi->dev, "chip map init failed:%ld\n", PTR_ERR(chip->map));
     }
 
     //2.复位芯片
@@ -290,7 +271,7 @@ static int spi_device_create(struct spi_icm_data *chip)
     int result;
     int major = DEFAULT_MAJOR;
     int minor = DEFAULT_MINOR;
-    struct spi_device *spi = (struct spi_device *)chip->private_data;
+    struct spi_device *spi = chip->private_data;
 
     //1.申请设备号
     if (major) {
@@ -301,7 +282,7 @@ static int spi_device_create(struct spi_icm_data *chip)
         major = MAJOR(chip->dev_id);
         minor = MINOR(chip->dev_id);
     }
-    if (result < 0){
+    if (result < 0) {
         dev_err(&spi->dev, "dev alloc id failed\n");
         goto exit;
     }

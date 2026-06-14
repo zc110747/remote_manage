@@ -3,7 +3,7 @@
 #include "qapi/error.h"
 #include "qemu/module.h"
 
-#define TYPE_ICM20608 "icm20608"
+#define  TYPE_ICM20608 "icm20608"
 OBJECT_DECLARE_SIMPLE_TYPE(ICM20608State, ICM20608)
 
 /* -------------------------------------------------- */
@@ -46,7 +46,8 @@ struct ICM20608State {
 
     uint8_t regs[256];
 
-    bool cmd_received;
+    bool cs_select;
+    bool is_first_reg;
     bool is_read;
 
     uint8_t current_reg;
@@ -83,7 +84,7 @@ static void icm20608_init_regs(ICM20608State *s)
     s->regs[ICM20_GYRO_ZOUT_H] = 0x55;
     s->regs[ICM20_GYRO_ZOUT_L] = 0x66;
 
-    s->cmd_received = false;
+    s->cs_select = false;
     s->is_read = false;
     s->current_reg = 0;
 }
@@ -97,36 +98,31 @@ static uint32_t icm20608_transfer(SSIPeripheral *dev,
 
     uint8_t data = value & 0xff;
 
-    if (!s->cmd_received) {
+    // cs未片选, 直接返回0
+    if (!s->cs_select) {
+        return 0;
+    } 
 
-        s->cmd_received = true;
-
+    // 判断是否为寄存器位，寄存器位为最高位
+    if (s->is_first_reg) {
+        s->is_first_reg = false;
         s->is_read = !!(data & 0x80);
-
         s->current_reg = data & 0x7f;
-
         return 0;
     }
 
     if (s->is_read) {
-
         uint8_t ret = s->regs[s->current_reg];
-
         s->current_reg++;
-
         return ret;
     }
 
     s->regs[s->current_reg] = data;
-
     if (s->current_reg == ICM20_PWR_MGMT_1 &&
         data == 0x80) {
-
         icm20608_init_regs(s);
-
         s->regs[ICM20_PWR_MGMT_1] = 0x80;
     }
-
     s->current_reg++;
 
     return 0;
@@ -139,17 +135,14 @@ static int icm20608_set_cs(SSIPeripheral *dev,
 {
     ICM20608State *s = ICM20608(dev);
 
-    /*
-     * SSI_CS_LOW
-     *
-     * select=true
-     * CS有效
-     */
-
-    if (select) {
-        s->cmd_received = false;
+    // cs片选, 低有效, 表示开始接收
+    if (select == 0) {
+        s->cs_select = true;
+    } else {
+        s->cs_select = false;
     }
-
+    s->is_first_reg = true;
+    
     return 0;
 }
 
@@ -172,11 +165,8 @@ static void icm20608_class_init(ObjectClass *klass,
         SSI_PERIPHERAL_CLASS(klass);
 
     spc->realize = icm20608_realize;
-
     spc->transfer = icm20608_transfer;
-
     spc->set_cs = icm20608_set_cs;
-
     spc->cs_polarity = SSI_CS_LOW;
 }
 

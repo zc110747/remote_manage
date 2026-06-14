@@ -316,6 +316,7 @@ static int i2c_probe(struct i2c_client *client, const struct i2c_device_id *id)
     if (ret) {
         return ret;
     }
+    
     // 3.将设备注册到内核和系统
     ret = i2c_device_create(chip);
     if (ret) {

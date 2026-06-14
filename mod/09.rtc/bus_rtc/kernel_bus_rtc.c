@@ -31,7 +31,7 @@
         pinctrl-names = "default";
         pinctrl-0 = <&pinctrl_rtc>;
         interrupt-parent = <&gpio1>;
-        interrupts = <2 IRQ_TYPE_LEVEL_LOW>;
+        interrupts = <2 IRQ_TYPE_EDGE_FALLING>;
         interrupt-gpios = <&gpio1 2 GPIO_ACTIVE_LOW>;
         status = "okay";
     };
@@ -108,12 +108,11 @@ hwclock -r -f /dev/rtc1
 struct pcf8563_data
 {
     //设备信息
-    struct rtc_device    *rtc;
+    struct rtc_device *rtc;
+    struct i2c_client *client;
 
-    //硬件信息     
-    void *private_data;
-
-    int c_polarity;    /* 0: MO_C=1 means 19xx, otherwise MO_C=1 means 20xx */
+    /* 0: MO_C=1 means 19xx, otherwise MO_C=1 means 20xx */
+    int c_polarity;    
 
     int irq_gpio;
 };
@@ -155,7 +154,7 @@ static int pcf8563_read_block( struct i2c_client *client, u8 reg, void *buf, int
 static int pcf8563_write_block( struct i2c_client *client, u8 reg, void *buf, int len)
 {
     u8 b[256];
-    struct i2c_msg msg;
+    struct i2c_msg msg = {0};
 
     b[0] = reg;
     memcpy(&b[1], buf, len);
@@ -265,14 +264,15 @@ static int pcf8563_get_alarm_mode(struct i2c_client *client, unsigned char *en,
                   unsigned char *pen)
 {
     unsigned char buf;
-    int err;
+    int ret;
 
-    err = pcf8563_read_block(client, PCF8563_REG_CONTROL2, &buf, 1);
-    if (err)
-        return err;
+    ret = pcf8563_read_block(client, PCF8563_REG_CONTROL2, &buf, 1);
+    if (ret) 
+        return ret;
 
     if (en)
         *en = !!(buf & PCF8563_BIT_AIE);
+
     if (pen)
         *pen = !!(buf & PCF8563_BIT_AF);
 
@@ -372,21 +372,22 @@ static int pcf8563_alarm_irq_enable(struct device *dev, unsigned int enabled)
 static irqreturn_t pcf8563_irq_handler(int irq, void *data)
 {
     struct pcf8563_data *chip = (struct pcf8563_data *)data;
-    struct i2c_client *client = (struct i2c_client *)(chip->private_data);
-    int err;
+    struct i2c_client *client = chip->client;
+    int ret;
     char pending;
 
-    err = pcf8563_get_alarm_mode(client, NULL, &pending);
-    if (err)
-        return IRQ_NONE;
-
-    if (pending) {
-        dev_info(&client->dev, "%s: irq pending:%d\n", __func__, pending);
-        rtc_update_irq(chip->rtc, 1, RTC_IRQF | RTC_AF);
-        pcf8563_set_alarm_mode(client, 1);
-        return IRQ_HANDLED;
+    ret = pcf8563_get_alarm_mode(client, NULL, &pending);
+    if (ret) {
+        dev_err(&client->dev, "pcf8563_get_alarm_mode err:%d!\n", ret);
+        return ret;
     }
 
+    dev_info(&client->dev, "%s: irq pending:%d\n", __func__, pending);
+    if (pending) {
+        rtc_update_irq(chip->rtc, 1, RTC_IRQF | RTC_AF);
+        pcf8563_set_alarm_mode(client, 1);
+    } 
+    
     return IRQ_RETVAL(IRQ_HANDLED);
 }
 
@@ -405,35 +406,38 @@ static int i2c_probe(struct i2c_client *client, const struct i2c_device_id *id)
     struct pcf8563_data *chip = NULL;
     unsigned char buf;
 
-    //1.申请管理RTC PCF8563的数据块
+    // 1.申请管理RTC PCF8563的数据块
     chip = devm_kzalloc(&client->dev, sizeof(struct pcf8563_data), GFP_KERNEL);
     if (!chip){
         dev_err(&client->dev, "chip malloc error!\n");
         return -ENOMEM;
     }
-    chip->private_data = (void *)client;
+    chip->client = client;
     i2c_set_clientdata(client, chip);
 
-    //2. 初始化硬件配置
+    // 2. 初始化硬件配置
     buf = 0;
+    dev_err(&client->dev, "start write!\n");
     err = pcf8563_write_block(client, PCF8563_REG_CONTROL2, &buf, 1);
     if (err < 0) {
         dev_err(&client->dev, "%s: write error\n", __func__);
         return err;
     }
+    dev_err(&client->dev, "end write!\n");
 
     //3. 申请中断控制引脚并申请中断
     chip->irq_gpio = of_get_named_gpio(client->dev.of_node, "interrupt-gpios", 0);
     err = devm_gpio_request(&client->dev, chip->irq_gpio, "rtc_irq");
-    if (err < 0)
-    {
+    if (err < 0) {
         dev_err(&client->dev, "rtc interrupt gpio request err:%d\n", err);
         return -EIO;
     }
     gpio_direction_input(chip->irq_gpio);
-    err = devm_request_threaded_irq(&client->dev, client->irq, 
-                            NULL, pcf8563_irq_handler, 
-                            IRQF_SHARED | IRQF_ONESHOT | IRQF_TRIGGER_LOW, 
+    err = devm_request_threaded_irq(&client->dev, 
+                            client->irq, 
+                            NULL, 
+                            pcf8563_irq_handler, 
+                            IRQF_ONESHOT | IRQF_TRIGGER_FALLING, 
                             "rtc_irq", 
                             (void *)chip);
     if (err < 0) {
@@ -441,7 +445,7 @@ static int i2c_probe(struct i2c_client *client, const struct i2c_device_id *id)
         return -EINVAL;
     }
 
-    //4. alloc memory manage the rtc
+    // 4. alloc memory manage the rtc
     chip->rtc = devm_rtc_allocate_device(&client->dev);
     if (IS_ERR(chip->rtc)){
         dev_err(&client->dev, "rtc alloc device failed!\n");
@@ -458,8 +462,7 @@ static int i2c_probe(struct i2c_client *client, const struct i2c_device_id *id)
 
     //5. register the rtc device.
     err = devm_rtc_register_device(chip->rtc);
-    if (err)
-    {
+    if (err) {
         dev_err(&client->dev, "rtc register failed!\n");
         return err;
     }
@@ -483,7 +486,6 @@ static struct i2c_driver pcf8563_driver = {
     .probe = i2c_probe,
     .remove = i2c_remove,
     .driver = {
-        .owner = THIS_MODULE,
         .name = DEVICE_NAME,
         .of_match_table = pcf8563_of_match, 
     },

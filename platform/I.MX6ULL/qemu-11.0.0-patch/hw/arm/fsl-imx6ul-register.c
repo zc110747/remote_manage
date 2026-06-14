@@ -7,6 +7,8 @@
 //
 //  Purpose:
 //      提供线程/进程间通讯的数据结构，需要满足copyable
+//      按键key: GPIO1_18
+//      
 //
 // Author:
 //     @微信公众号 <嵌入式技术总结>
@@ -32,11 +34,19 @@
 
 // internal defined
 #define KEY_TIMER_DEBUG         0
+#define LOGGER_DEBUG            1
+#define FSL_REGISTER_VERSION    "1.0.0.4"
+
+#if LOGGER_DEBUG == 1
+#define PRINT_LOG   printf
+#else
+#define PRINT_LOG(...)
+#endif
 
 // internal variable
 typedef struct fsl_device_info
 {
-    qemu_irq gpio_irq[2];
+    qemu_irq gpio_irq[IRQ_LINE_NUMS];
 #if KEY_TIMER_DEBUG == 1
     QEMUTimer *press_timer;
     QEMUTimer *release_timer;
@@ -56,6 +66,8 @@ static void ecspi_device_register(FslIMX6ULState *s);
 // global function
 void fsl_imx6ul_device_register(DeviceState *dev, FslIMX6ULState *s)
 {
+    PRINT_LOG("fsl version %s register.\n", FSL_REGISTER_VERSION);
+    
     // 注册iomuxc区域读写
     iomuxc_register(dev, s);
 
@@ -69,14 +81,18 @@ void fsl_imx6ul_device_register(DeviceState *dev, FslIMX6ULState *s)
     ecspi_device_register(s);
 }
 
+// 命令: 设置gpio interrupt level
 void imx6ul_gpio_irq_set(int pin, int level)
 {
     if (pin == KEY_IRQ_LINE) {
-        if (g_device_info.gpio_irq[0])
-            qemu_set_irq(g_device_info.gpio_irq[0], level);
+        if (g_device_info.gpio_irq[KEY_IRQ_LINE])
+            qemu_set_irq(g_device_info.gpio_irq[KEY_IRQ_LINE], level);
     } else if (pin == AP3216_IRQ_LINE) {
-        if (g_device_info.gpio_irq[1])
-            qemu_set_irq(g_device_info.gpio_irq[1], level);
+        if (g_device_info.gpio_irq[AP3216_IRQ_LINE])
+            qemu_set_irq(g_device_info.gpio_irq[AP3216_IRQ_LINE], level);
+    } else if (pin == PCF8563_IRQ_LINE) {
+        if (g_device_info.gpio_irq[PCF8563_IRQ_LINE])
+            qemu_set_irq(g_device_info.gpio_irq[PCF8563_IRQ_LINE], level);
     } else {
         fprintf(stderr, "imx6ul_gpio_irq_set pin %d invalid!\n", pin);
     }
@@ -86,7 +102,8 @@ void imx6ul_gpio_irq_set(int pin, int level)
 static void i2c_device_register(FslIMX6ULState *s)
 {
     // 注册i2c设备
-    if (!s->i2c[0].bus) {
+    if (!s->i2c[0].bus
+    || !s->i2c[1].bus) {
         return;
     }
 
@@ -94,56 +111,71 @@ static void i2c_device_register(FslIMX6ULState *s)
             I2C_BUS(s->i2c[0].bus),
             "ap3216",
             0x1e);
+    fprintf(stderr, "AP3216 device create!\n");
 
-    fprintf(stderr, "AP3216 create\n");
+    i2c_slave_create_simple(
+            I2C_BUS(s->i2c[1].bus),
+            "pcf8563",
+            0x51);
+    fprintf(stderr, "PCF8563 device create!\n");
 }
 
 #if KEY_TIMER_DEBUG
 static void key_release_cb(void *opaque)
 {
-    imx6ul_gpio1_18_set(0);
+    imx6ul_gpio_irq_set(KEY_IRQ_LINE, 0);
 
-    timer_mod(press_timer,
+    timer_mod(g_device_info.press_timer,
               qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + 1000);
 }
 
 static void key_press_cb(void *opaque)
 { 
-    imx6ul_gpio1_18_set(1);
+    imx6ul_gpio_irq_set(KEY_IRQ_LINE, 1);
 
-    timer_mod(release_timer,
+    timer_mod(g_device_info.release_timer,
               qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + 1000);
 }
 #endif
 
 static void key_gpio_register(FslIMX6ULState *s)
 {
-    g_device_info.gpio_irq[0] = qdev_get_gpio_in(
+    // gpio1_18
+    g_device_info.gpio_irq[KEY_IRQ_LINE] = qdev_get_gpio_in(
         DEVICE(&s->gpio[0]),
         18);
     if (!g_device_info.gpio_irq[0]) {
         fprintf(stderr, "gpio1_18 get failed\n");
     }
 
-    g_device_info.gpio_irq[1] = qdev_get_gpio_in(
+    // gpio1_1
+    g_device_info.gpio_irq[AP3216_IRQ_LINE] = qdev_get_gpio_in(
         DEVICE(&s->gpio[0]),
         1);
-    if (!g_device_info.gpio_irq[1]) {
+    if (!g_device_info.gpio_irq[AP3216_IRQ_LINE]) {
         fprintf(stderr, "gpio1_1 get failed\n");
     }
 
+    // gpio1_2
+    g_device_info.gpio_irq[PCF8563_IRQ_LINE] = qdev_get_gpio_in(
+        DEVICE(&s->gpio[0]),
+        2);
+    if (!g_device_info.gpio_irq[PCF8563_IRQ_LINE]) {
+        fprintf(stderr, "gpio1_2 get failed\n");
+    }
+
 #if KEY_TIMER_DEBUG
-    press_timer =
+    g_device_info.press_timer =
         timer_new_ms(QEMU_CLOCK_VIRTUAL,
                     key_press_cb,
                     NULL);
 
-    release_timer =
+    g_device_info.release_timer =
         timer_new_ms(QEMU_CLOCK_VIRTUAL,
                     key_release_cb,
                     NULL);
 
-    timer_mod(press_timer,
+    timer_mod(g_device_info.press_timer,
             qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + 1000);
 #endif
 } 
@@ -229,6 +261,7 @@ static void ecspi_device_register(FslIMX6ULState *s)
 {
     DeviceState *dev;
     SSIBus *bus;
+    qemu_irq cs_input;
 
     /*
      * ECSPI3 的 SPI BUS
@@ -247,4 +280,18 @@ static void ecspi_device_register(FslIMX6ULState *s)
     ssi_realize_and_unref(dev,
                           bus,
                           &error_fatal);
+
+    // kernel内部使用的是GPIO1_IO20 I/O访问(非硬件控制CS)
+    // 需要关联cs-gpio和spi-cs，才能正确工作
+    cs_input = qdev_get_gpio_in_named(dev,
+                                    SSI_GPIO_CS,
+                                    0);
+    if (!cs_input) {
+        error_report("cannot get icm20608 CS input");
+        return;
+    }
+
+    qdev_connect_gpio_out(DEVICE(&s->gpio[0]),  // GPIO1
+                                20,             // pin20
+                                cs_input);      // SPI slave CS input
 }

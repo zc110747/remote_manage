@@ -121,10 +121,6 @@ static int ap3216_send(I2CSlave *i2c,
 {
     AP3216State *s = AP3216(i2c);
 
-    /*
-     * First byte = register address
-     */
-
     if (s->waiting_reg) {
         s->reg_ptr = data;
         s->waiting_reg = false;

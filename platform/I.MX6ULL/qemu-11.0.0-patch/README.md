@@ -27,7 +27,7 @@ ${qemu_tools} -M mcimx6ul-evk -m 512M -kernel "${kernel_file}" \
     -append "console=ttymxc0,115200 rootfstype=ext4 root=/dev/mmcblk1 rw rootwait init=/sbin/init loglevel=8"
     -monitor telnet:127.0.0.1:4444,server,nowait
 
-telnet 127.0.0.1:4444
+telnet 127.0.0.1 4444
 (qemu) gpio-set 0 0
 (qemu) gpio-set 0 1
 

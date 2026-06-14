@@ -348,7 +348,7 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_rtc>;
 		interrupt-parent = <&gpio1>;
-		interrupts = <2 IRQ_TYPE_LEVEL_LOW>;
+		interrupts = <2 IRQ_TYPE_EDGE_FALLING>;
 		interrupt-gpios = <&gpio1 2 GPIO_ACTIVE_LOW>;
 		status = "okay";
 	};
