@@ -250,9 +250,9 @@ static int goodix_firmware_init(struct goodix_chip_data *chip)
 
     // 复位模块
     goodix_i2c_write_reg(client, GT_CTRL_REG, 0x02);
-    mdelay(100);
+    msleep(100);
     goodix_i2c_write_reg(client, GT_CTRL_REG, 0x00);
-    mdelay(100);
+    msleep(100);
 
     // 更新寄存器配置
     goodix_update_cfg(chip, 0);
@@ -331,6 +331,7 @@ static int goodix_gpio_init(struct goodix_chip_data *chip)
     gpio_set_value(chip->irq_pin, 0);
     msleep(50);
 
+    gpio_direction_input(chip->irq_pin);
     dev_info(&client->dev, "goodix_gpio_init success, irq:%d!\n", client->irq);
     return ret;
 }
@@ -405,10 +406,9 @@ static int goodix_probe(struct i2c_client *client, const struct i2c_device_id *i
     }
 
     //4.设置中断并使能
-    gpio_direction_input(chip->irq_pin);
     ret = devm_request_threaded_irq(&client->dev, client->irq,
                                 NULL, goodix_irq_handler,
-                                chip->irqflags | IRQF_ONESHOT | IRQF_SHARED,
+                                chip->irqflags | IRQF_ONESHOT,
                                 "goodix-int",
                                 chip);
     if (ret) {

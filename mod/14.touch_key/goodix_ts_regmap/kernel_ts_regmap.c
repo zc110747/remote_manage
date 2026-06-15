@@ -120,25 +120,29 @@ static int goodix_i2c_read(struct goodix_chip_data *chip, u16 reg, u8 *buf, int 
 
 static irqreturn_t goodix_irq_handler(int irq, void *pdata)
 {
-    struct goodix_chip_data *chip = (struct goodix_chip_data *)pdata;
     int touch_num = 0;
     int input_x, input_y;
     int slot_id = 0;
     int ret = 0;
     u8 data;
     u8 touch_data[5];
+    struct goodix_chip_data *chip = pdata;
+    struct i2c_client *client = chip->client;
 
     //读取触摸屏状态
     ret = goodix_i2c_read(chip, GT_GSTID_REG, &data, 1);
-    if (data == 0x00) {
+    if (ret || data == 0x00) {
+        dev_err(&client->dev, "goodix_i2c_read error:%d, data:%d.\n", ret, data);
         return IRQ_NONE;
     } else { 
         touch_num = data & 0x0f;
     }
 
+    dev_info(&client->dev, "goodix_irq_handler:%d!\n", touch_num);
     if (touch_num) {
         goodix_i2c_read(chip, GT_TP1_REG, touch_data, 5);
         slot_id = touch_data[0] & 0x0F;
+        dev_info(&client->dev, "goodix_irq_handler:%d!\n", slot_id);
         if (slot_id == 0) {
             input_x  = touch_data[1] | (touch_data[2] << 8);
             input_y  = touch_data[3] | (touch_data[4] << 8);
@@ -376,18 +380,20 @@ static int goodix_probe(struct i2c_client *client, const struct i2c_device_id *i
         return ret;
     }
 
-    //3.初始化传感器配置
+    // 3.初始化传感器配置
     ret = goodix_firmware_init(chip);
     if (ret){
         dev_err(&client->dev, "firmware init failed, error:%d.\n", ret);
         return ret;
     }
 
-    //4.设置中断并使能
+    // 4.设置中断并使能
     gpio_direction_input(chip->irq_pin);
-    ret = devm_request_threaded_irq(&client->dev, client->irq,
-                                NULL, goodix_irq_handler,
-                                chip->irqflags | IRQF_ONESHOT | IRQF_SHARED,
+    ret = devm_request_threaded_irq(&client->dev, 
+                                client->irq,
+                                NULL, 
+                                goodix_irq_handler,
+                                IRQF_ONESHOT | IRQF_TRIGGER_FALLING,
                                 "goodix-int",
                                 chip);
     if (ret) {

@@ -83,7 +83,7 @@ void fsl_imx6ul_device_register(DeviceState *dev, FslIMX6ULState *s)
 
 // 命令: 设置gpio interrupt level
 void imx6ul_gpio_irq_set(int pin, int level)
-{
+{   
     if (pin == KEY_IRQ_LINE) {
         if (g_device_info.gpio_irq[KEY_IRQ_LINE])
             qemu_set_irq(g_device_info.gpio_irq[KEY_IRQ_LINE], level);
@@ -93,6 +93,11 @@ void imx6ul_gpio_irq_set(int pin, int level)
     } else if (pin == PCF8563_IRQ_LINE) {
         if (g_device_info.gpio_irq[PCF8563_IRQ_LINE])
             qemu_set_irq(g_device_info.gpio_irq[PCF8563_IRQ_LINE], level);
+    } else if (pin == GT9147_IRQ_LINE) {
+        if (g_device_info.gpio_irq[GT9147_IRQ_LINE]) {
+            fprintf(stderr, "imx6ul_gpio_irq_set pin %d:%d!\n", g_device_info.gpio_irq[GT9147_IRQ_LINE]->n, level);
+            qemu_set_irq(g_device_info.gpio_irq[GT9147_IRQ_LINE], level);
+        }
     } else {
         fprintf(stderr, "imx6ul_gpio_irq_set pin %d invalid!\n", pin);
     }
@@ -118,6 +123,13 @@ static void i2c_device_register(FslIMX6ULState *s)
             "pcf8563",
             0x51);
     fprintf(stderr, "PCF8563 device create!\n");
+
+    
+    i2c_slave_create_simple(
+            I2C_BUS(s->i2c[1].bus),
+            "gt9147",
+            0x14);
+    fprintf(stderr, "GT9147 device create!\n");
 }
 
 #if KEY_TIMER_DEBUG
@@ -162,6 +174,14 @@ static void key_gpio_register(FslIMX6ULState *s)
         2);
     if (!g_device_info.gpio_irq[PCF8563_IRQ_LINE]) {
         fprintf(stderr, "gpio1_2 get failed\n");
+    }
+
+    // gpio1_9
+    g_device_info.gpio_irq[GT9147_IRQ_LINE] = qdev_get_gpio_in(
+        DEVICE(&s->gpio[0]),
+        9);
+    if (!g_device_info.gpio_irq[GT9147_IRQ_LINE]) {
+        fprintf(stderr, "gpio1_9 get failed\n");
     }
 
 #if KEY_TIMER_DEBUG
