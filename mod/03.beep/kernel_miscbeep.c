@@ -110,39 +110,33 @@ int beep_release(struct inode *inode, struct file *filp)
     return 0;
 }
 
-ssize_t beep_read(struct file *filp, char __user *buf, size_t count, loff_t *f_pos)
+ssize_t beep_read(struct file *filp, char __user *buf, size_t cnt, loff_t *f_pos)
 {
     int ret;
     u8 value;
     struct beep_data *chip = filp->private_data;
     struct platform_device *pdev = chip->pdev;
 
-    if (count < 1) 
-        return -EINVAL;
-
-    if (*f_pos)
-        return 0;
+    cnt = min_t(size_t, cnt, sizeof(value));
 
     value= gpiod_get_value_cansleep(chip->desc);
-    ret = copy_to_user(buf, &value, 1);
+    ret = copy_to_user(buf, &value, cnt);
     if (ret) {
-        dev_err(&pdev->dev, "read failed!\n");
-        return -EFAULT;
+        dev_err(&pdev->dev, "read failed:%d!\n", ret);
+        return ret;
     }
 
-    *f_pos += 1;
-
-    return 1;
+    return cnt;
 }
 
-ssize_t beep_write(struct file *filp, const char __user *buf, size_t count, loff_t *f_pos)
+ssize_t beep_write(struct file *filp, const char __user *buf, size_t cnt, loff_t *f_pos)
 {
     int ret;
     u8 data;
     struct beep_data *chip = filp->private_data;
     struct platform_device *pdev = chip->pdev;
 
-    if (count < 1) {
+    if (cnt < 1) {
         return -EINVAL;
     }
 
@@ -162,7 +156,7 @@ ssize_t beep_write(struct file *filp, const char __user *buf, size_t count, loff
         return ret;
     }
 
-    return count;
+    return cnt;
 }
 
 #define BEEP_IOC_MAGIC      'L'

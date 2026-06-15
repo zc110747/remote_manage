@@ -134,9 +134,6 @@ ssize_t led_read(struct file *filp, char __user *buf, size_t count, loff_t *f_po
     struct platform_device *pdev;
     u8 led_status[DEVICE_MAX_NUM];
     u8 index;
-
-    if (*f_pos)
-        return 0;
     
     chip = (struct loopled_data *)filp->private_data;
     pdev = chip->pdev;
@@ -153,7 +150,6 @@ ssize_t led_read(struct file *filp, char __user *buf, size_t count, loff_t *f_po
         return -EFAULT;
     }
     
-    *f_pos += count;
     return count;
 }
 

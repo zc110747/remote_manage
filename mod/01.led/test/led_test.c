@@ -22,6 +22,7 @@
 /////////////////////////////////////////////////////////////////////////////
 #include <fcntl.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
@@ -35,9 +36,9 @@
 
 int main(int argc, const char *argv[])
 {
-    unsigned char val = 1;
+    uint8_t val = 1;
     int fd;
-
+    
     fd = open(LED_DEVICE, O_RDWR | O_NDELAY);
     if (fd == -1) {
         printf("%s open error!\n", LED_DEVICE);
@@ -48,11 +49,19 @@ int main(int argc, const char *argv[])
         val = atoi(argv[1]);
     }
 
-    printf("write test!\n");
     write(fd, &val, 1);
+    val = 0;
+    if (read(fd, &val, 1)) {
+        printf("read val:%d\n", val);
+    }
 
     printf("ioctl set test!\n");
     ioctl(fd, LED_IOC_SET, &val);
+    val = 0;
+    
+    if (read(fd, &val, 1)) {
+        printf("read val:%d\n", val);
+    }
 
     ioctl(fd, LED_IOC_GET, &val);
     printf("ioctl get value:%d!\n", val);
