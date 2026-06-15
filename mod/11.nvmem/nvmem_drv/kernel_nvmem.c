@@ -76,7 +76,7 @@ static int nvmem_read(void *priv, unsigned int off, void *val, size_t count)
     return 0;
 }
 
-//val已经是内核memory, 不需要使用copy_from_user转换
+// val已经是内核memory, 不需要使用copy_from_user转换
 static int nvmem_write(void *priv, unsigned int off, void *val, size_t count)
 {
     struct nvmem_data* nvmem = (struct nvmem_data*)priv; 

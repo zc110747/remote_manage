@@ -56,32 +56,38 @@ typedef struct AP3216State {
     uint16_t als;
     uint16_t ps;
     uint16_t ir;
-
+    
+    uint16_t last_ps;
 } AP3216State;
 
-/* ------------------------------------------------ */
-/* Sensor Model                                     */
-/* ------------------------------------------------ */
-
+/*
+IR数据：10位分辨率，存放在 0x0A 和 0x0B。
+    0x0A：[7]位表示“IR&PS数据有效，0有效”，[1:0]位是IR的最低2位。- 
+    0x0B：[7:0]位是IR的高8位数据。
+ALS数据：16位分辨率，存放在 0x0C（低8位）和 0x0D（高8位）。
+PS数据：10位分辨率，存放在 0x0E 和 0x0F。
+    0x0E：[7]位表示物体接近状态（0：远离，1：靠近），[3:0]位是PS的最低4位，[6]：数据有效, 0有效
+    0x0F：[7]位也表示物体接近状态（同上），[5:0]位是PS的高6位。
+*/
 static void ap3216_update_sensor(AP3216State *s)
 {
-    s->regs[AP3216_IRDATALOW] =
-        s->ir & 0xff;
+    // IR register
+    s->regs[AP3216_IRDATALOW] = (s->ir&0x03);
+    s->regs[AP3216_IRDATAHIGH] = (s->ir>>2)&0xff;
 
-    s->regs[AP3216_IRDATAHIGH] =
-        (s->ir >> 8) & 0xff;
+    // ALS register
+    s->regs[AP3216_ALSDATALOW] = s->als & 0xff;
+    s->regs[AP3216_ALSDATAHIGH] =(s->als >> 8) & 0xff;
 
-    s->regs[AP3216_ALSDATALOW] =
-        s->als & 0xff;
+    // PS数据
+    s->regs[AP3216_PSDATALOW] = s->ps & 0x0f;
+    s->regs[AP3216_PSDATAHIGH] = (s->ps >> 4) & 0x3f;
 
-    s->regs[AP3216_ALSDATAHIGH] =
-        (s->als >> 8) & 0xff;
-
-    s->regs[AP3216_PSDATALOW] =
-        s->ps & 0xff;
-
-    s->regs[AP3216_PSDATAHIGH] =
-        (s->ps >> 8) & 0xff;
+    if (s->last_ps > s->ps) {
+        s->regs[AP3216_PSDATALOW] |= 1<<7;
+        s->regs[AP3216_PSDATAHIGH] |= 1<<7;
+    }
+    s->last_ps = s->ps;
 }
 
 /* ------------------------------------------------ */
@@ -95,9 +101,10 @@ static void ap3216_reset_state(AP3216State *s)
     s->reg_ptr = 0;
     s->waiting_reg = true;
 
-    s->als = 100;
-    s->ps  = 50;
-    s->ir  = 20;
+    s->als = 200;
+    s->ps  = 100;
+    s->last_ps = s->ps;
+    s->ir  = 50;
 
     s->regs[AP3216_SYS_CFG] = 0x00;
 
@@ -112,33 +119,24 @@ static void ap3216_reset_hold(Object *obj,
     ap3216_reset_state(s);
 }
 
-/* ------------------------------------------------ */
-/* I2C Write                                        */
-/* ------------------------------------------------ */
-
 static int ap3216_send(I2CSlave *i2c,
                        uint8_t data)
 {
     AP3216State *s = AP3216(i2c);
 
+    // recv register
     if (s->waiting_reg) {
         s->reg_ptr = data;
         s->waiting_reg = false;
         return 0;
     }
 
-    /*
-     * Register write
-     */
-
+    // register write
     if (s->reg_ptr <= AP3216_REG_MAX) {
         s->regs[s->reg_ptr] = data;
     }
 
-    /*
-     * AP3216 soft reset
-     */
-
+    // soft reset
     if (s->reg_ptr == AP3216_SYS_CFG &&
         data == 0x04) {
 
@@ -217,11 +215,9 @@ static void ap3216_realize(DeviceState *dev,
     AP3216State *s = AP3216(dev);
 
     ap3216_reset_state(s);
-}
 
-/* ------------------------------------------------ */
-/* Migration                                        */
-/* ------------------------------------------------ */
+
+}
 
 static const VMStateDescription vmstate_ap3216 = {
     .name = "ap3216",
@@ -229,39 +225,16 @@ static const VMStateDescription vmstate_ap3216 = {
     .minimum_version_id = 1,
 
     .fields = (const VMStateField[]) {
-
-        VMSTATE_UINT8_ARRAY(
-            regs,
-            AP3216State,
-            AP3216_REG_MAX + 1),
-
-        VMSTATE_UINT8(
-            reg_ptr,
-            AP3216State),
-
-        VMSTATE_BOOL(
-            waiting_reg,
-            AP3216State),
-
-        VMSTATE_UINT16(
-            als,
-            AP3216State),
-
-        VMSTATE_UINT16(
-            ps,
-            AP3216State),
-
-        VMSTATE_UINT16(
-            ir,
-            AP3216State),
-
+        VMSTATE_UINT8_ARRAY(regs, AP3216State, AP3216_REG_MAX + 1),
+        VMSTATE_UINT8(reg_ptr,  AP3216State),
+        VMSTATE_BOOL(waiting_reg, AP3216State),
+        VMSTATE_UINT16(als, AP3216State),
+        VMSTATE_UINT16(ps, AP3216State),
+        VMSTATE_UINT16(ir, AP3216State),
         VMSTATE_END_OF_LIST()
     }
 };
 
-/* ------------------------------------------------ */
-/* Instance Init                                    */
-/* ------------------------------------------------ */
 
 static void ap3216_init(Object *obj)
 {
@@ -269,10 +242,6 @@ static void ap3216_init(Object *obj)
 
     s->waiting_reg = true;
 }
-
-/* ------------------------------------------------ */
-/* Class Init                                       */
-/* ------------------------------------------------ */
 
 static void ap3216_class_init(ObjectClass *klass,
                               const void *data)
@@ -291,10 +260,6 @@ static void ap3216_class_init(ObjectClass *klass,
     k->recv = ap3216_recv;
     k->event = ap3216_event;
 }
-
-/* ------------------------------------------------ */
-/* Type                                             */
-/* ------------------------------------------------ */
 
 static const TypeInfo ap3216_type_info = {
     .name = TYPE_AP3216,

@@ -95,22 +95,19 @@ struct read_data
 
 struct ap3216_data
 {
-    //设备信息
+    // 设备信息
     dev_t dev_id;            
     struct cdev cdev;      
     struct class *class;   
     struct device *device;
 
-    //硬件信息
+    // 硬件信息
     int irq;
     struct i2c_client *client;
     struct regmap *map;
     struct gpio_desc *int_desc;
 
-    //i2c获取信息
-    struct read_data data;
-
-    //sys配置
+    // sys配置
     u8 sysconf;
 };
 
@@ -123,56 +120,37 @@ static int ap3216_open(struct inode *inode, struct file *filp)
     return 0;
 }
 
-static int read_values(struct ap3216_data* chip, int *readbuf)
+static ssize_t ap3216_read(struct file *filp, char __user *buf, size_t cnt, loff_t *off)
 {
     u8 i;
     int ret;
+    int readbuf[6];
+    struct read_data i2c_data;
+    struct ap3216_data *chip = filp->private_data;
+    struct i2c_client *client = chip->client;
 
+    cnt = min_t(size_t, cnt, sizeof(i2c_data));
     for (i = 0; i < 6; i++) {
         ret = regmap_read(chip->map, AP3216C_IRDATALOW + i, &readbuf[i]);
         if (ret) {
-            dev_err(&chip->client->dev, "ap316_read err:%s, %d", __func__, ret);
-            return -EIO;
+            dev_err(&client->dev, "ap3216_read failed: %d", ret);
+            return ret;
         }
     }
 
-    if (readbuf[0]&(1<<7)){
-        chip->data.ir = 0;
+    // 0: 有效 1: 无效
+    if ((readbuf[0]&(1<<7)) || (readbuf[4]&(1<<6))) {
+        i2c_data.ir = 0;
+        i2c_data.ps = 0;
     } else{
-        chip->data.ir = ((unsigned short)readbuf[1] << 2) | (readbuf[0] & 0X03);
+        i2c_data.ir = ((unsigned short)readbuf[1] << 2) | (readbuf[0] & 0X03);
+        i2c_data.ps = ((unsigned short)(readbuf[5] & 0X3F) << 4) | (readbuf[4] & 0X0F); 
     }
+    i2c_data.als = ((unsigned short)readbuf[3] << 8) | readbuf[2];
 
-    chip->data.als = ((unsigned short)readbuf[3] << 8) | readbuf[2];
-    if (readbuf[4]&(1<<6)) {
-        chip->data.ps = 0;
-    } else {
-        chip->data.ps = ((unsigned short)(readbuf[5] & 0X3F) << 4) | (readbuf[4] & 0X0F); 
-    }
-
-    return 0;
-}
-
-static ssize_t ap3216_read(struct file *filp, char __user *buf, size_t cnt, loff_t *off)
-{
-    short data[3];
-    int readbuf[6];
-    struct ap3216_data *chip;
-
-    chip = (struct ap3216_data *)filp->private_data;
-
-    cnt = min_t(size_t, cnt, sizeof(data));
-    if (read_values(chip, readbuf)) {
-        dev_err(&chip->client->dev, "read_values\n");
-        return -EIO;
-    }
-
-    data[0] = chip->data.ir;
-    data[1] = chip->data.als;
-    data[2] = chip->data.ps;
-    
-    if (copy_to_user(buf, data, cnt)) {
-        dev_err(&chip->client->dev, "copy_to_user\n");
-        return -EFAULT;
+    if (copy_to_user(buf, &i2c_data, cnt)) {
+        dev_err(&client->dev, "copy_to_user\n");
+        return -EINVAL;
     }
     return cnt;
 }
@@ -186,16 +164,13 @@ static irqreturn_t irq_handler(int irq, void *data)
 {
     struct ap3216_data* chip;
     struct i2c_client *client;
-    int readbuf[6];
 
     chip = (struct ap3216_data*)data;
     client = chip->client;
 
     usleep_range(1000,2000);
 
-    if (read_values(chip, readbuf) == 0) {
-        dev_info(&client->dev, "irq success, value:%d, %d, %d!\n", chip->data.als, chip->data.ir, chip->data.ps);
-    }
+    dev_info(&client->dev, "ap3216 irq_handler!\n");
 
     regmap_write(chip->map, AP3216C_INTCLEAR, 0x01);
 
@@ -225,7 +200,7 @@ static int i2c_device_create(struct ap3216_data *chip)
         major = MAJOR(chip->dev_id);
         minor = MINOR(chip->dev_id);
     }
-    if (result < 0){
+    if (result < 0) {
         dev_err(&client->dev, "dev alloc id failed\n");
         goto exit;
     }
@@ -308,7 +283,14 @@ static int i2c_probe(struct i2c_client *client, const struct i2c_device_id *id)
     regmap_write(chip->map, AP3216C_SYSTEMCONG, chip->sysconf);
     msleep(50);
 
-    // 4.获取ap3216c的interrupt引脚，设置为输入，并申请相应中断
+    // 4.创建i2c设备到内核和系统中
+    ret = i2c_device_create(chip);
+    if (ret){
+        dev_err(&client->dev, "device create failed!\n");
+        return ret;   
+    }
+
+    // 5. 获取ap3216c的interrupt引脚，设置为输入，并申请相应中断
     chip->int_desc = devm_gpiod_get(&client->dev, "int", GPIOD_IN);
     if (IS_ERR(chip->int_desc)) {
         dev_err(&client->dev, "gpio get failed!\n");
@@ -316,7 +298,7 @@ static int i2c_probe(struct i2c_client *client, const struct i2c_device_id *id)
     }
     chip->irq = gpiod_to_irq(chip->int_desc);
     if (chip->irq < 0) {
-        dev_err(&client->dev, "gpiod_to_irq failed!\n");
+        dev_err(&client->dev, "gpiod_to_irq failed:%d!\n", chip->irq);
         return chip->irq;   
     }
     ret = devm_request_threaded_irq(&client->dev, 
@@ -331,14 +313,7 @@ static int i2c_probe(struct i2c_client *client, const struct i2c_device_id *id)
         return -EINVAL;
     }
 
-    // 5.创建i2c设备到内核和系统中
-    ret = i2c_device_create(chip);
-    if (ret){
-        dev_err(&client->dev, "device create failed!\n");
-        return ret;   
-    }
-
-    dev_info(&client->dev, "i2c driver init ok， sysconf:%d!\r\n", chip->sysconf);
+    dev_info(&client->dev, "i2c driver init ok, sysconf:%d!\r\n", chip->sysconf);
     return 0;
 }
 
