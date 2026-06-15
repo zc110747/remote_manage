@@ -18,7 +18,6 @@
 #include "qapi/error.h"
 #include "qemu/module.h"
 #include "qemu/timer.h"
-#include "hw/arm/fsl-imx6ul-register.h"
 #include <time.h>
 
 #define TYPE_PCF8563 "pcf8563"
