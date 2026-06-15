@@ -187,7 +187,6 @@ void key_timer_func(struct timer_list *arg)
         atomic_set(&chip->status, KEY_KEEP);
     }
     atomic_set(&chip->protect, 0);
-
     dev_info(&pdev->dev, "key timer interrupt!");
 }
 

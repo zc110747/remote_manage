@@ -26,7 +26,7 @@
 #include <string.h>
 #include <sys/select.h>
 
-#define KEY_DEV_NAME "/dev/input/event1"
+#define KEY_DEV_NAME "/dev/input/event0"
 
 static int check_button_pressed(int fd) {
     assert(fd >= 0);

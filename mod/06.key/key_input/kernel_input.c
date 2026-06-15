@@ -57,7 +57,7 @@ struct key_data
     struct platform_device *pdev;
     struct input_dev *input_dev;
 
-    int key_gpio;             
+    struct gpio_desc *key_desc;           
     int irq;    
     
     int key_code; 
@@ -80,67 +80,71 @@ static irqreturn_t key_handler(int irq, void *data)
 {
     struct key_data* chip = (struct key_data*)data;
 
-    if (atomic_read(&chip->protect) == 0)
-    {
+    if (atomic_read(&chip->protect) == 0) {
         atomic_set(&chip->protect, 1);
-        mod_timer(&chip->key_timer, jiffies + msecs_to_jiffies(100));
+        mod_timer(&chip->key_timer, jiffies + msecs_to_jiffies(20));
     }
 
-    return IRQ_RETVAL(IRQ_HANDLED);
+    return IRQ_HANDLED;
 }
 
 void key_timer_func(struct timer_list *arg)
 {
-    unsigned char value;
+    int key_state;
     struct key_data *chip;
     struct platform_device *pdev;
 
     chip = container_of(arg, struct key_data, key_timer);
-    value = gpio_get_value(chip->key_gpio);
+    key_state = gpiod_get_value_cansleep(chip->key_desc);
     pdev = chip->pdev;
 
-    if (value == 0) {
+    if (key_state < 0) {
+        dev_err(&pdev->dev, "read gpio failed:%d\n", key_state);
+        goto out;
+    } else if (key_state == 0) {
         input_report_key(chip->input_dev, chip->key_code, KEY_ON);
     } else {
         input_report_key(chip->input_dev, chip->key_code, KEY_OFF);          
     }
     input_sync(chip->input_dev);
 
-    dev_info(&pdev->dev, "key timer interrupt:%d!", value);
+    dev_info(&pdev->dev, "key timer interrupt:%d!", key_state);
+out:
     atomic_set(&chip->protect, 0);
 }
 
 static int key_hw_init(struct key_data *chip)
 {
     int ret;
-    struct platform_device *pdev = chip->pdev;  
-    struct device_node *nd = pdev->dev.of_node;
+    struct platform_device *pdev = chip->pdev;
 
-    //1.获取gpio线号，申请资源，设置输入模式
-    chip->key_gpio = of_get_named_gpio(nd, "key-gpios", 0);
-    if (chip->key_gpio < 0){
-        dev_err(&pdev->dev, "gpio %s no find\n",  "key-gpios");
-        return -EINVAL;
-    }
-    devm_gpio_request(&pdev->dev, chip->key_gpio, "key0");
-    gpio_direction_input(chip->key_gpio);
-    
-    //2.根据gpio线号申请中断资源
-    //cat /proc/interrupts可以查看是否增加中断向量
-    chip->irq = irq_of_parse_and_map(nd, 0);
-    ret = devm_request_threaded_irq(&pdev->dev,
-                            chip->irq, 
-                            NULL, key_handler, 
-                            IRQF_SHARED | IRQF_ONESHOT | IRQF_TRIGGER_FALLING | IRQ_TYPE_EDGE_RISING,       
-                            "key0", 
-                            (void *)chip);
-    if (ret < 0){
-        dev_err(&pdev->dev, "key interrupt config error:%d\n", ret);
-        return -EINVAL;
-    }
-
+    // 优先初始化参数，避免中断误触发导致异常
     timer_setup(&chip->key_timer, key_timer_func, 0);
     atomic_set(&chip->protect, 0);
+
+    // 1.获取gpio线号，申请资源，设置输入模式
+    chip->key_desc = devm_gpiod_get(&pdev->dev, "key", GPIOD_IN);
+    if (IS_ERR(chip->key_desc)) {
+        dev_info(&pdev->dev, "devm_gpiod_get error!\n");
+        return PTR_ERR(chip->key_desc);
+    }
+    
+    // 2.根据gpio线号申请中断资源
+    //cat /proc/interrupts可以查看是否增加中断向量
+    chip->irq = gpiod_to_irq(chip->key_desc);
+    if (chip->irq < 0) {
+        return chip->irq;
+    }
+    ret = devm_request_threaded_irq(&pdev->dev,
+                            chip->irq, 
+                            NULL, 
+                            key_handler, 
+                            IRQF_ONESHOT | IRQF_TRIGGER_FALLING | IRQF_TRIGGER_RISING,       
+                            "key0", 
+                            (void *)chip);
+    if (ret){
+        return ret;
+    }
 
     dev_info(&pdev->dev, "key interrupt num:%d\n", chip->irq);
     return 0;
@@ -164,10 +168,10 @@ static int key_device_create(struct key_data *chip)
     chip->key_code = KEY_0; 
     chip->input_dev->name = pdev->name;
 
-    //支持双击的动作
+    // 支持双击的动作
     //__set_bit(EV_REP, chip->input_dev->evbit);
 
-    //将EV_KEY定义成按键的动作
+    // 将EV_KEY定义成按键的动作
     input_set_capability(chip->input_dev, EV_KEY, chip->key_code);
     result = input_register_device(chip->input_dev);
     if (result)
@@ -177,13 +181,12 @@ static int key_device_create(struct key_data *chip)
     }
 
     dev_info(&pdev->dev, "input driver create success!");
-
     return result;
 }
 
 static int key_probe(struct platform_device *pdev)
 {
-    int result;
+    int ret;
     struct key_data *chip = NULL;
 
     //1.申请按键管理控制块
@@ -195,23 +198,21 @@ static int key_probe(struct platform_device *pdev)
     chip->pdev = pdev;
     platform_set_drvdata(pdev, chip);
 
-    //2.key相关引脚硬件初始化
-    result = key_hw_init(chip);
-    if (result != 0)
-    {
-        dev_err(&pdev->dev, "Key gpio init failed!\r\n");
-        return result;
+    // 2.创建内核访问接口
+    ret = key_device_create(chip);
+    if (ret) {
+        dev_err(&pdev->dev, "device create failed:%d!\n", ret);
+        return ret;
     }
 
-    //3.创建内核访问接口
-    result = key_device_create(chip);
-    if (result != 0)
-    {
-        dev_err(&pdev->dev, "device create failed!\n");
-        return result;
+    // 3.key相关引脚硬件初始化
+    ret = key_hw_init(chip);
+    if (ret) {
+        dev_err(&pdev->dev, "Key gpio init failed:%d!\n", ret);
+        return ret;
     }
 
-    dev_info(&pdev->dev, "key driver init ok!\r\n");
+    dev_info(&pdev->dev, "key driver init ok!\n");
     return 0;
 }
 
@@ -221,9 +222,7 @@ static int key_remove(struct platform_device *pdev)
 
     del_timer_sync(&chip->key_timer);
 
-    input_unregister_device(chip->input_dev);
-
-    dev_info(&pdev->dev, "key remove ok!\r\n");
+    dev_info(&pdev->dev, "key remove ok!\n");
     return 0;
 }
 
