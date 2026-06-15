@@ -113,14 +113,15 @@ int beep_release(struct inode *inode, struct file *filp)
 ssize_t beep_read(struct file *filp, char __user *buf, size_t cnt, loff_t *f_pos)
 {
     int ret;
-    u8 value;
+    u8 beep_state;
     struct beep_data *chip = filp->private_data;
     struct platform_device *pdev = chip->pdev;
 
-    cnt = min_t(size_t, cnt, sizeof(value));
+    cnt = min_t(size_t, cnt, sizeof(beep_state));
 
-    value= gpiod_get_value_cansleep(chip->desc);
-    ret = copy_to_user(buf, &value, cnt);
+    beep_state = gpiod_get_value_cansleep(chip->desc);
+
+    ret = copy_to_user(buf, &beep_state, cnt);
     if (ret) {
         dev_err(&pdev->dev, "read failed:%d!\n", ret);
         return ret;
@@ -136,13 +137,11 @@ ssize_t beep_write(struct file *filp, const char __user *buf, size_t cnt, loff_t
     struct beep_data *chip = filp->private_data;
     struct platform_device *pdev = chip->pdev;
 
-    if (cnt < 1) {
-        return -EINVAL;
-    }
+    cnt = min_t(size_t, cnt, sizeof(data));
 
-    ret = copy_from_user(&data, buf, 1);
+    ret = copy_from_user(&data, buf, cnt);
     if (ret) {
-        dev_err(&pdev->dev, "write failed!\n");
+        dev_err(&pdev->dev, "copy_from_user failed!\n");
         return -EFAULT;
     }
 
@@ -175,25 +174,22 @@ long beep_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 
     switch (cmd) {
     case BEEP_IOC_SET:
-        ret = copy_from_user(&value,
-                             (void __user *)arg,
-                             sizeof(value));
-        if (ret)
+;
+        if (copy_from_user(&value, (void __user *)arg, sizeof(value)))
             return -EFAULT;
 
-        if (value != BEEP_OFF &&
-            value != BEEP_ON)
+        if (value != BEEP_OFF && value != BEEP_ON)
             return -EINVAL;
 
-        beep_hardware_set(chip, value);
+        ret = beep_hardware_set(chip, value);
+        if (ret) {
+            return ret;
+        }
         break;
 
     case BEEP_IOC_GET:
         value = gpiod_get_value_cansleep(chip->desc);
-        ret = copy_to_user((void __user *)arg,
-                           &value,
-                           sizeof(value));
-        if (ret)
+        if (copy_to_user((void __user *)arg, &value, sizeof(value)))
             return -EFAULT;
 
         break;

@@ -28,11 +28,6 @@
 		compatible = "rmk,ap3216";
 		reg = <0x1e>;
 		rmk,sysconf = <0x03>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_ap3216_tsc>;
-		interrupt-parent = <&gpio1>;
-		interrupts = <1 IRQ_TYPE_EDGE_FALLING>;
-		int-gpios = <&gpio1 1 GPIO_ACTIVE_LOW>;
     };
 };
 
@@ -41,12 +36,6 @@
         fsl,pins = <
             MX6UL_PAD_UART4_TX_DATA__I2C1_SCL 0x4001b8b0
             MX6UL_PAD_UART4_RX_DATA__I2C1_SDA 0x4001b8b0
-        >;
-    };
-
-    pinctrl_ap3216_tsc: gpio-ap3216 {
-        fsl,pins = <
-            MX6UL_PAD_GPIO1_IO01__GPIO1_IO01		0x40017059
         >;
     };
 };
@@ -177,7 +166,7 @@ static ssize_t ap3216_read(struct file *filp, char __user *buf, size_t cnt, loff
     int ret = 0;
     u8 readbuf[6] = {0};
     struct ap3216_data *chip;
-    struct read_data i2c_data;         //i2c获取信息
+    struct read_data i2c_data = {0};         //i2c获取信息
 
     chip = filp->private_data;
 
@@ -187,22 +176,20 @@ static ssize_t ap3216_read(struct file *filp, char __user *buf, size_t cnt, loff
     for (i = 0; i < 6; i++) {
         ret = ap3216_read_block(chip->client, AP3216C_IRDATALOW + i, &readbuf[i], 1);
         if (ret) {
-            dev_err(&chip->client->dev, "ap316_read err:%d", ret);
+            dev_err(&chip->client->dev, "ap3216_read err:%d", ret);
             return ret;
         }
     }
 
-    if (readbuf[0]&(1<<7)) {
+    // 0: 有效 1: 无效
+    if ((readbuf[0]&(1<<7)) || (readbuf[4]&(1<<6))) {
         i2c_data.ir = 0;
-    } else {
-        i2c_data.ir = ((unsigned short)readbuf[1] << 2) | (readbuf[0] & 0X03);
-    }
-    i2c_data.als = ((unsigned short)readbuf[3] << 8) | readbuf[2];
-    if (readbuf[4]&(1<<6)) {
         i2c_data.ps = 0;
-    } else {
+    } else{
+        i2c_data.ir = ((unsigned short)readbuf[1] << 2) | (readbuf[0] & 0X03);
         i2c_data.ps = ((unsigned short)(readbuf[5] & 0X3F) << 4) | (readbuf[4] & 0X0F); 
     }
+    i2c_data.als = ((unsigned short)readbuf[3] << 8) | readbuf[2];
 
     if (copy_to_user(buf, &i2c_data, cnt)) {
         dev_err(&chip->client->dev, "kernel copy failed, %s\n", __func__);
@@ -331,8 +318,12 @@ static void i2c_remove(struct i2c_client *client)
 {
     struct ap3216_data *chip = i2c_get_clientdata(client);
 
-    device_destroy(chip->class, chip->dev_id);
-    class_destroy(chip->class);
+    if (chip->device)
+        device_destroy(chip->class, chip->dev_id);
+
+    if (chip->class)
+        class_destroy(chip->class);
+    
     cdev_del(&chip->cdev);
     unregister_chrdev_region(chip->dev_id, DEVICE_CNT);
 }
