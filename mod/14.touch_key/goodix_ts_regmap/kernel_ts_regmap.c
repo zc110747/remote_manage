@@ -142,7 +142,7 @@ static irqreturn_t goodix_irq_handler(int irq, void *pdata)
     if (touch_num) {
         goodix_i2c_read(chip, GT_TP1_REG, touch_data, 5);
         slot_id = touch_data[0] & 0x0F;
-        dev_info(&client->dev, "goodix_irq_handler:%d!\n", slot_id);
+        dev_info(&client->dev, "goodix_i2c_read:%d!\n", slot_id);
         if (slot_id == 0) {
             input_x  = touch_data[1] | (touch_data[2] << 8);
             input_y  = touch_data[3] | (touch_data[4] << 8);

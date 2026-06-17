@@ -35,7 +35,7 @@
 // internal defined
 #define KEY_TIMER_DEBUG         0
 #define LOGGER_DEBUG            1
-#define FSL_REGISTER_VERSION    "1.0.0.4"
+#define FSL_REGISTER_VERSION    "1.0.0.5"
 
 #if LOGGER_DEBUG == 1
 #define PRINT_LOG   printf

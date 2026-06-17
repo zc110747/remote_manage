@@ -164,7 +164,7 @@ static irqreturn_t goodix_irq_handler(int irq, void *pdata)
 
     // 读取触摸点信息
     ret = goodix_i2c_read(client, GT_GSTID_REG, data, 1);
-    if (data[0] == 0x00) {
+    if (ret || data[0] == 0) {
         return IRQ_NONE;
     } else { 
         touch_num = data[0] & 0x0f;
@@ -406,8 +406,10 @@ static int goodix_probe(struct i2c_client *client, const struct i2c_device_id *i
     }
 
     //4.设置中断并使能
-    ret = devm_request_threaded_irq(&client->dev, client->irq,
-                                NULL, goodix_irq_handler,
+    ret = devm_request_threaded_irq(&client->dev, 
+                                client->irq,
+                                NULL, 
+                                goodix_irq_handler,
                                 chip->irqflags | IRQF_ONESHOT,
                                 "goodix-int",
                                 chip);

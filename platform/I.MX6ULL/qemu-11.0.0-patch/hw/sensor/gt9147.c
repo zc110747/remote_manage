@@ -32,10 +32,10 @@ struct GT9147State {
     bool pressed;
 };
 
+static GT9147State *s = NULL;
+
 static void gt9147_realize(DeviceState *dev, Error **errp)
 {
-    GT9147State *s = GT9147(dev);
-
     memset(s->regs, 0, sizeof(s->regs));
 
     memcpy(&s->regs[GT_PID_REG], "9147", 4);
@@ -63,8 +63,6 @@ static void gt9147_realize(DeviceState *dev, Error **errp)
 
 static int gt9147_send(I2CSlave *i2c, uint8_t data)
 {
-    GT9147State *s = GT9147(i2c);
-
     // 获取寄存器地址
     if (s->addr_len < 2) {
         if (s->addr_len == 0)
@@ -87,15 +85,11 @@ static int gt9147_send(I2CSlave *i2c, uint8_t data)
 
 static uint8_t gt9147_recv(I2CSlave *i2c)
 {
-    GT9147State *s = GT9147(i2c);
-
     return s->regs[s->addr++];
 }
 
 static int gt9147_event(I2CSlave *i2c, enum i2c_event event)
 {
-    GT9147State *s = GT9147(i2c);
-
     switch (event) {
 
     case I2C_START_SEND:
@@ -116,8 +110,7 @@ static int gt9147_event(I2CSlave *i2c, enum i2c_event event)
     return 0;
 }
 
-void gt9147_touch(GT9147State *s,
-                    uint16_t x,
+void gt9147_touch(uint16_t x,
                     uint16_t y,
                     bool down)
 {
@@ -163,7 +156,7 @@ static void gt9147_class_init(ObjectClass *klass, const void *data)
 
 static void gt9147_init(Object *obj)
 {
-    GT9147State *s = GT9147(obj);
+    s = GT9147(obj);
     s->addr_len = 0;
 }
 

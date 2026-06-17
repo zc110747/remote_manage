@@ -9,3 +9,5 @@ cp -rv ${SRC_DIR}/hw/* ${DST_DIR}/hw/
 cp -rv ${SRC_DIR}/include/* ${DST_DIR}/include/
 
 cp -rv ${SRC_DIR}/monitor/* ${DST_DIR}/monitor/
+
+cp -rv *.hx ${DST_DIR}/

@@ -195,4 +195,5 @@ void hmp_gpa2hva(Monitor *mon, const QDict *qdict);
 void hmp_gpa2hpa(Monitor *mon, const QDict *qdict);
 
 void hmp_gpio_set(Monitor *mon, const QDict *qdict);
+void hmp_touch_press(Monitor *mon, const QDict *qdict);
 #endif

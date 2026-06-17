@@ -1832,6 +1832,14 @@ ERST
         .cmd        = hmp_gpio_set,
     },
 
+    {
+        .name       = "touch",
+        .args_type  = "x:i,y:i,down:i",
+        .params     = "x y down",
+        .help       = "touch press",
+        .cmd        = hmp_touch_press,
+    },
+
 #if defined(CONFIG_FDT)
     {
         .name       = "dumpdtb",
