@@ -119,6 +119,12 @@ static void i2c_device_register(FslIMX6ULState *s)
     fprintf(stderr, "AP3216 device create!\n");
 
     i2c_slave_create_simple(
+            I2C_BUS(s->i2c[0].bus),
+            "ssd1306",
+            0x3c);
+    fprintf(stderr, "ssd1306 device create!\n");
+
+    i2c_slave_create_simple(
             I2C_BUS(s->i2c[1].bus),
             "pcf8563",
             0x51);
