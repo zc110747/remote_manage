@@ -18,6 +18,9 @@
 #define GT_TP5_REG              0x816F  // 第五个触摸点数据地址 
 #define GOODIX_MAX_CONTACTS     5       // 最多5点电容触摸
 
+void gt9147_touch(uint16_t x,
+                    uint16_t y,
+                    uint8_t point);
 
 #define TYPE_GT9147 "gt9147"
 OBJECT_DECLARE_SIMPLE_TYPE(GT9147State, GT9147)

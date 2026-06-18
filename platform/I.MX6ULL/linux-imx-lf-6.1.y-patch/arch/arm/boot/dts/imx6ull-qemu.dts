@@ -318,6 +318,21 @@
 		interrupts = <1 IRQ_TYPE_EDGE_FALLING>;
 		int-gpios = <&gpio1 1 GPIO_ACTIVE_LOW>;
 	};
+
+	oled@3c {
+        compatible = "solomon,ssd1306fb-i2c";
+        reg = <0x3c>;
+
+        solomon,width = <128>;
+        solomon,height = <64>;
+
+        solomon,page-offset = <0>;
+        solomon,col-offset = <0>;
+
+        reset-gpios = <&gpio5 9 GPIO_ACTIVE_LOW>;
+
+        status = "okay";
+    };
 };
 
 &rngb {
