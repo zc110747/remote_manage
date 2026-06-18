@@ -58,7 +58,7 @@
 #define GT_TP3_REG              0x815F  //第三个触摸点数据地址
 #define GT_TP4_REG              0x8167  //第四个触摸点数据地址
 #define GT_TP5_REG              0x816F  //第五个触摸点数据地址 
-#define MAX_SUPPORT_POINTS      5       //最多5点电容触摸
+#define GOODIX_MAX_CONTACTS     5       //最多5点电容触摸
 
 const u8 irq_table[] =
 {
@@ -84,6 +84,8 @@ struct goodix_chip_data
     /* 内核相关 */
     struct touchscreen_properties prop;     //触摸屏属性特性
     struct input_dev *input_dev;            //input子系统信息
+
+    bool slot_state[GOODIX_MAX_CONTACTS];
 };
 
 //goodix更新寄存器
@@ -117,50 +119,85 @@ static int goodix_i2c_read(struct goodix_chip_data *chip, u16 reg, u8 *buf, int 
 
     return ret;
 }
-
 static irqreturn_t goodix_irq_handler(int irq, void *pdata)
 {
-    int touch_num = 0;
-    int input_x, input_y;
-    int slot_id = 0;
-    int ret = 0;
-    u8 data;
-    u8 touch_data[5];
+    int i;
+    int ret;
+    int touch_num;
+    u8 status;
+    u8 point_data[GOODIX_MAX_CONTACTS*8];
+    bool seen[GOODIX_MAX_CONTACTS]= {false};
+
     struct goodix_chip_data *chip = pdata;
     struct i2c_client *client = chip->client;
 
     //读取触摸屏状态
-    ret = goodix_i2c_read(chip, GT_GSTID_REG, &data, 1);
-    if (ret || data == 0x00) {
-        dev_err(&client->dev, "goodix_i2c_read error:%d, data:%d.\n", ret, data);
-        return IRQ_NONE;
-    } else { 
-        touch_num = data & 0x0f;
+    ret = goodix_i2c_read(chip, GT_GSTID_REG, &status, 1);
+    if (ret) {
+        dev_err(&client->dev, "read failed:%d!\n", ret);
+        return IRQ_NONE; 
     }
 
-    dev_info(&client->dev, "goodix_irq_handler:%d!\n", touch_num);
-    if (touch_num) {
-        goodix_i2c_read(chip, GT_TP1_REG, touch_data, 5);
-        slot_id = touch_data[0] & 0x0F;
-        dev_info(&client->dev, "goodix_i2c_read:%d!\n", slot_id);
-        if (slot_id == 0) {
-            input_x  = touch_data[1] | (touch_data[2] << 8);
-            input_y  = touch_data[3] | (touch_data[4] << 8);
+    if (!(status & 0x80)) {
+        dev_err(&client->dev, "read status:%d!\n", status); 
+        return IRQ_NONE;
+    }
 
-            input_mt_slot(chip->input_dev, slot_id);
-            input_mt_report_slot_state(chip->input_dev, MT_TOOL_FINGER, true);
-            touchscreen_report_pos(chip->input_dev, &chip->prop,
-                           input_x, input_y, true);
+    touch_num = status & 0x0f;
+    if (touch_num > GOODIX_MAX_CONTACTS) {
+        touch_num = GOODIX_MAX_CONTACTS;
+    }
+
+    if (touch_num) {
+        ret = goodix_i2c_read(chip, GT_TP1_REG, point_data, touch_num * 8); // 读取所有的节点数据
+        if (ret) {
+            dev_err(&client->dev, "goodix_i2c_read failed:%d!\n", ret);  
+            goto out;
         }
-    } else {
-        // 没有触摸点或者触摸到松开时的上报
-        input_mt_slot(chip->input_dev, slot_id);
-        input_mt_report_slot_state(chip->input_dev, MT_TOOL_FINGER, false); 
+    }
+
+    // 上报当前存在的触点
+    for (i = 0; i < touch_num; i++) {
+        u8 *coor = &point_data[i*8];
+        
+        int id;
+        int x;
+        int y;
+        int w;
+
+        id = coor[0]&0x0f;
+        if (id >= GOODIX_MAX_CONTACTS)
+            continue;
+
+        x = ((u16)coor[2]<<8) | coor[1];
+        y = ((u16)coor[4]<<8) | coor[3];
+        w = ((u16)coor[6]<<8) | coor[5];
+
+        seen[id] = true;
+
+        input_mt_slot(chip->input_dev, id);
+        input_mt_report_slot_state(chip->input_dev, MT_TOOL_FINGER, true);
+        touchscreen_report_pos(chip->input_dev, &chip->prop, x, y, true);
+        //input_report_abs(chip->input_dev, ABS_MT_TOUCH_MAJOR, w);
+
+        dev_info(&client->dev, "press down:%d, %d, %d, %d\n", id, x, y, w);
+    }
+
+    // 释放消失的触点
+    for (i = 0; i < GOODIX_MAX_CONTACTS; i++) {
+        if (chip->slot_state[i] && !seen[i]) {
+            input_mt_slot(chip->input_dev, i);
+            input_mt_report_slot_state(chip->input_dev, MT_TOOL_FINGER, false);
+            dev_info(&client->dev, "press up:%d!\n", i);
+        }
+
+        chip->slot_state[i] = seen[i];
     }
 
     input_mt_report_pointer_emulation(chip->input_dev, true);
     input_sync(chip->input_dev);
 
+out:
     goodix_i2c_write_reg(chip, GT_GSTID_REG, 0x00);
 
     return IRQ_HANDLED;
@@ -316,19 +353,20 @@ static int goodix_inputdev_create(struct goodix_chip_data *chip)
     chip->input_dev->id.vendor = 0x0416;
     chip->input_dev->dev.parent = &chip->client->dev;
 
-    //单点触摸，将屏幕看作按键
-    // input_set_capability(chip->input_dev, EV_KEY, BTN_TOUCH);
-    // input_set_abs_params(chip->input_dev, ABS_X, 0, chip->max_x, 0, 0);
-    // input_set_abs_params(chip->input_dev, ABS_Y, 0, chip->max_y, 0, 0); 
+    // 多点触摸
+    input_set_capability(chip->input_dev, EV_KEY, BTN_TOUCH);
+    __set_bit(INPUT_PROP_DIRECT, chip->input_dev->propbit);
 
-    //多点触摸
+    input_set_abs_params(chip->input_dev, ABS_X, 0, chip->max_x, 0, 0);
+    input_set_abs_params(chip->input_dev, ABS_Y, 0, chip->max_y, 0, 0); 
     input_set_abs_params(chip->input_dev, ABS_MT_POSITION_X, 0, chip->max_x, 0, 0);
     input_set_abs_params(chip->input_dev, ABS_MT_POSITION_Y, 0, chip->max_y, 0, 0); 
+    input_set_abs_params(chip->input_dev, ABS_MT_TOUCH_MAJOR, 0, 1023, 0, 0);
     
-    //更新touchscreen属性
+    // 更新touchscreen属性
     touchscreen_parse_properties(chip->input_dev, true, &chip->prop);
 
-    ret = input_mt_init_slots(chip->input_dev, MAX_SUPPORT_POINTS, INPUT_MT_DIRECT | INPUT_MT_DROP_UNUSED);
+    ret = input_mt_init_slots(chip->input_dev, GOODIX_MAX_CONTACTS, INPUT_MT_DIRECT);
     if (ret) {
         dev_err(&chip->client->dev, "failed to input_mt_init_slots, err:%d.\n", ret);
         return ret;

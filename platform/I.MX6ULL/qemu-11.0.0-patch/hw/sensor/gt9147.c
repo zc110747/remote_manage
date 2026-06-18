@@ -6,12 +6,18 @@
 #include "qemu/timer.h"
 #include "qemu/log.h"
 
-#define GT_CTRL_REG      0x8040
-#define GT_CFG_REG       0x8047
-#define GT_CHECK_REG     0x80FF
-#define GT_PID_REG       0x8140
-#define GT_GSTID_REG     0x814E
-#define GT_TP1_REG       0x814F
+#define GT_CTRL_REG             0x8040
+#define GT_CFG_REG              0x8047
+#define GT_CHECK_REG            0x80FF
+#define GT_PID_REG              0x8140
+#define GT_GSTID_REG            0x814E
+#define GT_TP1_REG              0x814F  // 第一个触摸点数据地址
+#define GT_TP2_REG              0x8157  // 第二个触摸点数据地址
+#define GT_TP3_REG              0x815F  // 第三个触摸点数据地址
+#define GT_TP4_REG              0x8167  // 第四个触摸点数据地址
+#define GT_TP5_REG              0x816F  // 第五个触摸点数据地址 
+#define GOODIX_MAX_CONTACTS     5       // 最多5点电容触摸
+
 
 #define TYPE_GT9147 "gt9147"
 OBJECT_DECLARE_SIMPLE_TYPE(GT9147State, GT9147)
@@ -112,21 +118,32 @@ static int gt9147_event(I2CSlave *i2c, enum i2c_event event)
 
 void gt9147_touch(uint16_t x,
                     uint16_t y,
-                    bool down)
+                    uint8_t point)
 {
-    if (down) {
-        s->regs[GT_GSTID_REG] = 0x81;
+    int id;
+    int reg;
 
-        s->regs[GT_TP1_REG + 0] = 0;
+    if (point > GOODIX_MAX_CONTACTS)
+        point = GOODIX_MAX_CONTACTS;
 
-        s->regs[GT_TP1_REG + 1] = x & 0xff;
-        s->regs[GT_TP1_REG + 2] = x >> 8;
+    if (point) {
+        s->regs[GT_GSTID_REG] = 0x80 | point;
+        for (id=0; id<point; id++)
+        {
+            x += 10*id;
+            y += 5*id;
+            reg = GT_TP1_REG + 8*id;
 
-        s->regs[GT_TP1_REG + 3] = y & 0xff;
-        s->regs[GT_TP1_REG + 4] = y >> 8;
-
+            s->regs[reg + 0] = id;
+            s->regs[reg + 1] = x & 0xff;
+            s->regs[reg + 2] = x >> 8;
+            s->regs[reg + 3] = y & 0xff;
+            s->regs[reg + 4] = y >> 8;
+            s->regs[reg + 5] = 240;
+            s->regs[reg + 6] = 0;
+        }
     } else {
-        s->regs[GT_GSTID_REG] = 0;
+        s->regs[GT_GSTID_REG] = 0x80;
     }
 }
 

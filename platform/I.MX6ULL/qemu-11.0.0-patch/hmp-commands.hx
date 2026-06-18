@@ -1828,15 +1828,15 @@ ERST
         .name       = "gpio-set",
         .args_type  = "pin:i,value:i",
         .params     = "pin value",
-        .help       = "set gpio pin",
+        .help       = "cmd:gpio-set [pin value]",
         .cmd        = hmp_gpio_set,
     },
 
     {
         .name       = "touch",
-        .args_type  = "x:i,y:i,down:i",
-        .params     = "x y down",
-        .help       = "touch press",
+        .args_type  = "point:i,x:i,y:i",
+        .params     = "point x y",
+        .help       = "cmd:touch [point x y]",
         .cmd        = hmp_touch_press,
     },
 

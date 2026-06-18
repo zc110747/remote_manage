@@ -53,13 +53,17 @@ function imx_build_rootfs()
 }
 alias imx_build_rootfs="imx_build_rootfs"
 
-function imx_qemu_run()
+function imx_qemu_build()
 {
-	cd "${PLATFORM_INSTALL_SHELL}"/ || return
+	cd "${PLATFORM_SOC_CHIP}"/qemu-11.0.0-patch || return
 
-	chmod 777 qemu-nogui.sh && ./qemu-nogui.sh
+	chmod 777 qemu_upgrade.sh && ./qemu_upgrade.sh
+
+	cd "${PROGRAM_SDK_PATH}"/qemu/qemu-11.0.0
+
+	make -j6
 }
-alias imx_qemu_run="imx_qemu_run"
+alias SysBuildQemu="imx_qemu_build"
 
 #************************************************************************
 #				

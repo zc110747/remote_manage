@@ -805,18 +805,19 @@ void hmp_gpio_set(Monitor *mon,
     imx6ul_gpio_irq_set(pin, value);
 }
 
-extern void gt9147_touch(uint16_t x, uint16_t y, bool down);
+extern void gt9147_touch(uint16_t x, uint16_t y, uint8_t point);
 
 void hmp_touch_press(Monitor *mon, const QDict *qdict)
 {
     int x, y;
-    int down;
+    int point;
 
+    point = qdict_get_int(qdict, "point"); 
     x = qdict_get_int(qdict, "x");    
     y = qdict_get_int(qdict, "y");
-    down = qdict_get_int(qdict, "down"); 
+
     
-    gt9147_touch(x, y, down);
+    gt9147_touch(x, y, point);
 
     // 模拟中断触发
     imx6ul_gpio_irq_set(3, 1);
