@@ -65,7 +65,6 @@ struct beep_data
 
 //自定义设备号
 #define DEVICE_NAME                         "miscbeep"      /* 设备名, 应用将以/dev/miscbeep访问 */
-#define MISCBEEP_MINOR                      156             /* 子设备号 */
 
 static int beep_hardware_set(struct beep_data *chip, u8 status)
 {
@@ -124,7 +123,7 @@ ssize_t beep_read(struct file *filp, char __user *buf, size_t cnt, loff_t *f_pos
     ret = copy_to_user(buf, &beep_state, cnt);
     if (ret) {
         dev_err(&pdev->dev, "read failed:%d!\n", ret);
-        return ret;
+        return -EFAULT;
     }
 
     return cnt;
@@ -215,7 +214,7 @@ static int beep_device_create(struct beep_data *chip)
     int result;
     struct platform_device *pdev = chip->pdev;
 
-    chip->misc_dev.minor = MISCBEEP_MINOR;
+    chip->misc_dev.minor = MISC_DYNAMIC_MINOR;
     chip->misc_dev.name = DEVICE_NAME;
     chip->misc_dev.fops = &misc_fops;
 
@@ -257,7 +256,7 @@ static int beep_probe(struct platform_device *pdev)
     int result;
     struct beep_data *chip = NULL;
 
-    //1.申请beep控制块
+    // 1.申请beep控制块
     chip = devm_kzalloc(&pdev->dev, sizeof(struct beep_data), GFP_KERNEL);
     if (!chip) {
         dev_err(&pdev->dev, "malloc error\n");
@@ -266,14 +265,14 @@ static int beep_probe(struct platform_device *pdev)
     chip->pdev = pdev;
     platform_set_drvdata(pdev, chip);
 
-    //2.初始化beep硬件设备
+    // 2.初始化beep硬件设备
     result = beep_hardware_init(chip);
     if (result != 0) {
         dev_err(&pdev->dev, "hardware init failed!\n");
         return result;
     }
 
-    //3.创建内核访问接口
+    // 3.创建内核访问接口
     result = beep_device_create(chip);
     if (result != 0) {
         dev_err(&pdev->dev, "device create failed!\n");
