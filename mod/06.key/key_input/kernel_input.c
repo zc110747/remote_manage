@@ -65,22 +65,11 @@ struct key_data
     atomic_t protect;
 };
 
-#define DEFAULT_MAJOR                   0         
-#define DEFAULT_MINOR                   0         
-#define DEVICE_KEY_CNT                  1         
-#define DEVICE_NAME                     "key"
-
-#define KEY0_VALUE                      0x01
-#define KEYINVALD_VALUE                 0xFF
-
-#define KEY_OFF                         0
-#define KEY_ON                          1
-
 static irqreturn_t key_handler(int irq, void *data)
 {
     struct key_data* chip = (struct key_data*)data;
 
-    if (atomic_read(&chip->protect) == 0) {
+    if (atomic_xchg(&chip->protect, 1) == 0) {
         atomic_set(&chip->protect, 1);
         mod_timer(&chip->key_timer, jiffies + msecs_to_jiffies(20));
     }
@@ -102,9 +91,9 @@ void key_timer_func(struct timer_list *arg)
         dev_err(&pdev->dev, "read gpio failed:%d\n", key_state);
         goto out;
     } else if (key_state == 0) {
-        input_report_key(chip->input_dev, chip->key_code, KEY_ON);
+        input_report_key(chip->input_dev, chip->key_code, 1);
     } else {
-        input_report_key(chip->input_dev, chip->key_code, KEY_OFF);          
+        input_report_key(chip->input_dev, chip->key_code, 0);          
     }
     input_sync(chip->input_dev);
 
