@@ -112,6 +112,7 @@ static int key_hw_init(struct key_data *chip)
     atomic_set(&chip->protect, 0);
 
     // 1.获取gpio线号，申请资源，设置输入模式
+    // 对应设备树中的key-gpios
     chip->key_desc = devm_gpiod_get(&pdev->dev, "key", GPIOD_IN);
     if (IS_ERR(chip->key_desc)) {
         dev_info(&pdev->dev, "devm_gpiod_get error!\n");
@@ -119,7 +120,7 @@ static int key_hw_init(struct key_data *chip)
     }
     
     // 2.根据gpio线号申请中断资源
-    //cat /proc/interrupts可以查看是否增加中断向量
+    // cat /proc/interrupts可以查看是否增加中断向量
     chip->irq = gpiod_to_irq(chip->key_desc);
     if (chip->irq < 0) {
         return chip->irq;
@@ -154,7 +155,7 @@ static int key_device_create(struct key_data *chip)
     input_set_drvdata(chip->input_dev, chip);
 
     //3.创建input设备
-    chip->key_code = KEY_0; 
+    chip->key_code = KEY_ENTER; 
     chip->input_dev->name = pdev->name;
 
     // 支持双击的动作

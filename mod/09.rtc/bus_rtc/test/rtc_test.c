@@ -55,7 +55,6 @@ int main(int argc, char *argv[])
             rtc_time.tm_hour += 1;
         }
         alarm_time.enabled = 1;
-        alarm_time.pending = 1;
         alarm_time.time = rtc_time;
         retval = ioctl(device_fd, RTC_WKALM_SET, &alarm_time);
         if (retval >= 0) {

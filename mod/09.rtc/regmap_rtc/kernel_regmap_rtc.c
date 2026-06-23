@@ -112,7 +112,7 @@ struct pcf8563_data
 
     int c_polarity;
 
-    int irq_gpio;
+    struct gpio_desc *irq_desc; 
 
     struct regmap *map;
 
@@ -139,18 +139,16 @@ static int pcf8563_get_time(struct device *dev, struct rtc_time *tm)
     struct i2c_client *client = to_i2c_client(dev);
     struct pcf8563_data *chip = i2c_get_clientdata(client);
     unsigned char buf[9];
-    int err;
+    int ret;
 
-    err = regmap_bulk_read(chip->map, PCF8563_REG_CONTROL1, buf, 9);
-    if (err) {
-        dev_err(&client->dev,
-            "dev read block issue!.\n");
-        return err;
+    ret = regmap_bulk_read(chip->map, PCF8563_REG_CONTROL1, buf, 9);
+    if (ret) {
+        dev_err(&client->dev, "dev read block err!.\n");
+        return ret;
     }
 
     if (buf[PCF8563_REG_SECONDS] & (1<<7)) {
-        dev_err(&client->dev,
-            "low voltage detected, date/time is not reliable.\n");
+        dev_err(&client->dev,  "low voltage detected, date/time is not reliable.\n");
         return -EINVAL;
     }
 
@@ -180,7 +178,7 @@ static int pcf8563_set_time(struct device *dev, struct rtc_time *tm)
     struct i2c_client *client = to_i2c_client(dev);
     struct pcf8563_data *chip = i2c_get_clientdata(client);
     unsigned char buf[9];
-    int err;
+    int ret;
 
     dev_info(&client->dev, "%s: secs=%d, mins=%d, hours=%d, "
         "mday=%d, mon=%d, year=%d, wday=%d\n",
@@ -208,11 +206,11 @@ static int pcf8563_set_time(struct device *dev, struct rtc_time *tm)
         chip->c_polarity = 0;
     }
     
-    err =  regmap_bulk_write(chip->map, PCF8563_REG_SECONDS,
+    ret =  regmap_bulk_write(chip->map, PCF8563_REG_SECONDS,
                 buf + PCF8563_REG_SECONDS, 9 - PCF8563_REG_SECONDS);
-    if (err) {
-        dev_err(&client->dev, "dev read block issue!.\n");
-        return err;  
+    if (ret) {
+        dev_err(&client->dev, "pcf8563_set_time err!\n");
+        return ret;  
     }
     return 0;
 }
@@ -221,12 +219,14 @@ static int pcf8563_get_alarm_mode(struct i2c_client *client, unsigned char *en,
                   unsigned char *pen)
 {
     unsigned char buf;
-    int err;
+    int ret;
     struct pcf8563_data *chip = i2c_get_clientdata(client);
 
-    err = regmap_bulk_read(chip->map, PCF8563_REG_CONTROL2, &buf, 1);
-    if (err)
-        return err;
+    ret = regmap_bulk_read(chip->map, PCF8563_REG_CONTROL2, &buf, 1);
+    if (ret) {
+        dev_err(&client->dev, "regmap_bulk_read:%d!\n", ret);
+        return ret;
+    }
 
     if (en)
         *en = !!(buf & PCF8563_BIT_AIE);
@@ -241,12 +241,12 @@ static int pcf8563_read_alarm(struct device *dev, struct rtc_wkalrm *tm)
     struct i2c_client *client = to_i2c_client(dev);
     struct pcf8563_data *chip = i2c_get_clientdata(client);
     unsigned char buf[4];
-    int err;
+    int ret;
 
-    err = regmap_bulk_read(chip->map, PCF8563_REG_ALARM_MINUTE, buf, 4);
-    if (err) {
-        dev_err(&client->dev, "regmap_bulk_read failed:%d!\n", err);
-        return err;
+    ret = regmap_bulk_read(chip->map, PCF8563_REG_ALARM_MINUTE, buf, 4);
+    if (ret) {
+        dev_err(&client->dev, "regmap_bulk_read:%d!\n", ret);
+        return ret;
     }
 
     dev_dbg(&client->dev,
@@ -259,10 +259,10 @@ static int pcf8563_read_alarm(struct device *dev, struct rtc_wkalrm *tm)
     tm->time.tm_mday = bcdToDec(buf[2] & 0x3F);
     tm->time.tm_wday = bcdToDec(buf[3] & 0x7);
 
-    err = pcf8563_get_alarm_mode(client, &tm->enabled, &tm->pending);
-    if (err) {
-        dev_err(&client->dev, "pcf8563_get_alarm_mode err:%d!\n", err);
-        return err;
+    ret = pcf8563_get_alarm_mode(client, &tm->enabled, &tm->pending);
+    if (ret) {
+        dev_err(&client->dev, "pcf8563_get_alarm_mode:%d!\n", ret);
+        return ret;
     }
 
     dev_dbg(&client->dev, "%s: tm is mins=%d, hours=%d, mday=%d, wday=%d,"
@@ -276,12 +276,14 @@ static int pcf8563_read_alarm(struct device *dev, struct rtc_wkalrm *tm)
 static int pcf8563_set_alarm_mode(struct i2c_client *client, bool on)
 {
     unsigned char buf;
-    int err;
+    int ret;
     struct pcf8563_data *chip = i2c_get_clientdata(client);
 
-    err = regmap_bulk_read(chip->map, PCF8563_REG_CONTROL2, &buf, 1);
-    if (err < 0)
-        return err;
+    ret = regmap_bulk_read(chip->map, PCF8563_REG_CONTROL2, &buf, 1);
+    if (ret < 0) {
+        dev_err(&client->dev, "pcf8563_set_alarm_mode regmap_bulk_read error!\n");
+        return ret;
+    }
 
     if (on)
         buf |= PCF8563_BIT_AIE;
@@ -290,9 +292,9 @@ static int pcf8563_set_alarm_mode(struct i2c_client *client, bool on)
 
     buf &= ~(PCF8563_BIT_AF | PCF8563_BITS_ST2_N);
 
-    err = regmap_bulk_write(chip->map, PCF8563_REG_CONTROL2, &buf, 1);
-    if (err < 0) {
-        dev_err(&client->dev, "%s: write error\n", __func__);
+    ret = regmap_bulk_write(chip->map, PCF8563_REG_CONTROL2, &buf, 1);
+    if (ret < 0) {
+        dev_err(&client->dev, "pcf8563_set_alarm_mode regmap_bulk_write error!\n");
         return -EIO;
     }
 
@@ -302,19 +304,19 @@ static int pcf8563_set_alarm_mode(struct i2c_client *client, bool on)
 static int pcf8563_set_alarm(struct device *dev, struct rtc_wkalrm *tm)
 {
     struct i2c_client *client = to_i2c_client(dev);
-    struct pcf8563_data *chip = (struct pcf8563_data *)i2c_get_clientdata(client);
+    struct pcf8563_data *chip = i2c_get_clientdata(client);
     unsigned char buf[4];
-    int err;
+    int ret;
 
     buf[0] = decToBcd(tm->time.tm_min);
     buf[1] = decToBcd(tm->time.tm_hour);
     buf[2] = decToBcd(tm->time.tm_mday);
     buf[3] = tm->time.tm_wday & 0x07;
 
-    err = regmap_bulk_write(chip->map, PCF8563_REG_ALARM_MINUTE, buf, 4);
-    if (err) {
-        dev_err(&client->dev, "%s: write error\n", __func__);
-        return err;
+    ret = regmap_bulk_write(chip->map, PCF8563_REG_ALARM_MINUTE, buf, 4);
+    if (ret) {
+        dev_err(&client->dev, "pcf8563_set_alarm error\n");
+        return ret;
     }
 
     dev_info(dev, "set alarm, wday:%d, day:%d, timer:%d:%d",
@@ -331,23 +333,26 @@ static int pcf8563_alarm_irq_enable(struct device *dev, unsigned int enabled)
 
 static irqreturn_t pcf8563_irq_handler(int irq, void *data)
 {
-    struct pcf8563_data *chip = (struct pcf8563_data *)data;
-    struct i2c_client *client = (struct i2c_client *)(chip->private_data);
-    int err;
+    struct pcf8563_data *chip = data;
+    struct i2c_client *client = chip->private_data;
+    int ret;
     char pending;
 
-    err = pcf8563_get_alarm_mode(client, NULL, &pending);
-    if (err)
+    ret = pcf8563_get_alarm_mode(client, NULL, &pending);
+    if (ret) {
+        dev_err(&client->dev, "pcf8563_get_alarm_mode:%d!\n", ret);
         return IRQ_NONE;
-
-    if (pending) {
-        dev_info(&client->dev, "%s: irq pending:%d\n", __func__, pending);
-        rtc_update_irq(chip->rtc, 1, RTC_IRQF | RTC_AF);
-        pcf8563_set_alarm_mode(client, 1);
-        return IRQ_HANDLED;
+    }
+    if (!pending) {
+        dev_err(&client->dev, "spurious rtc irq\n");
+        return IRQ_NONE;
     }
 
-    return IRQ_RETVAL(IRQ_HANDLED);
+    dev_info(&client->dev, "irq pending:%d\n", pending);
+    rtc_update_irq(chip->rtc, 1, RTC_IRQF | RTC_AF);
+    pcf8563_set_alarm_mode(client, 1);
+
+    return IRQ_HANDLED;
 }
 
 static const struct rtc_class_ops pcf8563_ops = {
@@ -367,11 +372,12 @@ const struct regmap_config rtc_regmap_config = {
 
 static int i2c_probe(struct i2c_client *client, const struct i2c_device_id *id)
 {
-    int err;
+    int ret;
+    int irq;
     struct pcf8563_data *chip = NULL;
     unsigned char buf;
 
-    //1.申请管理RTC PCF8563的数据块
+    // 1.申请管理RTC PCF8563的数据块
     chip = devm_kzalloc(&client->dev, sizeof(struct pcf8563_data), GFP_KERNEL);
     if (!chip){
         dev_err(&client->dev, "chip malloc error!\n");
@@ -380,49 +386,27 @@ static int i2c_probe(struct i2c_client *client, const struct i2c_device_id *id)
     chip->private_data = (void *)client;
     i2c_set_clientdata(client, chip);
 
-    //2.初始化regmap i2c控制结构
+    // 2.初始化regmap i2c控制结构
     chip->map = devm_regmap_init_i2c(client, &rtc_regmap_config);
-    if (IS_ERR(chip->map))
-    {
+    if (IS_ERR(chip->map)) {
         dev_err(&client->dev, "chip map init failed\n");
-        return -ENXIO;
+        return PTR_ERR(chip->map);
     }
-
-    //2. 初始化硬件配置
+    
     buf = 0;
-    err = regmap_bulk_write(chip->map, PCF8563_REG_CONTROL2, &buf, 1);
-    if (err < 0) {
+    ret = regmap_bulk_write(chip->map, PCF8563_REG_CONTROL2, &buf, 1);
+    if (ret < 0) {
         dev_err(&client->dev, "%s: write error\n", __func__);
-        return err;
+        return ret;
     }
 
-    //3. 初始化rtc中断输入引脚和中断回调
-    chip->irq_gpio = of_get_named_gpio(client->dev.of_node, "interrupt-gpios", 0);
-    err = devm_gpio_request(&client->dev, chip->irq_gpio, "rtc_irq");
-    if (err < 0)
-    {
-        dev_err(&client->dev, "rtc interrupt gpio request err:%d\n", err);
-        return -EIO;
-    }
-    gpio_direction_input(chip->irq_gpio);
-    err = devm_request_threaded_irq(&client->dev, 
-                            client->irq, 
-                            NULL, 
-                            pcf8563_irq_handler, 
-                            IRQF_ONESHOT | IRQF_TRIGGER_FALLING, 
-                            "rtc_irq", 
-                            (void *)chip);
-    if (err < 0) {
-        dev_err(&client->dev, "rtc interrupt config err:%d\n", err);
-        return -EINVAL;
-    }
-
-    //4.申请rtc管理模块，并初始化
+    // 3.申请rtc管理模块，并初始化
     chip->rtc = devm_rtc_allocate_device(&client->dev);
     if (IS_ERR(chip->rtc)){
         dev_err(&client->dev, "rtc alloc device failed!\n");
         return PTR_ERR(chip->rtc);
     }
+
     chip->rtc->owner = THIS_MODULE;
     chip->rtc->ops = &pcf8563_ops;
     set_bit(RTC_FEATURE_ALARM_RES_MINUTE, chip->rtc->features);
@@ -431,12 +415,32 @@ static int i2c_probe(struct i2c_client *client, const struct i2c_device_id *id)
     chip->rtc->range_max = RTC_TIMESTAMP_END_2099;
     chip->rtc->set_start_time = true;
 
-    //5. 注册RTC设备
-    err = devm_rtc_register_device(chip->rtc);
-    if (err)
-    {
+    ret = devm_rtc_register_device(chip->rtc);
+    if (ret) {
         dev_err(&client->dev, "rtc register failed!\n");
-        return err;
+        return ret;
+    }
+
+    // 4. 配置中断相关引脚
+    chip->irq_desc = devm_gpiod_get(&client->dev, "interrupt", GPIOD_IN);
+    if (IS_ERR(chip->irq_desc)) {
+        dev_info(&client->dev, "devm_gpiod_get error!\n");
+        return PTR_ERR(chip->irq_desc);
+    }
+    irq = gpiod_to_irq(chip->irq_desc);
+    if (irq < 0) {
+        return irq;
+    }
+    ret = devm_request_threaded_irq(&client->dev, 
+                            irq, 
+                            NULL, 
+                            pcf8563_irq_handler, 
+                            IRQF_ONESHOT | IRQF_TRIGGER_FALLING, 
+                            "rtc_irq", 
+                            (void *)chip);
+    if (ret < 0) {
+        dev_err(&client->dev, "rtc interrupt config:%d\n", ret);
+        return ret;
     }
 
     dev_info(&client->dev, "pcf8563 driver init success!\n");
