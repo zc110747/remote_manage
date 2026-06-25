@@ -12,9 +12,12 @@ fi
 # nogui
 # qemu_tools=qemu-system-arm
 qemu_tools=${PROGRAM_SDK_PATH}/qemu/qemu-11.0.0/build/qemu-system-arm
-${qemu_tools} -M mcimx6ul-evk -m 512M -kernel "${kernel_file}" \
+sudo ${qemu_tools} -M mcimx6ul-evk -m 512M -kernel "${kernel_file}" \
     -dtb "${dtb_file}"  \
+    -nographic \
     -serial mon:stdio \
     -drive  file="${rootfs_file}",format=raw,id=mysdcard -device sd-card,drive=mysdcard \
     -append "console=ttymxc0,115200 rootfstype=ext4 root=/dev/mmcblk1 rw rootwait init=/sbin/init loglevel=8" \
-    -monitor telnet:127.0.0.1:4444,server,nowait
+    -monitor telnet:127.0.0.1:4444,server,nowait \
+    -nic user \
+    -nic user,hostfwd=tcp::2222-:22

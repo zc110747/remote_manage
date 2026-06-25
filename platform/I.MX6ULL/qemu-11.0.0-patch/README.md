@@ -2,7 +2,7 @@
 
 ```shell
 # 编译选项
-./configure --prefix=$PWD/ --target-list="arm-softmmu arm-linux-user" --enable-debug --enable-sdl --enable-kvm --enable-tools --disable-curl --disable-coreaudio --disable-pa --disable-sdl --disable-sndio
+./configure --prefix=$PWD/ --target-list="arm-softmmu arm-linux-user" --enable-debug --enable-sdl --enable-slirp --enable-kvm --enable-tools --disable-curl --disable-coreaudio --disable-pa --disable-sdl --disable-sndio 
 make -j6
 
 # 运行命令
@@ -25,7 +25,9 @@ ${qemu_tools} -M mcimx6ul-evk -m 512M -kernel "${kernel_file}" \
     -nographic -serial mon:stdio \
     -drive  file="${rootfs_file}",format=raw,id=mysdcard -device sd-card,drive=mysdcard \
     -append "console=ttymxc0,115200 rootfstype=ext4 root=/dev/mmcblk1 rw rootwait init=/sbin/init loglevel=8"
-    -monitor telnet:127.0.0.1:4444,server,nowait
+    -monitor telnet:127.0.0.1:4444,server,nowait \
+    -nic user \
+    -nic user,hostfwd=tcp::2222-:22
 
 telnet 127.0.0.1 4444
 (qemu) gpio-set 0 0
@@ -57,4 +59,15 @@ cd e2fsprogs-1.47.2
 make -j$(nproc)
 
 sudo ./e2fsck/e2fsck -fy buildroot.img
+
+ifconfig eth0 up
+udhcpc -i eth0
+
+qemu-system-arm -M mcimx6ul-evk -netdev help
+
+# 开启网络
+vi /etc/network/interfaces
+
+auto eth1
+iface eth1 inet dhcp
 ```
