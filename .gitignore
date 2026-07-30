@@ -2,7 +2,6 @@
 #this shows not include by git
 
 *.o*
-*.d
 *.mod.c*
 *.mod.o*
 *.mod
@@ -12,7 +11,7 @@
 *.a
 *.so
 *.so*
-*.ko
+# *.ko
 *.scr
 *.export*
 *.module*

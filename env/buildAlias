@@ -47,6 +47,10 @@ function imx_build_rootfs()
 
 	cp -fv imx6ullrmk_defconfig "${SUPPORT_FS_BUILDROOT_DIR}"/configs/
 
+	cp -rfv imx6ull "${SUPPORT_FS_BUILDROOT_DIR}"/board/arm/
+
+	chmod 777 "${SUPPORT_FS_BUILDROOT_DIR}"/board/arm/imx6ull/rootfs-overlay/etc/init.d/S10udevd
+
     cdp || return
 
     ./make.sh rootfs $1
