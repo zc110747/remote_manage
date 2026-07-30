@@ -45,26 +45,16 @@ typedef struct
     double value;
 }MEM_INFO;
 
-static int diskinfo_manage(void);
 static int memory_manage(void);
-static int ip_list(void);
 static int kernal_info_get(void);
-static int get_cpuinfo(void);
-static int show_time(void);
-
-int main()
+static int diskinfo_manage(void);
+int main(int argc, char *argv[])
 {
-    diskinfo_manage();
-
     memory_manage();
-
-    ip_list();
 
     kernal_info_get();
 
-    get_cpuinfo();
-
-    show_time();
+    diskinfo_manage();
     return 0;
 }
 
@@ -97,24 +87,8 @@ char *get_memory_info(uint8_t unit)
             return "TB";
         break;
     }
-}
 
-static int show_time(void)
-{
-    time_t timep;
-    struct tm mytime, *p;
-
-    time(&timep);
-    p = localtime_r(&timep, &mytime); //gmtime_r将秒数转换成UTC时钟的时区值
-
-    if (p != NULL)
-    {
-        printf("%d-%d-%d-%d:%d:%d\n", 
-                mytime.tm_year+1900, mytime.tm_mon+1, mytime.tm_mday, 
-                mytime.tm_hour, mytime.tm_min, mytime.tm_sec);
-    }
-
-    return 0;
+    return "NULL";
 }
 
 static int diskinfo_manage(void)
@@ -136,6 +110,8 @@ static int diskinfo_manage(void)
 
     printf("disk total:%lf%s, available:%lf%s\n", total.value, get_memory_info(total.unit),
         available.value, get_memory_info(available.unit));
+
+    return 0;
 }
 
 static int memory_manage(void)
@@ -163,33 +139,8 @@ static int memory_manage(void)
     printf("memory total: %lf%s, free: %lf%s, used: %lf%s\n", total.value, get_memory_info(total.unit),
         free.value, get_memory_info(free.unit),
         used.value, get_memory_info(used.unit));
-}
 
-static int ip_list(void)
-{
-    struct ifaddrs *ifaddr, *ifa;
-    char host[NI_MAXHOST];
-
-    if (getifaddrs(&ifaddr) == -1)
-    {
-        perror("getifaddrs");
-        exit(EXIT_FAILURE);
-    }
-
-    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
-    {  
-        if (ifa->ifa_addr == NULL)
-        {
-            continue;
-        }
-        int family = ifa->ifa_addr->sa_family;
-        if (family == AF_INET) { // IPv4 or IPv6
-            if (getnameinfo(ifa->ifa_addr, family==AF_INET?sizeof(struct sockaddr_in):sizeof(struct sockaddr_in6), host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST) == 0) {  
-                printf("%s IP地址:%s\n", ifa->ifa_name, host);
-            }
-        }
-    }
-    freeifaddrs(ifaddr);
+    return 0;
 }
 
 static int kernal_info_get(void)
@@ -201,51 +152,5 @@ static int kernal_info_get(void)
         return -1; 
     }
     printf("Kernel version: %s\n", uname_info.release);
-    return 0;
-}
-
-#define MAX_LINE_LENGTH 1024
-static int get_cpuinfo(void)
-{
-    FILE *file;
-    char line[MAX_LINE_LENGTH];
-    char *token;
-    char *saveptr;
-    int is_success = 0;
-
-    file = fopen("/proc/cpuinfo", "r");
-    if (file == NULL)
-    {  
-        perror("Failed to open /proc/cpuinfo");
-        exit(EXIT_FAILURE);
-    }
-  
-    while (fgets(line, MAX_LINE_LENGTH, file))
-    {  
-        if (line[0] == '\n' || line[0] == '#')
-        {
-            continue;
-        }
-
-        token = strtok_r(line, ":", &saveptr);
-        while (token != NULL)
-        {
-            if (strncmp(token, "model name", strlen("model name")) == 0)
-            {
-                token = strtok_r(NULL, ":", &saveptr);
-                printf("CPU info: %s", token);
-                is_success = 1;
-                break;
-            }
-            token = strtok_r(NULL, ":", &saveptr);
-        }
-
-        if (is_success == 1)
-        {
-            break;
-        }
-    }
-
-    fclose(file);
     return 0;
 }
