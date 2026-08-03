@@ -6,7 +6,7 @@
 //      kernel_spi_icm.c
 //
 //  Purpose:
-//      spi3 icm20608驱动。
+//      spi icm20608驱动。
 //
 // Author:
 //     @听心跳的声音

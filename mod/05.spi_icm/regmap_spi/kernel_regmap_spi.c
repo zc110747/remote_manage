@@ -6,7 +6,7 @@
 //      kernel_regmap_spi.c
 //
 //  Purpose:
-//      spi icm20608 regmap驱动。
+//      spi regmap驱动。
 //
 // Author:
 //     @听心跳的声音

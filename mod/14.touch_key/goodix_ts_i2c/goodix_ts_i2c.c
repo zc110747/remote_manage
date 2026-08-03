@@ -439,14 +439,14 @@ static int goodix_probe(struct i2c_client *client, const struct i2c_device_id *i
         return ret;
     }
 
-    //3.初始化传感器配置
+    // 3.初始化传感器配置
     ret = goodix_firmware_init(chip);
     if (ret){
         dev_err(&client->dev, "firmware init failed, error:%d.\n", ret);
         return ret;
     }
 
-    //4.设置中断并使能
+    // 4.设置中断并使能
     ret = devm_request_threaded_irq(&client->dev, 
                                 client->irq,
                                 NULL, 
@@ -459,7 +459,7 @@ static int goodix_probe(struct i2c_client *client, const struct i2c_device_id *i
         return ret;
     }
 
-    //5.向内核注册input设备
+    // 5.向内核注册input设备
     ret = goodix_inputdev_create(chip);
     if (ret){
         dev_err(&client->dev, "input dev create failed, error:%d.\n", ret);
