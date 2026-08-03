@@ -92,6 +92,7 @@ static int ap3216_read_raw(struct iio_dev *indio_dev,
                            int *val2,
                            long mask)
 {
+    u8 i;
     struct ap3216_data *chip;
     int readbuf[6];
     int ret;
@@ -105,7 +106,14 @@ static int ap3216_read_raw(struct iio_dev *indio_dev,
     chip = iio_priv(indio_dev);
 
     mutex_lock(&chip->lock);
-    ret = regmap_bulk_read(chip->map, AP3216C_IRDATALOW, readbuf, 6);
+    for (i = 0; i < 6; i++) {
+        ret = regmap_read(chip->map, AP3216C_IRDATALOW + i, &readbuf[i]);
+        if (ret) {
+            mutex_unlock(&chip->lock);
+            dev_err(&chip->client->dev, "ap3216_read failed: %d\n", ret);
+            return ret;
+        }
+    }
     mutex_unlock(&chip->lock);
 
     if(ret) {
