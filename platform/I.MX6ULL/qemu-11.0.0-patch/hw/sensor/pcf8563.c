@@ -56,15 +56,11 @@ OBJECT_DECLARE_SIMPLE_TYPE(PCF8563State, PCF8563)
 
 typedef struct PCF8563State {
     I2CSlave parent_obj;
-
     uint8_t regs[PCF8563_REG_MAX + 1];
-
     uint8_t reg;
-
     bool waiting_reg;
-
+    bool read_update;
     time_t timestamp;
-
     QEMUTimer *timer;
 } PCF8563State;
 
@@ -146,6 +142,7 @@ static void pcf8563_reset_state(PCF8563State *s)
 
     s->reg = 0;
     s->waiting_reg = true;
+    s->read_update = true;
     s->timestamp = time(NULL);  // 获取当前的时间戳
 
     pcf8563_update_time(s);
@@ -153,8 +150,7 @@ static void pcf8563_reset_state(PCF8563State *s)
     s->timer = timer_new_ms(QEMU_CLOCK_VIRTUAL,
                 timer_cb,
                 s);
-    timer_mod(s->timer,
-            qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + 1000);
+    timer_mod(s->timer, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + 1000);
 }
 
 static void pcf8563_reset_hold(Object *obj,
@@ -173,31 +169,20 @@ static int pcf8563_send(I2CSlave *i2c, uint8_t data)
 {
     PCF8563State *s = PCF8563(i2c);
 
-    /*
-     * First byte = register address
-     */
-
     if (s->waiting_reg) {
         s->reg = data;
         s->waiting_reg = false;
         return 0;
     }
 
-    /*
-     * Register write
-     */
-
     if (s->reg <= PCF8563_REG_MAX) {
         s->regs[s->reg] = data;
     }
 
-    /*
-     * Time registers written
-     */
-
     if (s->reg >= REG_SEC &&
         s->reg <= REG_YEAR) {
         pcf8563_store_time(s);
+        s->read_update = false;
     }
 
     s->reg++;
@@ -215,9 +200,13 @@ static uint8_t pcf8563_recv(I2CSlave *i2c)
 
     uint8_t value = 0xFF;
 
-    if (s->reg >= REG_SEC
-    && s->reg <= REG_YEAR) {
-        pcf8563_update_time(s);
+    if(!s->read_update)
+    {
+        if (s->reg >= REG_SEC
+        && s->reg <= REG_YEAR) {
+            pcf8563_update_time(s);
+            s->read_update = true;
+        }
     }
 
     // 读取当前寄存器值
@@ -242,13 +231,15 @@ static int pcf8563_event(I2CSlave *i2c,
     switch (event) {
 
     case I2C_START_SEND:
-        s->waiting_reg = true;
         break;
 
     case I2C_START_RECV:
+        s->read_update=false;
         break;
 
     case I2C_FINISH:
+        s->waiting_reg=true;
+        s->read_update=false;
         break;
 
     case I2C_NACK:
