@@ -91,7 +91,9 @@ static void pcf8563_update_time(PCF8563State *s)
     s->regs[REG_WEEKDAY] = tm->tm_wday;
     s->regs[REG_MONTH] = to_bcd(tm->tm_mon + 1);
     if (tm->tm_year >= 100) {
-        s->regs[REG_MONTH] |= 1<<7;
+        s->regs[REG_MONTH] &= ~0x80;
+    } else {
+        s->regs[REG_MONTH] |= 0x80;
     }
     s->regs[REG_YEAR] = to_bcd(tm->tm_year % 100);
 }
@@ -110,7 +112,7 @@ static void pcf8563_store_time(PCF8563State *s)
     rtc_tm.tm_mday = from_bcd(s->regs[REG_DAY] & 0x3F);
     rtc_tm.tm_mon = from_bcd(s->regs[REG_MONTH] & 0x1F) - 1;
     rtc_tm.tm_year = from_bcd(s->regs[REG_YEAR]);
-    if (s->regs[REG_MONTH] & 1<<7) {
+    if (!(s->regs[REG_MONTH] & 1<<7)) {
         rtc_tm.tm_year += 100;
     }
     
