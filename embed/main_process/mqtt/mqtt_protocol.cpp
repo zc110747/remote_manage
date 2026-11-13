@@ -127,7 +127,7 @@ bool mqtt_protocol::decode_json_command(char *ptr, int size)
                     data = root["data"]["device"].asString();
                     if (JsonDevMap.count(data) == 0)
                     {
-                        LOG_ERROR(xGetCurrentTicks(), "invalid device: %s", data);
+                        LOG_ERROR(xGetCurrentTicks(), "invalid device: %s", data.c_str());
                         return false;
                     } 
                     dev = JsonDevMap.find(data)->second;

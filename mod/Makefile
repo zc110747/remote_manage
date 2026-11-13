@@ -26,7 +26,7 @@ subdirs := 	${dir}/01.led \
 		${dir}/11.nvmem \
 		${dir}/14.touch_key/goodix_ts_i2c \
 		${dir}/17.pwm/pwm_consumer \
-		${dir}/18.pwm/pwm_provider
+		${dir}/17.pwm/pwm_provider
 
 
 with_kernel :=0

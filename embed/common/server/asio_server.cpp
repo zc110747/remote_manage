@@ -92,7 +92,7 @@ void session::start()
 void session::do_read()
 {
     auto self(shared_from_this());
-    socket_.async_read_some(asio::buffer(data_, MAX_LENGTH),
+    socket_.async_read_some(asio::buffer(data_, MAX_LENGTH-1),
         [this, self](std::error_code ec, std::size_t length)
         {
             if (!ec) {

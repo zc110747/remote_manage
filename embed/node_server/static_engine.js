@@ -1,10 +1,12 @@
 
 //modules
 const fs = require('fs');
-const _a = require('path'), extname = _a.extname, join = _a.join;
+const path = require('path');
+const {join, resolve, extname, sep } = path;
 
 //user modules
 const _tools = require('./tool.js');
+const STATIC_ROOT = resolve(__dirname, 'webpage');
 
 var contentTypeStatic = {
     "html": "text/html",
@@ -20,39 +22,87 @@ var contentTypeStatic = {
 
 function engine_process(request, response)
 {
-    var pathname = request.url;
-    if (pathname === '/'){
-        pathname = 'index.html'
+    var pathname;
+
+    // 1. Parse URL
+    try
+    {
+        pathname = new URL(
+            request.url,
+            'http://localhost'
+        ).pathname;
+
+        pathname = decodeURIComponent(pathname);
+    }
+    catch (error)
+    {
+        response.statusCode = 400;
+        response.end("400 bad request");
+        return true;
     }
 
-    var localpath = "".concat(__dirname, "/webpage/");
-    var filepath = join(localpath, pathname);
-    var ext = extname(filepath).slice(1);
+    // 2. Default document
+    if (pathname === '/')
+    {
+        pathname = '/index.html';
+    }
 
-    //static document process
+    // 3. Resolve local file path
+    var filepath = resolve(
+        STATIC_ROOT,
+        '.' + pathname
+    );
+
+    // 4. Security check: prevent path traversal
+    if (
+        filepath !== STATIC_ROOT &&
+        !filepath.startsWith(STATIC_ROOT + sep)
+    )
+    {
+        response.statusCode = 403;
+        response.end("403 forbidden");
+        return true;
+    }
+
+    // 5. Get file extension
+    var ext = extname(filepath).slice(1).toLowerCase();
+
+    // Static document process
     if (_tools.hasOwnKey(contentTypeStatic, ext))
     {
-        //static data struct
-        response.setHeader('content-type', contentTypeStatic[ext]);
-        response.setHeader('server', 'node'); 
-        if (fs.existsSync(filepath)) 
+        response.setHeader(
+            'content-type',
+            contentTypeStatic[ext]
+        );
+
+        response.setHeader('server', 'node');
+
+        // 6. Check file existence
+        if (fs.existsSync(filepath))
         {
+            var stat = fs.statSync(filepath);
+
+            if (!stat.isFile())
+            {
+                response.statusCode = 404;
+                response.end("404 not found");
+                return true;
+            }
+
             var FileData = fs.readFileSync(filepath);
             response.end(FileData);
         }
-        else 
+        else
         {
             console.log(`invalid pathname:${pathname}`);
+
             response.statusCode = 404;
             response.end("404 not found");
         }
+
         return true;
     }
-    else
-    {
-        //console.log("Not Static Request");
-    }
-    
+
     return false;
 }
 

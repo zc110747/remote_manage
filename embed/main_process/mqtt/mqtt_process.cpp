@@ -70,12 +70,18 @@ void mqtt_device::on_message(const struct mosquitto_message *message)
 {
     if (!strcmp(message->topic, info_.sub_topic.c_str()))
     {
+        uint32_t payloadlen;
+
         /* Copy N-1 bytes to ensure always 0 terminated. */
-        memcpy(buffer_, message->payload, message->payloadlen);
-        buffer_[message->payloadlen] = '\0';
+        payloadlen = message->payloadlen;
+        if (payloadlen > 511)
+            payloadlen = 511;
+
+        memcpy(buffer_, message->payload, payloadlen);
+        buffer_[payloadlen] = '\0';
         if (func_handler_)
         {
-            func_handler_(buffer_, message->payloadlen);
+            func_handler_(buffer_, payloadlen);
         }
     }
 }

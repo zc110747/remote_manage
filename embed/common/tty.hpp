@@ -39,6 +39,7 @@ public:
     /// - This method is used to init the object.
     /// \return Wheather initialization is success or failed.
     bool init(const std::string& path, int flags) {
+        path_ = path;
         fd_ = ::open(path_.c_str(), flags);
         if (fd_ < 0) {
             return false;

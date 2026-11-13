@@ -87,7 +87,7 @@ void vMBPortSerialEnable( BOOL xRxEnable, BOOL xTxEnable )
         tty_tx_index = 0;
         tx_check_semaphore.signal();
     } else {
-        tty_tx_index = 0;
+        // do nothing
     }
 }
 

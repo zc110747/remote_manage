@@ -77,12 +77,16 @@ void asio_client::asio_client_rx_run()
         {
             LOG_INFO(xGetCurrentTimes(), "start asio client connet:%s:%d", ipaddress.c_str(), port);
             asio::connect(socket_, resolver.resolve(ipaddress, std::to_string(port)));
+            asio::error_code ec;
             is_client_link_ = true;
+            
+            socket_.non_blocking(true);
+
             LOG_INFO(xGetCurrentTimes(), "asio client connet success!");
 
             do
             {
-                size_t reply_length = asio::read(socket_, asio::buffer(rx_buffer_, CLIENT_RX_MAX_BUFFER_SIZE));
+                size_t reply_length = socket_.read_some(asio::buffer(rx_buffer_, CLIENT_RX_MAX_BUFFER_SIZE), ec);
                 if (reply_length > 0)
                 {
                     serial_manage::get_instance()->send_msg(rx_buffer_, reply_length);
